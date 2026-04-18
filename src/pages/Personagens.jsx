@@ -146,7 +146,9 @@ export default function Personagens() {
                     <div className="flex-1 min-w-0">
                       {/* Nome e badges */}
                       <div className="flex items-center gap-3 mb-2 flex-wrap">
-                        <h2 style={cinzel} className="text-[#f0e8d8] text-lg font-semibold">
+                        <h2 style={cinzel}
+                          className="text-[#f0e8d8] text-lg font-semibold cursor-pointer hover:text-[#c8a84b] transition-colors"
+                          onClick={() => navigate(`/personagens/${p.id}`)}>
                           {d.name || p.name || 'Sem nome'}
                         </h2>
                         <span className="border border-[#c8a84b25] text-[#c8a84b] px-2 py-0.5 text-xs"
@@ -263,10 +265,8 @@ export default function Personagens() {
 
                   {/* Nome e tipo */}
                   <div>
-                    <h2 style={cinzel} 
-                      className="text-[#f0e8d8] text-lg font-semibold cursor-pointer hover:text-[#c8a84b] transition-colors"
-                      onClick={() => navigate(`/personagens/${p.id}`)}>
-                      {d.name || p.name || 'Sem nome'}
+                    <h2 style={cinzel} className="text-[#f0e8d8] text-xl font-semibold mb-2">
+                      {descricaoSkill.name || modal.skill}
                     </h2>
                     {descricaoSkill.type && (
                       <span className="text-xs px-3 py-1 border"
