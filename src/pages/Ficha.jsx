@@ -34,8 +34,9 @@ export default function Ficha() {
   const [carregandoSkill, setCarregandoSkill] = useState(false);
 
   useEffect(() => {
-    buscarPersonagem();
-  }, [id]);
+  buscarPersonagem();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [id]);
 
   async function buscarPersonagem() {
     setCarregando(true);
