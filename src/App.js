@@ -3,6 +3,7 @@ import Home from './pages/Home';
 import CriarPersonagem from './pages/CriarPersonagem';
 import Personagens from './pages/Personagens';
 import Mestre from './pages/Mestre';
+import Ficha from './pages/Ficha';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/personagens" element={<Personagens />} />
         <Route path="/personagens/criar" element={<CriarPersonagem />} />
         <Route path="/mestre" element={<Mestre />} />
+        <Route path="/personagens/:id" element={<Ficha />} />
       </Routes>
     </BrowserRouter>
   );

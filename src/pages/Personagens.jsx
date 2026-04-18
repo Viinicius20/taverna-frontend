@@ -263,8 +263,10 @@ export default function Personagens() {
 
                   {/* Nome e tipo */}
                   <div>
-                    <h2 style={cinzel} className="text-[#f0e8d8] text-xl font-semibold mb-2">
-                      {descricaoSkill.name || modal.skill}
+                    <h2 style={cinzel} 
+                      className="text-[#f0e8d8] text-lg font-semibold cursor-pointer hover:text-[#c8a84b] transition-colors"
+                      onClick={() => navigate(`/personagens/${p.id}`)}>
+                      {d.name || p.name || 'Sem nome'}
                     </h2>
                     {descricaoSkill.type && (
                       <span className="text-xs px-3 py-1 border"
