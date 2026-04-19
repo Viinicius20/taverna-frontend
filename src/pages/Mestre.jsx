@@ -7,6 +7,7 @@ const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
 
 const CAMPANHA_ID = '00000000-0000-0000-0000-000000000001';
+const attrLabel = { str: 'FOR', dex: 'DES', con: 'CON', int: 'INT', wis: 'SAB', cha: 'CAR' };
 
 export default function Mestre() {
   const navigate = useNavigate();
@@ -22,12 +23,17 @@ export default function Mestre() {
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfNome, setPdfNome] = useState('');
   const sistemas = ['D&D 5e', 'Tormenta20', 'Pathfinder 2e', 'Call of Cthulhu', 'Outro'];
+
+  // Notas e atributos editados localmente
   const [notasLocais, setNotasLocais] = useState({});
+  const [attrsLocais, setAttrsLocais] = useState({});
 
   useEffect(() => {
     buscarNpcs();
     const notas = localStorage.getItem('taverna-notas-npcs');
     if (notas) setNotasLocais(JSON.parse(notas));
+    const attrs = localStorage.getItem('taverna-attrs-npcs');
+    if (attrs) setAttrsLocais(JSON.parse(attrs));
   }, []);
 
   async function buscarNpcs() {
@@ -49,11 +55,10 @@ export default function Mestre() {
       const res = await api.post('/npcs', null, {
         params: { campaign_id: CAMPANHA_ID, description: descNpc, system: sistema }
       });
-      const novoNpc = res.data;
-      setNpcs(prev => [novoNpc, ...prev]);
+      setNpcs(prev => [res.data, ...prev]);
       setDescNpc('');
       setMostrarForm(false);
-      setNpcExpandido(novoNpc.saved_id || novoNpc.id);
+      setNpcExpandido(res.data.saved_id || res.data.id);
     } catch {
       setErro('Erro ao gerar NPC. Verifique se o backend está rodando.');
     }
@@ -71,16 +76,41 @@ export default function Mestre() {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      const fichaImportada = respdf.data.data;
-      const descricao = `${fichaImportada.name || 'NPC'}, ${fichaImportada.race || ''} ${fichaImportada.class || ''}, nível ${fichaImportada.level || 1}. ${fichaImportada.background_story || ''}`.trim();
+      const f = respdf.data.data;
+
+      // Gera NPC com descrição limpa — sem inventário nas notas
+      const descricao = [
+        f.name,
+        f.race && f.class ? `${f.race} ${f.class}` : f.race || f.class,
+        f.level ? `nível ${f.level}` : null,
+        f.background ? `antecedente: ${f.background}` : null,
+        f.alignment ? `alinhamento: ${f.alignment}` : null,
+      ].filter(Boolean).join(', ');
 
       const res = await api.post('/npcs', null, {
         params: { campaign_id: CAMPANHA_ID, description: descricao, system: sistema }
       });
 
+      // Monta NPC com dados reais do PDF — inventário vai pro campo correto
       const novoNpc = {
         ...res.data,
-        data: { ...fichaImportada, occupation: fichaImportada.class || fichaImportada.background || '' }
+        data: {
+          name: f.name,
+          race: f.race,
+          class: f.class,
+          level: f.level,
+          alignment: f.alignment,
+          background: f.background,
+          occupation: f.class || f.background || '',
+          attributes: f.attributes || {},
+          skills: f.skills || {},
+          features: f.features || [],
+          inventory: f.inventory || [],
+          background_story: f.background_story || '',
+          personality: '',
+          motivation: '',
+          appearance: '',
+        }
       };
 
       setNpcs(prev => [novoNpc, ...prev]);
@@ -122,7 +152,17 @@ export default function Mestre() {
     return notasLocais[`${id}_${campo}`] ?? fallback;
   }
 
-  const attrLabel = { str: 'FOR', dex: 'DES', con: 'CON', int: 'INT', wis: 'SAB', cha: 'CAR' };
+  function editarAttrLocal(npcId, attr, valor) {
+    const chave = `${npcId}_${attr}`;
+    const novos = { ...attrsLocais, [chave]: Number(valor) };
+    setAttrsLocais(novos);
+    localStorage.setItem('taverna-attrs-npcs', JSON.stringify(novos));
+  }
+
+  function getAttr(npcId, attr, fallback) {
+    const chave = `${npcId}_${attr}`;
+    return attrsLocais[chave] !== undefined ? attrsLocais[chave] : fallback;
+  }
 
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0]" style={crimson}>
@@ -168,7 +208,6 @@ export default function Mestre() {
                 className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
             </div>
 
-            {/* ABAS */}
             <div className="flex gap-px border-b border-[#c8a84b15]">
               {[{ id: 'ia', label: '✦ Gerar com IA' }, { id: 'pdf', label: '◈ Importar PDF' }].map(({ id, label }) => (
                 <button key={id} onClick={() => { setAbaForm(id); setErro(''); }}
@@ -236,7 +275,6 @@ export default function Mestre() {
                       )}
                     </label>
                   </div>
-
                   {pdfNome && (
                     <div className="border border-[#c8a84b15] bg-[#c8a84b05] px-4 py-3">
                       <p className="text-[#6a6050] text-sm font-light">
@@ -244,9 +282,7 @@ export default function Mestre() {
                       </p>
                     </div>
                   )}
-
                   {erro && <p className="text-red-400 text-sm">{erro}</p>}
-
                   <div className="flex gap-3">
                     <button onClick={importarPdfNpc} disabled={!pdfFile || gerando}
                       className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
@@ -308,6 +344,7 @@ export default function Mestre() {
                       <div className="flex items-center gap-3 mb-1 flex-wrap">
                         <h2 style={cinzel} className="text-[#f0e8d8] text-lg font-semibold">{d.name || npc.name}</h2>
                         {d.race && <span className="text-[#4a4030] text-xs" style={cinzel}>{d.race}</span>}
+                        {d.level && <span className="text-[#4a4030] text-xs" style={cinzel}>Nível {d.level}</span>}
                       </div>
                       <p className="text-[#6a6050] text-sm">
                         {[d.occupation || d.class, d.alignment].filter(Boolean).join(' · ')}
@@ -322,23 +359,34 @@ export default function Mestre() {
                   {expandido && (
                     <div className="border-t border-[#c8a84b10] px-6 pb-6 flex flex-col gap-6 pt-6">
 
+                      {/* ATRIBUTOS EDITÁVEIS */}
                       {Object.keys(attrs).length > 0 && (
                         <div>
                           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">ATRIBUTOS</p>
-                          <div className="flex gap-4 flex-wrap">
-                            {Object.entries(attrs).map(([attr, val]) => (
-                              <div key={attr} className="flex flex-col items-center gap-0.5 border border-[#c8a84b15] px-3 py-2 bg-[#0f0e0c]">
-                                <span style={cinzel} className="text-[#4a4030] text-xs">{attrLabel[attr] || attr.toUpperCase()}</span>
-                                <span className="text-[#c8a84b] text-base">{val}</span>
-                                <span style={cinzel} className="text-[#3a3020] text-xs">
-                                  {Math.floor((val - 10) / 2) >= 0 ? '+' : ''}{Math.floor((val - 10) / 2)}
-                                </span>
-                              </div>
-                            ))}
+                          <div className="grid grid-cols-6 gap-3">
+                            {Object.entries(attrs).map(([attr, val]) => {
+                              const valor = getAttr(npc.id, attr, val);
+                              return (
+                                <div key={attr} className="flex flex-col items-center gap-1">
+                                  <label style={cinzel} className="text-[#c8a84b] text-xs tracking-widest">
+                                    {attrLabel[attr] || attr.toUpperCase()}
+                                  </label>
+                                  <input type="number" min={1} max={30} value={valor}
+                                    onChange={e => editarAttrLocal(npc.id, attr, e.target.value)}
+                                    onClick={e => e.stopPropagation()}
+                                    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-lg w-full py-2 focus:outline-none focus:border-[#c8a84b50]"
+                                    style={{ borderRadius: '2px' }} />
+                                  <span style={cinzel} className="text-[#3a3020] text-xs">
+                                    {Math.floor((valor - 10) / 2) >= 0 ? '+' : ''}{Math.floor((valor - 10) / 2)}
+                                  </span>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       )}
 
+                      {/* DADOS GERADOS PELA IA */}
                       {[
                         { label: 'PERSONALIDADE', campo: 'personality' },
                         { label: 'MOTIVAÇÃO', campo: 'motivation' },
@@ -350,19 +398,38 @@ export default function Mestre() {
                         </div>
                       ) : null)}
 
+                      {/* CAMPOS EDITÁVEIS DO MESTRE — maiores */}
                       {[
-                        { label: '🔒 SEGREDO', campo: 'secret', placeholder: 'O que este NPC esconde...', cor: '#8a5030' },
-                        { label: 'NOTAS DO MESTRE', campo: 'notes', placeholder: 'Anotações privadas...', cor: '#8a5030' },
-                      ].map(({ label, campo, placeholder, cor }) => (
+                        { label: '🔒 SEGREDO', campo: 'secret', placeholder: 'O que este NPC esconde dos aventureiros...', cor: '#8a5030', rows: 3 },
+                        { label: 'NOTAS DO MESTRE', campo: 'notes', placeholder: 'Anotações privadas sobre este NPC...', cor: '#8a5030', rows: 4 },
+                      ].map(({ label, campo, placeholder, cor, rows }) => (
                         <div key={campo}>
                           <label style={{ ...cinzel, color: cor }} className="text-xs tracking-[2px] block mb-2">{label}</label>
-                          <textarea value={getNota(npc.id, campo)} onChange={e => editarNotaLocal(npc.id, campo, e.target.value)}
-                            placeholder={placeholder} rows={2}
-                            className="bg-[#0f0e0c] text-[#a09880] px-4 py-3 w-full focus:outline-none resize-none placeholder-[#2a2520] text-sm"
-                            style={{ borderRadius: '2px', lineHeight: '1.7', border: 'none', borderLeft: '2px solid rgba(180,80,40,0.3)' }} />
+                          <textarea
+                            value={getNota(npc.id, campo)}
+                            onChange={e => editarNotaLocal(npc.id, campo, e.target.value)}
+                            onClick={e => e.stopPropagation()}
+                            placeholder={placeholder}
+                            rows={rows}
+                            className="bg-[#0f0e0c] text-[#a09880] px-4 py-3 w-full focus:outline-none placeholder-[#2a2520] text-sm"
+                            style={{ borderRadius: '2px', lineHeight: '1.7', border: 'none', borderLeft: '2px solid rgba(180,80,40,0.3)', resize: 'vertical' }} />
                         </div>
                       ))}
 
+                      {/* INVENTÁRIO (do PDF) */}
+                      {d.inventory && d.inventory.length > 0 && (
+                        <div>
+                          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">INVENTÁRIO</p>
+                          <div className="flex flex-wrap gap-2">
+                            {d.inventory.map((item, i) => (
+                              <span key={i} className="border border-[#c8a84b15] text-[#6a6050] px-2 py-0.5 text-xs"
+                                style={{ borderRadius: '2px' }}>{item}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* HABILIDADES */}
                       {d.features && d.features.length > 0 && (
                         <div>
                           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">HABILIDADES</p>
@@ -375,6 +442,7 @@ export default function Mestre() {
                         </div>
                       )}
 
+                      {/* HISTÓRIA */}
                       {d.background_story && (
                         <div>
                           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-2">HISTÓRIA</p>
