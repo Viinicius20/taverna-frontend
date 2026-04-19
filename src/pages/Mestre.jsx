@@ -6,7 +6,6 @@ import Dados from '../components/Dados';
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
 
-// ID fixo de campanha local enquanto não tem login
 const CAMPANHA_ID = '00000000-0000-0000-0000-000000000001';
 
 export default function Mestre() {
@@ -17,11 +16,12 @@ export default function Mestre() {
   const [erro, setErro] = useState('');
   const [npcExpandido, setNpcExpandido] = useState(null);
   const [mostrarForm, setMostrarForm] = useState(false);
+  const [abaForm, setAbaForm] = useState('ia');
   const [descNpc, setDescNpc] = useState('');
   const [sistema, setSistema] = useState('D&D 5e');
+  const [pdfFile, setPdfFile] = useState(null);
+  const [pdfNome, setPdfNome] = useState('');
   const sistemas = ['D&D 5e', 'Tormenta20', 'Pathfinder 2e', 'Call of Cthulhu', 'Outro'];
-
-  // Campos editáveis locais (salvos no localStorage)
   const [notasLocais, setNotasLocais] = useState({});
 
   useEffect(() => {
@@ -33,11 +33,9 @@ export default function Mestre() {
   async function buscarNpcs() {
     setCarregando(true);
     try {
-      // Primeiro garante que a campanha existe no Supabase
       const res = await api.get(`/npcs/${CAMPANHA_ID}`);
       setNpcs(res.data.data || []);
     } catch {
-      // Se a campanha não existir ainda, começa vazio
       setNpcs([]);
     }
     setCarregando(false);
@@ -49,21 +47,58 @@ export default function Mestre() {
     setErro('');
     try {
       const res = await api.post('/npcs', null, {
-        params: {
-          campaign_id: CAMPANHA_ID,
-          description: descNpc,
-          system: sistema,
-        }
+        params: { campaign_id: CAMPANHA_ID, description: descNpc, system: sistema }
       });
       const novoNpc = res.data;
       setNpcs(prev => [novoNpc, ...prev]);
       setDescNpc('');
       setMostrarForm(false);
       setNpcExpandido(novoNpc.saved_id || novoNpc.id);
-    } catch (e) {
+    } catch {
       setErro('Erro ao gerar NPC. Verifique se o backend está rodando.');
     }
     setGerando(false);
+  }
+
+  async function importarPdfNpc() {
+    if (!pdfFile) return;
+    setGerando(true);
+    setErro('');
+    try {
+      const formData = new FormData();
+      formData.append('file', pdfFile);
+      const respdf = await api.post(`/upload-pdf?system=${encodeURIComponent(sistema)}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      const fichaImportada = respdf.data.data;
+      const descricao = `${fichaImportada.name || 'NPC'}, ${fichaImportada.race || ''} ${fichaImportada.class || ''}, nível ${fichaImportada.level || 1}. ${fichaImportada.background_story || ''}`.trim();
+
+      const res = await api.post('/npcs', null, {
+        params: { campaign_id: CAMPANHA_ID, description: descricao, system: sistema }
+      });
+
+      const novoNpc = {
+        ...res.data,
+        data: { ...fichaImportada, occupation: fichaImportada.class || fichaImportada.background || '' }
+      };
+
+      setNpcs(prev => [novoNpc, ...prev]);
+      setPdfFile(null);
+      setPdfNome('');
+      setMostrarForm(false);
+      setNpcExpandido(novoNpc.saved_id || novoNpc.id);
+    } catch {
+      setErro('Erro ao importar PDF. Verifique se é uma ficha de RPG válida.');
+    }
+    setGerando(false);
+  }
+
+  function selecionarPdf(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    setPdfFile(file);
+    setPdfNome(file.name);
   }
 
   async function deletarNpc(id) {
@@ -92,18 +127,15 @@ export default function Mestre() {
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0]" style={crimson}>
 
-      {/* NAV */}
       <nav className="flex items-center justify-between px-8 py-4 border-b border-[#c8a84b20]">
         <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
-          onClick={() => navigate('/')}>
-          ⚔ TAVERNA
-        </span>
+          onClick={() => navigate('/')}>⚔ TAVERNA</span>
         <div className="flex gap-6 items-center">
           <button onClick={() => navigate('/')}
             className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
             ← Voltar
           </button>
-          <button onClick={() => setMostrarForm(f => !f)}
+          <button onClick={() => { setMostrarForm(f => !f); setErro(''); }}
             className="bg-[#c8a84b] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors"
             style={{ ...cinzel, borderRadius: '2px' }}>
             + Novo NPC
@@ -113,7 +145,6 @@ export default function Mestre() {
 
       <div className="max-w-5xl mx-auto px-8 py-12">
 
-        {/* HEADER */}
         <div className="flex items-start justify-between mb-2">
           <div>
             <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">ÁREA RESTRITA</p>
@@ -132,10 +163,22 @@ export default function Mestre() {
         {mostrarForm && (
           <div className="border border-[#c8a84b30] bg-[#161410] mb-8">
             <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
-              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">GERAR NOVO NPC</p>
+              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">NOVO NPC</p>
               <button onClick={() => setMostrarForm(false)}
                 className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
             </div>
+
+            {/* ABAS */}
+            <div className="flex gap-px border-b border-[#c8a84b15]">
+              {[{ id: 'ia', label: '✦ Gerar com IA' }, { id: 'pdf', label: '◈ Importar PDF' }].map(({ id, label }) => (
+                <button key={id} onClick={() => { setAbaForm(id); setErro(''); }}
+                  className="px-6 py-3 text-xs tracking-widest transition-colors"
+                  style={{ ...cinzel, background: abaForm === id ? '#c8a84b' : 'transparent', color: abaForm === id ? '#0f0e0c' : '#6a6050' }}>
+                  {label}
+                </button>
+              ))}
+            </div>
+
             <div className="p-6 flex flex-col gap-4">
               <div>
                 <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] block mb-2">SISTEMA</label>
@@ -145,32 +188,83 @@ export default function Mestre() {
                   {sistemas.map(s => <option key={s}>{s}</option>)}
                 </select>
               </div>
-              <div>
-                <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] block mb-2">DESCRIÇÃO DO NPC</label>
-                <textarea value={descNpc} onChange={e => setDescNpc(e.target.value)}
-                  placeholder="Ex: taberneiro anão idoso que esconde um passado como assassino, desconfiado de estranhos..."
-                  rows={3}
-                  className="bg-[#0f0e0c] border border-[#c8a84b30] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b60] resize-none placeholder-[#3a3528]"
-                  style={{ fontSize: '1rem', borderRadius: '2px', lineHeight: '1.7' }} />
-              </div>
-              {erro && <p className="text-red-400 text-sm">{erro}</p>}
-              <div className="flex gap-3">
-                <button onClick={gerarNpc} disabled={!descNpc.trim() || gerando}
-                  className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
-                  style={{ ...cinzel, borderRadius: '2px' }}>
-                  {gerando ? 'Gerando...' : 'Gerar NPC com IA →'}
-                </button>
-                <button onClick={() => setMostrarForm(false)}
-                  className="border border-[#c8a84b30] text-[#6a6050] px-6 py-2 text-xs tracking-widest hover:border-[#c8a84b60] transition-colors"
-                  style={{ ...cinzel, borderRadius: '2px' }}>
-                  Cancelar
-                </button>
-              </div>
+
+              {abaForm === 'ia' && (
+                <>
+                  <div>
+                    <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] block mb-2">DESCRIÇÃO DO NPC</label>
+                    <textarea value={descNpc} onChange={e => setDescNpc(e.target.value)}
+                      placeholder="Ex: taberneiro anão idoso que esconde um passado como assassino, desconfiado de estranhos..."
+                      rows={3}
+                      className="bg-[#0f0e0c] border border-[#c8a84b30] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b60] resize-none placeholder-[#3a3528]"
+                      style={{ fontSize: '1rem', borderRadius: '2px', lineHeight: '1.7' }} />
+                  </div>
+                  {erro && <p className="text-red-400 text-sm">{erro}</p>}
+                  <div className="flex gap-3">
+                    <button onClick={gerarNpc} disabled={!descNpc.trim() || gerando}
+                      className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
+                      style={{ ...cinzel, borderRadius: '2px' }}>
+                      {gerando ? 'Gerando...' : 'Gerar NPC com IA →'}
+                    </button>
+                    <button onClick={() => setMostrarForm(false)}
+                      className="border border-[#c8a84b30] text-[#6a6050] px-6 py-2 text-xs tracking-widest hover:border-[#c8a84b60] transition-colors"
+                      style={{ ...cinzel, borderRadius: '2px' }}>
+                      Cancelar
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {abaForm === 'pdf' && (
+                <>
+                  <div>
+                    <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] block mb-2">ARQUIVO PDF</label>
+                    <label className="flex flex-col items-center justify-center border border-dashed border-[#c8a84b30] bg-[#0f0e0c] py-10 cursor-pointer hover:border-[#c8a84b60] hover:bg-[#161410] transition-all"
+                      style={{ borderRadius: '2px' }}>
+                      <input type="file" accept=".pdf" onChange={selecionarPdf} className="hidden" />
+                      <span className="text-2xl mb-2" style={{ color: '#c8a84b' }}>◈</span>
+                      {pdfNome ? (
+                        <>
+                          <p style={cinzel} className="text-[#c8a84b] text-sm tracking-widest mb-1">{pdfNome}</p>
+                          <p className="text-[#4a4030] text-xs">Clique para trocar</p>
+                        </>
+                      ) : (
+                        <>
+                          <p style={cinzel} className="text-[#6a6050] text-sm tracking-widest mb-1">Clique para selecionar o PDF</p>
+                          <p className="text-[#3a3528] text-xs">Ficha de qualquer sistema</p>
+                        </>
+                      )}
+                    </label>
+                  </div>
+
+                  {pdfNome && (
+                    <div className="border border-[#c8a84b15] bg-[#c8a84b05] px-4 py-3">
+                      <p className="text-[#6a6050] text-sm font-light">
+                        ✦ A IA vai ler a ficha e criar o NPC com todos os dados automaticamente.
+                      </p>
+                    </div>
+                  )}
+
+                  {erro && <p className="text-red-400 text-sm">{erro}</p>}
+
+                  <div className="flex gap-3">
+                    <button onClick={importarPdfNpc} disabled={!pdfFile || gerando}
+                      className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
+                      style={{ ...cinzel, borderRadius: '2px' }}>
+                      {gerando ? 'Importando...' : 'Importar PDF →'}
+                    </button>
+                    <button onClick={() => setMostrarForm(false)}
+                      className="border border-[#c8a84b30] text-[#6a6050] px-6 py-2 text-xs tracking-widest hover:border-[#c8a84b60] transition-colors"
+                      style={{ ...cinzel, borderRadius: '2px' }}>
+                      Cancelar
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
 
-        {/* CARREGANDO */}
         {carregando && (
           <div className="flex flex-col items-center justify-center py-24 gap-6">
             <div className="w-10 h-10 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
@@ -178,15 +272,15 @@ export default function Mestre() {
           </div>
         )}
 
-        {/* GERANDO */}
         {gerando && (
           <div className="flex items-center gap-4 border border-[#c8a84b15] bg-[#161410] px-6 py-4 mb-6">
             <div className="w-5 h-5 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin flex-shrink-0" />
-            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-widest">FORJANDO O NPC...</p>
+            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-widest">
+              {abaForm === 'pdf' ? 'LENDO O PDF...' : 'FORJANDO O NPC...'}
+            </p>
           </div>
         )}
 
-        {/* VAZIO */}
         {!carregando && npcs.length === 0 && !mostrarForm && (
           <div className="flex flex-col items-center justify-center py-20 gap-4 border border-[#c8a84b15] bg-[#161410]">
             <span className="text-4xl opacity-20">◈</span>
@@ -199,7 +293,6 @@ export default function Mestre() {
           </div>
         )}
 
-        {/* LISTA */}
         {!carregando && npcs.length > 0 && (
           <div className="flex flex-col gap-px bg-[#c8a84b15] border border-[#c8a84b15]">
             {npcs.map(npc => {
@@ -209,20 +302,15 @@ export default function Mestre() {
 
               return (
                 <div key={npc.id} className="bg-[#161410]">
-                  {/* CABEÇALHO */}
                   <div className="p-6 flex items-start justify-between gap-4 cursor-pointer hover:bg-[#1c1a16] transition-colors"
                     onClick={() => setNpcExpandido(expandido ? null : npc.id)}>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-1 flex-wrap">
-                        <h2 style={cinzel} className="text-[#f0e8d8] text-lg font-semibold">
-                          {d.name || npc.name}
-                        </h2>
-                        {d.race && (
-                          <span className="text-[#4a4030] text-xs" style={cinzel}>{d.race}</span>
-                        )}
+                        <h2 style={cinzel} className="text-[#f0e8d8] text-lg font-semibold">{d.name || npc.name}</h2>
+                        {d.race && <span className="text-[#4a4030] text-xs" style={cinzel}>{d.race}</span>}
                       </div>
                       <p className="text-[#6a6050] text-sm">
-                        {[d.occupation, d.alignment].filter(Boolean).join(' · ')}
+                        {[d.occupation || d.class, d.alignment].filter(Boolean).join(' · ')}
                       </p>
                       {getNota(npc.id, 'secret') && !expandido && (
                         <p className="text-[#4a3020] text-xs mt-1 font-light">🔒 Segredo registrado</p>
@@ -231,11 +319,9 @@ export default function Mestre() {
                     <span style={cinzel} className="text-[#4a4030] text-lg">{expandido ? '∧' : '∨'}</span>
                   </div>
 
-                  {/* DETALHES */}
                   {expandido && (
                     <div className="border-t border-[#c8a84b10] px-6 pb-6 flex flex-col gap-6 pt-6">
 
-                      {/* Atributos */}
                       {Object.keys(attrs).length > 0 && (
                         <div>
                           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">ATRIBUTOS</p>
@@ -253,7 +339,6 @@ export default function Mestre() {
                         </div>
                       )}
 
-                      {/* Dados gerados pela IA */}
                       {[
                         { label: 'PERSONALIDADE', campo: 'personality' },
                         { label: 'MOTIVAÇÃO', campo: 'motivation' },
@@ -265,24 +350,19 @@ export default function Mestre() {
                         </div>
                       ) : null)}
 
-                      {/* Campos editáveis pelo mestre (salvos local) */}
                       {[
-                        { label: '🔒 SEGREDO', campo: 'secret', placeholder: 'O que este NPC esconde dos aventureiros...', cor: '#8a5030' },
+                        { label: '🔒 SEGREDO', campo: 'secret', placeholder: 'O que este NPC esconde...', cor: '#8a5030' },
                         { label: 'NOTAS DO MESTRE', campo: 'notes', placeholder: 'Anotações privadas...', cor: '#8a5030' },
                       ].map(({ label, campo, placeholder, cor }) => (
                         <div key={campo}>
                           <label style={{ ...cinzel, color: cor }} className="text-xs tracking-[2px] block mb-2">{label}</label>
-                          <textarea
-                            value={getNota(npc.id, campo)}
-                            onChange={e => editarNotaLocal(npc.id, campo, e.target.value)}
-                            placeholder={placeholder}
-                            rows={2}
+                          <textarea value={getNota(npc.id, campo)} onChange={e => editarNotaLocal(npc.id, campo, e.target.value)}
+                            placeholder={placeholder} rows={2}
                             className="bg-[#0f0e0c] text-[#a09880] px-4 py-3 w-full focus:outline-none resize-none placeholder-[#2a2520] text-sm"
-                            style={{ borderRadius: '2px', lineHeight: '1.7', border: 'none', borderLeft: `2px solid rgba(180,80,40,0.3)` }} />
+                            style={{ borderRadius: '2px', lineHeight: '1.7', border: 'none', borderLeft: '2px solid rgba(180,80,40,0.3)' }} />
                         </div>
                       ))}
 
-                      {/* Features */}
                       {d.features && d.features.length > 0 && (
                         <div>
                           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">HABILIDADES</p>
@@ -295,7 +375,6 @@ export default function Mestre() {
                         </div>
                       )}
 
-                      {/* História */}
                       {d.background_story && (
                         <div>
                           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-2">HISTÓRIA</p>
@@ -323,13 +402,15 @@ export default function Mestre() {
             {npcs.length} {npcs.length === 1 ? 'NPC' : 'NPCs'} REGISTRADOS
           </p>
         )}
-      </div>
+
+        {/* DADOS SECRETOS */}
         <div className="mt-12">
-        <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
-      <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">EXCLUSIVO DO MESTRE</p>
-      <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-2">Rolagens Secretas</h2>
-      <p className="text-[#7a7060] mb-6 font-light text-sm">Resultados visíveis apenas para você.</p>
-      <Dados secreto={true} />
+          <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+          <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">EXCLUSIVO DO MESTRE</p>
+          <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-2">Rolagens Secretas</h2>
+          <p className="text-[#7a7060] mb-6 font-light text-sm">Resultados visíveis apenas para você.</p>
+          <Dados secreto={true} />
+        </div>
       </div>
     </div>
   );
