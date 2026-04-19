@@ -4,6 +4,7 @@ import CriarPersonagem from './pages/CriarPersonagem';
 import Personagens from './pages/Personagens';
 import Mestre from './pages/Mestre';
 import Ficha from './pages/Ficha';
+import RolarDados from './pages/RolarDados';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/personagens/criar" element={<CriarPersonagem />} />
         <Route path="/mestre" element={<Mestre />} />
         <Route path="/personagens/:id" element={<Ficha />} />
+        <Route path="/dados" element={<RolarDados />} />
       </Routes>
     </BrowserRouter>
   );

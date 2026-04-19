@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import Dados from '../components/Dados';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -322,6 +323,13 @@ export default function Mestre() {
             {npcs.length} {npcs.length === 1 ? 'NPC' : 'NPCs'} REGISTRADOS
           </p>
         )}
+      </div>
+        <div className="mt-12">
+        <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+      <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">EXCLUSIVO DO MESTRE</p>
+      <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-2">Rolagens Secretas</h2>
+      <p className="text-[#7a7060] mb-6 font-light text-sm">Resultados visíveis apenas para você.</p>
+      <Dados secreto={true} />
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ const crimson = { fontFamily: "'Crimson Pro', serif" };
 const navLinks = [
   { label: 'Início', rota: '/' },
   { label: 'Personagens', rota: '/personagens' },
+  { label: 'Dados', rota: '/dados' },
   { label: 'Mestre', rota: '/mestre' },
 ];
 
