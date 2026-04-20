@@ -336,7 +336,7 @@ export default function Ficha() {
                 ))}
               </div>
             </div>
-          )}
+          )
         </div>
 
         {/* ATRIBUTOS */}
@@ -444,7 +444,6 @@ export default function Ficha() {
             ↑ Subir de Nível
           </button>
         </div>
-      </div>
 
       {/* MODAL LEVEL UP */}
       {modalLevelUp && (
