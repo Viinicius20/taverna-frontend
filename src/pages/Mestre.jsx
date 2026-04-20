@@ -23,8 +23,6 @@ export default function Mestre() {
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfNome, setPdfNome] = useState('');
   const sistemas = ['D&D 5e', 'Tormenta20', 'Pathfinder 2e', 'Call of Cthulhu', 'Outro'];
-
-  // Notas e atributos editados localmente
   const [notasLocais, setNotasLocais] = useState({});
   const [attrsLocais, setAttrsLocais] = useState({});
 
@@ -58,7 +56,7 @@ export default function Mestre() {
       setNpcs(prev => [res.data, ...prev]);
       setDescNpc('');
       setMostrarForm(false);
-      setNpcExpandido(res.data.saved_id || res.data.id);
+      setNpcExpandido(res.data.id || res.data.saved_id);
     } catch {
       setErro('Erro ao gerar NPC. Verifique se o backend está rodando.');
     }
@@ -72,52 +70,26 @@ export default function Mestre() {
     try {
       const formData = new FormData();
       formData.append('file', pdfFile);
-      const respdf = await api.post(`/upload-pdf?system=${encodeURIComponent(sistema)}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
 
-      const f = respdf.data.data;
+      // Usa o endpoint dedicado que salva direto como NPC
+      const res = await api.post(
+        `/upload-pdf-npc?system=${encodeURIComponent(sistema)}&campaign_id=${CAMPANHA_ID}`,
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
 
-      // Gera NPC com descrição limpa — sem inventário nas notas
-      const descricao = [
-        f.name,
-        f.race && f.class ? `${f.race} ${f.class}` : f.race || f.class,
-        f.level ? `nível ${f.level}` : null,
-        f.background ? `antecedente: ${f.background}` : null,
-        f.alignment ? `alinhamento: ${f.alignment}` : null,
-      ].filter(Boolean).join(', ');
-
-      const res = await api.post('/npcs', null, {
-        params: { campaign_id: CAMPANHA_ID, description: descricao, system: sistema }
-      });
-
-      // Monta NPC com dados reais do PDF — inventário vai pro campo correto
+      // Monta objeto NPC com id para exibição
       const novoNpc = {
-        ...res.data,
-        data: {
-          name: f.name,
-          race: f.race,
-          class: f.class,
-          level: f.level,
-          alignment: f.alignment,
-          background: f.background,
-          occupation: f.class || f.background || '',
-          attributes: f.attributes || {},
-          skills: f.skills || {},
-          features: f.features || [],
-          inventory: f.inventory || [],
-          background_story: f.background_story || '',
-          personality: '',
-          motivation: '',
-          appearance: '',
-        }
+        id: res.data.saved_id,
+        name: res.data.data?.name || 'NPC importado',
+        data: res.data.data,
       };
 
       setNpcs(prev => [novoNpc, ...prev]);
       setPdfFile(null);
       setPdfNome('');
       setMostrarForm(false);
-      setNpcExpandido(novoNpc.saved_id || novoNpc.id);
+      setNpcExpandido(res.data.saved_id);
     } catch {
       setErro('Erro ao importar PDF. Verifique se é uma ficha de RPG válida.');
     }
@@ -153,15 +125,13 @@ export default function Mestre() {
   }
 
   function editarAttrLocal(npcId, attr, valor) {
-    const chave = `${npcId}_${attr}`;
-    const novos = { ...attrsLocais, [chave]: Number(valor) };
+    const novos = { ...attrsLocais, [`${npcId}_${attr}`]: Number(valor) };
     setAttrsLocais(novos);
     localStorage.setItem('taverna-attrs-npcs', JSON.stringify(novos));
   }
 
   function getAttr(npcId, attr, fallback) {
-    const chave = `${npcId}_${attr}`;
-    return attrsLocais[chave] !== undefined ? attrsLocais[chave] : fallback;
+    return attrsLocais[`${npcId}_${attr}`] !== undefined ? attrsLocais[`${npcId}_${attr}`] : fallback;
   }
 
   return (
@@ -278,7 +248,7 @@ export default function Mestre() {
                   {pdfNome && (
                     <div className="border border-[#c8a84b15] bg-[#c8a84b05] px-4 py-3">
                       <p className="text-[#6a6050] text-sm font-light">
-                        ✦ A IA vai ler a ficha e criar o NPC com todos os dados automaticamente.
+                        ✦ A IA vai ler a ficha e criar o NPC diretamente — sem criar personagem.
                       </p>
                     </div>
                   )}
@@ -386,7 +356,6 @@ export default function Mestre() {
                         </div>
                       )}
 
-                      {/* DADOS GERADOS PELA IA */}
                       {[
                         { label: 'PERSONALIDADE', campo: 'personality' },
                         { label: 'MOTIVAÇÃO', campo: 'motivation' },
@@ -398,7 +367,7 @@ export default function Mestre() {
                         </div>
                       ) : null)}
 
-                      {/* CAMPOS EDITÁVEIS DO MESTRE — maiores */}
+                      {/* CAMPOS EDITÁVEIS DO MESTRE */}
                       {[
                         { label: '🔒 SEGREDO', campo: 'secret', placeholder: 'O que este NPC esconde dos aventureiros...', cor: '#8a5030', rows: 3 },
                         { label: 'NOTAS DO MESTRE', campo: 'notes', placeholder: 'Anotações privadas sobre este NPC...', cor: '#8a5030', rows: 4 },
@@ -416,7 +385,6 @@ export default function Mestre() {
                         </div>
                       ))}
 
-                      {/* INVENTÁRIO (do PDF) */}
                       {d.inventory && d.inventory.length > 0 && (
                         <div>
                           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">INVENTÁRIO</p>
@@ -429,7 +397,6 @@ export default function Mestre() {
                         </div>
                       )}
 
-                      {/* HABILIDADES */}
                       {d.features && d.features.length > 0 && (
                         <div>
                           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">HABILIDADES</p>
@@ -442,7 +409,6 @@ export default function Mestre() {
                         </div>
                       )}
 
-                      {/* HISTÓRIA */}
                       {d.background_story && (
                         <div>
                           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-2">HISTÓRIA</p>
