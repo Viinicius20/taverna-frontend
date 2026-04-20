@@ -12,6 +12,19 @@ const tipoColor = {
   'perícia': '#c87ab8',
 };
 
+const combatFields = [
+  { label: 'HP ATUAL', campo: 'hp', tipo: 'number' },
+  { label: 'HP MÁXIMO', campo: 'hp_max', tipo: 'number' },
+  { label: 'CA', campo: 'ac', tipo: 'number' },
+  { label: 'INICIATIVA', campo: 'initiative', tipo: 'number' },
+  { label: 'VELOCIDADE', campo: 'speed', tipo: 'number' },
+  { label: 'BÔNUS PROF.', campo: 'proficiency_bonus', tipo: 'number' },
+  { label: 'PERC. PASSIVA', campo: 'passive_perception', tipo: 'number' },
+  { label: 'DADO DE VIDA', campo: 'hit_dice', tipo: 'text' },
+];
+
+const saveLabel = { str: 'FOR', dex: 'DES', con: 'CON', int: 'INT', wis: 'SAB', cha: 'CAR' };
+
 export default function Ficha() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -23,20 +36,18 @@ export default function Ficha() {
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState('');
 
-  // Level up
   const [modalLevelUp, setModalLevelUp] = useState(false);
   const [nivelAlvo, setNivelAlvo] = useState(2);
   const [upando, setUpando] = useState(false);
 
-  // Modal habilidade
   const [modal, setModal] = useState(null);
   const [descricaoSkill, setDescricaoSkill] = useState(null);
   const [carregandoSkill, setCarregandoSkill] = useState(false);
 
   useEffect(() => {
-  buscarPersonagem();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [id]);
+    buscarPersonagem();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   async function buscarPersonagem() {
     setCarregando(true);
@@ -59,6 +70,29 @@ export default function Ficha() {
     setFicha(prev => ({
       ...prev,
       attributes: { ...prev.attributes, [attr]: Number(valor) }
+    }));
+  }
+
+  function editarCombat(campo, valor) {
+    setFicha(prev => ({
+      ...prev,
+      combat: {
+        ...prev.combat,
+        [campo]: campo === 'hit_dice' ? valor : Number(valor)
+      }
+    }));
+  }
+
+  function editarSavingThrow(attr, valor) {
+    setFicha(prev => ({
+      ...prev,
+      combat: {
+        ...prev.combat,
+        saving_throws: {
+          ...prev.combat?.saving_throws,
+          [attr]: Number(valor)
+        }
+      }
     }));
   }
 
@@ -131,10 +165,11 @@ export default function Ficha() {
     </div>
   );
 
+  const combat = ficha.combat || {};
+
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0]" style={crimson}>
 
-      {/* NAV */}
       <nav className="flex items-center justify-between px-8 py-4 border-b border-[#c8a84b20]">
         <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
           onClick={() => navigate('/')}>⚔ TAVERNA</span>
@@ -146,7 +181,6 @@ export default function Ficha() {
 
       <div className="max-w-3xl mx-auto px-8 py-12">
 
-        {/* HEADER */}
         <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
           <div>
             <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">FICHA DO PERSONAGEM</p>
@@ -206,6 +240,90 @@ export default function Ficha() {
                 style={{ borderRadius: '2px' }} />
             </div>
           </div>
+        </div>
+
+        {/* STATS DE COMBATE */}
+        <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+          <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
+            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">STATS DE COMBATE</p>
+            {!ficha.combat && (
+              <p className="text-[#4a4030] text-xs font-light">Crie um novo personagem para ver estes campos</p>
+            )}
+          </div>
+          {ficha.combat ? (
+            <div className="p-6">
+              {/* HP em destaque */}
+              <div className="flex items-center gap-4 mb-6 border border-[#c8a84b15] bg-[#0f0e0c] p-4">
+                <div className="flex-1">
+                  <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">HP ATUAL</label>
+                  <input type="number" value={combat.hp ?? 0}
+                    onChange={e => editarCombat('hp', e.target.value)}
+                    className="bg-transparent border-b border-[#c8a84b30] text-[#f0e8d8] text-3xl font-light w-full focus:outline-none focus:border-[#c8a84b60] text-center pb-1"
+                    style={cinzel} />
+                </div>
+                <span className="text-[#4a4030] text-2xl">/</span>
+                <div className="flex-1">
+                  <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">HP MÁXIMO</label>
+                  <input type="number" value={combat.hp_max ?? 0}
+                    onChange={e => editarCombat('hp_max', e.target.value)}
+                    className="bg-transparent border-b border-[#c8a84b30] text-[#f0e8d8] text-3xl font-light w-full focus:outline-none focus:border-[#c8a84b60] text-center pb-1"
+                    style={cinzel} />
+                </div>
+              </div>
+
+              {/* Outros stats */}
+              <div className="grid grid-cols-3 gap-4 mb-6">
+                {combatFields.filter(f => f.campo !== 'hp' && f.campo !== 'hp_max').map(({ label, campo, tipo }) => (
+                  <div key={campo} className="flex flex-col items-center border border-[#c8a84b15] bg-[#0f0e0c] p-3">
+                    <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest mb-2 text-center">{label}</label>
+                    <input
+                      type={tipo}
+                      value={combat[campo] ?? (tipo === 'number' ? 0 : '')}
+                      onChange={e => editarCombat(campo, e.target.value)}
+                      className="bg-transparent text-[#c8a84b] text-xl font-light w-full focus:outline-none text-center"
+                      style={cinzel} />
+                  </div>
+                ))}
+              </div>
+
+              {/* Salvaguardas */}
+              {combat.saving_throws && (
+                <div>
+                  <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">SALVAGUARDAS</p>
+                  <div className="grid grid-cols-6 gap-2">
+                    {Object.entries(combat.saving_throws).map(([attr, val]) => (
+                      <div key={attr} className="flex flex-col items-center gap-1">
+                        <label style={cinzel} className="text-[#4a4030] text-xs">{saveLabel[attr] || attr.toUpperCase()}</label>
+                        <input type="number" value={val ?? 0}
+                          onChange={e => editarSavingThrow(attr, e.target.value)}
+                          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-sm w-full py-1.5 focus:outline-none focus:border-[#c8a84b50]"
+                          style={{ borderRadius: '2px', ...cinzel }} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="p-6">
+              <p className="text-[#4a4030] text-sm font-light text-center py-4">
+                Este personagem foi criado antes desta funcionalidade. Edite e salve a ficha para adicionar os stats de combate manualmente, ou recrie o personagem para preenchimento automático.
+              </p>
+              <div className="grid grid-cols-3 gap-4 mt-4">
+                {combatFields.map(({ label, campo, tipo }) => (
+                  <div key={campo} className="flex flex-col items-center border border-[#c8a84b15] bg-[#0f0e0c] p-3">
+                    <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest mb-2 text-center">{label}</label>
+                    <input
+                      type={tipo}
+                      defaultValue={tipo === 'number' ? 0 : ''}
+                      onChange={e => editarCombat(campo, e.target.value)}
+                      className="bg-transparent text-[#c8a84b] text-xl font-light w-full focus:outline-none text-center"
+                      style={cinzel} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ATRIBUTOS */}
@@ -301,7 +419,6 @@ export default function Ficha() {
           </div>
         )}
 
-        {/* BOTÃO SALVAR FINAL */}
         <div className="flex gap-4">
           <button onClick={salvarFicha} disabled={salvando}
             className="bg-[#c8a84b] text-[#0f0e0c] px-8 py-3 text-sm tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50"
@@ -330,7 +447,6 @@ export default function Ficha() {
                   className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
               )}
             </div>
-
             <div className="px-6 py-6 flex flex-col gap-5">
               <div className="flex items-center gap-4">
                 <div className="text-center">
@@ -346,27 +462,22 @@ export default function Ficha() {
                     style={{ ...cinzel, borderRadius: '2px' }} />
                 </div>
               </div>
-
               <div className="border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3">
                 <p className="text-[#6a6050] text-sm font-light">
-                  ✦ A IA vai adicionar automaticamente todas as features, melhorias de atributos e benefícios do nível {ficha.level + 1} até o nível {nivelAlvo}. Você poderá editar depois.
+                  ✦ A IA vai adicionar automaticamente todas as features, melhorias de atributos e recalcular os stats de combate. Você poderá editar depois.
                 </p>
               </div>
-
               {upando && (
                 <div className="flex items-center gap-3">
                   <div className="w-5 h-5 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin flex-shrink-0" />
                   <p style={cinzel} className="text-[#c8a84b] text-xs tracking-widest">SUBINDO DE NÍVEL...</p>
                 </div>
               )}
-
-              <div className="flex gap-3">
-                <button onClick={fazerLevelUp} disabled={upando || nivelAlvo <= ficha.level || nivelAlvo > 20}
-                  className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30 flex-1"
-                  style={{ ...cinzel, borderRadius: '2px' }}>
-                  {upando ? 'Aguarde...' : `Subir para Nível ${nivelAlvo} com IA →`}
-                </button>
-              </div>
+              <button onClick={fazerLevelUp} disabled={upando || nivelAlvo <= ficha.level || nivelAlvo > 20}
+                className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                {upando ? 'Aguarde...' : `Subir para Nível ${nivelAlvo} com IA →`}
+              </button>
               <button onClick={() => !upando && setModalLevelUp(false)}
                 className="text-[#4a4030] text-xs tracking-widest hover:text-[#6a6050] transition-colors text-center"
                 style={cinzel}>
