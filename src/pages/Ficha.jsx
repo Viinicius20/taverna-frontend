@@ -74,27 +74,34 @@ export default function Ficha() {
   }
 
   function editarCombat(campo, valor) {
-    setFicha(prev => ({
+  setFicha(prev => {
+    const combatAtual = prev.combat || {};           // ← Garante que sempre existe
+    return {
       ...prev,
       combat: {
-        ...prev.combat,
-        [campo]: campo === 'hit_dice' ? valor : Number(valor)
+        ...combatAtual,
+        [campo]: campo === 'hit_dice' ? valor : Number(valor) || 0
       }
-    }));
-  }
+    };
+  });
+}
 
   function editarSavingThrow(attr, valor) {
-    setFicha(prev => ({
+  setFicha(prev => {
+    const combatAtual = prev.combat || {};
+    const savingAtual = combatAtual.saving_throws || {};
+    return {
       ...prev,
       combat: {
-        ...prev.combat,
+        ...combatAtual,
         saving_throws: {
-          ...prev.combat?.saving_throws,
-          [attr]: Number(valor)
+          ...savingAtual,
+          [attr]: Number(valor) || 0
         }
       }
-    }));
-  }
+    };
+  });
+}
 
   async function salvarFicha() {
     setSalvando(true);
@@ -242,69 +249,75 @@ export default function Ficha() {
           </div>
         </div>
 
-        {/* STATS DE COMBATE */}
-        <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
-          <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
-            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">STATS DE COMBATE</p>
-            {!ficha.combat && (
-              <p className="text-[#4a4030] text-xs font-light">Crie um novo personagem para ver estes campos</p>
-            )}
+        {/* STATS DE COMBATE - VERSÃO CORRIGIDA */}
+<div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+  <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
+    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">STATS DE COMBATE</p>
+  </div>
+
+  <div className="p-6">
+    {/* HP em destaque */}
+    <div className="flex items-center gap-4 mb-6 border border-[#c8a84b15] bg-[#0f0e0c] p-4 rounded">
+      <div className="flex-1">
+        <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">HP ATUAL</label>
+        <input 
+          type="number" 
+          value={combat.hp ?? 0}
+          onChange={e => editarCombat('hp', e.target.value)}
+          className="bg-transparent border-b border-[#c8a84b30] text-[#f0e8d8] text-3xl font-light w-full focus:outline-none focus:border-[#c8a84b60] text-center pb-1"
+          style={cinzel} 
+        />
+      </div>
+      <span className="text-[#4a4030] text-2xl">/</span>
+      <div className="flex-1">
+        <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">HP MÁXIMO</label>
+        <input 
+          type="number" 
+          value={combat.hp_max ?? 0}
+          onChange={e => editarCombat('hp_max', e.target.value)}
+          className="bg-transparent border-b border-[#c8a84b30] text-[#f0e8d8] text-3xl font-light w-full focus:outline-none focus:border-[#c8a84b60] text-center pb-1"
+          style={cinzel} 
+        />
+      </div>
+    </div>
+
+    {/* Outros stats */}
+    <div className="grid grid-cols-3 gap-4 mb-6">
+      {combatFields.filter(f => !['hp', 'hp_max'].includes(f.campo)).map(({ label, campo, tipo }) => (
+        <div key={campo} className="flex flex-col items-center border border-[#c8a84b15] bg-[#0f0e0c] p-3 rounded">
+          <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest mb-2 text-center">{label}</label>
+          <input
+            type={tipo}
+            value={combat[campo] ?? (tipo === 'number' ? 0 : '')}
+            onChange={e => editarCombat(campo, e.target.value)}
+            className="bg-transparent text-[#c8a84b] text-xl font-light w-full focus:outline-none text-center"
+            style={cinzel}
+          />
+        </div>
+      ))}
+    </div>
+
+    {/* Salvaguardas */}
+    <div>
+      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">SALVAGUARDAS</p>
+      <div className="grid grid-cols-6 gap-2">
+        {Object.entries(combat.saving_throws || {}).map(([attr, val]) => (
+          <div key={attr} className="flex flex-col items-center gap-1">
+            <label style={cinzel} className="text-[#4a4030] text-xs">{saveLabel[attr] || attr.toUpperCase()}</label>
+            <input 
+              type="number" 
+              value={val ?? 0}
+              onChange={e => editarSavingThrow(attr, e.target.value)}
+              className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-sm w-full py-1.5 focus:outline-none focus:border-[#c8a84b50]"
+              style={{ borderRadius: '2px', ...cinzel }} 
+            />
           </div>
-          {ficha.combat ? (
-            <div className="p-6">
-              {/* HP em destaque */}
-              <div className="flex items-center gap-4 mb-6 border border-[#c8a84b15] bg-[#0f0e0c] p-4">
-                <div className="flex-1">
-                  <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">HP ATUAL</label>
-                  <input type="number" value={combat.hp ?? 0}
-                    onChange={e => editarCombat('hp', e.target.value)}
-                    className="bg-transparent border-b border-[#c8a84b30] text-[#f0e8d8] text-3xl font-light w-full focus:outline-none focus:border-[#c8a84b60] text-center pb-1"
-                    style={cinzel} />
-                </div>
-                <span className="text-[#4a4030] text-2xl">/</span>
-                <div className="flex-1">
-                  <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">HP MÁXIMO</label>
-                  <input type="number" value={combat.hp_max ?? 0}
-                    onChange={e => editarCombat('hp_max', e.target.value)}
-                    className="bg-transparent border-b border-[#c8a84b30] text-[#f0e8d8] text-3xl font-light w-full focus:outline-none focus:border-[#c8a84b60] text-center pb-1"
-                    style={cinzel} />
-                </div>
-              </div>
-
-              {/* Outros stats */}
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                {combatFields.filter(f => f.campo !== 'hp' && f.campo !== 'hp_max').map(({ label, campo, tipo }) => (
-                  <div key={campo} className="flex flex-col items-center border border-[#c8a84b15] bg-[#0f0e0c] p-3">
-                    <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest mb-2 text-center">{label}</label>
-                    <input
-                      type={tipo}
-                      value={combat[campo] ?? (tipo === 'number' ? 0 : '')}
-                      onChange={e => editarCombat(campo, e.target.value)}
-                      className="bg-transparent text-[#c8a84b] text-xl font-light w-full focus:outline-none text-center"
-                      style={cinzel} />
-                  </div>
-                ))}
-              </div>
-
-              {/* Salvaguardas */}
-              {combat.saving_throws && (
-                <div>
-                  <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">SALVAGUARDAS</p>
-                  <div className="grid grid-cols-6 gap-2">
-                    {Object.entries(combat.saving_throws).map(([attr, val]) => (
-                      <div key={attr} className="flex flex-col items-center gap-1">
-                        <label style={cinzel} className="text-[#4a4030] text-xs">{saveLabel[attr] || attr.toUpperCase()}</label>
-                        <input type="number" value={val ?? 0}
-                          onChange={e => editarSavingThrow(attr, e.target.value)}
-                          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-sm w-full py-1.5 focus:outline-none focus:border-[#c8a84b50]"
-                          style={{ borderRadius: '2px', ...cinzel }} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+           : (
             <div className="p-6">
               <p className="text-[#4a4030] text-sm font-light text-center py-4">
                 Este personagem foi criado antes desta funcionalidade. Edite e salve a ficha para adicionar os stats de combate manualmente, ou recrie o personagem para preenchimento automático.
