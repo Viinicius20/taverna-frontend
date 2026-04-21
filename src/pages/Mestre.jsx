@@ -329,6 +329,69 @@ export default function Mestre() {
                   {expandido && (
                     <div className="border-t border-[#c8a84b10] px-6 pb-6 flex flex-col gap-6 pt-6">
 
+                    {/* STATS DE COMBATE */}
+                      {d.combat && (
+                        <div className="border border-[#c8a84b15] bg-[#c8a84b05] p-4">
+                          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">STATS DE COMBATE</p>
+                          
+                          {/* HP */}
+                          <div className="flex gap-6 mb-4 pb-4 border-b border-[#c8a84b10]">
+                            <div className="flex-1">
+                              <label style={cinzel} className="text-[#c8a84b] text-xs tracking-widest block mb-1">HP ATUAL</label>
+                              <input type="number" min={0} value={getAttr(npc.id, 'combat_hp', d.combat.hp || 0)}
+                                onChange={e => editarAttrLocal(npc.id, 'combat_hp', e.target.value)}
+                                onClick={e => e.stopPropagation()}
+                                className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-lg w-full py-2 focus:outline-none focus:border-[#c8a84b50]"
+                                style={{ borderRadius: '2px' }} />
+                            </div>
+                            <div className="flex-1">
+                              <label style={cinzel} className="text-[#c8a84b] text-xs tracking-widest block mb-1">HP MÁXIMO</label>
+                              <input type="number" min={1} value={getAttr(npc.id, 'combat_hp_max', d.combat.hp_max || 0)}
+                                onChange={e => editarAttrLocal(npc.id, 'combat_hp_max', e.target.value)}
+                                onClick={e => e.stopPropagation()}
+                                className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-lg w-full py-2 focus:outline-none focus:border-[#c8a84b50]"
+                                style={{ borderRadius: '2px' }} />
+                            </div>
+                          </div>
+
+                          {/* CA, Iniciativa, Velocidade */}
+                          <div className="grid grid-cols-3 gap-3 mb-4">
+                            {[
+                              { label: 'CA', attr: 'combat_ac', val: d.combat.ac },
+                              { label: 'INICIATIVA', attr: 'combat_initiative', val: d.combat.initiative },
+                              { label: 'VELOCIDADE', attr: 'combat_speed', val: d.combat.speed },
+                            ].map(({ label, attr, val }) => (
+                              <div key={attr}>
+                                <label style={cinzel} className="text-[#c8a84b] text-xs tracking-widest block mb-1">{label}</label>
+                                <input type="number" value={getAttr(npc.id, attr, val || 0)}
+                                  onChange={e => editarAttrLocal(npc.id, attr, e.target.value)}
+                                  onClick={e => e.stopPropagation()}
+                                  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-lg w-full py-2 focus:outline-none focus:border-[#c8a84b50]"
+                                  style={{ borderRadius: '2px' }} />
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Bônus Prof, Perc Passiva, Dado de Vida */}
+                          <div className="grid grid-cols-3 gap-3">
+                            {[
+                              { label: 'BÔNUS PROF.', attr: 'combat_proficiency_bonus', val: d.combat.proficiency_bonus },
+                              { label: 'PERC. PASSIVA', attr: 'combat_passive_perception', val: d.combat.passive_perception },
+                              { label: 'DADO DE VIDA', attr: 'combat_hit_dice', val: d.combat.hit_dice, tipo: 'text' },
+                            ].map(({ label, attr, val, tipo }) => (
+                              <div key={attr}>
+                                <label style={cinzel} className="text-[#c8a84b] text-xs tracking-widest block mb-1">{label}</label>
+                                <input type={tipo || "number"} value={getAttr(npc.id, attr, val || 0)}
+                                  onChange={e => editarAttrLocal(npc.id, attr, e.target.value)}
+                                  onClick={e => e.stopPropagation()}
+                                  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-lg w-full py-2 focus:outline-none focus:border-[#c8a84b50]"
+                                  style={{ borderRadius: '2px' }} />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
                       {/* ATRIBUTOS EDITÁVEIS */}
                       {Object.keys(attrs).length > 0 && (
                         <div>
