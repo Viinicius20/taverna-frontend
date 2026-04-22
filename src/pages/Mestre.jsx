@@ -391,6 +391,50 @@ export default function Mestre() {
                           </div>
                         </div>
                       )}
+
+                      {/* SPELLCASTING */}
+                      {d.spellcasting && (
+                        <div className="border border-[#c8a84b15] bg-[#c8a84b05] p-4">
+                          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">LANÇAMENTO DE FEITIÇOS</p>
+                          
+                          <div className="grid grid-cols-2 gap-3 mb-4 pb-4 border-b border-[#c8a84b10]">
+                            <div>
+                              <label style={cinzel} className="text-[#c8a84b] text-xs tracking-widest block mb-1">HABILIDADE</label>
+                              <select value={getNota(npc.id, 'spellcasting_ability', d.spellcasting.ability || 'int')}
+                                onChange={e => editarNotaLocal(npc.id, 'spellcasting_ability', e.target.value)}
+                                onClick={e => e.stopPropagation()}
+                                className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-2 py-1 w-full focus:outline-none focus:border-[#c8a84b50] text-xs"
+                                style={{ borderRadius: '2px' }}>
+                                {Object.entries(attrLabel).map(([key, val]) => (
+                                  <option key={key} value={key}>{val}</option>
+                                ))}
+                              </select>
+                            </div>
+                            <div>
+                              <label style={cinzel} className="text-[#c8a84b] text-xs tracking-widest block mb-1">DC</label>
+                              <input type="number" value={getNota(npc.id, 'spellcasting_dc', d.spellcasting.dc || 0)}
+                                onChange={e => editarNotaLocal(npc.id, 'spellcasting_dc', e.target.value)}
+                                onClick={e => e.stopPropagation()}
+                                className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-lg w-full py-1 focus:outline-none focus:border-[#c8a84b50]"
+                                style={{ borderRadius: '2px' }} />
+                            </div>
+                          </div>
+
+                          {d.spellcasting.spells && d.spellcasting.spells.length > 0 ? (
+                            <div className="space-y-2">
+                              {d.spellcasting.spells.map((spell, idx) => (
+                                <div key={idx} className="bg-[#0f0e0c] border border-[#c8a84b10] p-2 flex items-center gap-2 text-xs">
+                                  <span className="flex-1 text-[#6a6050]">{spell.name || 'Sem nome'}</span>
+                                  <span style={cinzel} className="text-[#4a4030] text-xs">N{spell.level || 0}</span>
+                                  <span style={cinzel} className="text-[#4a4030] text-xs">{spell.slots_used || 0}/{spell.slots || 0}</span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-[#4a4030] text-xs text-center py-2">Sem feitiços</p>
+                          )}
+                        </div>
+                      )}
                       
                       {/* ATRIBUTOS EDITÁVEIS */}
                       {Object.keys(attrs).length > 0 && (

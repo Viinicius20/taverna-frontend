@@ -74,34 +74,34 @@ export default function Ficha() {
   }
 
   function editarCombat(campo, valor) {
-  setFicha(prev => {
-    const combatAtual = prev.combat || {};           // ← Garante que sempre existe
-    return {
-      ...prev,
-      combat: {
-        ...combatAtual,
-        [campo]: campo === 'hit_dice' ? valor : Number(valor) || 0
-      }
-    };
-  });
-}
+    setFicha(prev => {
+      const combatAtual = prev.combat || {};
+      return {
+        ...prev,
+        combat: {
+          ...combatAtual,
+          [campo]: campo === 'hit_dice' ? valor : Number(valor) || 0
+        }
+      };
+    });
+  }
 
   function editarSavingThrow(attr, valor) {
-  setFicha(prev => {
-    const combatAtual = prev.combat || {};
-    const savingAtual = combatAtual.saving_throws || {};
-    return {
-      ...prev,
-      combat: {
-        ...combatAtual,
-        saving_throws: {
-          ...savingAtual,
-          [attr]: Number(valor) || 0
+    setFicha(prev => {
+      const combatAtual = prev.combat || {};
+      const savingAtual = combatAtual.saving_throws || {};
+      return {
+        ...prev,
+        combat: {
+          ...combatAtual,
+          saving_throws: {
+            ...savingAtual,
+            [attr]: Number(valor) || 0
+          }
         }
-      }
-    };
-  });
-}
+      };
+    });
+  }
 
   async function salvarFicha() {
     setSalvando(true);
@@ -249,95 +249,201 @@ export default function Ficha() {
           </div>
         </div>
 
-        {/* STATS DE COMBATE - VERSÃO CORRIGIDA */}
-<div className="border border-[#c8a84b20] bg-[#161410] mb-6">
-  <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
-    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">STATS DE COMBATE</p>
-  </div>
-
-  <div className="p-6">
-    {/* HP em destaque */}
-    <div className="flex items-center gap-4 mb-6 border border-[#c8a84b15] bg-[#0f0e0c] p-4 rounded">
-      <div className="flex-1">
-        <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">HP ATUAL</label>
-        <input 
-          type="number" 
-          value={combat.hp ?? 0}
-          onChange={e => editarCombat('hp', e.target.value)}
-          className="bg-transparent border-b border-[#c8a84b30] text-[#f0e8d8] text-3xl font-light w-full focus:outline-none focus:border-[#c8a84b60] text-center pb-1"
-          style={cinzel} 
-        />
-      </div>
-      <span className="text-[#4a4030] text-2xl">/</span>
-      <div className="flex-1">
-        <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">HP MÁXIMO</label>
-        <input 
-          type="number" 
-          value={combat.hp_max ?? 0}
-          onChange={e => editarCombat('hp_max', e.target.value)}
-          className="bg-transparent border-b border-[#c8a84b30] text-[#f0e8d8] text-3xl font-light w-full focus:outline-none focus:border-[#c8a84b60] text-center pb-1"
-          style={cinzel} 
-        />
-      </div>
-    </div>
-
-    {/* Outros stats */}
-    <div className="grid grid-cols-3 gap-4 mb-6">
-      {combatFields.filter(f => !['hp', 'hp_max'].includes(f.campo)).map(({ label, campo, tipo }) => (
-        <div key={campo} className="flex flex-col items-center border border-[#c8a84b15] bg-[#0f0e0c] p-3 rounded">
-          <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest mb-2 text-center">{label}</label>
-          <input
-            type={tipo}
-            value={combat[campo] ?? (tipo === 'number' ? 0 : '')}
-            onChange={e => editarCombat(campo, e.target.value)}
-            className="bg-transparent text-[#c8a84b] text-xl font-light w-full focus:outline-none text-center"
-            style={cinzel}
-          />
-        </div>
-      ))}
-    </div>
-
-    {/* Salvaguardas */}
-    <div>
-      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">SALVAGUARDAS</p>
-      <div className="grid grid-cols-6 gap-2">
-        {Object.entries(combat.saving_throws || {}).map(([attr, val]) => (
-          <div key={attr} className="flex flex-col items-center gap-1">
-            <label style={cinzel} className="text-[#4a4030] text-xs">{saveLabel[attr] || attr.toUpperCase()}</label>
-            <input 
-              type="number" 
-              value={val ?? 0}
-              onChange={e => editarSavingThrow(attr, e.target.value)}
-              className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-sm w-full py-1.5 focus:outline-none focus:border-[#c8a84b50]"
-              style={{ borderRadius: '2px', ...cinzel }} 
-            />
+        {/* STATS DE COMBATE */}
+        <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+          <div className="px-6 py-4 border-b border-[#c8a84b15]">
+            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">STATS DE COMBATE</p>
           </div>
-        ))}
-      </div>
-    </div>
-  </div>
-</div>
-           : (
-            <div className="p-6">
-              <p className="text-[#4a4030] text-sm font-light text-center py-4">
-                Este personagem foi criado antes desta funcionalidade. Edite e salve a ficha para adicionar os stats de combate manualmente, ou recrie o personagem para preenchimento automático.
-              </p>
-              <div className="grid grid-cols-3 gap-4 mt-4">
-                {combatFields.map(({ label, campo, tipo }) => (
-                  <div key={campo} className="flex flex-col items-center border border-[#c8a84b15] bg-[#0f0e0c] p-3">
-                    <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest mb-2 text-center">{label}</label>
-                    <input
-                      type={tipo}
-                      defaultValue={tipo === 'number' ? 0 : ''}
-                      onChange={e => editarCombat(campo, e.target.value)}
-                      className="bg-transparent text-[#c8a84b] text-xl font-light w-full focus:outline-none text-center"
-                      style={cinzel} />
+          <div className="p-6">
+            <div className="flex items-center gap-4 mb-6 border border-[#c8a84b15] bg-[#0f0e0c] p-4 rounded">
+              <div className="flex-1">
+                <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">HP ATUAL</label>
+                <input 
+                  type="number" 
+                  value={combat.hp ?? 0}
+                  onChange={e => editarCombat('hp', e.target.value)}
+                  className="bg-transparent border-b border-[#c8a84b30] text-[#f0e8d8] text-3xl font-light w-full focus:outline-none focus:border-[#c8a84b60] text-center pb-1"
+                  style={cinzel} 
+                />
+              </div>
+              <span className="text-[#4a4030] text-2xl">/</span>
+              <div className="flex-1">
+                <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">HP MÁXIMO</label>
+                <input 
+                  type="number" 
+                  value={combat.hp_max ?? 0}
+                  onChange={e => editarCombat('hp_max', e.target.value)}
+                  className="bg-transparent border-b border-[#c8a84b30] text-[#f0e8d8] text-3xl font-light w-full focus:outline-none focus:border-[#c8a84b60] text-center pb-1"
+                  style={cinzel} 
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              {combatFields.filter(f => !['hp', 'hp_max'].includes(f.campo)).map(({ label, campo, tipo }) => (
+                <div key={campo} className="flex flex-col items-center border border-[#c8a84b15] bg-[#0f0e0c] p-3 rounded">
+                  <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest mb-2 text-center">{label}</label>
+                  <input
+                    type={tipo}
+                    value={combat[campo] ?? (tipo === 'number' ? 0 : '')}
+                    onChange={e => editarCombat(campo, e.target.value)}
+                    className="bg-transparent text-[#c8a84b] text-xl font-light w-full focus:outline-none text-center"
+                    style={cinzel}
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div>
+              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">SALVAGUARDAS</p>
+              <div className="grid grid-cols-6 gap-2">
+                {Object.entries(combat.saving_throws || {}).map(([attr, val]) => (
+                  <div key={attr} className="flex flex-col items-center gap-1">
+                    <label style={cinzel} className="text-[#4a4030] text-xs">{saveLabel[attr] || attr.toUpperCase()}</label>
+                    <input 
+                      type="number" 
+                      value={val ?? 0}
+                      onChange={e => editarSavingThrow(attr, e.target.value)}
+                      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-sm w-full py-1.5 focus:outline-none focus:border-[#c8a84b50]"
+                      style={{ borderRadius: '2px', ...cinzel }} 
+                    />
                   </div>
                 ))}
               </div>
             </div>
-          )
+          </div>
         </div>
+
+        {/* SPELLCASTING */}
+        {ficha.spellcasting && (
+          <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+            <div className="px-6 py-4 border-b border-[#c8a84b15]">
+              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">LANÇAMENTO DE FEITIÇOS</p>
+            </div>
+            <div className="p-6 flex flex-col gap-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">HABILIDADE</label>
+                  <select value={ficha.spellcasting.ability || 'int'}
+                    onChange={e => setFicha(prev => ({
+                      ...prev,
+                      spellcasting: { ...prev.spellcasting, ability: e.target.value }
+                    }))}
+                    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
+                    style={{ borderRadius: '2px' }}>
+                    {Object.entries(attrLabel).map(([key, val]) => (
+                      <option key={key} value={key}>{val}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">DC DO FEITIÇO</label>
+                  <input type="number" value={ficha.spellcasting.dc || 0}
+                    onChange={e => setFicha(prev => ({
+                      ...prev,
+                      spellcasting: { ...prev.spellcasting, dc: Number(e.target.value) }
+                    }))}
+                    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
+                    style={{ borderRadius: '2px' }} />
+                </div>
+              </div>
+
+              {ficha.spellcasting.spells && ficha.spellcasting.spells.length > 0 ? (
+                <div>
+                  <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-3">FEITIÇOS</p>
+                  <div className="space-y-2">
+                    {ficha.spellcasting.spells.map((spell, idx) => (
+                      <div key={idx} className="border border-[#c8a84b15] bg-[#0f0e0c] p-3 flex items-end gap-3">
+                        <div className="flex-1">
+                          <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest block mb-1">NOME</label>
+                          <input type="text" value={spell.name || ''}
+                            onChange={e => {
+                              const novoSpell = [...ficha.spellcasting.spells];
+                              novoSpell[idx].name = e.target.value;
+                              setFicha(prev => ({ ...prev, spellcasting: { ...prev.spellcasting, spells: novoSpell } }));
+                            }}
+                            className="bg-transparent border-b border-[#c8a84b20] text-[#e8e0d0] w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
+                            style={{ borderRadius: '0' }} />
+                        </div>
+                        <div className="w-16">
+                          <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest block mb-1">NÍVEL</label>
+                          <input type="number" min={0} max={9} value={spell.level || 0}
+                            onChange={e => {
+                              const novoSpell = [...ficha.spellcasting.spells];
+                              novoSpell[idx].level = Number(e.target.value);
+                              setFicha(prev => ({ ...prev, spellcasting: { ...prev.spellcasting, spells: novoSpell } }));
+                            }}
+                            className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
+                            style={{ borderRadius: '2px' }} />
+                        </div>
+                        <div className="w-16">
+                          <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest block mb-1">SLOTS</label>
+                          <input type="number" min={0} value={spell.slots || 0}
+                            onChange={e => {
+                              const novoSpell = [...ficha.spellcasting.spells];
+                              novoSpell[idx].slots = Number(e.target.value);
+                              setFicha(prev => ({ ...prev, spellcasting: { ...prev.spellcasting, spells: novoSpell } }));
+                            }}
+                            className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
+                            style={{ borderRadius: '2px' }} />
+                        </div>
+                        <div className="w-16">
+                          <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest block mb-1">USADOS</label>
+                          <input type="number" min={0} value={spell.slots_used || 0}
+                            onChange={e => {
+                              const novoSpell = [...ficha.spellcasting.spells];
+                              novoSpell[idx].slots_used = Number(e.target.value);
+                              setFicha(prev => ({ ...prev, spellcasting: { ...prev.spellcasting, spells: novoSpell } }));
+                            }}
+                            className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
+                            style={{ borderRadius: '2px' }} />
+                        </div>
+                        <button onClick={() => {
+                          const novoSpells = ficha.spellcasting.spells.filter((_, i) => i !== idx);
+                          setFicha(prev => ({ ...prev, spellcasting: { ...prev.spellcasting, spells: novoSpells } }));
+                        }}
+                          className="text-red-900 hover:text-red-600 px-2 py-1 text-xs border border-red-900 transition-colors"
+                          style={{ ...cinzel, borderRadius: '2px', letterSpacing: '0.5px' }}>
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={() => {
+                    setFicha(prev => ({
+                      ...prev,
+                      spellcasting: {
+                        ...prev.spellcasting,
+                        spells: [...(prev.spellcasting.spells || []), { name: '', level: 1, slots: 1, slots_used: 0 }]
+                      }
+                    }));
+                  }}
+                    className="mt-3 border border-[#c8a84b30] text-[#c8a84b] px-4 py-2 text-xs tracking-widest hover:bg-[#c8a84b10] transition-colors"
+                    style={{ ...cinzel, borderRadius: '2px' }}>
+                    + Adicionar Feitiço
+                  </button>
+                </div>
+              ) : (
+                <div className="border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3 text-center">
+                  <p className="text-[#4a4030] text-sm font-light">Nenhum feitiço registrado</p>
+                  <button onClick={() => {
+                    setFicha(prev => ({
+                      ...prev,
+                      spellcasting: {
+                        ...prev.spellcasting,
+                        spells: [{ name: '', level: 1, slots: 1, slots_used: 0 }]
+                      }
+                    }));
+                  }}
+                    className="mt-2 border border-[#c8a84b30] text-[#c8a84b] px-4 py-1 text-xs tracking-widest hover:bg-[#c8a84b10] transition-colors"
+                    style={{ ...cinzel, borderRadius: '2px' }}>
+                    + Adicionar Feitiço
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* ATRIBUTOS */}
         {ficha.attributes && (
@@ -389,7 +495,9 @@ export default function Ficha() {
               <p className="text-[#4a4030] text-xs mt-1">Clique para ver descrição</p>
             </div>
             <div className="p-6 flex flex-wrap gap-2">
-              {ficha.features.map((f, i) => (
+              {ficha.features
+              .filter(f => !f.toLowerCase().includes('spellcasting'))  // ← Filtra
+              .map((f, i) => (
                 <button key={i} onClick={() => abrirSkill(f)}
                   className="border border-[#c8a84b25] bg-[#c8a84b08] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b18] hover:border-[#c8a84b50] transition-all"
                   style={{ ...cinzel, borderRadius: '2px', letterSpacing: '0.5px' }}>
@@ -445,132 +553,133 @@ export default function Ficha() {
           </button>
         </div>
 
-      {/* MODAL LEVEL UP */}
-      {modalLevelUp && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
-          onClick={() => !upando && setModalLevelUp(false)}>
-          <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full"
-            style={{ borderRadius: '2px' }}
-            onClick={e => e.stopPropagation()}>
-            <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
-              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">SUBIR DE NÍVEL</p>
-              {!upando && (
-                <button onClick={() => setModalLevelUp(false)}
-                  className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
-              )}
-            </div>
-            <div className="px-6 py-6 flex flex-col gap-5">
-              <div className="flex items-center gap-4">
-                <div className="text-center">
-                  <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest mb-1">ATUAL</p>
-                  <p style={cinzel} className="text-[#c8a84b] text-3xl font-bold">{ficha.level}</p>
-                </div>
-                <div className="text-[#4a4030] text-2xl flex-1 text-center">→</div>
-                <div className="text-center">
-                  <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest mb-1">NOVO NÍVEL</p>
-                  <input type="number" min={ficha.level + 1} max={20} value={nivelAlvo}
-                    onChange={e => setNivelAlvo(Number(e.target.value))}
-                    className="bg-[#0f0e0c] border border-[#c8a84b30] text-[#c8a84b] text-center text-3xl font-bold w-20 py-2 focus:outline-none focus:border-[#c8a84b60]"
-                    style={{ ...cinzel, borderRadius: '2px' }} />
-                </div>
+        {/* MODAL LEVEL UP */}
+        {modalLevelUp && (
+          <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
+            onClick={() => !upando && setModalLevelUp(false)}>
+            <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full"
+              style={{ borderRadius: '2px' }}
+              onClick={e => e.stopPropagation()}>
+              <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
+                <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">SUBIR DE NÍVEL</p>
+                {!upando && (
+                  <button onClick={() => setModalLevelUp(false)}
+                    className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
+                )}
               </div>
-              <div className="border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3">
-                <p className="text-[#6a6050] text-sm font-light">
-                  ✦ A IA vai adicionar automaticamente todas as features, melhorias de atributos e recalcular os stats de combate. Você poderá editar depois.
-                </p>
-              </div>
-              {upando && (
-                <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin flex-shrink-0" />
-                  <p style={cinzel} className="text-[#c8a84b] text-xs tracking-widest">SUBINDO DE NÍVEL...</p>
+              <div className="px-6 py-6 flex flex-col gap-5">
+                <div className="flex items-center gap-4">
+                  <div className="text-center">
+                    <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest mb-1">ATUAL</p>
+                    <p style={cinzel} className="text-[#c8a84b] text-3xl font-bold">{ficha.level}</p>
+                  </div>
+                  <div className="text-[#4a4030] text-2xl flex-1 text-center">→</div>
+                  <div className="text-center">
+                    <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest mb-1">NOVO NÍVEL</p>
+                    <input type="number" min={ficha.level + 1} max={20} value={nivelAlvo}
+                      onChange={e => setNivelAlvo(Number(e.target.value))}
+                      className="bg-[#0f0e0c] border border-[#c8a84b30] text-[#c8a84b] text-center text-3xl font-bold w-20 py-2 focus:outline-none focus:border-[#c8a84b60]"
+                      style={{ ...cinzel, borderRadius: '2px' }} />
+                  </div>
                 </div>
-              )}
-              <button onClick={fazerLevelUp} disabled={upando || nivelAlvo <= ficha.level || nivelAlvo > 20}
-                className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
-                style={{ ...cinzel, borderRadius: '2px' }}>
-                {upando ? 'Aguarde...' : `Subir para Nível ${nivelAlvo} com IA →`}
-              </button>
-              <button onClick={() => !upando && setModalLevelUp(false)}
-                className="text-[#4a4030] text-xs tracking-widest hover:text-[#6a6050] transition-colors text-center"
-                style={cinzel}>
-                Cancelar — prefiro editar manualmente
-              </button>
+                <div className="border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3">
+                  <p className="text-[#6a6050] text-sm font-light">
+                    ✦ A IA vai adicionar automaticamente todas as features, melhorias de atributos e recalcular os stats de combate.
+                  </p>
+                </div>
+                {upando && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-5 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin flex-shrink-0" />
+                    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-widest">SUBINDO DE NÍVEL...</p>
+                  </div>
+                )}
+                <button onClick={fazerLevelUp} disabled={upando || nivelAlvo <= ficha.level || nivelAlvo > 20}
+                  className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
+                  style={{ ...cinzel, borderRadius: '2px' }}>
+                  {upando ? 'Aguarde...' : `Subir para Nível ${nivelAlvo} com IA →`}
+                </button>
+                <button onClick={() => !upando && setModalLevelUp(false)}
+                  className="text-[#4a4030] text-xs tracking-widest hover:text-[#6a6050] transition-colors text-center"
+                  style={cinzel}>
+                  Cancelar
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* MODAL HABILIDADE */}
-      {modal && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
-          onClick={() => { setModal(null); setDescricaoSkill(null); }}>
-          <div className="bg-[#161410] border border-[#c8a84b30] max-w-lg w-full max-h-[80vh] overflow-y-auto"
-            style={{ borderRadius: '2px' }}
-            onClick={e => e.stopPropagation()}>
-            <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
-              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">HABILIDADE</p>
-              <button onClick={() => { setModal(null); setDescricaoSkill(null); }}
-                className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
-            </div>
-            <div className="px-6 py-6">
-              {carregandoSkill && (
-                <div className="flex flex-col items-center py-10 gap-4">
-                  <div className="w-8 h-8 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-                  <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">CONSULTANDO A IA...</p>
-                </div>
-              )}
-              {!carregandoSkill && descricaoSkill && !descricaoSkill.error && (
-                <div className="flex flex-col gap-5">
-                  <div>
-                    <h2 style={cinzel} className="text-[#f0e8d8] text-xl font-semibold mb-2">
-                      {descricaoSkill.name || modal.skill}
-                    </h2>
-                    {descricaoSkill.type && (
-                      <span className="text-xs px-3 py-1 border"
-                        style={{
-                          ...cinzel, borderRadius: '2px', letterSpacing: '1px',
-                          color: tipoColor[descricaoSkill.type] || '#c8a84b',
-                          borderColor: `${tipoColor[descricaoSkill.type] || '#c8a84b'}40`,
-                          background: `${tipoColor[descricaoSkill.type] || '#c8a84b'}10`,
-                        }}>
-                        {descricaoSkill.type.toUpperCase()}
-                      </span>
+        {/* MODAL HABILIDADE */}
+        {modal && (
+          <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
+            onClick={() => { setModal(null); setDescricaoSkill(null); }}>
+            <div className="bg-[#161410] border border-[#c8a84b30] max-w-lg w-full max-h-[80vh] overflow-y-auto"
+              style={{ borderRadius: '2px' }}
+              onClick={e => e.stopPropagation()}>
+              <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
+                <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">HABILIDADE</p>
+                <button onClick={() => { setModal(null); setDescricaoSkill(null); }}
+                  className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
+              </div>
+              <div className="px-6 py-6">
+                {carregandoSkill && (
+                  <div className="flex flex-col items-center py-10 gap-4">
+                    <div className="w-8 h-8 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
+                    <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">CONSULTANDO A IA...</p>
+                  </div>
+                )}
+                {!carregandoSkill && descricaoSkill && !descricaoSkill.error && (
+                  <div className="flex flex-col gap-5">
+                    <div>
+                      <h2 style={cinzel} className="text-[#f0e8d8] text-xl font-semibold mb-2">
+                        {descricaoSkill.name || modal.skill}
+                      </h2>
+                      {descricaoSkill.type && (
+                        <span className="text-xs px-3 py-1 border"
+                          style={{
+                            ...cinzel, borderRadius: '2px', letterSpacing: '1px',
+                            color: tipoColor[descricaoSkill.type] || '#c8a84b',
+                            borderColor: `${tipoColor[descricaoSkill.type] || '#c8a84b'}40`,
+                            background: `${tipoColor[descricaoSkill.type] || '#c8a84b'}10`,
+                          }}>
+                          {descricaoSkill.type.toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    {descricaoSkill.source && (
+                      <div>
+                        <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-1">ORIGEM</p>
+                        <p className="text-[#6a6050] text-sm font-light">{descricaoSkill.source}</p>
+                      </div>
+                    )}
+                    {descricaoSkill.description && (
+                      <div>
+                        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">DESCRIÇÃO</p>
+                        <p className="text-[#a09880] text-base leading-relaxed font-light">{descricaoSkill.description}</p>
+                      </div>
+                    )}
+                    {descricaoSkill.mechanics && (
+                      <div className="border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-4">
+                        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">EM JOGO</p>
+                        <p className="text-[#8a8070] text-sm leading-relaxed font-light">{descricaoSkill.mechanics}</p>
+                      </div>
                     )}
                   </div>
-                  {descricaoSkill.source && (
-                    <div>
-                      <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-1">ORIGEM</p>
-                      <p className="text-[#6a6050] text-sm font-light">{descricaoSkill.source}</p>
-                    </div>
-                  )}
-                  {descricaoSkill.description && (
-                    <div>
-                      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">DESCRIÇÃO</p>
-                      <p className="text-[#a09880] text-base leading-relaxed font-light">{descricaoSkill.description}</p>
-                    </div>
-                  )}
-                  {descricaoSkill.mechanics && (
-                    <div className="border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-4">
-                      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">EM JOGO</p>
-                      <p className="text-[#8a8070] text-sm leading-relaxed font-light">{descricaoSkill.mechanics}</p>
-                    </div>
-                  )}
-                </div>
-              )}
-              {!carregandoSkill && descricaoSkill?.error && (
-                <p className="text-red-400 text-sm text-center py-8">{descricaoSkill.error}</p>
-              )}
-            </div>
-            <div className="px-6 pb-6">
-              <button onClick={() => { setModal(null); setDescricaoSkill(null); }}
-                className="border border-[#c8a84b30] text-[#6a6050] px-6 py-2 text-xs tracking-widest hover:border-[#c8a84b60] hover:text-[#c8a84b] transition-colors w-full"
-                style={{ ...cinzel, borderRadius: '2px' }}>
-                Fechar
-              </button>
+                )}
+                {!carregandoSkill && descricaoSkill?.error && (
+                  <p className="text-red-400 text-sm text-center py-8">{descricaoSkill.error}</p>
+                )}
+              </div>
+              <div className="px-6 pb-6">
+                <button onClick={() => { setModal(null); setDescricaoSkill(null); }}
+                  className="border border-[#c8a84b30] text-[#6a6050] px-6 py-2 text-xs tracking-widest hover:border-[#c8a84b60] hover:text-[#c8a84b] transition-colors w-full"
+                  style={{ ...cinzel, borderRadius: '2px' }}>
+                  Fechar
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
