@@ -495,9 +495,7 @@ export default function Ficha() {
               <p className="text-[#4a4030] text-xs mt-1">Clique para ver descrição</p>
             </div>
             <div className="p-6 flex flex-wrap gap-2">
-              {ficha.features
-              .filter(f => !f.toLowerCase().includes('spellcasting'))  // ← Filtra
-              .map((f, i) => (
+              {ficha.features.filter(f => !f.toLowerCase().includes('spellcasting')).map((f, i) => (
                 <button key={i} onClick={() => abrirSkill(f)}
                   className="border border-[#c8a84b25] bg-[#c8a84b08] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b18] hover:border-[#c8a84b50] transition-all"
                   style={{ ...cinzel, borderRadius: '2px', letterSpacing: '0.5px' }}>
