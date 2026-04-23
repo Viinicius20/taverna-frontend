@@ -16,6 +16,8 @@ export default function CriarPersonagem() {
   const [salvando, setSalvando] = useState(false);
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfNome, setPdfNome] = useState('');
+  const [novaClasse, setNovaClasse] = useState('');
+  const [novoLevel, setNovoLevel] = useState(1);
 
   async function gerarPersonagem() {
     if (!descricao.trim()) return;
@@ -58,6 +60,40 @@ export default function CriarPersonagem() {
       setErro('Erro ao importar PDF. Verifique se o arquivo é uma ficha de RPG válida.');
       setStep('form');
     }
+  }
+
+  // ========== FUNÇÕES DE MULTICLASSING ==========
+  function adicionarClasse() {
+    if (!novaClasse.trim()) return;
+    setFicha(prev => ({
+      ...prev,
+      classes: [
+        ...(prev.classes || []),
+        { name: novaClasse, level: novoLevel }
+      ]
+    }));
+    setNovaClasse('');
+    setNovoLevel(1);
+  }
+
+  function removerClasse(index) {
+    setFicha(prev => ({
+      ...prev,
+      classes: prev.classes.filter((_, i) => i !== index)
+    }));
+  }
+
+  function editarClasse(index, campo, valor) {
+    setFicha(prev => ({
+      ...prev,
+      classes: prev.classes.map((c, i) => 
+        i === index ? { ...c, [campo]: valor } : c
+      )
+    }));
+  }
+
+  function calcularTotalLevel() {
+    return (ficha?.classes || []).reduce((sum, c) => sum + (c.level || 1), 0);
   }
 
   function editarCampo(campo, valor) {
@@ -237,7 +273,6 @@ export default function CriarPersonagem() {
                 {[
                   { label: 'NOME', campo: 'name' },
                   { label: 'RAÇA', campo: 'race' },
-                  { label: 'CLASSE', campo: 'class' },
                   { label: 'ANTECEDENTE', campo: 'background' },
                   { label: 'ALINHAMENTO', campo: 'alignment' },
                 ].map(({ label, campo }) => (
@@ -254,6 +289,75 @@ export default function CriarPersonagem() {
                     onChange={e => editarCampo('level', Number(e.target.value))}
                     className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
                     style={{ borderRadius: '2px' }} />
+                </div>
+              </div>
+            </div>
+            
+            {/* CLASSES MÚLTIPLAS */}
+            <div className="border border-[#c8a84b20] bg-[#161410]">
+              <div className="px-6 py-4 border-b border-[#c8a84b15]">
+                <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">CLASSES ({calcularTotalLevel()} total)</p>
+              </div>
+              <div className="p-6 flex flex-col gap-3">
+                {/* Lista de classes */}
+                {(ficha.classes || []).map((cls, idx) => (
+                  <div key={idx} className="flex gap-2 items-center bg-[#0f0e0c] p-3 border border-[#c8a84b20]">
+                    <input 
+                      value={cls.name} 
+                      onChange={e => editarClasse(idx, 'name', e.target.value)}
+                      className="flex-1 bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-2 py-1 text-sm focus:outline-none focus:border-[#c8a84b50]"
+                      style={{ borderRadius: '2px' }}
+                      placeholder="Nome da classe"
+                    />
+                    <div className="flex items-center gap-1">
+                      <label className="text-[#6a6050] text-xs">Lvl:</label>
+                      <input 
+                        type="number" 
+                        min={1} 
+                        max={20}
+                        value={cls.level || 1}
+                        onChange={e => editarClasse(idx, 'level', Number(e.target.value))}
+                        className="w-16 bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-2 py-1 text-center text-sm focus:outline-none focus:border-[#c8a84b50]"
+                        style={{ borderRadius: '2px' }}
+                      />
+                    </div>
+                    {ficha.classes.length > 1 && (
+                      <button 
+                        onClick={() => removerClasse(idx)}
+                        className="text-red-400 hover:text-red-300 text-sm px-2"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                ))}
+
+                {/* Adicionar nova classe */}
+                <div className="flex gap-2 items-end pt-2 border-t border-[#c8a84b15]">
+                  <input 
+                    value={novaClasse}
+                    onChange={e => setNovaClasse(e.target.value)}
+                    placeholder="Nova classe"
+                    className="flex-1 bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+                    style={{ borderRadius: '2px' }}
+                  />
+                  <input 
+                    type="number" 
+                    min={1} 
+                    max={20}
+                    value={novoLevel}
+                    onChange={e => setNovoLevel(Number(e.target.value))}
+                    className="w-16 bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-2 py-2 text-center text-sm focus:outline-none focus:border-[#c8a84b50]"
+                    style={{ borderRadius: '2px' }}
+                  />
+                  <button 
+                    onClick={adicionarClasse}
+                    disabled={!novaClasse.trim()}
+                    className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-sm font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
+                    style={{ ...cinzel, borderRadius: '2px' }}
+                  >
+                    + Classe
+                  </button>
                 </div>
               </div>
             </div>
