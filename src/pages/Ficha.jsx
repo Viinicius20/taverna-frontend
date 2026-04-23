@@ -44,6 +44,10 @@ export default function Ficha() {
   const [descricaoSkill, setDescricaoSkill] = useState(null);
   const [carregandoSkill, setCarregandoSkill] = useState(false);
 
+  const [modalAddSpell, setModalAddSpell] = useState(false);
+  const [availableSpells, setAvailableSpells] = useState([]);
+  const [loadingSpells, setLoadingSpells] = useState(false);
+
   useEffect(() => {
     buscarPersonagem();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -155,6 +159,31 @@ export default function Ficha() {
       setDescricaoSkill({ error: 'Não foi possível carregar a descrição.' });
     }
     setCarregandoSkill(false);
+  }
+
+  async function abrirModalAddSpell() {
+    setModalAddSpell(true);
+    setLoadingSpells(true);
+    try {
+      const className = ficha.class.split('(')[0].trim();
+      const res = await api.get(`/spells?class_name=${className}`);
+      setAvailableSpells(res.data.data);
+    } catch {
+      setAvailableSpells([]);
+    }
+    setLoadingSpells(false);
+  }
+
+  function adicionarFeiticoDoDropdown(spell) {
+    setFicha(prev => ({
+      ...prev,
+      spellcasting: {
+        ...prev.spellcasting,
+        spells: [...(prev.spellcasting.spells || []), 
+          { name: spell.name, level: spell.level, slots: 0, slots_used: 0 }]
+      }
+    }));
+    setModalAddSpell(false);
   }
 
   if (carregando) return (
@@ -409,15 +438,7 @@ export default function Ficha() {
                       </div>
                     ))}
                   </div>
-                  <button onClick={() => {
-                    setFicha(prev => ({
-                      ...prev,
-                      spellcasting: {
-                        ...prev.spellcasting,
-                        spells: [...(prev.spellcasting.spells || []), { name: '', level: 1, slots: 1, slots_used: 0 }]
-                      }
-                    }));
-                  }}
+                  <button onClick={abrirModalAddSpell}
                     className="mt-3 border border-[#c8a84b30] text-[#c8a84b] px-4 py-2 text-xs tracking-widest hover:bg-[#c8a84b10] transition-colors"
                     style={{ ...cinzel, borderRadius: '2px' }}>
                     + Adicionar Feitiço
@@ -426,21 +447,47 @@ export default function Ficha() {
               ) : (
                 <div className="border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3 text-center">
                   <p className="text-[#4a4030] text-sm font-light">Nenhum feitiço registrado</p>
-                  <button onClick={() => {
-                    setFicha(prev => ({
-                      ...prev,
-                      spellcasting: {
-                        ...prev.spellcasting,
-                        spells: [{ name: '', level: 1, slots: 1, slots_used: 0 }]
-                      }
-                    }));
-                  }}
+                  <button onClick={abrirModalAddSpell}
                     className="mt-2 border border-[#c8a84b30] text-[#c8a84b] px-4 py-1 text-xs tracking-widest hover:bg-[#c8a84b10] transition-colors"
                     style={{ ...cinzel, borderRadius: '2px' }}>
                     + Adicionar Feitiço
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* MODAL ADICIONAR FEITIÇO */}
+        {modalAddSpell && (
+          <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
+            onClick={() => setModalAddSpell(false)}>
+            <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full"
+              style={{ borderRadius: '2px' }}
+              onClick={e => e.stopPropagation()}>
+              <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
+                <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">ADICIONAR FEITIÇO</p>
+                <button onClick={() => setModalAddSpell(false)}
+                  className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
+              </div>
+              <div className="px-6 py-6 flex flex-col gap-4">
+                {loadingSpells ? (
+                  <div className="flex items-center gap-3 justify-center py-4">
+                    <div className="w-5 h-5 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
+                    <p style={cinzel} className="text-[#4a4030] text-xs">CARREGANDO...</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {availableSpells.map((spell, i) => (
+                      <button key={i} onClick={() => adicionarFeiticoDoDropdown(spell)}
+                        className="w-full text-left border border-[#c8a84b25] bg-[#c8a84b08] text-[#c8a84b] px-3 py-2 text-xs hover:bg-[#c8a84b18] transition-colors"
+                        style={{ borderRadius: '2px', letterSpacing: '0.5px' }}>
+                        <span className="font-bold">{spell.name}</span> <span className="text-[#4a4030]">(Nível {spell.level})</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
