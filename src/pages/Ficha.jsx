@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../services/api';
 
+
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
 const attrLabel = { str: 'FOR', dex: 'DES', con: 'CON', int: 'INT', wis: 'SAB', cha: 'CAR' };
@@ -39,6 +40,9 @@ export default function Ficha() {
   const [modalLevelUp, setModalLevelUp] = useState(false);
   const [nivelAlvo, setNivelAlvo] = useState(2);
   const [upando, setUpando] = useState(false);
+
+  const [showClassLevelUpModal, setShowClassLevelUpModal] = useState(false);
+  const [classeSelecionada, setClasseSelecionada] = useState(null);
 
   const [modal, setModal] = useState(null);
   const [descricaoSkill, setDescricaoSkill] = useState(null);
@@ -125,26 +129,6 @@ export default function Ficha() {
     setSalvando(false);
   }
 
-  async function fazerLevelUp() {
-    setUpando(true);
-    setErro('');
-    try {
-      const res = await api.post('/level-up', {
-        character_id: id,
-        ficha_atual: ficha,
-        system: personagem.system || 'D&D 5e',
-        nivel_alvo: nivelAlvo,
-      });
-      setFicha(res.data.data);
-      setModalLevelUp(false);
-      setSucesso(`Personagem subiu para o nível ${nivelAlvo}!`);
-      setTimeout(() => setSucesso(''), 4000);
-    } catch {
-      setErro('Erro ao subir de nível. Tente novamente.');
-    }
-    setUpando(false);
-  }
-
   async function abrirSkill(skillName) {
     setModal({ skill: skillName });
     setDescricaoSkill(null);
@@ -186,6 +170,70 @@ export default function Ficha() {
     setModalAddSpell(false);
   }
 
+  // ===== FUNÇÕES DE LEVEL UP COM MULTICLASSING =====
+  async function handleLevelUp() {
+    if (!ficha) return;
+
+    const totalLevelAtual = ficha.level || 1;
+    
+    if (totalLevelAtual >= 20) {
+      alert("Nível máximo atingido (20)");
+      return;
+    }
+
+    const temMultiplasClasses = 
+      Array.isArray(ficha.classes) && ficha.classes.length > 1;
+
+    if (temMultiplasClasses) {
+      setShowClassLevelUpModal(true);
+      return;
+    }
+
+    // Se tem só 1 classe, faz level up direto
+    const proximoNivel = totalLevelAtual + 1;
+    await fazerLevelUpComClasse(proximoNivel, null);
+  }
+
+  async function fazerLevelUpComClasse(novoNivel, classNameAlvo) {
+    setUpando(true);
+    setErro('');
+    try {
+      const payload = {
+        character_id: id,
+        ficha_atual: ficha,
+        system: personagem.system || 'D&D 5e',
+        nivel_alvo: novoNivel
+      };
+
+      if (classNameAlvo) {
+        payload.class_name = classNameAlvo;
+      }
+
+      const res = await api.post('/level-up', payload);
+      
+      setFicha(res.data.data);
+      setModalLevelUp(false);
+      setShowClassLevelUpModal(false);
+      setClasseSelecionada(null);
+      setSucesso(`${ficha.name} subiu para nível ${novoNivel}!`);
+      setTimeout(() => setSucesso(''), 4000);
+    } catch (error) {
+      setErro('Erro ao fazer level up: ' + error.message);
+    }
+    setUpando(false);
+  }
+
+  async function confirmarLevelUpComClasse(classeName) {
+    if (!classeName) {
+      alert("Escolha uma classe");
+      return;
+    }
+
+    const proximoNivel = (ficha.level || 1) + 1;
+    await fazerLevelUpComClasse(proximoNivel, classeName);
+  }
+  // ===== FIM FUNÇÕES LEVEL UP =====
+
   if (carregando) return (
     <div className="min-h-screen bg-[#0f0e0c] flex items-center justify-center" style={crimson}>
       <div className="flex flex-col items-center gap-4">
@@ -224,7 +272,7 @@ export default function Ficha() {
             <p className="text-[#6a6050] mt-1">{[ficha.race, ficha.class, ficha.background].filter(Boolean).join(' · ')}</p>
           </div>
           <div className="flex gap-3 flex-wrap">
-            <button onClick={() => setModalLevelUp(true)}
+            <button onClick={handleLevelUp}
               className="border border-[#c8a84b40] text-[#c8a84b] px-5 py-2 text-xs tracking-widest hover:bg-[#c8a84b10] transition-colors"
               style={{ ...cinzel, borderRadius: '2px' }}>
               ↑ Subir de Nível
@@ -591,14 +639,14 @@ export default function Ficha() {
             style={{ ...cinzel, borderRadius: '2px' }}>
             {salvando ? 'Salvando...' : 'Salvar Ficha'}
           </button>
-          <button onClick={() => setModalLevelUp(true)}
+          <button onClick={handleLevelUp}
             className="border border-[#c8a84b40] text-[#c8a84b] px-8 py-3 text-sm tracking-widest hover:bg-[#c8a84b10] transition-colors"
             style={{ ...cinzel, borderRadius: '2px' }}>
             ↑ Subir de Nível
           </button>
         </div>
 
-        {/* MODAL LEVEL UP */}
+        {/* MODAL LEVEL UP COM IA */}
         {modalLevelUp && (
           <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
             onClick={() => !upando && setModalLevelUp(false)}>
@@ -638,7 +686,7 @@ export default function Ficha() {
                     <p style={cinzel} className="text-[#c8a84b] text-xs tracking-widest">SUBINDO DE NÍVEL...</p>
                   </div>
                 )}
-                <button onClick={fazerLevelUp} disabled={upando || nivelAlvo <= ficha.level || nivelAlvo > 20}
+                <button onClick={() => fazerLevelUpComClasse(nivelAlvo, null)} disabled={upando}
                   className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
                   style={{ ...cinzel, borderRadius: '2px' }}>
                   {upando ? 'Aguarde...' : `Subir para Nível ${nivelAlvo} com IA →`}
@@ -646,6 +694,39 @@ export default function Ficha() {
                 <button onClick={() => !upando && setModalLevelUp(false)}
                   className="text-[#4a4030] text-xs tracking-widest hover:text-[#6a6050] transition-colors text-center"
                   style={cinzel}>
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL ESCOLHER CLASSE (Multiclassing) */}
+        {showClassLevelUpModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
+            onClick={() => !upando && setShowClassLevelUpModal(false)}>
+            <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full"
+              style={{ borderRadius: '2px' }}
+              onClick={e => e.stopPropagation()}>
+              <div className="px-6 py-4 border-b border-[#c8a84b15]">
+                <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">QUAL CLASSE SUBIR?</p>
+              </div>
+              <div className="px-6 py-6 space-y-3">
+                {ficha.classes && ficha.classes.map((cls, idx) => (
+                  <button key={idx}
+                    onClick={() => confirmarLevelUpComClasse(cls.name)}
+                    disabled={upando}
+                    className="w-full bg-[#0f0e0c] hover:bg-[#1a1814] border border-[#c8a84b30] text-[#e8e0d0] p-4 rounded text-left transition disabled:opacity-50"
+                    style={{ borderRadius: '2px' }}>
+                    <span style={cinzel} className="font-bold text-[#c8a84b]">{cls.name}</span>
+                    <span className="text-[#4a4030] text-sm float-right">{cls.level} → {cls.level + 1}</span>
+                  </button>
+                ))}
+                <button
+                  onClick={() => setShowClassLevelUpModal(false)}
+                  disabled={upando}
+                  className="w-full border border-[#4a4030] text-[#4a4030] hover:text-[#6a6050] p-2 rounded transition disabled:opacity-50"
+                  style={{ borderRadius: '2px', ...cinzel }}>
                   Cancelar
                 </button>
               </div>
