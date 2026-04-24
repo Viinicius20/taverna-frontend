@@ -174,7 +174,7 @@ export default function Ficha() {
   async function handleLevelUp() {
     if (!ficha) return;
 
-    const totalLevelAtual = ficha.level || 1;
+    const totalLevelAtual = ficha.level || ficha.total_level || 1;
     
     if (totalLevelAtual >= 20) {
       alert("Nível máximo atingido (20)");
@@ -195,6 +195,11 @@ export default function Ficha() {
   }
 
   async function fazerLevelUpComClasse(novoNivel, classNameAlvo) {
+    console.log("=== LEVEL UP DEBUG ===");
+    console.log("id:", id);
+    console.log("ficha:", ficha);
+    console.log("novoNivel:", novoNivel);
+    console.log("personagem:", personagem);
     setUpando(true);
     setErro('');
     try {
@@ -210,7 +215,9 @@ export default function Ficha() {
       }
 
       const res = await api.post('/level-up', payload);
-      
+
+      console.log("RESPOSTA COMPLETA:", res.data);
+      console.log("res.data.data:", res.data.data);
       setFicha(res.data.data);
       setModalLevelUp(false);
       setShowClassLevelUpModal(false);
@@ -218,7 +225,8 @@ export default function Ficha() {
       setSucesso(`${ficha.name} subiu para nível ${novoNivel}!`);
       setTimeout(() => setSucesso(''), 4000);
     } catch (error) {
-      setErro('Erro ao fazer level up: ' + error.message);
+    console.log("ERRO CATCH:", error.response?.data || error.message);
+    setErro('Erro ao fazer level up: ' + error.message);
     }
     setUpando(false);
   }
