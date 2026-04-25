@@ -19,23 +19,27 @@ export default function CriarPersonagem() {
   const [novaClasse, setNovaClasse] = useState('');
   const [novoLevel, setNovoLevel] = useState(1);
   const [savedId, setSavedId] = useState(null);
+  const [gerando, setGerando] = useState(false);
 
   async function gerarPersonagem() {
-    if (!descricao.trim()) return;
+    if (gerando || !descricao.trim()) return;  
+    setGerando(true);
     setStep('gerando');
-    setErro('');
     try {
       const res = await api.post('/create-character', {
-        description: descricao,
-        system: sistema,
-        campaign_context: '',
+      description: descricao,
+      system: sistema,
+      campaign_context: '',
       });
       setFicha(res.data.data);
       setSavedId(res.data.saved_id);
+      setDescricao('');
       setStep('ficha');
     } catch {
-      setErro('Erro ao gerar personagem. Verifique se o backend está rodando.');
+      setErro('Erro ao gerar personagem.');
       setStep('form');
+    } finally {
+      setGerando(false);
     }
   }
 
