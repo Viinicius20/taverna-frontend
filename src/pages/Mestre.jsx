@@ -53,7 +53,11 @@ export default function Mestre() {
       const res = await api.post('/npcs', null, {
         params: { campaign_id: CAMPANHA_ID, description: descNpc, system: sistema }
       });
-      setNpcs(prev => [res.data, ...prev]);
+      setNpcs(prev => [{
+        id: res.data.id || res.data.saved_id,
+        name: res.data.data?.name || 'NPC',
+        data: res.data.data
+      }, ...prev]);
       setDescNpc('');
       setMostrarForm(false);
       setNpcExpandido(res.data.id || res.data.saved_id);
