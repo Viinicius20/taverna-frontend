@@ -18,6 +18,7 @@ export default function CriarPersonagem() {
   const [pdfNome, setPdfNome] = useState('');
   const [novaClasse, setNovaClasse] = useState('');
   const [novoLevel, setNovoLevel] = useState(1);
+  const [savedId, setSavedId] = useState(null);
 
   async function gerarPersonagem() {
     if (!descricao.trim()) return;
@@ -30,6 +31,7 @@ export default function CriarPersonagem() {
         campaign_context: '',
       });
       setFicha(res.data.data);
+      setSavedId(res.data.saved_id);
       setStep('ficha');
     } catch {
       setErro('Erro ao gerar personagem. Verifique se o backend está rodando.');
@@ -55,6 +57,7 @@ export default function CriarPersonagem() {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setFicha(res.data.data);
+      setSavedId(res.data.saved_id);
       setStep('ficha');
     } catch {
       setErro('Erro ao importar PDF. Verifique se o arquivo é uma ficha de RPG válida.');
@@ -110,10 +113,10 @@ export default function CriarPersonagem() {
   async function salvarPersonagem() {
     setSalvando(true);
     try {
-      await api.post('/create-character', {
-        description: `Personagem salvo: ${ficha.name}`,
-        system: sistema,
-      });
+      await api.put(`/characters/${savedId}`, {
+        name: ficha.name,
+        data: ficha,
+    });
       navigate('/personagens');
     } catch {
       setErro('Erro ao salvar.');
