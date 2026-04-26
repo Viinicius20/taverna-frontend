@@ -42,7 +42,6 @@ export default function Ficha() {
   const [upando, setUpando] = useState(false);
 
   const [showClassLevelUpModal, setShowClassLevelUpModal] = useState(false);
-  const [classeSelecionada, setClasseSelecionada] = useState(null);
 
   const [modal, setModal] = useState(null);
   const [descricaoSkill, setDescricaoSkill] = useState(null);
@@ -221,7 +220,6 @@ export default function Ficha() {
       setFicha(res.data.data);
       setModalLevelUp(false);
       setShowClassLevelUpModal(false);
-      setClasseSelecionada(null);
       setSucesso(`${ficha.name} subiu para nível ${novoNivel}!`);
       setTimeout(() => setSucesso(''), 4000);
     } catch (error) {
@@ -277,7 +275,19 @@ export default function Ficha() {
           <div>
             <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">FICHA DO PERSONAGEM</p>
             <h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold">{ficha.name}</h1>
-            <p className="text-[#6a6050] mt-1">{[ficha.race, ficha.class, ficha.background].filter(Boolean).join(' · ')}</p>
+            {console.log('ficha.class TYPE:', typeof ficha.class, 'VALUE:', ficha.class)}
+            <p className="text-[#6a6050] mt-1">{[
+  ficha.race, 
+  ficha.class ? (() => {
+    try {
+      const parsed = typeof ficha.class === 'string' ? JSON.parse(ficha.class) : ficha.class;
+      return Array.isArray(parsed) ? `${parsed[0]?.name} ${parsed[0]?.level}` : ficha.class;
+    } catch {
+      return ficha.class;
+    }
+  })() : '',
+  ficha.background
+].filter(Boolean).join(' · ')}</p>
           </div>
           <div className="flex gap-3 flex-wrap">
             <button onClick={handleLevelUp}
@@ -319,9 +329,25 @@ export default function Ficha() {
             ].map(({ label, campo }) => (
               <div key={campo}>
                 <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">{label}</label>
-                <input value={ficha[campo] || ''} onChange={e => editarCampo(campo, e.target.value)}
-                  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
-                  style={{ borderRadius: '2px' }} />
+                <input 
+  disabled={campo === 'class'}
+  readOnly={campo === 'class'}
+  value={
+    campo === 'class'
+      ? ficha.class ? (() => {
+          try {
+            const parsed = typeof ficha.class === 'string' ? JSON.parse(ficha.class) : ficha.class;
+            return Array.isArray(parsed) ? `${parsed[0]?.name} ${parsed[0]?.level}` : ficha.class;
+          } catch {
+            return ficha.class;
+          }
+        })() : ''
+      : (ficha[campo] || '')
+  }
+  onChange={e => editarCampo(campo, e.target.value)}
+  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm disabled:opacity-50"
+  style={{ borderRadius: '2px' }}
+/> 
               </div>
             ))}
             <div>
