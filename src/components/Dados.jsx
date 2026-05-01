@@ -17,6 +17,25 @@ function rolar(lados) {
   return Math.floor(Math.random() * lados) + 1;
 }
 
+function tocarSomDado() {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  
+  [0, 0.08, 0.16, 0.25, 0.35, 0.46].forEach((tempo, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    
+    osc.type = 'square';
+    osc.frequency.value = 180 + Math.random() * 120;
+    gain.gain.setValueAtTime(0.15 - i * 0.02, ctx.currentTime + tempo);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + tempo + 0.06);
+    
+    osc.start(ctx.currentTime + tempo);
+    osc.stop(ctx.currentTime + tempo + 0.08);
+  });
+}
+
 export default function Dados({ secreto = false }) {
   const [historico, setHistorico] = useState([]);
   const [rolando, setRolando] = useState(null);
@@ -25,6 +44,7 @@ export default function Dados({ secreto = false }) {
   const [ultimoResultado, setUltimoResultado] = useState(null);
 
   async function rolarDado(dado) {
+    tocarSomDado();
     setRolando(dado.tipo);
     setUltimoResultado(null);
 
