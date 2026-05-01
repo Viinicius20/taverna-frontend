@@ -51,6 +51,12 @@ export default function Ficha() {
   const [availableSpells, setAvailableSpells] = useState([]);
   const [loadingSpells, setLoadingSpells] = useState(false);
 
+  const [tab, setTab] = useState('procurar'); 
+  const [homebrewInput, setHomebrewInput] = useState('');
+  const [criandoHomebrew, setCriandoHomebrew] = useState(false);
+
+  const [spellDetalhes, setSpellDetalhes] = useState(null);
+
   useEffect(() => {
     buscarPersonagem();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -148,7 +154,9 @@ export default function Ficha() {
     setModalAddSpell(true);
     setLoadingSpells(true);
     try {
-      const className = ficha.class.split('(')[0].trim();
+      const className = (ficha.classes && ficha.classes.length > 0) 
+        ? ficha.classes[0].name 
+        : 'Wizard';
       const res = await api.get(`/spells?class_name=${className}`);
       setAvailableSpells(res.data.data);
     } catch {
@@ -163,11 +171,52 @@ export default function Ficha() {
       spellcasting: {
         ...prev.spellcasting,
         spells: [...(prev.spellcasting.spells || []), 
-          { name: spell.name, level: spell.level, slots: 0, slots_used: 0 }]
+          { 
+            name: spell.name, 
+            level: spell.level, 
+            slots: 0, 
+            slots_used: 0,
+            description: spell.description || '',
+            mechanics: spell.mechanics || '',
+            range: spell.range || '',
+            duration: spell.duration || '',
+            components: spell.components || '',
+            school: spell.school || ''
+          }]
       }
     }));
     setModalAddSpell(false);
   }
+
+  async function criarMagiaHomebrew() {
+  if (!homebrewInput.trim()) {
+    alert("Digite o nome da magia");
+    return;
+  }
+
+  setCriandoHomebrew(true);
+  try {
+    const className = ficha.class 
+      ? (Array.isArray(ficha.class) 
+          ? JSON.parse(ficha.class)[0]?.name 
+          : ficha.class)
+      : 'Wizard';
+
+    const res = await api.post('/spells/homebrew', {
+      name: homebrewInput,
+      class_name: className
+    });
+
+    adicionarFeiticoDoDropdown(res.data.data);
+    setHomebrewInput('');
+    
+    setSucesso(`Magia "${res.data.data.name}" criada com IA!`);
+    setTimeout(() => setSucesso(''), 3000);
+  } catch (error) {
+    setErro('Erro ao criar magia: ' + error.message);
+  }
+  setCriandoHomebrew(false);
+}
 
   // ===== FUNÇÕES DE LEVEL UP COM MULTICLASSING =====
   async function handleLevelUp() {
@@ -275,7 +324,6 @@ export default function Ficha() {
           <div>
             <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">FICHA DO PERSONAGEM</p>
             <h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold">{ficha.name}</h1>
-            {console.log('ficha.class TYPE:', typeof ficha.class, 'VALUE:', ficha.class)}
             <p className="text-[#6a6050] mt-1">{[
   ficha.race, 
   ficha.class ? (() => {
@@ -324,14 +372,15 @@ export default function Ficha() {
               { label: 'NOME', campo: 'name' },
               { label: 'RAÇA', campo: 'race' },
               { label: 'CLASSE', campo: 'class' },
+              { label: 'ARQUÉTIPO', campo: 'subclass' },
               { label: 'ANTECEDENTE', campo: 'background' },
               { label: 'ALINHAMENTO', campo: 'alignment' },
             ].map(({ label, campo }) => (
               <div key={campo}>
                 <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">{label}</label>
                 <input 
-  disabled={campo === 'class'}
-  readOnly={campo === 'class'}
+  disabled={campo === 'class' || campo === 'subclass'}
+  readOnly={campo === 'class' || campo === 'subclass'}
   value={
     campo === 'class'
       ? ficha.class ? (() => {
@@ -465,60 +514,58 @@ export default function Ficha() {
                   <div className="space-y-2">
                     {ficha.spellcasting.spells.map((spell, idx) => (
                       <div key={idx} className="border border-[#c8a84b15] bg-[#0f0e0c] p-3 flex items-end gap-3">
-                        <div className="flex-1">
-                          <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest block mb-1">NOME</label>
-                          <input type="text" value={spell.name || ''}
-                            onChange={e => {
-                              const novoSpell = [...ficha.spellcasting.spells];
-                              novoSpell[idx].name = e.target.value;
-                              setFicha(prev => ({ ...prev, spellcasting: { ...prev.spellcasting, spells: novoSpell } }));
-                            }}
-                            className="bg-transparent border-b border-[#c8a84b20] text-[#e8e0d0] w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
-                            style={{ borderRadius: '0' }} />
-                        </div>
-                        <div className="w-16">
-                          <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest block mb-1">NÍVEL</label>
-                          <input type="number" min={0} max={9} value={spell.level || 0}
-                            onChange={e => {
-                              const novoSpell = [...ficha.spellcasting.spells];
-                              novoSpell[idx].level = Number(e.target.value);
-                              setFicha(prev => ({ ...prev, spellcasting: { ...prev.spellcasting, spells: novoSpell } }));
-                            }}
-                            className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
-                            style={{ borderRadius: '2px' }} />
-                        </div>
-                        <div className="w-16">
-                          <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest block mb-1">SLOTS</label>
-                          <input type="number" min={0} value={spell.slots || 0}
-                            onChange={e => {
-                              const novoSpell = [...ficha.spellcasting.spells];
-                              novoSpell[idx].slots = Number(e.target.value);
-                              setFicha(prev => ({ ...prev, spellcasting: { ...prev.spellcasting, spells: novoSpell } }));
-                            }}
-                            className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
-                            style={{ borderRadius: '2px' }} />
-                        </div>
-                        <div className="w-16">
-                          <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest block mb-1">USADOS</label>
-                          <input type="number" min={0} value={spell.slots_used || 0}
-                            onChange={e => {
-                              const novoSpell = [...ficha.spellcasting.spells];
-                              novoSpell[idx].slots_used = Number(e.target.value);
-                              setFicha(prev => ({ ...prev, spellcasting: { ...prev.spellcasting, spells: novoSpell } }));
-                            }}
-                            className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
-                            style={{ borderRadius: '2px' }} />
-                        </div>
-                        <button onClick={() => {
-                          const novoSpells = ficha.spellcasting.spells.filter((_, i) => i !== idx);
-                          setFicha(prev => ({ ...prev, spellcasting: { ...prev.spellcasting, spells: novoSpells } }));
-                        }}
-                          className="text-red-900 hover:text-red-600 px-2 py-1 text-xs border border-red-900 transition-colors"
-                          style={{ ...cinzel, borderRadius: '2px', letterSpacing: '0.5px' }}>
-                          ✕
-                        </button>
-                      </div>
-                    ))}
+                      <div className="flex-1">
+                    <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest block mb-1">NOME</label>
+                    <button
+                      onClick={() => setSpellDetalhes(spell)}
+                      className="text-left text-[#e8e0d0] hover:text-[#c8a84b] text-sm transition-colors w-full"
+                      style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
+                      {spell.name || '—'}
+                    </button>
+                  </div>
+                  <div className="w-16">
+                    <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest block mb-1">NÍVEL</label>
+                    <input type="number" min={0} max={9} value={spell.level || 0}
+                      onChange={e => {
+                        const novoSpell = [...ficha.spellcasting.spells];
+                        novoSpell[idx].level = Number(e.target.value);
+                        setFicha(prev => ({ ...prev, spellcasting: { ...prev.spellcasting, spells: novoSpell } }));
+                      }}
+                      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
+                      style={{ borderRadius: '2px' }} />
+                  </div>
+                  <div className="w-16">
+                    <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest block mb-1">SLOTS</label>
+                    <input type="number" min={0} value={spell.slots || 0}
+                      onChange={e => {
+                        const novoSpell = [...ficha.spellcasting.spells];
+                        novoSpell[idx].slots = Number(e.target.value);
+                        setFicha(prev => ({ ...prev, spellcasting: { ...prev.spellcasting, spells: novoSpell } }));
+                      }}
+                      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
+                      style={{ borderRadius: '2px' }} />
+                  </div>
+                  <div className="w-16">
+                    <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest block mb-1">USADOS</label>
+                    <input type="number" min={0} value={spell.slots_used || 0}
+                      onChange={e => {
+                        const novoSpell = [...ficha.spellcasting.spells];
+                        novoSpell[idx].slots_used = Number(e.target.value);
+                        setFicha(prev => ({ ...prev, spellcasting: { ...prev.spellcasting, spells: novoSpell } }));
+                      }}
+                      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
+                      style={{ borderRadius: '2px' }} />
+                  </div>
+                  <button onClick={() => {
+                    const novoSpells = ficha.spellcasting.spells.filter((_, i) => i !== idx);
+                    setFicha(prev => ({ ...prev, spellcasting: { ...prev.spellcasting, spells: novoSpells } }));
+                  }}
+                    className="text-red-900 hover:text-red-600 px-2 py-1 text-xs border border-red-900 transition-colors"
+                    style={{ ...cinzel, borderRadius: '2px' }}>
+                    ✕
+                  </button>
+                </div>
+                  ))}
                   </div>
                   <button onClick={abrirModalAddSpell}
                     className="mt-3 border border-[#c8a84b30] text-[#c8a84b] px-4 py-2 text-xs tracking-widest hover:bg-[#c8a84b10] transition-colors"
@@ -536,43 +583,162 @@ export default function Ficha() {
                   </button>
                 </div>
               )}
+              {spellDetalhes && (
+  <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+    onClick={() => setSpellDetalhes(null)}>
+    <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full mx-4 p-6"
+      style={{ borderRadius: '2px' }}
+      onClick={e => e.stopPropagation()}>
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <p style={cinzel} className="text-[#c8a84b] text-lg font-bold">{spellDetalhes.name}</p>
+          <p className="text-[#4a4030] text-xs mt-1" style={cinzel}>
+            Nível {spellDetalhes.level} · {spellDetalhes.school || ''}
+          </p>
+        </div>
+        <button onClick={() => setSpellDetalhes(null)}
+          className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">✕</button>
+      </div>
+      {spellDetalhes.description && (
+        <div className="mb-3">
+          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">DESCRIÇÃO</p>
+          <p className="text-[#a09880] text-sm leading-relaxed">{spellDetalhes.description}</p>
+        </div>
+      )}
+      {spellDetalhes.mechanics && (
+        <div className="mb-3">
+          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">MECÂNICA</p>
+          <p className="text-[#a09880] text-sm leading-relaxed">{spellDetalhes.mechanics}</p>
+        </div>
+      )}
+      <div className="grid grid-cols-3 gap-2 mt-4 text-xs text-center">
+        {spellDetalhes.range && (
+          <div className="border border-[#c8a84b15] p-2">
+            <p style={cinzel} className="text-[#4a4030] tracking-widest mb-1">ALCANCE</p>
+            <p className="text-[#e8e0d0]">{spellDetalhes.range}</p>
+          </div>
+        )}
+        {spellDetalhes.duration && (
+          <div className="border border-[#c8a84b15] p-2">
+            <p style={cinzel} className="text-[#4a4030] tracking-widest mb-1">DURAÇÃO</p>
+            <p className="text-[#e8e0d0]">{spellDetalhes.duration}</p>
+          </div>
+        )}
+        {spellDetalhes.components && (
+          <div className="border border-[#c8a84b15] p-2">
+            <p style={cinzel} className="text-[#4a4030] tracking-widest mb-1">COMPONENTES</p>
+            <p className="text-[#e8e0d0]">{spellDetalhes.components}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+)}
             </div>
           </div>
         )}
 
         {/* MODAL ADICIONAR FEITIÇO */}
         {modalAddSpell && (
-          <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
-            onClick={() => setModalAddSpell(false)}>
-            <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full"
-              style={{ borderRadius: '2px' }}
-              onClick={e => e.stopPropagation()}>
-              <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
-                <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">ADICIONAR FEITIÇO</p>
-                <button onClick={() => setModalAddSpell(false)}
-                  className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
+  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
+    onClick={() => setModalAddSpell(false)}>
+    <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full"
+      style={{ borderRadius: '2px' }}
+      onClick={e => e.stopPropagation()}>
+      
+      <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">ADICIONAR FEITIÇO</p>
+        <button onClick={() => setModalAddSpell(false)}
+          className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
+      </div>
+      
+      <div className="px-6 py-6 flex flex-col gap-4">
+        
+        <div className="flex gap-2">
+          <button 
+            onClick={() => setTab('procurar')}
+            className={`flex-1 px-3 py-2 text-xs tracking-widest transition-colors ${
+              tab === 'procurar' 
+                ? 'bg-[#c8a84b] text-[#0f0e0c]' 
+                : 'border border-[#c8a84b30] text-[#c8a84b]'
+            }`}
+            style={{ ...cinzel, borderRadius: '2px' }}>
+            PROCURAR
+          </button>
+          <button 
+            onClick={() => setTab('criar')}
+            className={`flex-1 px-3 py-2 text-xs tracking-widest transition-colors ${
+              tab === 'criar' 
+                ? 'bg-[#c8a84b] text-[#0f0e0c]' 
+                : 'border border-[#c8a84b30] text-[#c8a84b]'
+            }`}
+            style={{ ...cinzel, borderRadius: '2px' }}>
+            CRIAR COM IA
+          </button>
+        </div>
+
+        {tab === 'procurar' && (
+          <div className="space-y-2 max-h-64 overflow-y-auto">
+            {loadingSpells ? (
+              <div className="flex items-center gap-3 justify-center py-4">
+                <div className="w-5 h-5 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
+                <p style={cinzel} className="text-[#4a4030] text-xs">CARREGANDO...</p>
               </div>
-              <div className="px-6 py-6 flex flex-col gap-4">
-                {loadingSpells ? (
-                  <div className="flex items-center gap-3 justify-center py-4">
-                    <div className="w-5 h-5 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-                    <p style={cinzel} className="text-[#4a4030] text-xs">CARREGANDO...</p>
-                  </div>
-                ) : (
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
-                    {availableSpells.map((spell, i) => (
-                      <button key={i} onClick={() => adicionarFeiticoDoDropdown(spell)}
-                        className="w-full text-left border border-[#c8a84b25] bg-[#c8a84b08] text-[#c8a84b] px-3 py-2 text-xs hover:bg-[#c8a84b18] transition-colors"
-                        style={{ borderRadius: '2px', letterSpacing: '0.5px' }}>
-                        <span className="font-bold">{spell.name}</span> <span className="text-[#4a4030]">(Nível {spell.level})</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+            ) : (
+              availableSpells.map((spell, i) => (
+                <button key={i} onClick={() => adicionarFeiticoDoDropdown(spell)}
+                  className="w-full text-left border border-[#c8a84b25] bg-[#c8a84b08] text-[#c8a84b] px-3 py-2 text-xs hover:bg-[#c8a84b18] transition-colors"
+                  style={{ borderRadius: '2px', letterSpacing: '0.5px' }}>
+                  <span className="font-bold">{spell.name}</span> <span className="text-[#4a4030]">(Nível {spell.level})</span>
+                </button>
+              ))
+            )}
           </div>
         )}
+
+        {tab === 'criar' && (
+          <div className="space-y-3">
+            <div>
+              <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">
+                NOME DA MAGIA
+              </label>
+              <input 
+                type="text"
+                value={homebrewInput}
+                onChange={e => setHomebrewInput(e.target.value)}
+                placeholder="ex: Magia Obscura da Perdição"
+                className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
+                style={{ borderRadius: '2px' }}
+              />
+            </div>
+
+            <div className="border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3">
+              <p className="text-[#6a6050] text-xs font-light">
+                ✦ A IA vai criar uma magia completa baseada no nome e sua classe. 
+                A magia fica salva no banco pra próxima vez!
+              </p>
+            </div>
+
+            {criandoHomebrew && (
+              <div className="flex items-center gap-3">
+                <div className="w-5 h-5 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin flex-shrink-0" />
+                <p style={cinzel} className="text-[#c8a84b] text-xs tracking-widest">CRIANDO MAGIA...</p>
+              </div>
+            )}
+
+            <button 
+              onClick={criarMagiaHomebrew}
+              disabled={criandoHomebrew || !homebrewInput.trim()}
+              className="w-full bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
+              style={{ ...cinzel, borderRadius: '2px' }}>
+              {criandoHomebrew ? 'Aguarde...' : 'CRIAR MAGIA COM IA →'}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+)}
 
         {/* ATRIBUTOS */}
         {ficha.attributes && (
