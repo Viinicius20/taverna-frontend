@@ -407,6 +407,43 @@ export default function Ficha() {
           </div>
         </div>
 
+        {/* CLASSES */}
+<div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+  <div className="px-6 py-4 border-b border-[#c8a84b15]">
+    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">
+      CLASSES ({(ficha.classes || []).reduce((s, c) => s + (c.level || 1), 0)} total)
+    </p>
+  </div>
+  <div className="p-6 flex flex-col gap-3">
+    {(ficha.classes || []).map((cls, idx) => (
+      <div key={idx} className="flex gap-2 items-center bg-[#0f0e0c] p-3 border border-[#c8a84b20]">
+        <input
+          value={cls.name}
+          onChange={e => {
+            const novas = [...ficha.classes];
+            novas[idx] = { ...novas[idx], name: e.target.value };
+            setFicha(prev => ({ ...prev, classes: novas }));
+          }}
+          className="flex-1 bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-2 py-1 text-sm focus:outline-none focus:border-[#c8a84b50]"
+          style={{ borderRadius: '2px' }}
+        />
+        <label className="text-[#6a6050] text-xs">Lvl:</label>
+        <input
+          type="number" min={1} max={20}
+          value={cls.level || 1}
+          onChange={e => {
+            const novas = [...ficha.classes];
+            novas[idx] = { ...novas[idx], level: Number(e.target.value) };
+            setFicha(prev => ({ ...prev, classes: novas }));
+          }}
+          className="w-16 bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-2 py-1 text-center text-sm focus:outline-none focus:border-[#c8a84b50]"
+          style={{ borderRadius: '2px' }}
+        />
+      </div>
+    ))}
+  </div>
+</div>
+
         {/* STATS DE COMBATE */}
         <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
           <div className="px-6 py-4 border-b border-[#c8a84b15]">
