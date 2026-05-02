@@ -17,12 +17,17 @@ function rolar(lados) {
   return Math.floor(Math.random() * lados) + 1;
 }
 
-function tocarSomDado() {
-  const audio = new Audio('/dice.wav');
-  audio.volume = 0.6;
-  audio.play();
-}
+let dadoAudio = null;
 
+function tocarSomDado() {
+  if (dadoAudio) {
+    dadoAudio.pause();
+    dadoAudio.currentTime = 0;
+  }
+  dadoAudio = new Audio('/dice.wav');
+  dadoAudio.volume = 0.6;
+  dadoAudio.play();
+}
 export default function Dados({ secreto = false }) {
   const [historico, setHistorico] = useState([]);
   const [rolando, setRolando] = useState(null);
