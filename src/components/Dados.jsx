@@ -24,7 +24,7 @@ function tocarSomDado() {
     dadoAudio.pause();
     dadoAudio.currentTime = 0;
   }
-  dadoAudio = new Audio('/dice.wav');
+  dadoAudio = new Audio('/dice2.wav');
   dadoAudio.volume = 0.6;
   dadoAudio.play();
 }
