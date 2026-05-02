@@ -371,8 +371,6 @@ export default function Ficha() {
             {[
               { label: 'NOME', campo: 'name' },
               { label: 'RAÇA', campo: 'race' },
-              { label: 'CLASSE', campo: 'class' },
-              { label: 'ARQUÉTIPO', campo: 'subclass' },
               { label: 'ANTECEDENTE', campo: 'background' },
               { label: 'ALINHAMENTO', campo: 'alignment' },
             ].map(({ label, campo }) => (
