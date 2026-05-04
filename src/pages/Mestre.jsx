@@ -33,7 +33,6 @@ export default function Mestre() {
   const [gerandoLoot, setGerandoLoot] = useState(false);
   const [lootConfig, setLootConfig] = useState({ nivel_medio: 5, quantidade_mundanos: 4, quantidade_magicos: 1, contexto: '' });
   const [personagens, setPersonagens] = useState([]);
-  const [entregando, setEntregando] = useState(null);
   const [magicItems, setMagicItems] = useState([]);
   const [loadingItems, setLoadingItems] = useState(false);
   const [filtroRaridade, setFiltroRaridade] = useState('');
