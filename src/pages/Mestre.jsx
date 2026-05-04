@@ -164,7 +164,6 @@ async function gerarLoot() {
 }
 
 async function entregarItem(item, personagemId) {
-  setEntregando(item);
   try {
     const resChar = await api.get(`/characters/${personagemId}`); 
     const char = resChar.data.data;
@@ -182,7 +181,6 @@ async function entregarItem(item, personagemId) {
   } catch {
     setErro('Erro ao entregar item.');
   }
-  setEntregando(null);
 }
 
 
