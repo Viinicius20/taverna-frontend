@@ -25,6 +25,27 @@ export default function Mestre() {
   const sistemas = ['D&D 5e', 'Tormenta20', 'Pathfinder 2e', 'Call of Cthulhu', 'Outro'];
   const [notasLocais, setNotasLocais] = useState({});
   const [attrsLocais, setAttrsLocais] = useState({});
+  const [combatentes, setCombatentes] = useState([]);
+  const [turnoAtual, setTurnoAtual] = useState(0);
+  const [combateAtivo, setCombateAtivo] = useState(false);
+  const [novoMonstro, setNovoMonstro] = useState({ nome: '', hp: '', qtd: 1 });
+  const [loot, setLoot] = useState(null);
+  const [gerandoLoot, setGerandoLoot] = useState(false);
+  const [lootConfig, setLootConfig] = useState({ nivel_medio: 5, quantidade_mundanos: 4, quantidade_magicos: 1, contexto: '' });
+  const [personagens, setPersonagens] = useState([]);
+  const [entregando, setEntregando] = useState(null);
+  const [magicItems, setMagicItems] = useState([]);
+  const [loadingItems, setLoadingItems] = useState(false);
+  const [filtroRaridade, setFiltroRaridade] = useState('');
+  const [filtroTipo, setFiltroTipo] = useState('');
+  const [novoItemNome, setNovoItemNome] = useState('');
+  const [criandoItem, setCriandoItem] = useState(false);
+  const [itemDetalhes, setItemDetalhes] = useState(null);
+  const [novoItemRaridade, setNovoItemRaridade] = useState('');
+  const [rulesQuery, setRulesQuery] = useState('');
+  const [rulesResult, setRulesResult] = useState(null);
+  const [buscandoRegra, setBuscandoRegra] = useState(false);
+  const [rulesSistema, setRulesSistema] = useState('D&D 5e');
 
   useEffect(() => {
     buscarNpcs();
@@ -118,6 +139,114 @@ export default function Mestre() {
     }
   }
 
+  useEffect(() => {
+  buscarPersonagens();
+}, []);
+
+async function buscarPersonagens() {
+  try {
+    const res = await api.get(`/characters`);  
+    setPersonagens(res.data.data || []);
+  } catch {
+    setPersonagens([]);
+  }
+}
+
+async function gerarLoot() {
+  setGerandoLoot(true);
+  setLoot(null);
+  try {
+    const res = await api.post('/loot/generate', lootConfig);
+    setLoot(res.data.data);
+  } catch {
+    setErro('Erro ao gerar loot.');
+  }
+  setGerandoLoot(false);
+}
+
+async function entregarItem(item, personagemId) {
+  setEntregando(item);
+  try {
+    const resChar = await api.get(`/characters/${personagemId}`); 
+    const char = resChar.data.data;
+    const inventarioAtual = char.data?.inventory || [];
+    const nomeItem = typeof item === 'string' ? item : `${item.nome} (${item.raridade})`;
+    const novoInventario = [...inventarioAtual, nomeItem];
+    await api.put(`/characters/${personagemId}`, {
+      data: { ...char.data, inventory: novoInventario }
+    });
+    setPersonagens(prev => prev.map(p => p.id === personagemId
+      ? { ...p, data: { ...p.data, inventory: novoInventario } }
+      : p
+    ));
+    alert(`✅ "${nomeItem}" entregue para ${char.name}!`);
+  } catch {
+    setErro('Erro ao entregar item.');
+  }
+  setEntregando(null);
+}
+
+useEffect(() => {
+  buscarMagicItems();
+}, []);
+
+async function buscarMagicItems() {
+  setLoadingItems(true);
+  try {
+    const res = await api.get('/magic-items');
+    setMagicItems(res.data.data || []);
+  } catch {
+    setMagicItems([]);
+  }
+  setLoadingItems(false);
+}
+
+async function criarItemHomebrew() {
+  if (!novoItemNome.trim()) return;
+  setCriandoItem(true);
+  try {
+    const res = await api.post('/magic-items/homebrew', { 
+      name: novoItemNome,
+      rarity: novoItemRaridade 
+    });
+    setMagicItems(prev => [res.data.data, ...prev]);
+    setNovoItemNome('');
+    setNovoItemRaridade('');
+  } catch {
+    setErro('Erro ao criar item mágico.');
+  }
+  setCriandoItem(false);
+}
+
+async function entregarItemMagico(item, personagemId) {
+  try {
+    const resChar = await api.get(`/characters/${personagemId}`);
+    const char = resChar.data.data;
+    const inventarioAtual = char.data?.inventory || [];
+    const nomeItem = `${item.name} (${item.rarity})`;
+    const novoInventario = [...inventarioAtual, nomeItem];
+    await api.put(`/characters/${personagemId}`, {
+      data: { ...char.data, inventory: novoInventario }
+    });
+    alert(`✅ "${item.name}" entregue para ${char.name}!`);
+  } catch {
+    setErro('Erro ao entregar item.');
+  }
+}
+
+async function buscarRegra() {
+  if (!rulesQuery.trim()) return;
+  setBuscandoRegra(true);
+  setRulesResult(null);
+  try {
+    const res = await api.post('/rules/search', { query: rulesQuery, system: rulesSistema });
+    setRulesResult(res.data.data);
+  } catch {
+    setErro('Erro ao buscar regra.');
+  }
+  setBuscandoRegra(false);
+}
+
   function editarNotaLocal(id, campo, valor) {
     const novas = { ...notasLocais, [`${id}_${campo}`]: valor };
     setNotasLocais(novas);
@@ -137,6 +266,62 @@ export default function Mestre() {
   function getAttr(npcId, attr, fallback) {
     return attrsLocais[`${npcId}_${attr}`] !== undefined ? attrsLocais[`${npcId}_${attr}`] : fallback;
   }
+
+  function adicionarMonstro() {
+  if (!novoMonstro.nome.trim() || !novoMonstro.hp) return;
+  const novos = Array.from({ length: novoMonstro.qtd }, (_, i) => ({
+    id: Date.now() + i,
+    nome: novoMonstro.qtd > 1 ? `${novoMonstro.nome} ${i + 1}` : novoMonstro.nome,
+    tipo: 'monstro',
+    hpMax: Number(novoMonstro.hp),
+    hpAtual: Number(novoMonstro.hp),
+    iniciativa: 0,
+  }));
+  setCombatentes(prev => [...prev, ...novos]);
+  setNovoMonstro({ nome: '', hp: '', qtd: 1 });
+}
+
+function adicionarPersonagem(npc) {
+  const d = npc.data || {};
+  const hp = d.combat?.hp_max || d.combat?.hp || 10;
+  setCombatentes(prev => [...prev, {
+    id: npc.id,
+    nome: npc.name,
+    tipo: 'personagem',
+    hpMax: hp,
+    hpAtual: hp,
+    iniciativa: 0,
+  }]);
+}
+
+function ordenarIniciativa() {
+  setCombatentes(prev => [...prev].sort((a, b) => b.iniciativa - a.iniciativa));
+  setTurnoAtual(0);
+}
+
+function atualizarCombatente(id, campo, valor) {
+  setCombatentes(prev => prev.map(c => c.id === id ? { ...c, [campo]: valor } : c));
+}
+
+function removerCombatente(id) {
+  setCombatentes(prev => prev.filter(c => c.id !== id));
+}
+
+function proximoTurno() {
+  setTurnoAtual(prev => (prev + 1) % combatentes.length);
+}
+
+function resetarCombate() {
+  if (!window.confirm('Resetar o combate?')) return;
+  setCombatentes([]);
+  setTurnoAtual(0);
+  setCombateAtivo(false);
+}
+
+function limparMarkdown(texto) {
+  if (!texto) return '';
+  return texto.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
+}
 
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0]" style={crimson}>
@@ -547,6 +732,429 @@ export default function Mestre() {
             {npcs.length} {npcs.length === 1 ? 'NPC' : 'NPCs'} REGISTRADOS
           </p>
         )}
+
+        {/* PAINEL DE COMBATE */}
+<div className="mt-12">
+  <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+  <div className="flex items-center justify-between mb-2">
+    <div>
+      <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">ENCONTRO ATUAL</p>
+      <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold">Painel de Combate</h2>
+    </div>
+    <div className="flex gap-2">
+      {combatentes.length > 0 && (
+        <>
+          <button onClick={ordenarIniciativa}
+            className="border border-[#c8a84b40] text-[#c8a84b] px-4 py-2 text-xs hover:bg-[#c8a84b10] transition-colors"
+            style={{ ...cinzel, borderRadius: '2px' }}>
+            ↕ ORDENAR
+          </button>
+          {combateAtivo ? (
+            <button onClick={proximoTurno}
+              className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors"
+              style={{ ...cinzel, borderRadius: '2px' }}>
+              PRÓXIMO TURNO →
+            </button>
+          ) : (
+            <button onClick={() => setCombateAtivo(true)}
+              className="bg-[#8a5030] text-[#f0e8d8] px-4 py-2 text-xs font-bold hover:bg-[#a06040] transition-colors"
+              style={{ ...cinzel, borderRadius: '2px' }}>
+              ⚔ INICIAR
+            </button>
+          )}
+          <button onClick={resetarCombate}
+            className="border border-red-900 text-red-900 px-3 py-2 text-xs hover:border-red-600 hover:text-red-600 transition-colors"
+            style={{ ...cinzel, borderRadius: '2px' }}>
+            ✕
+          </button>
+        </>
+      )}
+    </div>
+  </div>
+
+  {/* Adicionar monstro genérico */}
+  <div className="flex gap-2 mb-4 mt-6">
+    <input value={novoMonstro.nome} onChange={e => setNovoMonstro(p => ({ ...p, nome: e.target.value }))}
+      placeholder="Nome do monstro..."
+      className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 flex-1 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
+      style={{ borderRadius: '2px' }} />
+    <input value={novoMonstro.hp} onChange={e => setNovoMonstro(p => ({ ...p, hp: e.target.value }))}
+      placeholder="HP" type="number" min={1}
+      className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-20 text-sm text-center focus:outline-none focus:border-[#c8a84b50]"
+      style={{ borderRadius: '2px' }} />
+    <input value={novoMonstro.qtd} onChange={e => setNovoMonstro(p => ({ ...p, qtd: Math.max(1, Number(e.target.value)) }))}
+      type="number" min={1} max={20}
+      className="bg-[#161410] border border-[#c8a84b20] text-[#c8a84b] px-3 py-2 w-16 text-sm text-center focus:outline-none focus:border-[#c8a84b50]"
+      style={{ borderRadius: '2px' }} />
+    <button onClick={adicionarMonstro}
+      className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      + MONSTRO
+    </button>
+  </div>
+
+  {/* Adicionar NPCs existentes */}
+  {npcs.length > 0 && (
+    <div className="flex flex-wrap gap-2 mb-6">
+      {npcs.map(npc => (
+        <button key={npc.id} onClick={() => adicionarPersonagem(npc)}
+          disabled={combatentes.some(c => c.id === npc.id)}
+          className="border border-[#c8a84b20] text-[#6a6050] px-3 py-1 text-xs hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          + {npc.name}
+        </button>
+      ))}
+    </div>
+  )}
+
+  {/* Lista de combatentes */}
+  {combatentes.length === 0 ? (
+    <p className="text-[#3a3020] text-sm text-center py-8">Nenhum combatente adicionado.</p>
+  ) : (
+    <div className="space-y-2">
+      {combatentes.map((c, idx) => {
+        const isAtivo = combateAtivo && idx === turnoAtual;
+        const hpPct = Math.max(0, (c.hpAtual / c.hpMax) * 100);
+        const hpCor = hpPct > 50 ? '#2a7a2a' : hpPct > 25 ? '#8a7020' : '#8a2020';
+        return (
+          <div key={c.id}
+            className="border p-3 transition-all"
+            style={{
+              borderRadius: '2px',
+              borderColor: isAtivo ? '#c8a84b' : '#c8a84b15',
+              backgroundColor: isAtivo ? '#c8a84b08' : '#161410',
+              boxShadow: isAtivo ? '0 0 12px #c8a84b20' : 'none',
+            }}>
+            <div className="flex items-center gap-3">
+              {/* Iniciativa */}
+              <div className="flex flex-col items-center">
+                <span style={cinzel} className="text-[#c8a84b] text-xs opacity-50 mb-1">INIT</span>
+                <input type="number" value={c.iniciativa}
+                  onChange={e => atualizarCombatente(c.id, 'iniciativa', Number(e.target.value))}
+                  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-lg w-14 py-1 focus:outline-none focus:border-[#c8a84b50]"
+                  style={{ borderRadius: '2px' }} />
+              </div>
+
+              {/* Nome e tipo */}
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  {isAtivo && <span className="text-[#c8a84b] text-xs">▶</span>}
+                  <span style={cinzel} className="text-[#e8e0d0] text-sm">{c.nome}</span>
+                  <span style={cinzel} className={`text-xs px-2 py-0.5 border ${c.tipo === 'monstro' ? 'border-red-900 text-red-900' : 'border-[#c8a84b30] text-[#c8a84b60]'}`}
+                    style={{ borderRadius: '2px' }}>
+                    {c.tipo === 'monstro' ? 'MONSTRO' : 'NPC'}
+                  </span>
+                </div>
+                {/* Barra de HP */}
+                <div className="h-1.5 bg-[#0f0e0c] rounded-full overflow-hidden">
+                  <div className="h-full transition-all" style={{ width: `${hpPct}%`, backgroundColor: hpCor }} />
+                </div>
+              </div>
+
+              {/* HP */}
+              <div className="flex items-center gap-1">
+                <input type="number" value={c.hpAtual}
+                  onChange={e => atualizarCombatente(c.id, 'hpAtual', Number(e.target.value))}
+                  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] text-center text-lg w-16 py-1 focus:outline-none focus:border-[#c8a84b50]"
+                  style={{ borderRadius: '2px' }} />
+                <span className="text-[#3a3020] text-sm">/</span>
+                <span style={cinzel} className="text-[#3a3020] text-sm w-10 text-center">{c.hpMax}</span>
+              </div>
+
+              {/* Remover */}
+              <button onClick={() => removerCombatente(c.id)}
+                className="text-red-900 hover:text-red-600 text-lg transition-colors px-1">×</button>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  )}
+
+  {combateAtivo && combatentes.length > 0 && (
+    <p style={cinzel} className="text-[#c8a84b60] text-xs tracking-widest text-center mt-4">
+      TURNO DO: {combatentes[turnoAtual]?.nome}
+    </p>
+  )}
+</div>
+
+{/* GERADOR DE LOOT */}
+<div className="mt-12">
+  <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+  <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">FERRAMENTAS</p>
+  <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Gerador de Loot</h2>
+
+  {/* Config */}
+  <div className="grid grid-cols-2 gap-3 mb-4">
+    <div>
+      <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">NÍVEL MÉDIO</label>
+      <input type="number" min={1} max={20} value={lootConfig.nivel_medio}
+        onChange={e => setLootConfig(p => ({ ...p, nivel_medio: Number(e.target.value) }))}
+        className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50]"
+        style={{ borderRadius: '2px' }} />
+    </div>
+    <div>
+      <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">ITENS MUNDANOS</label>
+      <input type="number" min={0} max={10} value={lootConfig.quantidade_mundanos}
+        onChange={e => setLootConfig(p => ({ ...p, quantidade_mundanos: Number(e.target.value) }))}
+        className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50]"
+        style={{ borderRadius: '2px' }} />
+    </div>
+    <div>
+      <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">ITENS MÁGICOS</label>
+      <input type="number" min={0} max={5} value={lootConfig.quantidade_magicos}
+        onChange={e => setLootConfig(p => ({ ...p, quantidade_magicos: Number(e.target.value) }))}
+        className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50]"
+        style={{ borderRadius: '2px' }} />
+    </div>
+    <div>
+      <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">CONTEXTO</label>
+      <input value={lootConfig.contexto}
+        onChange={e => setLootConfig(p => ({ ...p, contexto: e.target.value }))}
+        placeholder="Ex: covil de orcs, dragão jovem..."
+        className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
+        style={{ borderRadius: '2px' }} />
+    </div>
+  </div>
+
+  <button onClick={gerarLoot} disabled={gerandoLoot}
+    className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50 mb-6"
+    style={{ ...cinzel, borderRadius: '2px' }}>
+    {gerandoLoot ? '⟳ GERANDO...' : '⚄ GERAR LOOT'}
+  </button>
+
+  {/* Resultado */}
+  {loot && (
+    <div className="space-y-6">
+
+      {/* Mundanos */}
+      {loot.mundanos?.length > 0 && (
+        <div className="border border-[#c8a84b15] bg-[#161410] p-4">
+          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">ITENS MUNDANOS</p>
+          <div className="space-y-2">
+            {loot.mundanos.map((item, i) => (
+              <div key={i} className="flex items-center justify-between gap-3">
+                <span className="text-[#a09880] text-sm">{item}</span>
+                <select onChange={e => e.target.value && entregarItem(item, e.target.value)}
+                  defaultValue=""
+                  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#6a6050] px-2 py-1 text-xs focus:outline-none focus:border-[#c8a84b50]"
+                  style={{ borderRadius: '2px' }}>
+                  <option value="">Entregar para...</option>
+                  {personagens.map(p => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Mágicos */}
+      {loot.magicos?.length > 0 && (
+        <div className="border border-[#c8a84b30] bg-[#161410] p-4">
+          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">✦ ITENS MÁGICOS</p>
+          <div className="space-y-4">
+            {loot.magicos.map((item, i) => {
+              const rarCor = {
+                'Comum': '#a09880', 'Incomum': '#4a8a4a', 'Raro': '#4a6aaa',
+                'Muito Raro': '#8a4aaa', 'Lendário': '#c8a84b'
+              }[item.raridade] || '#c8a84b';
+              return (
+                <div key={i} className="border border-[#c8a84b20] bg-[#0f0e0c] p-4">
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <div>
+                      <p style={cinzel} className="text-[#f0e8d8] text-sm font-semibold">{item.nome}</p>
+                      <span style={{ ...cinzel, color: rarCor, borderColor: `${rarCor}40` }}
+                        className="text-xs border px-2 py-0.5 mt-1 inline-block"
+                        style2={{ borderRadius: '2px' }}>
+                        {item.raridade}
+                      </span>
+                    </div>
+                    <select onChange={e => e.target.value && entregarItem(item, e.target.value)}
+                      defaultValue=""
+                      className="bg-[#161410] border border-[#c8a84b30] text-[#6a6050] px-2 py-1 text-xs focus:outline-none focus:border-[#c8a84b50]"
+                      style={{ borderRadius: '2px' }}>
+                      <option value="">Entregar para...</option>
+                      {personagens.map(p => (
+                        <option key={p.id} value={p.id}>{p.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <p className="text-[#6a6050] text-sm font-light leading-relaxed">{item.descricao}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+    </div>
+  )}
+</div>
+
+{/* ALMANAQUE DE ITENS MÁGICOS */}
+<div className="mt-12">
+  <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+  <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">BIBLIOTECA</p>
+  <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Itens Mágicos</h2>
+
+  {/* Criar homebrew */}
+  <div className="flex gap-2 mb-6">
+  <input value={novoItemNome} onChange={e => setNovoItemNome(e.target.value)}
+    placeholder="Nome do item para criar com IA..."
+    className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 flex-1 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
+    style={{ borderRadius: '2px' }} />
+  <select value={novoItemRaridade} onChange={e => setNovoItemRaridade(e.target.value)}
+    className="bg-[#161410] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-xs focus:outline-none focus:border-[#c8a84b50]"
+    style={{ borderRadius: '2px' }}>
+    <option value="">Raridade (IA decide)</option>
+    {['Comum', 'Incomum', 'Raro', 'Muito Raro', 'Lendário'].map(r => (
+      <option key={r} value={r}>{r}</option>
+    ))}
+  </select>
+  <button onClick={criarItemHomebrew} disabled={criandoItem}
+    className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50"
+    style={{ ...cinzel, borderRadius: '2px' }}>
+    {criandoItem ? '⟳ CRIANDO...' : '✦ CRIAR COM IA'}
+  </button>
+</div>
+
+  {/* Filtros */}
+  <div className="flex gap-2 mb-4">
+    <select value={filtroRaridade} onChange={e => setFiltroRaridade(e.target.value)}
+      className="bg-[#161410] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-xs focus:outline-none focus:border-[#c8a84b50]"
+      style={{ borderRadius: '2px' }}>
+      <option value="">Todas raridades</option>
+      {['Comum', 'Incomum', 'Raro', 'Muito Raro', 'Lendário'].map(r => (
+        <option key={r} value={r}>{r}</option>
+      ))}
+    </select>
+    <select value={filtroTipo} onChange={e => setFiltroTipo(e.target.value)}
+      className="bg-[#161410] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-xs focus:outline-none focus:border-[#c8a84b50]"
+      style={{ borderRadius: '2px' }}>
+      <option value="">Todos tipos</option>
+      {['Arma', 'Armadura', 'Poção', 'Anel', 'Varinha', 'Maravilha', 'Outro'].map(t => (
+        <option key={t} value={t}>{t}</option>
+      ))}
+    </select>
+  </div>
+
+  {/* Lista */}
+  {loadingItems ? (
+    <div className="flex items-center gap-3 justify-center py-8">
+      <div className="w-6 h-6 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
+      <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">CARREGANDO...</p>
+    </div>
+  ) : (
+    <div className="space-y-2">
+      {magicItems
+        .filter(i => !filtroRaridade || i.rarity === filtroRaridade)
+        .filter(i => !filtroTipo || i.type === filtroTipo)
+        .map((item, idx) => {
+          const rarCor = {
+            'Comum': '#a09880', 'Incomum': '#4a8a4a', 'Raro': '#4a6aaa',
+            'Muito Raro': '#8a4aaa', 'Lendário': '#c8a84b'
+          }[item.rarity] || '#c8a84b';
+          return (
+            <div key={idx} className="border border-[#c8a84b15] bg-[#161410] p-3 cursor-pointer hover:border-[#c8a84b30] transition-all"
+              style={{ borderRadius: '2px' }}
+              onClick={() => setItemDetalhes(itemDetalhes?.id === item.id ? null : item)}>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <span style={{ ...cinzel, color: rarCor }} className="text-xs w-20 shrink-0">{item.rarity}</span>
+                  <span style={cinzel} className="text-[#e8e0d0] text-sm">{item.name}</span>
+                  {item.is_homebrew && (
+                    <span style={cinzel} className="text-xs border border-[#8a5030] text-[#8a5030] px-1.5 py-0.5"
+                      style2={{ borderRadius: '2px' }}>HOMEBREW</span>
+                  )}
+                  {item.requires_attunement && (
+                    <span style={cinzel} className="text-xs text-[#4a4030]">sintonização</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                  <select onChange={e => e.target.value && entregarItemMagico(item, e.target.value)}
+                    defaultValue=""
+                    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#6a6050] px-2 py-1 text-xs focus:outline-none"
+                    style={{ borderRadius: '2px' }}>
+                    <option value="">Entregar...</option>
+                    {personagens.map(p => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Expandido */}
+              {itemDetalhes?.id === item.id && (
+                <div className="mt-3 pt-3 border-t border-[#c8a84b10] space-y-2">
+                  {item.description && (
+                    <p className="text-[#6a6050] text-sm font-light leading-relaxed">{limparMarkdown(item.description)}</p>
+                  )}
+                  {item.mechanics && (
+                    <div className="bg-[#0f0e0c] border border-[#c8a84b10] px-3 py-2">
+                      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">MECÂNICA</p>
+                      <p className="text-[#8a8070] text-sm leading-relaxed">{limparMarkdown(item.mechanics)}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+    </div>
+  )}
+</div>
+
+{/* RESUMO DE REGRAS */}
+<div className="mt-12">
+  <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+  <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">CONSULTA RÁPIDA</p>
+  <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Resumo de Regras</h2>
+
+  <div className="flex gap-2 mb-6">
+    <select value={rulesSistema} onChange={e => setRulesSistema(e.target.value)}
+      className="bg-[#161410] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-xs focus:outline-none focus:border-[#c8a84b50]"
+      style={{ borderRadius: '2px' }}>
+      {sistemas.map(s => <option key={s} value={s}>{s}</option>)}
+    </select>
+    <input value={rulesQuery} onChange={e => setRulesQuery(e.target.value)}
+      onKeyDown={e => e.key === 'Enter' && buscarRegra()}
+      placeholder='Ex: "Caído", "Envenenado", "Grapple", "Ação de Espreita"...'
+      className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 flex-1 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
+      style={{ borderRadius: '2px' }} />
+    <button onClick={buscarRegra} disabled={buscandoRegra}
+      className="bg-[#c8a84b] text-[#0f0e0c] px-5 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      {buscandoRegra ? '⟳ BUSCANDO...' : '⚲ BUSCAR'}
+    </button>
+  </div>
+
+  {buscandoRegra && (
+    <div className="flex items-center gap-3 justify-center py-8">
+      <div className="w-6 h-6 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
+      <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">CONSULTANDO...</p>
+    </div>
+  )}
+
+  {rulesResult && !buscandoRegra && (
+    <div className="border border-[#c8a84b20] bg-[#161410] p-6 space-y-4">
+      <div>
+        <h3 style={cinzel} className="text-[#f0e8d8] text-lg font-semibold">{rulesResult.titulo}</h3>
+        <p className="text-[#c8a84b] text-sm mt-1 font-light">{rulesResult.resumo}</p>
+      </div>
+      <div className="border-t border-[#c8a84b10] pt-4">
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">REGRA COMPLETA</p>
+        <p className="text-[#a09880] text-sm leading-relaxed font-light">{rulesResult.detalhes}</p>
+      </div>
+      {rulesResult.fonte && (
+        <div className="border-t border-[#c8a84b10] pt-3">
+          <p style={cinzel} className="text-[#4a4030] text-xs">📖 {rulesResult.fonte}</p>
+        </div>
+      )}
+    </div>
+  )}
+</div>
 
         {/* DADOS SECRETOS */}
         <div className="mt-12">
