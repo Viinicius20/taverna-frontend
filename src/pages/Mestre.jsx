@@ -841,8 +841,7 @@ function limparMarkdown(texto) {
                 <div className="flex items-center gap-2 mb-2">
                   {isAtivo && <span className="text-[#c8a84b] text-xs">▶</span>}
                   <span style={cinzel} className="text-[#e8e0d0] text-sm">{c.nome}</span>
-                  <span style={cinzel} className={`text-xs px-2 py-0.5 border ${c.tipo === 'monstro' ? 'border-red-900 text-red-900' : 'border-[#c8a84b30] text-[#c8a84b60]'}`}
-                    style={{ borderRadius: '2px' }}>
+                  <span style={{ ...cinzel, borderRadius: '2px' }} className={`text-xs px-2 py-0.5 border ${c.tipo === 'monstro' ? 'border-red-900 text-red-900' : 'border-[#c8a84b30] text-[#c8a84b60]'}`}>
                     {c.tipo === 'monstro' ? 'MONSTRO' : 'NPC'}
                   </span>
                 </div>
