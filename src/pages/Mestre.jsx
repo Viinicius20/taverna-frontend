@@ -186,6 +186,7 @@ async function entregarItem(item, personagemId) {
   setEntregando(null);
 }
 
+
 useEffect(() => {
   buscarMagicItems();
 }, []);
