@@ -324,10 +324,10 @@ function limparMarkdown(texto) {
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] overflow-x-hidden" style={crimson}>
 
-      <nav className="flex items-center justify-between px-8 py-4 border-b border-[#c8a84b20]">
+      <nav className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-[#c8a84b20]">
         <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
           onClick={() => navigate('/')}>⚔ TAVERNA</span>
-        <div className="flex gap-6 items-center">
+        <div className="flex gap-4 sm:gap-6 items-center">
           <button onClick={() => navigate('/')}
             className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
             ← Voltar
@@ -340,15 +340,15 @@ function limparMarkdown(texto) {
         </div>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-8 py-12">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-8 md:py-12">
 
-        <div className="flex items-start justify-between mb-2">
+        <div className="flex flex-col sm:flex-row items-start justify-between mb-2 gap-4">
           <div>
             <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">ÁREA RESTRITA</p>
             <h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold mb-2">Área do Mestre</h1>
             <p className="text-[#7a7060] font-light">Informações secretas visíveis apenas para você.</p>
           </div>
-          <div className="border border-[#c8a84b20] bg-[#c8a84b08] px-4 py-2 text-right">
+          <div className="border border-[#c8a84b20] bg-[#c8a84b08] px-4 py-2 text-right shrink-0">
             <p style={cinzel} className="text-[#c8a84b] text-xs tracking-widest">🔒 PRIVADO</p>
             <p className="text-[#4a4030] text-xs mt-0.5 font-light">Jogadores não veem esta área</p>
           </div>
