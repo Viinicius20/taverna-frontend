@@ -1,13 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const navLinks = [
-  { label: 'Personagens', rota: '/personagens' },
-  { label: 'Dados', rota: '/dados' },
-  { label: 'Mestre', rota: '/mestre' },
-];
-
-
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
 
