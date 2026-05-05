@@ -1005,12 +1005,8 @@ export default function Ficha() {
             <div className="flex items-center justify-between mb-2">
               <span style={cinzel} className="text-[#e8e0d0] text-sm">{recurso.nome}</span>
               {recurso.recuperacao && (
-                <span style={cinzel} className="text-xs border px-1.5 py-0.5 ml-2"
-                  style={{
-                    borderRadius: '2px',
-                    borderColor: recurso.recuperacao === 'curto' ? '#4a6a8a40' : '#8a4a8a40',
-                    color: recurso.recuperacao === 'curto' ? '#4a6a8a' : '#8a4a8a',
-                  }}>
+                <span style={{ ...cinzel, borderRadius: '2px', borderColor: recurso.recuperacao === 'curto' ? '#4a6a8a40' : '#8a4a8a40', color: recurso.recuperacao === 'curto' ? '#4a6a8a' : '#8a4a8a' }}
+                  className="text-xs border px-1.5 py-0.5 ml-2">
                   {recurso.recuperacao === 'curto' ? 'CURTO' : 'LONGO'}
                 </span>
               )}
