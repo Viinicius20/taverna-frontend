@@ -71,6 +71,7 @@ export default function Home() {
             { icon: '◈', title: 'Import de PDF', desc: 'Já tem uma ficha pronta? Importe direto do PDF e ela é lida e organizada automaticamente.', rota: '/personagens/criar' },
             { icon: '◉', title: 'Habilidades', desc: 'Veja todas as magias, features e perícias com descrições detalhadas geradas pela IA.', rota: '/personagens' },
             { icon: '⬡', title: 'NPCs do Mestre', desc: 'Gere NPCs completos com personalidade, segredos e motivações. Visíveis só para o mestre.', rota: '/mestre' },
+            { icon: '📋', title: 'Quadro de Rumores', desc: 'Mural visual de post-its com NPCs, locais e pistas descobertas na sessão. Visível para todos.', rota: '/quadro' },
           ].map(({ icon, title, desc, rota }) => (
             <div key={title} onClick={() => navigate(rota)}
               className="bg-[#161410] p-8 group cursor-pointer hover:bg-[#1c1a16] transition-colors relative overflow-hidden">

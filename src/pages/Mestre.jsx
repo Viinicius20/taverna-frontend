@@ -45,6 +45,10 @@ export default function Mestre() {
   const [rulesResult, setRulesResult] = useState(null);
   const [buscandoRegra, setBuscandoRegra] = useState(false);
   const [rulesSistema, setRulesSistema] = useState('D&D 5e');
+  const [countdownAtivo, setCountdownAtivo] = useState(false);
+  const [countdownFim, setCountdownFim] = useState(null);
+  const [countdownDuracao, setCountdownDuracao] = useState(60);
+  const [countdownDisplay, setCountdownDisplay] = useState('');
 
   useEffect(() => {
     buscarNpcs();
@@ -277,6 +281,45 @@ async function buscarRegra() {
   }));
   setCombatentes(prev => [...prev, ...novos]);
   setNovoMonstro({ nome: '', hp: '', qtd: 1 });
+}
+
+useEffect(() => {
+  if (!countdownAtivo || !countdownFim) return;
+  const interval = setInterval(() => {
+    const agora = new Date();
+    const fim = new Date(countdownFim);
+    const diff = Math.max(0, Math.floor((fim - agora) / 1000));
+    const min = Math.floor(diff / 60);
+    const seg = diff % 60;
+    setCountdownDisplay(`${min}:${seg.toString().padStart(2, '0')}`);
+    if (diff === 0) {
+      setCountdownAtivo(false);
+      clearInterval(interval);
+    }
+  }, 1000);
+  return () => clearInterval(interval);
+}, [countdownAtivo, countdownFim]);
+
+async function ativarCountdown() {
+  try {
+    await api.post(`/session-state/${CAMPANHA_ID}/countdown?active=true&duration=${countdownDuracao}`);
+    const fim = new Date(Date.now() + countdownDuracao * 1000).toISOString();
+    setCountdownFim(fim);
+    setCountdownAtivo(true);
+  } catch {
+    setErro('Erro ao ativar countdown.');
+  }
+}
+
+async function pararCountdown() {
+  try {
+    await api.post(`/session-state/${CAMPANHA_ID}/countdown?active=false`);
+    setCountdownAtivo(false);
+    setCountdownFim(null);
+    setCountdownDisplay('');
+  } catch {
+    setErro('Erro ao parar countdown.');
+  }
 }
 
 function adicionarPersonagem(npc) {
@@ -1151,6 +1194,49 @@ function limparMarkdown(texto) {
           <p style={cinzel} className="text-[#4a4030] text-xs">📖 {rulesResult.fonte}</p>
         </div>
       )}
+    </div>
+  )}
+</div>
+
+{/* RELÓGIO DE PRESSÃO */}
+<div className="mt-12">
+  <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+  <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">TENSÃO</p>
+  <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Relógio de Pressão</h2>
+
+  <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center mb-6">
+    <div>
+      <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">DURAÇÃO (segundos)</label>
+      <input type="number" min={10} max={600} value={countdownDuracao}
+        onChange={e => setCountdownDuracao(Number(e.target.value))}
+        disabled={countdownAtivo}
+        className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-32 text-sm text-center focus:outline-none focus:border-[#c8a84b50] disabled:opacity-50"
+        style={{ borderRadius: '2px' }} />
+    </div>
+    <div className="flex gap-2 mt-4 sm:mt-0 sm:self-end">
+      {!countdownAtivo ? (
+        <button onClick={ativarCountdown}
+          className="bg-[#8a2020] text-[#f0e8d8] px-5 py-2 text-xs font-bold hover:bg-[#aa3030] transition-colors"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          ⏱ INICIAR
+        </button>
+      ) : (
+        <button onClick={pararCountdown}
+          className="border border-red-900 text-red-900 px-5 py-2 text-xs font-bold hover:border-red-600 hover:text-red-600 transition-colors"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          ✕ PARAR
+        </button>
+      )}
+    </div>
+  </div>
+
+  {countdownAtivo && countdownDisplay && (
+    <div className="border border-red-900 bg-[#1a0808] p-8 text-center"
+      style={{ borderRadius: '2px' }}>
+      <p style={cinzel} className="text-red-600 text-xs tracking-[4px] mb-2">TEMPO RESTANTE</p>
+      <p style={cinzel} className="text-red-500 text-6xl font-bold tracking-widest">
+        {countdownDisplay}
+      </p>
     </div>
   )}
 </div>
