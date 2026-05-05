@@ -4,7 +4,6 @@ const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
 
 const navLinks = [
-  { label: 'Início', rota: '/' },
   { label: 'Personagens', rota: '/personagens' },
   { label: 'Dados', rota: '/dados' },
   { label: 'Mestre', rota: '/mestre' },
@@ -22,7 +21,7 @@ export default function Home() {
           onClick={() => navigate('/')}>
           ⚔ TAVERNA
         </span>
-        <div className="hidden sm:flex gap-8">
+        <div className="flex gap-4 sm:gap-8">
           {navLinks.map(({ label, rota }) => (
             <button key={label} onClick={() => navigate(rota)} style={cinzel}
               className="text-[#a09880] text-sm tracking-widest hover:text-[#c8a84b] transition-colors">
