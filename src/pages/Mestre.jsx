@@ -49,6 +49,12 @@ export default function Mestre() {
   const [countdownFim, setCountdownFim] = useState(null);
   const [countdownDuracao, setCountdownDuracao] = useState(60);
   const [countdownDisplay, setCountdownDisplay] = useState('');
+  const [sessoes, setSessoes] = useState([]);
+  const [novaSessao, setNovaSessao] = useState({ title: '', summary: '', session_number: 1 });
+  const [salvandoSessao, setSalvandoSessao] = useState(false);
+  const [sessaoExpandida, setSessaoExpandida] = useState(null);
+  const [monstros, setMonstros] = useState([{ nome: '', xp: 0 }]);
+  const [xpCalculado, setXpCalculado] = useState(null);
 
   useEffect(() => {
     buscarNpcs();
@@ -319,6 +325,68 @@ async function pararCountdown() {
     setCountdownDisplay('');
   } catch {
     setErro('Erro ao parar countdown.');
+  }
+}
+
+useEffect(() => {
+  buscarSessoes();
+}, []);
+
+async function buscarSessoes() {
+  try {
+    const res = await api.get(`/sessions/${CAMPANHA_ID}`);
+    setSessoes(res.data.data || []);
+  } catch {
+    setSessoes([]);
+  }
+}
+
+async function criarSessao() {
+  if (!novaSessao.title.trim()) return;
+  setSalvandoSessao(true);
+  try {
+    const res = await api.post('/sessions', { ...novaSessao, campaign_id: CAMPANHA_ID });
+    setSessoes(prev => [res.data.data, ...prev]);
+    setNovaSessao({ title: '', summary: '', session_number: novaSessao.session_number + 1 });
+  } catch {
+    setErro('Erro ao salvar sessão.');
+  }
+  setSalvandoSessao(false);
+}
+
+async function deletarSessao(id) {
+  if (!window.confirm('Deletar esta sessão?')) return;
+  try {
+    await api.delete(`/sessions/${id}`);
+    setSessoes(prev => prev.filter(s => s.id !== id));
+  } catch {
+    setErro('Erro ao deletar sessão.');
+  }
+}
+
+function calcularXp() {
+  const totalXp = monstros.reduce((acc, m) => acc + Number(m.xp || 0), 0);
+  const numPersonagens = personagens.length || 1;
+  const xpPorPersonagem = Math.floor(totalXp / numPersonagens);
+  setXpCalculado({ total: totalXp, porPersonagem: xpPorPersonagem });
+}
+
+async function distribuirXp() {
+  if (!xpCalculado) return;
+  try {
+    await Promise.all(personagens.map(async p => {
+      const xpAtual = p.data?.xp || 0;
+      const novoXp = xpAtual + xpCalculado.porPersonagem;
+      await api.put(`/characters/${p.id}`, {
+        data: { ...p.data, xp: novoXp }
+      });
+    }));
+    alert(`✅ ${xpCalculado.porPersonagem} XP distribuído para ${personagens.length} personagens!`);
+    setXpCalculado(null);
+    setMonstros([{ nome: '', xp: 0 }]);
+    buscarPersonagens();
+  } catch {
+    setErro('Erro ao distribuir XP.');
   }
 }
 
@@ -1237,6 +1305,141 @@ function limparMarkdown(texto) {
       <p style={cinzel} className="text-red-500 text-6xl font-bold tracking-widest">
         {countdownDisplay}
       </p>
+    </div>
+  )}
+</div>
+
+{/* HISTÓRICO DE SESSÕES */}
+<div className="mt-12">
+  <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+  <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">CRÔNICAS</p>
+  <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Histórico de Sessões</h2>
+
+  {/* Nova sessão */}
+  <div className="border border-[#c8a84b20] bg-[#161410] p-6 mb-6">
+    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">REGISTRAR SESSÃO</p>
+    <div className="flex gap-2 mb-3">
+      <input type="number" value={novaSessao.session_number}
+        onChange={e => setNovaSessao(p => ({ ...p, session_number: Number(e.target.value) }))}
+        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] px-3 py-2 w-20 text-sm text-center focus:outline-none focus:border-[#c8a84b50]"
+        style={{ borderRadius: '2px' }}
+        placeholder="Nº" />
+      <input value={novaSessao.title}
+        onChange={e => setNovaSessao(p => ({ ...p, title: e.target.value }))}
+        placeholder="Título da sessão..."
+        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 flex-1 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
+        style={{ borderRadius: '2px' }} />
+    </div>
+    <textarea value={novaSessao.summary}
+      onChange={e => setNovaSessao(p => ({ ...p, summary: e.target.value }))}
+      placeholder="Resumo do que aconteceu na sessão..."
+      rows={4}
+      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020] resize-none mb-3"
+      style={{ borderRadius: '2px' }} />
+    <button onClick={criarSessao} disabled={salvandoSessao}
+      className="bg-[#c8a84b] text-[#0f0e0c] px-5 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      {salvandoSessao ? '⟳ SALVANDO...' : '✦ SALVAR SESSÃO'}
+    </button>
+  </div>
+
+  {/* Lista de sessões */}
+  {sessoes.length === 0 ? (
+    <p className="text-[#3a3020] text-sm text-center py-8">Nenhuma sessão registrada.</p>
+  ) : (
+    <div className="space-y-2">
+      {sessoes.map(s => (
+        <div key={s.id} className="border border-[#c8a84b15] bg-[#161410]"
+          style={{ borderRadius: '2px' }}>
+          <div className="px-4 py-3 flex items-center justify-between cursor-pointer hover:bg-[#1c1a16] transition-colors"
+            onClick={() => setSessaoExpandida(sessaoExpandida === s.id ? null : s.id)}>
+            <div className="flex items-center gap-3">
+              <span style={cinzel} className="text-[#c8a84b] text-xs opacity-60">#{s.session_number}</span>
+              <span style={cinzel} className="text-[#e8e0d0] text-sm">{s.title}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-[#4a4030] text-xs">
+                {new Date(s.created_at).toLocaleDateString('pt-BR')}
+              </span>
+              <button onClick={e => { e.stopPropagation(); deletarSessao(s.id); }}
+                className="text-red-900 hover:text-red-600 text-sm transition-colors">×</button>
+              <span className="text-[#4a4030] text-xs">{sessaoExpandida === s.id ? '▲' : '▼'}</span>
+            </div>
+          </div>
+          {sessaoExpandida === s.id && s.summary && (
+            <div className="px-4 pb-4 border-t border-[#c8a84b10] pt-3">
+              <p className="text-[#8a8070] text-sm leading-relaxed font-light">{s.summary}</p>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+{/* CALCULADORA DE XP */}
+<div className="mt-12">
+  <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+  <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">RECOMPENSAS</p>
+  <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Calculadora de XP</h2>
+
+  <div className="border border-[#c8a84b20] bg-[#161410] p-6 mb-4">
+    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">MONSTROS DERROTADOS</p>
+    <div className="space-y-2 mb-4">
+      {monstros.map((m, idx) => (
+        <div key={idx} className="flex gap-2">
+          <input value={m.nome}
+            onChange={e => {
+              const novos = [...monstros];
+              novos[idx].nome = e.target.value;
+              setMonstros(novos);
+            }}
+            placeholder="Nome do monstro..."
+            className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 flex-1 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
+            style={{ borderRadius: '2px' }} />
+          <input type="number" min={0} value={m.xp}
+            onChange={e => {
+              const novos = [...monstros];
+              novos[idx].xp = e.target.value;
+              setMonstros(novos);
+            }}
+            placeholder="XP"
+            className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] px-3 py-2 w-24 text-sm text-center focus:outline-none focus:border-[#c8a84b50]"
+            style={{ borderRadius: '2px' }} />
+          <button onClick={() => setMonstros(prev => prev.filter((_, i) => i !== idx))}
+            className="text-red-900 hover:text-red-600 text-sm transition-colors px-2">×</button>
+        </div>
+      ))}
+    </div>
+    <button onClick={() => setMonstros(prev => [...prev, { nome: '', xp: 0 }])}
+      className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors mb-4"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      + MONSTRO
+    </button>
+
+    <div className="flex gap-2">
+      <button onClick={calcularXp}
+        className="bg-[#c8a84b] text-[#0f0e0c] px-5 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors"
+        style={{ ...cinzel, borderRadius: '2px' }}>
+        ⚔ CALCULAR
+      </button>
+    </div>
+  </div>
+
+  {xpCalculado && (
+    <div className="border border-[#c8a84b30] bg-[#161410] p-6">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-1">RESULTADO</p>
+          <p className="text-[#8a8070] text-sm">Total: <span className="text-[#e8e0d0]">{xpCalculado.total} XP</span> ÷ {personagens.length} personagens</p>
+        </div>
+        <p style={cinzel} className="text-[#c8a84b] text-3xl font-bold">{xpCalculado.porPersonagem} XP</p>
+      </div>
+      <button onClick={distribuirXp}
+        className="bg-[#8a5030] text-[#f0e8d8] px-5 py-2 text-xs font-bold hover:bg-[#a06040] transition-colors w-full"
+        style={{ ...cinzel, borderRadius: '2px' }}>
+        ✦ DISTRIBUIR PARA TODOS OS PERSONAGENS
+      </button>
     </div>
   )}
 </div>

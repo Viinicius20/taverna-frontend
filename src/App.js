@@ -6,6 +6,7 @@ import Mestre from './pages/Mestre';
 import Ficha from './pages/Ficha';
 import RolarDados from './pages/RolarDados';
 import Quadro from './pages/Quadro';
+import Historico from './pages/Historico';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/personagens/:id" element={<Ficha />} />
         <Route path="/dados" element={<RolarDados />} />
         <Route path="/quadro" element={<Quadro />} />
+        <Route path="/historico" element={<Historico />} />
       </Routes>
     </BrowserRouter>
   );

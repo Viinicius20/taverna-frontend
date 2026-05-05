@@ -57,6 +57,8 @@ export default function Ficha() {
 
   const [spellDetalhes, setSpellDetalhes] = useState(null);
 
+  const [abaInventario, setAbaInventario] = useState('todos');
+
   useEffect(() => {
     buscarPersonagem();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -404,6 +406,35 @@ export default function Ficha() {
                 className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
                 style={{ borderRadius: '2px' }} />
             </div>
+          <div>
+              <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">XP</label>
+              <input type="number" min={0} value={ficha.xp || 0}
+                 onChange={e => {
+                  const novoXP = Number(e.target.value);
+                  const tabela = [0,300,900,2700,6500,14000,23000,34000,48000,64000,85000,100000,120000,140000,165000,195000,225000,265000,305000,355000];
+                  const novoNivel = tabela.filter(x => x <= novoXP).length;
+                  editarCampo('xp', novoXP);
+                  editarCampo('level', Math.min(20, novoNivel));
+                }}
+                className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
+                style={{ borderRadius: '2px' }} />
+            </div>
+            {(() => {
+  const xpAtual = ficha.xp || 0;
+  const tabela = [0,300,900,2700,6500,14000,23000,34000,48000,64000,85000,100000,120000,140000,165000,195000,225000,265000,305000,355000];
+  const nivelAtual = ficha.level || 1;  // ← usa o nível da ficha
+  const xpAtualNivel = tabela[nivelAtual - 1] || 0;
+  const xpProxNivel = tabela[nivelAtual] || tabela[tabela.length - 1];
+  const pct = Math.min(100, ((xpAtual - xpAtualNivel) / (xpProxNivel - xpAtualNivel)) * 100);
+  return nivelAtual < 20 ? (
+    <div className="col-span-2 mt-1">
+      <div className="h-0.5 bg-[#c8a84b15] w-full">
+        <div className="h-full bg-[#c8a84b40] transition-all" style={{ width: `${pct}%` }} />
+      </div>
+      <p style={cinzel} className="text-[#3a3020] text-xs mt-1">{xpAtual} / {xpProxNivel} XP</p>
+    </div>
+  ) : null;
+})()}
           </div>
         </div>
 
@@ -505,6 +536,112 @@ export default function Ficha() {
                   </div>
                 ))}
               </div>
+              {/* STATS DE COMBATE */}
+        <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+          <div className="px-6 py-4 border-b border-[#c8a84b15]">
+            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">STATS DE COMBATE</p>
+          </div>
+          <div className="p-6">
+            <div className="flex items-center gap-4 mb-6 border border-[#c8a84b15] bg-[#0f0e0c] p-4 rounded">
+              <div className="flex-1">
+                <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">HP ATUAL</label>
+                <input 
+                  type="number" 
+                  value={combat.hp ?? 0}
+                  onChange={e => editarCombat('hp', e.target.value)}
+                  className="bg-transparent border-b border-[#c8a84b30] text-[#f0e8d8] text-3xl font-light w-full focus:outline-none focus:border-[#c8a84b60] text-center pb-1"
+                  style={cinzel} 
+                />
+              </div>
+              <span className="text-[#4a4030] text-2xl">/</span>
+              <div className="flex-1">
+                <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">HP MÁXIMO</label>
+                <input 
+                  type="number" 
+                  value={combat.hp_max ?? 0}
+                  onChange={e => editarCombat('hp_max', e.target.value)}
+                  className="bg-transparent border-b border-[#c8a84b30] text-[#f0e8d8] text-3xl font-light w-full focus:outline-none focus:border-[#c8a84b60] text-center pb-1"
+                  style={cinzel} 
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              {combatFields.filter(f => !['hp', 'hp_max'].includes(f.campo)).map(({ label, campo, tipo }) => (
+                <div key={campo} className="flex flex-col items-center border border-[#c8a84b15] bg-[#0f0e0c] p-3 rounded">
+                  <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest mb-2 text-center">{label}</label>
+                  <input
+                    type={tipo}
+                    value={combat[campo] ?? (tipo === 'number' ? 0 : '')}
+                    onChange={e => editarCombat(campo, e.target.value)}
+                    className="bg-transparent text-[#c8a84b] text-xl font-light w-full focus:outline-none text-center"
+                    style={cinzel}
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div>
+              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">SALVAGUARDAS</p>
+              <div className="grid grid-cols-6 gap-2">
+                {Object.entries(combat.saving_throws || {}).map(([attr, val]) => (
+                  <div key={attr} className="flex flex-col items-center gap-1">
+                    <label style={cinzel} className="text-[#4a4030] text-xs">{saveLabel[attr] || attr.toUpperCase()}</label>
+                    <input 
+                      type="number" 
+                      value={val ?? 0}
+                      onChange={e => editarSavingThrow(attr, e.target.value)}
+                      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-sm w-full py-1.5 focus:outline-none focus:border-[#c8a84b50]"
+                      style={{ borderRadius: '2px', ...cinzel }} 
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          {/* CONDIÇÕES */}
+<div className="mt-6">
+  <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">CONDIÇÕES</p>
+  <div className="flex flex-wrap gap-2">
+    {[
+      { label: 'Caído', cor: '#8a2020' },
+      { label: 'Envenenado', cor: '#4a8a20' },
+      { label: 'Paralisado', cor: '#8a6020' },
+      { label: 'Enfeitiçado', cor: '#8a4a8a' },
+      { label: 'Amedrontado', cor: '#6a4020' },
+      { label: 'Atordoado', cor: '#4a6a8a' },
+      { label: 'Invisível', cor: '#6a6a6a' },
+      { label: 'Surdo', cor: '#4a4030' },
+      { label: 'Cego', cor: '#303030' },
+      { label: 'Incapacitado', cor: '#8a2050' },
+      { label: 'Petrificado', cor: '#607060' },
+      { label: 'Inconsciente', cor: '#202020' },
+    ].map(({ label, cor }) => {
+      const ativo = (ficha.condicoes || []).includes(label);
+      return (
+        <button key={label}
+          onClick={() => {
+            const atual = ficha.condicoes || [];
+            const novo = ativo
+              ? atual.filter(c => c !== label)
+              : [...atual, label];
+            setFicha(prev => ({ ...prev, condicoes: novo }));
+          }}
+          className="px-3 py-1 text-xs border transition-all"
+          style={{
+            ...cinzel,
+            borderRadius: '2px',
+            borderColor: ativo ? cor : '#c8a84b15',
+            backgroundColor: ativo ? `${cor}25` : 'transparent',
+            color: ativo ? cor : '#4a4030',
+          }}>
+          {label}
+        </button>
+      );
+    })}
+  </div>
+</div>
+        </div>
             </div>
           </div>
         </div>
@@ -836,22 +973,154 @@ export default function Ficha() {
           </div>
         )}
 
-        {/* INVENTÁRIO */}
-        {ficha.inventory && ficha.inventory.length > 0 && (
-          <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
-            <div className="px-6 py-4 border-b border-[#c8a84b15]">
-              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">INVENTÁRIO</p>
-            </div>
-            <div className="p-6 flex flex-wrap gap-2">
-              {ficha.inventory.map((item, i) => (
-                <span key={i} className="border border-[#c8a84b15] text-[#6a6050] px-3 py-1 text-sm"
-                  style={{ borderRadius: '2px' }}>
-                  {item}
+        {/* CONTADOR DE RECURSOS */}
+<div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+  <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
+    <div>
+      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">RECURSOS</p>
+      <p className="text-[#4a4030] text-xs mt-1">Features e habilidades com usos limitados</p>
+    </div>
+    <button onClick={() => {
+      const nome = prompt('Nome do recurso (ex: Imposição de Mãos, Metamagia):');
+      if (!nome?.trim()) return;
+      const max = Number(prompt('Usos máximos:') || 1);
+      const recuperacao = prompt('Recupera em:\n1 - Descanso Curto\n2 - Descanso Longo');
+      const tipo = recuperacao === '1' ? 'curto' : 'longo';
+      const novos = [...(ficha.recursos || []), { nome, max, atual: max, recuperacao: tipo }];
+      setFicha(prev => ({ ...prev, recursos: novos }));
+    }}
+      className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      + ADICIONAR
+    </button>
+    </div>
+
+  <div className="p-6">
+    {!ficha.recursos || ficha.recursos.length === 0 ? (
+      <p className="text-[#3a3020] text-sm text-center py-4">Nenhum recurso adicionado.</p>
+    ) : (
+      <div className="space-y-3">
+        {ficha.recursos.map((recurso, idx) => (
+          <div key={idx} className="border border-[#c8a84b15] bg-[#0f0e0c] p-3">
+            <div className="flex items-center justify-between mb-2">
+              <span style={cinzel} className="text-[#e8e0d0] text-sm">{recurso.nome}</span>
+              {recurso.recuperacao && (
+                <span style={cinzel} className="text-xs border px-1.5 py-0.5 ml-2"
+                  style={{
+                    borderRadius: '2px',
+                    borderColor: recurso.recuperacao === 'curto' ? '#4a6a8a40' : '#8a4a8a40',
+                    color: recurso.recuperacao === 'curto' ? '#4a6a8a' : '#8a4a8a',
+                  }}>
+                  {recurso.recuperacao === 'curto' ? 'CURTO' : 'LONGO'}
                 </span>
+              )}
+              <div className="flex items-center gap-2">
+                <span style={cinzel} className="text-[#4a4030] text-xs">{recurso.atual}/{recurso.max}</span>
+                <button onClick={() => {
+                  const novos = ficha.recursos.filter((_, i) => i !== idx);
+                  setFicha(prev => ({ ...prev, recursos: novos }));
+                }} className="text-red-900 hover:text-red-600 text-sm transition-colors">×</button>
+              </div>
+            </div>
+            <div className="flex gap-1 flex-wrap">
+              {Array.from({ length: recurso.max }).map((_, i) => (
+                <button key={i}
+                  onClick={() => {
+                    const novos = [...ficha.recursos];
+                    novos[idx] = {
+                      ...novos[idx],
+                      atual: i < novos[idx].atual ? i : i + 1
+                    };
+                    setFicha(prev => ({ ...prev, recursos: novos }));
+                  }}
+                  className="w-6 h-6 border transition-all"
+                  style={{
+                    borderRadius: '2px',
+                    borderColor: i < recurso.atual ? '#c8a84b' : '#c8a84b20',
+                    backgroundColor: i < recurso.atual ? '#c8a84b25' : 'transparent',
+                  }} />
               ))}
             </div>
           </div>
-        )}
+        ))}
+      </div>
+    )}
+  </div>
+</div>
+
+{/* DESCANSO */}
+<div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+  <div className="px-6 py-4 border-b border-[#c8a84b15]">
+    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">DESCANSO</p>
+  </div>
+  <div className="p-6 flex gap-3">
+    <button onClick={() => {
+      // Reseta recursos de descanso curto
+      const novosRecursos = (ficha.recursos || []).map(r =>
+        r.recuperacao === 'curto' ? { ...r, atual: r.max } : r
+      );
+      setFicha(prev => ({ ...prev, recursos: novosRecursos }));
+    }}
+      className="flex-1 border border-[#4a6a8a50] text-[#4a6a8a] py-3 text-xs hover:bg-[#4a6a8a10] transition-colors"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      🌙 DESCANSO CURTO
+    </button>
+    <button onClick={() => {
+      // Reseta tudo — HP, recursos, slots
+      const novosRecursos = (ficha.recursos || []).map(r => ({ ...r, atual: r.max }));
+      const novosSpells = (ficha.spellcasting?.spells || []).map(s => ({ ...s, slots_used: 0 }));
+      setFicha(prev => ({
+        ...prev,
+        recursos: novosRecursos,
+        combat: { ...prev.combat, hp: prev.combat?.hp_max },
+        spellcasting: { ...prev.spellcasting, spells: novosSpells },
+        condicoes: [],
+      }));
+    }}
+      className="flex-1 border border-[#8a4a8a50] text-[#8a4a8a] py-3 text-xs hover:bg-[#8a4a8a10] transition-colors"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      ☀ DESCANSO LONGO
+    </button>
+  </div>
+</div>
+
+        {/* INVENTÁRIO */}
+{ficha.inventory && ficha.inventory.length > 0 && (
+  <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+    <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
+      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">INVENTÁRIO</p>
+      <div className="flex gap-2">
+        {['todos', 'magicos'].map(aba => (
+          <button key={aba}
+            onClick={() => setAbaInventario(aba)}
+            className={`px-3 py-1 text-xs transition-colors ${abaInventario === aba ? 'bg-[#c8a84b] text-[#0f0e0c]' : 'border border-[#c8a84b30] text-[#c8a84b]'}`}
+            style={{ ...cinzel, borderRadius: '2px' }}>
+            {aba === 'todos' ? 'TODOS' : '✦ MÁGICOS'}
+          </button>
+        ))}
+      </div>
+    </div>
+    <div className="p-6 flex flex-wrap gap-2">
+      {ficha.inventory
+        .filter(item => abaInventario === 'todos' || item.toLowerCase().includes('(comum)') || item.toLowerCase().includes('(incomum)') || item.toLowerCase().includes('(raro)') || item.toLowerCase().includes('(muito raro)') || item.toLowerCase().includes('(lendário)'))
+        .map((item, i) => {
+          const isMagico = ['(comum)', '(incomum)', '(raro)', '(muito raro)', '(lendário)'].some(r => item.toLowerCase().includes(r));
+          return (
+            <span key={i}
+              className="border px-3 py-1 text-sm"
+              style={{
+                borderRadius: '2px',
+                borderColor: isMagico ? '#c8a84b40' : '#c8a84b15',
+                color: isMagico ? '#c8a84b' : '#6a6050',
+                backgroundColor: isMagico ? '#c8a84b08' : 'transparent',
+              }}>
+              {item}
+            </span>
+          );
+        })}
+    </div>
+  </div>
+)}
 
         {/* HISTÓRIA */}
         {ficha.background_story && (
