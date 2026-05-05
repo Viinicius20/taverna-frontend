@@ -771,11 +771,12 @@ function limparMarkdown(texto) {
   </div>
 
   {/* Adicionar monstro genérico */}
-  <div className="flex gap-2 mb-4 mt-6">
-    <input value={novoMonstro.nome} onChange={e => setNovoMonstro(p => ({ ...p, nome: e.target.value }))}
-      placeholder="Nome do monstro..."
-      className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 flex-1 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
-      style={{ borderRadius: '2px' }} />
+  <div className="flex flex-col sm:flex-row gap-2 mb-4 mt-6">
+  <input value={novoMonstro.nome} onChange={e => setNovoMonstro(p => ({ ...p, nome: e.target.value }))}
+    placeholder="Nome do monstro..."
+    className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
+    style={{ borderRadius: '2px' }} />
+  <div className="flex gap-2">
     <input value={novoMonstro.hp} onChange={e => setNovoMonstro(p => ({ ...p, hp: e.target.value }))}
       placeholder="HP" type="number" min={1}
       className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-20 text-sm text-center focus:outline-none focus:border-[#c8a84b50]"
@@ -790,6 +791,7 @@ function limparMarkdown(texto) {
       + MONSTRO
     </button>
   </div>
+</div>
 
   {/* Adicionar NPCs existentes */}
   {npcs.length > 0 && (
@@ -882,7 +884,7 @@ function limparMarkdown(texto) {
   <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Gerador de Loot</h2>
 
   {/* Config */}
-  <div className="grid grid-cols-2 gap-3 mb-4">
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
     <div>
       <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">NÍVEL MÉDIO</label>
       <input type="number" min={1} max={20} value={lootConfig.nivel_medio}
@@ -997,7 +999,7 @@ function limparMarkdown(texto) {
   <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Itens Mágicos</h2>
 
   {/* Criar homebrew */}
-  <div className="flex gap-2 mb-6">
+  <div className="flex flex-col sm:flex-row gap-2 mb-6">
   <input value={novoItemNome} onChange={e => setNovoItemNome(e.target.value)}
     placeholder="Nome do item para criar com IA..."
     className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 flex-1 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
@@ -1128,7 +1130,7 @@ function limparMarkdown(texto) {
   </div>
 
   {buscandoRegra && (
-    <div className="flex items-center gap-3 justify-center py-8">
+    <div className="flex flex-col sm:flex-row gap-2 mb-6">
       <div className="w-6 h-6 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
       <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">CONSULTANDO...</p>
     </div>
