@@ -1111,7 +1111,7 @@ function limparMarkdown(texto) {
   <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">CONSULTA RÁPIDA</p>
   <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Resumo de Regras</h2>
 
-  <div className="flex gap-2 mb-6">
+  <div className="flex flex-col sm:flex-row gap-2 mb-6">
     <select value={rulesSistema} onChange={e => setRulesSistema(e.target.value)}
       className="bg-[#161410] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-xs focus:outline-none focus:border-[#c8a84b50]"
       style={{ borderRadius: '2px' }}>
