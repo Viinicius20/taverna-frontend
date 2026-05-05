@@ -1041,48 +1041,48 @@ function limparMarkdown(texto) {
 
   {/* Lista */}
   {loadingItems ? (
-    <div className="flex items-center gap-3 justify-center py-8">
-      <div className="w-6 h-6 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-      <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">CARREGANDO...</p>
-    </div>
-  ) : (
-    <div className="space-y-2">
-      {magicItems
-        .filter(i => !filtroRaridade || i.rarity === filtroRaridade)
-        .filter(i => !filtroTipo || i.type === filtroTipo)
-        .map((item, idx) => {
-          const rarCor = {
-            'Comum': '#a09880', 'Incomum': '#4a8a4a', 'Raro': '#4a6aaa',
-            'Muito Raro': '#8a4aaa', 'Lendário': '#c8a84b'
-          }[item.rarity] || '#c8a84b';
-          return (
-            <div key={idx} className="border border-[#c8a84b15] bg-[#161410] p-3 cursor-pointer hover:border-[#c8a84b30] transition-all"
-              style={{ borderRadius: '2px' }}
-              onClick={() => setItemDetalhes(itemDetalhes?.id === item.id ? null : item)}>
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <span style={{ ...cinzel, color: rarCor }} className="text-xs w-20 shrink-0">{item.rarity}</span>
-                  <span style={cinzel} className="text-[#e8e0d0] text-sm">{item.name}</span>
-                  {item.is_homebrew && (
-                    <span style={cinzel} className="text-xs border border-[#8a5030] text-[#8a5030] px-1.5 py-0.5"
-                      style2={{ borderRadius: '2px' }}>HOMEBREW</span>
-                  )}
-                  {item.requires_attunement && (
-                    <span style={cinzel} className="text-xs text-[#4a4030]">sintonização</span>
-                  )}
-                </div>
-                <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-                  <select onChange={e => e.target.value && entregarItemMagico(item, e.target.value)}
-                    defaultValue=""
-                    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#6a6050] px-2 py-1 text-xs focus:outline-none"
-                    style={{ borderRadius: '2px' }}>
-                    <option value="">Entregar...</option>
-                    {personagens.map(p => (
-                      <option key={p.id} value={p.id}>{p.name}</option>
-                    ))}
-                  </select>
-                </div>
+  <div className="flex items-center gap-3 justify-center py-8">
+    <div className="w-6 h-6 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
+    <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">CARREGANDO...</p>
+  </div>
+) : (
+  <div className="space-y-2">
+    {magicItems
+      .filter(i => !filtroRaridade || i.rarity === filtroRaridade)
+      .filter(i => !filtroTipo || i.type === filtroTipo)
+      .map((item, idx) => {
+        const rarCor = {
+          'Comum': '#a09880', 'Incomum': '#4a8a4a', 'Raro': '#4a6aaa',
+          'Muito Raro': '#8a4aaa', 'Lendário': '#c8a84b'
+        }[item.rarity] || '#c8a84b';
+        return (
+          <div key={idx} className="border border-[#c8a84b15] bg-[#161410] p-3 cursor-pointer hover:border-[#c8a84b30] transition-all"
+            style={{ borderRadius: '2px' }}
+            onClick={() => setItemDetalhes(itemDetalhes?.id === item.id ? null : item)}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <span style={{ ...cinzel, color: rarCor }} className="text-xs w-20 shrink-0">{item.rarity}</span>
+                <span style={cinzel} className="text-[#e8e0d0] text-sm">{item.name}</span>
+                {item.is_homebrew && (
+                  <span style={cinzel} className="text-xs border border-[#8a5030] text-[#8a5030] px-1.5 py-0.5"
+                    style2={{ borderRadius: '2px' }}>HOMEBREW</span>
+                )}
+                {item.requires_attunement && (
+                  <span style={cinzel} className="text-xs text-[#4a4030]">sintonização</span>
+                )}
               </div>
+              <div onClick={e => e.stopPropagation()}>
+                <select onChange={e => e.target.value && entregarItemMagico(item, e.target.value)}
+                  defaultValue=""
+                  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#6a6050] px-2 py-1 text-xs focus:outline-none w-full sm:w-auto"
+                  style={{ borderRadius: '2px' }}>
+                  <option value="">Entregar...</option>
+                  {personagens.map(p => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
               {/* Expandido */}
               {itemDetalhes?.id === item.id && (
