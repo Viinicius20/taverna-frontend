@@ -46,26 +46,38 @@ async function buscarCountdown() {
   try {
     const res = await fetch(`https://taverna-backend-eq3b.onrender.com/session-state/${CAMPANHA_ID}`);
     const json = await res.json();
-    if (json.data?.countdown_active) {
-      setCountdown(json.data);
-    } else {
-      setCountdown(null);
-      setCountdownDisplay('');
-    }
+    if (json.data?.countdown_active && json.data?.countdown_end) {
+  const diff = Math.floor((new Date(json.data.countdown_end) - new Date()) / 1000);
+  if (diff > 0) {
+    setCountdown(json.data);
+  } else {
+    setCountdown(null);
+  }
+} else {
+  setCountdown(null);
+  setCountdownDisplay('');
+}
   } catch {}
 }
-
+// Polling — só busca estado, não interfere no countdown
 useEffect(() => {
-    if (!countdown?.countdown_end) return;
-    const interval = setInterval(() => {
-        const diff = Math.max(0, Math.floor((new Date(countdown.countdown_end) - new Date()) / 1000));
-        const min = Math.floor(diff / 60);
-        const seg = diff % 60;
-        setCountdownDisplay(`${min}:${seg.toString().padStart(2, '0')}`);
-        if (diff === 0) setCountdown(null);
-    }, 1000);
-    return () => clearInterval(interval);
-}, [countdown]);
+  buscarCountdown();
+  const interval = setInterval(buscarCountdown, 3000);
+  return () => clearInterval(interval);
+}, []);
+
+// Countdown — roda independente
+useEffect(() => {
+  if (!countdown?.countdown_end) return;
+  const interval = setInterval(() => {
+    const diff = Math.max(0, Math.floor((new Date(countdown.countdown_end) - new Date()) / 1000));
+    const min = Math.floor(diff / 60);
+    const seg = diff % 60;
+    setCountdownDisplay(`${min}:${seg.toString().padStart(2, '0')}`);
+    if (diff === 0) setCountdown(null);
+  }, 1000);
+  return () => clearInterval(interval);
+}, [countdown?.countdown_end]); // ← depende só do fim, não do objeto inteiro
 
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0]" style={crimson}>

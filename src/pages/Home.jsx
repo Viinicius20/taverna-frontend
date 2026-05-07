@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -11,6 +12,21 @@ const navLinks = [
 
 export default function Home() {
   const navigate = useNavigate();
+  const [boato, setBoato] = useState(null);
+  const [gerandoBoato, setGerandoBoato] = useState(false);
+
+  async function gerarBoato() {
+  setGerandoBoato(true);
+  setBoato(null);
+  try {
+    const res = await fetch('https://taverna-backend-eq3b.onrender.com/boato');
+    const json = await res.json();
+    setBoato(json.data);
+  } catch {
+    setBoato(null);
+  }
+  setGerandoBoato(false);
+}
 
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0]" style={crimson}>
@@ -124,6 +140,29 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* BOATOS DE TAVERNA */}
+<div className="max-w-5xl mx-auto px-8 mb-20">
+  <div className="w-16 h-px bg-[#c8a84b60] mx-auto mb-16" />
+  <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">TAVERNA</p>
+  <h2 style={cinzel} className="text-2xl text-[#f0e8d8] mb-6 font-semibold">Boatos da Noite</h2>
+
+  <button onClick={gerarBoato} disabled={gerandoBoato}
+    className="border border-[#c8a84b40] text-[#c8a84b] px-6 py-3 text-xs tracking-widest hover:bg-[#c8a84b10] transition-colors disabled:opacity-50 mb-6"
+    style={{ ...cinzel, borderRadius: '2px' }}>
+    {gerandoBoato ? '⟳ OUVINDO...' : '🍺 OUVIR BOATOS'}
+  </button>
+
+  {boato && (
+    <div className="border border-[#c8a84b20] bg-[#161410] p-6"
+      style={{ borderRadius: '2px' }}>
+      <p className="text-[#a09880] text-base leading-relaxed mb-4 font-light italic">
+        "{boato.boato}"
+      </p>
+      <p style={cinzel} className="text-[#4a4030] text-xs">— {boato.fonte}</p>
+    </div>
+  )}
+</div>
 
       {/* FOOTER */}
       <footer className="border-t border-[#c8a84b15] py-8 text-center">

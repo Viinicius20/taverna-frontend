@@ -55,6 +55,10 @@ export default function Mestre() {
   const [sessaoExpandida, setSessaoExpandida] = useState(null);
   const [monstros, setMonstros] = useState([{ nome: '', xp: 0 }]);
   const [xpCalculado, setXpCalculado] = useState(null);
+  const [nomeGerado, setNomeGerado] = useState('');
+  const [racaNome, setRacaNome] = useState('Humano');
+  const [novoItemIdentificado, setNovoItemIdentificado] = useState(true);
+  const [novoItemNomeMisterioso, setNovoItemNomeMisterioso] = useState('');
 
   useEffect(() => {
     buscarNpcs();
@@ -215,11 +219,15 @@ async function criarItemHomebrew() {
   try {
     const res = await api.post('/magic-items/homebrew', { 
       name: novoItemNome,
-      rarity: novoItemRaridade 
+      rarity: novoItemRaridade,
+      identificado: novoItemIdentificado,
+      nome_misterioso: novoItemNomeMisterioso 
     });
     setMagicItems(prev => [res.data.data, ...prev]);
     setNovoItemNome('');
     setNovoItemRaridade('');
+    setNovoItemIdentificado(true);
+    setNovoItemNomeMisterioso('');
   } catch {
     setErro('Erro ao criar item mágico.');
   }
@@ -231,12 +239,20 @@ async function entregarItemMagico(item, personagemId) {
     const resChar = await api.get(`/characters/${personagemId}`);
     const char = resChar.data.data;
     const inventarioAtual = char.data?.inventory || [];
-    const nomeItem = `${item.name} (${item.rarity})`;
-    const novoInventario = [...inventarioAtual, nomeItem];
+    const novoItem = {
+      name: item.identificado ? item.name : (item.nome_misterioso || 'Item Desconhecido'),
+      rarity: item.rarity,
+      description: item.identificado ? item.description : null,
+      mechanics: item.identificado ? item.mechanics : null,
+      identificado: item.identificado,
+      nome_misterioso: item.nome_misterioso || null,
+      is_magic: true
+    };
+    const novoInventario = [...inventarioAtual, novoItem];
     await api.put(`/characters/${personagemId}`, {
       data: { ...char.data, inventory: novoInventario }
     });
-    alert(`✅ "${item.name}" entregue para ${char.name}!`);
+    alert(`✅ "${novoItem.name}" entregue para ${char.name}!`);
   } catch {
     setErro('Erro ao entregar item.');
   }
@@ -430,6 +446,22 @@ function resetarCombate() {
 function limparMarkdown(texto) {
   if (!texto) return '';
   return texto.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
+}
+
+function gerarNome() {
+  const nomes = {
+    'Humano': ['Aldric', 'Maren', 'Jovan', 'Sera', 'Edric', 'Lila', 'Torvin', 'Cass', 'Bran', 'Deva'],
+    'Elfo': ['Aerith', 'Sylvan', 'Elowen', 'Thalion', 'Niriel', 'Caladwen', 'Fenris', 'Aerin', 'Lyara', 'Silvanos'],
+    'Anão': ['Dolgrin', 'Bofri', 'Thora', 'Grimka', 'Baldur', 'Hilda', 'Torvak', 'Morda', 'Brundar', 'Helga'],
+    'Halfling': ['Merric', 'Pip', 'Rosie', 'Tobias', 'Calla', 'Bando', 'Nora', 'Filbo', 'Lila', 'Samwell'],
+    'Gnomo': ['Fizwick', 'Tinkle', 'Zippi', 'Wrendle', 'Cogsworth', 'Nix', 'Bimble', 'Fizzle', 'Sprocket', 'Glim'],
+    'Meio-Orc': ['Groth', 'Varka', 'Muzgash', 'Ragna', 'Thok', 'Ursa', 'Krug', 'Mira', 'Droga', 'Yeva'],
+    'Tiefling': ['Xanathos', 'Zariel', 'Melech', 'Riven', 'Kallista', 'Malachar', 'Seraphel', 'Damek', 'Lilith', 'Pyre'],
+    'Draconato': ['Arjhan', 'Balasar', 'Bharash', 'Ghesh', 'Heskan', 'Kriv', 'Patrin', 'Rhogar', 'Shedinn', 'Torinn'],
+  };
+  const lista = nomes[racaNome] || nomes['Humano'];
+  const nome = lista[Math.floor(Math.random() * lista.length)];
+  setNomeGerado(nome);
 }
 
   return (
@@ -1123,6 +1155,20 @@ function limparMarkdown(texto) {
       <option key={r} value={r}>{r}</option>
     ))}
   </select>
+  <div className="flex items-center gap-3 mt-2">
+  <button onClick={() => setNovoItemIdentificado(p => !p)}
+    className={`px-3 py-1 text-xs border transition-colors ${novoItemIdentificado ? 'border-[#c8a84b30] text-[#4a4030]' : 'border-[#8a5030] text-[#8a5030] bg-[#8a503010]'}`}
+    style={{ ...cinzel, borderRadius: '2px' }}>
+    {novoItemIdentificado ? '✓ IDENTIFICADO' : '? NÃO IDENTIFICADO'}
+  </button>
+  {!novoItemIdentificado && (
+    <input value={novoItemNomeMisterioso}
+      onChange={e => setNovoItemNomeMisterioso(e.target.value)}
+      placeholder="Nome misterioso (ex: Cajado Estranho)..."
+      className="bg-[#161410] border border-[#8a503040] text-[#e8e0d0] px-3 py-1 flex-1 text-sm focus:outline-none placeholder-[#3a3020]"
+      style={{ borderRadius: '2px' }} />
+  )}
+</div>
   <button onClick={criarItemHomebrew} disabled={criandoItem}
     className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50"
     style={{ ...cinzel, borderRadius: '2px' }}>
@@ -1192,23 +1238,56 @@ function limparMarkdown(texto) {
                     <option key={p.id} value={p.id}>{p.name}</option>
                   ))}
                 </select>
+                {!item.identificado && (
+  <button onClick={async e => {
+    e.stopPropagation();
+    await api.patch(`/magic-items/${item.id}/revelar`);
+    
+    // Atualiza todos os personagens que têm esse item no inventário
+    for (const p of personagens) {
+      const res = await api.get(`/characters/${p.id}`);
+      const char = res.data.data;
+      const inv = char.data?.inventory || [];
+      const temItem = inv.some(i => typeof i === 'object' && i.name === item.name);
+      if (temItem) {
+        const novoInv = inv.map(i => 
+          typeof i === 'object' && i.name === item.name
+            ? { ...i, identificado: true, description: item.description, mechanics: item.mechanics }
+            : i
+        );
+        await api.put(`/characters/${p.id}`, {
+          data: { ...char.data, inventory: novoInv }
+        });
+      }
+    }
+    
+    setMagicItems(prev => prev.map(i => i.id === item.id ? { ...i, identificado: true } : i));
+  }}
+    className="text-xs border border-[#8a5030] text-[#8a5030] px-2 py-0.5 hover:bg-[#8a503020] transition-colors"
+    style={{ ...cinzel, borderRadius: '2px' }}>
+    REVELAR
+  </button>
+)}
               </div>
             </div>
 
               {/* Expandido */}
               {itemDetalhes?.id === item.id && (
-                <div className="mt-3 pt-3 border-t border-[#c8a84b10] space-y-2">
-                  {item.description && (
-                    <p className="text-[#6a6050] text-sm font-light leading-relaxed">{limparMarkdown(item.description)}</p>
-                  )}
-                  {item.mechanics && (
-                    <div className="bg-[#0f0e0c] border border-[#c8a84b10] px-3 py-2">
-                      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">MECÂNICA</p>
-                      <p className="text-[#8a8070] text-sm leading-relaxed">{limparMarkdown(item.mechanics)}</p>
-                    </div>
-                  )}
-                </div>
-              )}
+  <div className="mt-3 pt-3 border-t border-[#c8a84b10] space-y-2">
+    {!item.identificado && (
+      <p style={cinzel} className="text-[#8a5030] text-xs tracking-[2px] mb-2">? NÃO IDENTIFICADO PELO JOGADOR</p>
+    )}
+    {item.description && (
+      <p className="text-[#6a6050] text-sm font-light leading-relaxed">{limparMarkdown(item.description)}</p>
+    )}
+    {item.mechanics && (
+      <div className="bg-[#0f0e0c] border border-[#c8a84b10] px-3 py-2">
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">MECÂNICA</p>
+        <p className="text-[#8a8070] text-sm leading-relaxed">{limparMarkdown(item.mechanics)}</p>
+      </div>
+    )}
+  </div>
+)}
             </div>
           );
         })}
@@ -1452,6 +1531,31 @@ function limparMarkdown(texto) {
           <p className="text-[#7a7060] mb-6 font-light text-sm">Resultados visíveis apenas para você.</p>
           <Dados secreto={true} />
         </div>
+
+        {/* GERADOR DE NOMES — fixo */}
+<div className="fixed bottom-6 right-6 z-50">
+  <div className="bg-[#161410] border border-[#c8a84b30] p-4 shadow-lg" style={{ borderRadius: '2px' }}>
+    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">GERAR NOME</p>
+    <div className="flex gap-2 mb-2">
+      <select value={racaNome} onChange={e => setRacaNome(e.target.value)}
+        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#6a6050] px-2 py-1 text-xs focus:outline-none"
+        style={{ borderRadius: '2px' }}>
+        {['Humano','Elfo','Anão','Halfling','Gnomo','Meio-Orc','Tiefling','Draconato'].map(r => (
+          <option key={r} value={r}>{r}</option>
+        ))}
+      </select>
+      <button onClick={gerarNome}
+        className="bg-[#c8a84b] text-[#0f0e0c] px-3 py-1 text-xs font-bold hover:bg-[#e0c060] transition-colors"
+        style={{ ...cinzel, borderRadius: '2px' }}>
+        ⚄
+      </button>
+    </div>
+    {nomeGerado && (
+      <p style={cinzel} className="text-[#f0e8d8] text-sm text-center tracking-widest">{nomeGerado}</p>
+    )}
+  </div>
+</div>
+
       </div>
     </div>
   );

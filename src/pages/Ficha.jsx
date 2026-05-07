@@ -59,6 +59,8 @@ export default function Ficha() {
 
   const [abaInventario, setAbaInventario] = useState('todos');
 
+  const [itemInventarioDetalhes, setItemInventarioDetalhes] = useState(null);
+
   useEffect(() => {
     buscarPersonagem();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1098,25 +1100,80 @@ export default function Ficha() {
     </div>
     <div className="p-6 flex flex-wrap gap-2">
       {ficha.inventory
-        .filter(item => abaInventario === 'todos' || item.toLowerCase().includes('(comum)') || item.toLowerCase().includes('(incomum)') || item.toLowerCase().includes('(raro)') || item.toLowerCase().includes('(muito raro)') || item.toLowerCase().includes('(lendário)'))
-        .map((item, i) => {
-          const isMagico = ['(comum)', '(incomum)', '(raro)', '(muito raro)', '(lendário)'].some(r => item.toLowerCase().includes(r));
-          return (
-            <span key={i}
-              className="border px-3 py-1 text-sm"
-              style={{
-                borderRadius: '2px',
-                borderColor: isMagico ? '#c8a84b40' : '#c8a84b15',
-                color: isMagico ? '#c8a84b' : '#6a6050',
-                backgroundColor: isMagico ? '#c8a84b08' : 'transparent',
-              }}>
-              {item}
-            </span>
-          );
-        })}
+  .filter(item => {
+    if (abaInventario === 'todos') return true;
+    const rarity = typeof item === 'object' ? item.rarity : item;
+    return ['Comum','Incomum','Raro','Muito Raro','Lendário'].some(r => rarity?.includes(r));
+  })
+  .map((item, i) => {
+    const isObj = typeof item === 'object';
+    const nome = isObj ? item.name : item;
+    const isMagico = isObj ? item.is_magic : ['(comum)','(incomum)','(raro)','(muito raro)','(lendário)'].some(r => item.toLowerCase().includes(r));
+    return (
+      <div key={i} className="flex items-center gap-1 group">
+  <span
+    onClick={() => isObj && item.is_magic && setItemInventarioDetalhes(item)}
+    className="border px-3 py-1 text-sm"
+    style={{
+      borderRadius: '2px',
+      borderColor: isMagico ? '#c8a84b40' : '#c8a84b15',
+      color: isMagico ? '#c8a84b' : '#6a6050',
+      backgroundColor: isMagico ? '#c8a84b08' : 'transparent',
+      cursor: isObj && item.is_magic ? 'pointer' : 'default',
+    }}>
+    {nome}
+  </span>
+  <button
+    onClick={() => {
+      const novos = ficha.inventory.filter((_, idx) => idx !== i);
+      setFicha(prev => ({ ...prev, inventory: novos }));
+    }}
+    className="text-red-900 hover:text-red-600 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+    ×
+  </button>
+</div>
+    );
+  })}
     </div>
   </div>
 )}
+
+{itemInventarioDetalhes && (
+  <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+    onClick={() => setItemInventarioDetalhes(null)}>
+    <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full mx-4 p-6"
+      style={{ borderRadius: '2px' }}
+      onClick={e => e.stopPropagation()}>
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <p style={cinzel} className="text-[#c8a84b] text-lg font-bold">{itemInventarioDetalhes.name}</p>
+          <p className="text-[#4a4030] text-xs mt-1" style={cinzel}>{itemInventarioDetalhes.rarity}</p>
+        </div>
+        <button onClick={() => setItemInventarioDetalhes(null)}
+          className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">✕</button>
+      </div>
+      {itemInventarioDetalhes.identificado ? (
+        <>
+          {itemInventarioDetalhes.description && (
+            <p className="text-[#a09880] text-sm leading-relaxed mb-3">{itemInventarioDetalhes.description}</p>
+          )}
+          {itemInventarioDetalhes.mechanics && (
+            <div className="bg-[#0f0e0c] border border-[#c8a84b10] px-3 py-2">
+              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">MECÂNICA</p>
+              <p className="text-[#8a8070] text-sm leading-relaxed">{itemInventarioDetalhes.mechanics}</p>
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="text-center py-4">
+          <p style={cinzel} className="text-[#8a5030] text-xs tracking-[2px] mb-2">? NÃO IDENTIFICADO</p>
+          <p className="text-[#4a4030] text-sm">As propriedades deste item são desconhecidas.</p>
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
 
         {/* HISTÓRIA */}
         {ficha.background_story && (

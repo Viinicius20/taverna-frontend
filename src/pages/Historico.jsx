@@ -17,7 +17,7 @@ export default function Historico() {
 
   async function buscarSessoes() {
     try {
-      const res = await fetch(`http://localhost:8000/sessions/${CAMPANHA_ID}`);
+      const res = await fetch(`https://taverna-backend-eq3b.onrender.com/sessions/${CAMPANHA_ID}`);
       const json = await res.json();
       setSessoes(json.data || []);
     } catch {
