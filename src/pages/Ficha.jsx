@@ -299,6 +299,7 @@ export default function Ficha() {
   buscarMensagensSecretas();
   const interval = setInterval(buscarMensagensSecretas, 5000);
   return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 async function buscarMensagensSecretas() {
   try {
