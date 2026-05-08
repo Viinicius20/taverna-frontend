@@ -65,6 +65,9 @@ export default function Mestre() {
   const [mensagemSecreta, setMensagemSecreta] = useState('');
   const [personagemDestino, setPersonagemDestino] = useState('');
   const [enviandoMensagem, setEnviandoMensagem] = useState(false);
+  const [modalSkillNpc, setModalSkillNpc] = useState(null);
+  const [descricaoSkillNpc, setDescricaoSkillNpc] = useState(null);
+  const [carregandoSkillNpc, setCarregandoSkillNpc] = useState(false);
 
   useEffect(() => {
     buscarNpcs();
@@ -442,16 +445,33 @@ async function enviarMensagemSecreta() {
   setEnviandoMensagem(false);
 }
 
+async function abrirSkillNpc(skillName, npcData) {
+  setModalSkillNpc(skillName);
+  setDescricaoSkillNpc(null);
+  setCarregandoSkillNpc(true);
+  try {
+    const context = `${npcData?.race || ''} ${npcData?.class || ''} nível ${npcData?.level || 1}`;
+    const res = await api.get(`/skill-description/${encodeURIComponent(skillName)}`, {
+      params: { system: sistema, character_context: context }
+    });
+    setDescricaoSkillNpc(res.data.data);
+  } catch {
+    setDescricaoSkillNpc({ error: 'Não foi possível carregar a descrição.' });
+  }
+  setCarregandoSkillNpc(false);
+}
+
 function adicionarPersonagem(npc) {
   const d = npc.data || {};
   const hp = d.combat?.hp_max || d.combat?.hp || 10;
+  const isJogador = !!npc.user_id; // personagens de jogadores têm user_id
   setCombatentes(prev => [...prev, {
     id: npc.id,
     nome: npc.name,
-    tipo: 'personagem',
+    tipo: isJogador ? 'jogador' : 'npc',
     hpMax: hp,
     hpAtual: hp,
-    iniciativa: 0,
+    iniciativa: d.combat?.initiative || 0,
   }]);
 }
 
@@ -871,16 +891,23 @@ function gerarNome() {
                       )}
 
                       {d.features && d.features.length > 0 && (
-                        <div>
-                          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">HABILIDADES</p>
-                          <div className="flex flex-wrap gap-2">
-                            {d.features.map((f, i) => (
-                              <span key={i} className="border border-[#c8a84b20] text-[#6a6050] px-2 py-0.5 text-xs"
-                                style={{ borderRadius: '2px' }}>{f}</span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+  <div>
+    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">HABILIDADES</p>
+    <div className="flex flex-wrap gap-2">
+      {d.features.map((f, i) => (
+        <button key={i}
+          onClick={e => {
+            e.stopPropagation();
+            abrirSkillNpc(f, d);
+          }}
+          className="border border-[#c8a84b20] text-[#6a6050] px-2 py-0.5 text-xs hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors"
+          style={{ borderRadius: '2px' }}>
+          {f} ↗
+        </button>
+      ))}
+    </div>
+  </div>
+)}
 
                       {d.background_story && (
                         <div>
@@ -972,19 +999,39 @@ function gerarNome() {
   </div>
 </div>
 
-  {/* Adicionar NPCs existentes */}
+  {/* Adicionar NPCs e Personagens */}
+<div className="mb-6 space-y-2">
   {npcs.length > 0 && (
-    <div className="flex flex-wrap gap-2 mb-6">
-      {npcs.map(npc => (
-        <button key={npc.id} onClick={() => adicionarPersonagem(npc)}
-          disabled={combatentes.some(c => c.id === npc.id)}
-          className="border border-[#c8a84b20] text-[#6a6050] px-3 py-1 text-xs hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-          style={{ ...cinzel, borderRadius: '2px' }}>
-          + {npc.name}
-        </button>
-      ))}
+    <div>
+      <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-2">NPCS</p>
+      <div className="flex flex-wrap gap-2">
+        {npcs.map(npc => (
+          <button key={npc.id} onClick={() => adicionarPersonagem(npc)}
+            disabled={combatentes.some(c => c.id === npc.id)}
+            className="border border-[#c8a84b20] text-[#6a6050] px-3 py-1 text-xs hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            style={{ ...cinzel, borderRadius: '2px' }}>
+            + {npc.name}
+          </button>
+        ))}
+      </div>
     </div>
   )}
+  {personagens.length > 0 && (
+    <div>
+      <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-2">JOGADORES</p>
+      <div className="flex flex-wrap gap-2">
+        {personagens.map(p => (
+          <button key={p.id} onClick={() => adicionarPersonagem(p)}
+            disabled={combatentes.some(c => c.id === p.id)}
+            className="border border-[#7ab8d420] text-[#6a6050] px-3 py-1 text-xs hover:border-[#7ab8d450] hover:text-[#7ab8d4] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            style={{ ...cinzel, borderRadius: '2px' }}>
+            + {p.name}
+          </button>
+        ))}
+      </div>
+    </div>
+  )}
+</div>
 
   {/* Lista de combatentes */}
   {combatentes.length === 0 ? (
@@ -1019,8 +1066,14 @@ function gerarNome() {
                 <div className="flex items-center gap-2 mb-2">
                   {isAtivo && <span className="text-[#c8a84b] text-xs">▶</span>}
                   <span style={cinzel} className="text-[#e8e0d0] text-sm">{c.nome}</span>
-                  <span style={{ ...cinzel, borderRadius: '2px' }} className={`text-xs px-2 py-0.5 border ${c.tipo === 'monstro' ? 'border-red-900 text-red-900' : 'border-[#c8a84b30] text-[#c8a84b60]'}`}>
-                    {c.tipo === 'monstro' ? 'MONSTRO' : 'NPC'}
+                  <span style={{ ...cinzel, borderRadius: '2px' }}
+                    className={[
+                      'text-xs px-2 py-0.5 border',
+                      c.tipo === 'monstro' ? 'border-red-900 text-red-900' :
+                      c.tipo === 'jogador' ? 'border-[#7ab8d430] text-[#7ab8d4]' :
+                      'border-[#c8a84b30] text-[#c8a84b60]'
+                    ].join(' ')}>
+                    {c.tipo === 'monstro' ? 'MONSTRO' : c.tipo === 'jogador' ? 'JOGADOR' : 'NPC'}
                   </span>
                 </div>
                 {/* Barra de HP */}
@@ -1689,6 +1742,57 @@ function gerarNome() {
     )}
   </div>
 </div>
+
+{/* MODAL HABILIDADE NPC */}
+{modalSkillNpc && (
+  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
+    onClick={() => { setModalSkillNpc(null); setDescricaoSkillNpc(null); }}>
+    <div className="bg-[#161410] border border-[#c8a84b30] max-w-lg w-full max-h-[80vh] overflow-y-auto"
+      style={{ borderRadius: '2px' }}
+      onClick={e => e.stopPropagation()}>
+      <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">HABILIDADE</p>
+        <button onClick={() => { setModalSkillNpc(null); setDescricaoSkillNpc(null); }}
+          className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
+      </div>
+      <div className="px-6 py-6">
+        {carregandoSkillNpc && (
+          <div className="flex flex-col items-center py-10 gap-4">
+            <div className="w-8 h-8 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
+            <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">CONSULTANDO A IA...</p>
+          </div>
+        )}
+        {!carregandoSkillNpc && descricaoSkillNpc && !descricaoSkillNpc.error && (
+          <div className="flex flex-col gap-5">
+            <h2 style={cinzel} className="text-[#f0e8d8] text-xl font-semibold">{descricaoSkillNpc.name || modalSkillNpc}</h2>
+            {descricaoSkillNpc.description && (
+              <div>
+                <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">DESCRIÇÃO</p>
+                <p className="text-[#a09880] text-base leading-relaxed font-light">{descricaoSkillNpc.description}</p>
+              </div>
+            )}
+            {descricaoSkillNpc.mechanics && (
+              <div className="border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-4">
+                <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">EM JOGO</p>
+                <p className="text-[#8a8070] text-sm leading-relaxed font-light">{descricaoSkillNpc.mechanics}</p>
+              </div>
+            )}
+          </div>
+        )}
+        {!carregandoSkillNpc && descricaoSkillNpc?.error && (
+          <p className="text-red-400 text-sm text-center py-8">{descricaoSkillNpc.error}</p>
+        )}
+      </div>
+      <div className="px-6 pb-6">
+        <button onClick={() => { setModalSkillNpc(null); setDescricaoSkillNpc(null); }}
+          className="border border-[#c8a84b30] text-[#6a6050] px-6 py-2 text-xs tracking-widest hover:border-[#c8a84b60] hover:text-[#c8a84b] transition-colors w-full"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       </div>
     </div>
