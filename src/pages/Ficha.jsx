@@ -61,6 +61,8 @@ export default function Ficha() {
 
   const [itemInventarioDetalhes, setItemInventarioDetalhes] = useState(null);
 
+  const [mensagensSecretas, setMensagensSecretas] = useState([]);
+
   useEffect(() => {
     buscarPersonagem();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -291,8 +293,30 @@ export default function Ficha() {
     const proximoNivel = (ficha.level || 1) + 1;
     await fazerLevelUpComClasse(proximoNivel, classeName);
   }
-  // ===== FIM FUNÇÕES LEVEL UP =====
 
+  useEffect(() => {
+  if (!id) return;
+  buscarMensagensSecretas();
+  const interval = setInterval(buscarMensagensSecretas, 5000);
+  return () => clearInterval(interval);
+}, [id]);
+
+async function buscarMensagensSecretas() {
+  try {
+    const res = await api.get(`/secret-messages/${id}`);
+    setMensagensSecretas(res.data.data || []);
+  } catch {}
+}
+
+async function marcarComoLida(id) {
+  try {
+    await api.patch(`/secret-messages/${id}/lida`);
+    setMensagensSecretas(prev => prev.filter(m => m.id !== id));
+  } catch {}
+}
+  
+
+  // ===== FIM FUNÇÕES LEVEL UP =====
   if (carregando) return (
     <div className="min-h-screen bg-[#0f0e0c] flex items-center justify-center" style={crimson}>
       <div className="flex flex-col items-center gap-4">
@@ -1363,6 +1387,22 @@ export default function Ficha() {
           </div>
         )}
       </div>
+      {mensagensSecretas.length > 0 && (
+  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
+    <div className="bg-[#0f0e0c] border border-[#8a4a8a] max-w-md w-full p-6 animate-pulse"
+      style={{ borderRadius: '2px', boxShadow: '0 0 30px #8a4a8a40' }}>
+      <p style={cinzel} className="text-[#8a4a8a] text-xs tracking-[4px] mb-4">🔮 SUSSURRO DO MESTRE</p>
+      <p className="text-[#e8e0d0] text-base leading-relaxed mb-6 font-light italic">
+        "{mensagensSecretas[0].message}"
+      </p>
+      <button onClick={() => marcarComoLida(mensagensSecretas[0].id)}
+        className="border border-[#8a4a8a50] text-[#8a4a8a] px-4 py-2 text-xs hover:bg-[#8a4a8a10] transition-colors w-full"
+        style={{ ...cinzel, borderRadius: '2px' }}>
+        ENTENDIDO
+      </button>
+    </div>
+  </div>
+)}
     </div>
   );
 }

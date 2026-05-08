@@ -59,6 +59,12 @@ export default function Mestre() {
   const [racaNome, setRacaNome] = useState('Humano');
   const [novoItemIdentificado, setNovoItemIdentificado] = useState(true);
   const [novoItemNomeMisterioso, setNovoItemNomeMisterioso] = useState('');
+  const [encounter, setEncounter] = useState(null);
+  const [gerandoEncounter, setGerandoEncounter] = useState(false);
+  const [encounterConfig, setEncounterConfig] = useState({ bioma: 'Floresta', nivel: 5, contexto: '' });
+  const [mensagemSecreta, setMensagemSecreta] = useState('');
+  const [personagemDestino, setPersonagemDestino] = useState('');
+  const [enviandoMensagem, setEnviandoMensagem] = useState(false);
 
   useEffect(() => {
     buscarNpcs();
@@ -404,6 +410,36 @@ async function distribuirXp() {
   } catch {
     setErro('Erro ao distribuir XP.');
   }
+}
+
+async function gerarEncounter() {
+  setGerandoEncounter(true);
+  setEncounter(null);
+  try {
+    const res = await api.post('/encounter/generate', encounterConfig);
+    setEncounter(res.data.data);
+  } catch {
+    setErro('Erro ao gerar encontro.');
+  }
+  setGerandoEncounter(false);
+}
+
+async function enviarMensagemSecreta() {
+  if (!mensagemSecreta.trim() || !personagemDestino) return;
+  setEnviandoMensagem(true);
+  try {
+    await api.post('/secret-messages', {
+      campaign_id: CAMPANHA_ID,
+      character_id: personagemDestino,
+      message: mensagemSecreta
+    });
+    setMensagemSecreta('');
+    setPersonagemDestino('');
+    alert('✅ Mensagem enviada!');
+  } catch {
+    setErro('Erro ao enviar mensagem.');
+  }
+  setEnviandoMensagem(false);
 }
 
 function adicionarPersonagem(npc) {
@@ -1521,6 +1557,104 @@ function gerarNome() {
       </button>
     </div>
   )}
+</div>
+
+{/* ENCONTRO ALEATÓRIO */}
+<div className="mt-12">
+  <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+  <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">IMPROVISO</p>
+  <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Encontro Aleatório</h2>
+
+  <div className="flex flex-col sm:flex-row gap-2 mb-4">
+    <select value={encounterConfig.bioma} onChange={e => setEncounterConfig(p => ({ ...p, bioma: e.target.value }))}
+      className="bg-[#161410] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-xs focus:outline-none focus:border-[#c8a84b50]"
+      style={{ borderRadius: '2px' }}>
+      {['Floresta', 'Masmorra', 'Cidade', 'Deserto', 'Montanha', 'Pântano', 'Costa', 'Planície', 'Subterrâneo'].map(b => (
+        <option key={b} value={b}>{b}</option>
+      ))}
+    </select>
+    <input type="number" min={1} max={20} value={encounterConfig.nivel}
+      onChange={e => setEncounterConfig(p => ({ ...p, nivel: Number(e.target.value) }))}
+      className="bg-[#161410] border border-[#c8a84b20] text-[#c8a84b] px-3 py-2 w-20 text-sm text-center focus:outline-none focus:border-[#c8a84b50]"
+      style={{ borderRadius: '2px' }} />
+    <input value={encounterConfig.contexto} onChange={e => setEncounterConfig(p => ({ ...p, contexto: e.target.value }))}
+      placeholder="Contexto extra (opcional)..."
+      className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 flex-1 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
+      style={{ borderRadius: '2px' }} />
+    <button onClick={gerarEncounter} disabled={gerandoEncounter}
+      className="bg-[#c8a84b] text-[#0f0e0c] px-5 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      {gerandoEncounter ? '⟳ GERANDO...' : '⚔ GERAR'}
+    </button>
+  </div>
+
+  {encounter && (
+    <div className="border border-[#c8a84b20] bg-[#161410] p-6 space-y-4">
+      <div>
+        <h3 style={cinzel} className="text-[#f0e8d8] text-lg font-semibold">{encounter.titulo}</h3>
+        <p className="text-[#8a8070] text-sm leading-relaxed mt-2 font-light">{encounter.descricao}</p>
+      </div>
+
+      {encounter.inimigos?.length > 0 && (
+        <div className="border-t border-[#c8a84b10] pt-4">
+          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">INIMIGOS</p>
+          <div className="flex flex-wrap gap-2">
+            {encounter.inimigos.map((inimigo, i) => (
+              <div key={i} className="border border-[#c8a84b15] bg-[#0f0e0c] px-3 py-2 text-sm">
+                <span style={cinzel} className="text-[#e8e0d0]">{inimigo.quantidade}× {inimigo.nome}</span>
+                <span style={cinzel} className="text-[#4a4030] text-xs ml-2">CR {inimigo.cr}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {encounter.diferencial && (
+        <div className="border-t border-[#c8a84b10] pt-4">
+          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">TWIST</p>
+          <p className="text-[#8a8070] text-sm leading-relaxed font-light">{encounter.diferencial}</p>
+        </div>
+      )}
+
+      {encounter.recompensa && (
+        <div className="border-t border-[#c8a84b10] pt-4">
+          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">RECOMPENSA</p>
+          <p className="text-[#8a8070] text-sm leading-relaxed font-light">{encounter.recompensa}</p>
+        </div>
+      )}
+    </div>
+  )}
+</div>
+
+{/* VOZES NA CABEÇA */}
+<div className="mt-12">
+  <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+  <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">SUSSURROS</p>
+  <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Vozes na Cabeça</h2>
+
+  <div className="border border-[#c8a84b20] bg-[#161410] p-6">
+    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">ENVIAR MENSAGEM SECRETA</p>
+    <div className="flex flex-col gap-3">
+      <select value={personagemDestino} onChange={e => setPersonagemDestino(e.target.value)}
+        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+        style={{ borderRadius: '2px' }}>
+        <option value="">Selecionar personagem...</option>
+        {personagens.map(p => (
+          <option key={p.id} value={p.id}>{p.name}</option>
+        ))}
+      </select>
+      <textarea value={mensagemSecreta} onChange={e => setMensagemSecreta(e.target.value)}
+        placeholder="Ex: Você percebe que o Paladino está com a bolsa aberta..."
+        rows={3}
+        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020] resize-none"
+        style={{ borderRadius: '2px' }} />
+      <button onClick={enviarMensagemSecreta} disabled={enviandoMensagem || !personagemDestino || !mensagemSecreta.trim()}
+        className="bg-[#8a4a8a] text-[#f0e8d8] px-5 py-2 text-xs font-bold hover:bg-[#aa60aa] transition-colors disabled:opacity-50"
+        style={{ ...cinzel, borderRadius: '2px' }}>
+        {enviandoMensagem ? '⟳ ENVIANDO...' : '🔮 SUSSURRAR'}
+      </button>
+    </div>
+  </div>
 </div>
 
         {/* DADOS SECRETOS */}
