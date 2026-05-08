@@ -299,8 +299,7 @@ export default function Ficha() {
   buscarMensagensSecretas();
   const interval = setInterval(buscarMensagensSecretas, 5000);
   return () => clearInterval(interval);
-}, [id]);
-
+  }, [id]);
 async function buscarMensagensSecretas() {
   try {
     const res = await api.get(`/secret-messages/${id}`);
