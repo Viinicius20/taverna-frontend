@@ -68,6 +68,7 @@ export default function Mestre() {
   const [modalSkillNpc, setModalSkillNpc] = useState(null);
   const [descricaoSkillNpc, setDescricaoSkillNpc] = useState(null);
   const [carregandoSkillNpc, setCarregandoSkillNpc] = useState(false);
+  const [novoItemContexto, setNovoItemContexto] = useState('');
 
   useEffect(() => {
     buscarNpcs();
@@ -230,8 +231,10 @@ async function criarItemHomebrew() {
       name: novoItemNome,
       rarity: novoItemRaridade,
       identificado: novoItemIdentificado,
-      nome_misterioso: novoItemNomeMisterioso 
+      nome_misterioso: novoItemNomeMisterioso,
+      contexto: novoItemContexto
     });
+    setNovoItemContexto('');
     setMagicItems(prev => [res.data.data, ...prev]);
     setNovoItemNome('');
     setNovoItemRaridade('');
@@ -1258,6 +1261,11 @@ function gerarNome() {
       style={{ borderRadius: '2px' }} />
   )}
 </div>
+<textarea value={novoItemContexto} onChange={e => setNovoItemContexto(e.target.value)}
+    placeholder="Contexto opcional... Ex: Pertenceu a um paladino caído, feito de escamas de dragão..."
+    rows={2}
+    className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020] resize-none"
+    style={{ borderRadius: '2px' }} />
   <button onClick={criarItemHomebrew} disabled={criandoItem}
     className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50"
     style={{ ...cinzel, borderRadius: '2px' }}>
