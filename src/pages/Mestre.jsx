@@ -1384,11 +1384,12 @@ function gerarNome() {
       </div>
     )}
     <button onClick={async e => {
-      e.stopPropagation();
-      await api.delete(`/magic-items/${item.id}`);
-      setMagicItems(prev => prev.filter(i => i.id !== item.id));
-      setItemDetalhes(null);
-    }}
+  e.stopPropagation();
+  console.log("Deletando item:", item.id, item);
+  await api.delete(`/magic-items/${item.id}`);
+  setMagicItems(prev => prev.filter(i => i.id !== item.id));
+  setItemDetalhes(null);
+}}
       className="text-xs border border-red-900 text-red-900 px-2 py-0.5 hover:bg-red-900 hover:text-white transition-colors mt-2"
       style={{ ...cinzel, borderRadius: '2px' }}>
       🗑 DELETAR ITEM
