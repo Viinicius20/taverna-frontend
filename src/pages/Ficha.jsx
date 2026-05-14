@@ -63,6 +63,10 @@ export default function Ficha() {
 
   const [mensagensSecretas, setMensagensSecretas] = useState([]);
 
+  const [fichaPreview, setFichaPreview] = useState(null);
+  const [levelUpDiff, setLevelUpDiff] = useState([]);
+  const [modalRevisao, setModalRevisao] = useState(false);
+
   useEffect(() => {
     buscarPersonagem();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -249,40 +253,94 @@ export default function Ficha() {
   }
 
   async function fazerLevelUpComClasse(novoNivel, classNameAlvo) {
-    console.log("=== LEVEL UP DEBUG ===");
-    console.log("id:", id);
-    console.log("ficha:", ficha);
-    console.log("novoNivel:", novoNivel);
-    console.log("personagem:", personagem);
-    setUpando(true);
-    setErro('');
-    try {
-      const payload = {
-        character_id: id,
-        ficha_atual: ficha,
-        system: personagem.system || 'D&D 5e',
-        nivel_alvo: novoNivel
-      };
+  setUpando(true);
+  setErro('');
+  try {
+    const payload = {
+      character_id: id,
+      ficha_atual: ficha,
+      system: personagem.system || 'D&D 5e',
+      nivel_alvo: novoNivel,
+      ...(classNameAlvo && { class_name: classNameAlvo }),
+    };
 
-      if (classNameAlvo) {
-        payload.class_name = classNameAlvo;
-      }
+    const res = await api.post('/level-up', payload);
+    const novaFicha = res.data.data;
 
-      const res = await api.post('/level-up', payload);
+    const diff = calcularDiff(ficha, novaFicha);
 
-      console.log("RESPOSTA COMPLETA:", res.data);
-      console.log("res.data.data:", res.data.data);
-      setFicha(res.data.data);
-      setModalLevelUp(false);
-      setShowClassLevelUpModal(false);
-      setSucesso(`${ficha.name} subiu para nível ${novoNivel}!`);
-      setTimeout(() => setSucesso(''), 4000);
-    } catch (error) {
-    console.log("ERRO CATCH:", error.response?.data || error.message);
+    setFichaPreview(novaFicha);
+    setLevelUpDiff(diff);
+    setModalLevelUp(false);
+    setShowClassLevelUpModal(false);
+    setModalRevisao(true); // abre modal de revisão
+  } catch (error) {
     setErro('Erro ao fazer level up: ' + error.message);
-    }
-    setUpando(false);
   }
+  setUpando(false);
+}
+
+  function calcularDiff(antiga, nova) {
+  const mudancas = [];
+
+  // Nível
+  if (nova.level !== antiga.level)
+    mudancas.push({ tipo: 'numero', campo: 'level', label: 'Nível', de: antiga.level, para: nova.level });
+
+  // HP máximo
+  if (nova.combat?.hp_max !== antiga.combat?.hp_max)
+    mudancas.push({ tipo: 'numero', campo: 'combat.hp_max', label: 'HP Máximo', de: antiga.combat?.hp_max, para: nova.combat?.hp_max });
+
+  // CA
+  if (nova.combat?.ca !== antiga.combat?.ca)
+    mudancas.push({ tipo: 'numero', campo: 'combat.ca', label: 'Classe de Armadura', de: antiga.combat?.ca, para: nova.combat?.ca });
+
+  // Bônus de Proficiência
+  if (nova.combat?.proficiency !== antiga.combat?.proficiency)
+    mudancas.push({ tipo: 'numero', campo: 'combat.proficiency', label: 'Bônus de Proficiência', de: antiga.combat?.proficiency, para: nova.combat?.proficiency });
+
+  // Atributos
+  const attrLabels = { for: 'Força', des: 'Destreza', con: 'Constituição', int: 'Inteligência', sab: 'Sabedoria', car: 'Carisma' };
+  Object.entries(attrLabels).forEach(([key, label]) => {
+    const de = antiga.atributos?.[key];
+    const para = nova.atributos?.[key];
+    if (de !== para)
+      mudancas.push({ tipo: 'numero', campo: `atributos.${key}`, label, de, para });
+  });
+
+  // Salvaguardas
+  const saveLabels = { str: 'Salva FOR', dex: 'Salva DES', con: 'Salva CON', int: 'Salva INT', wis: 'Salva SAB', cha: 'Salva CAR' };
+  Object.entries(saveLabels).forEach(([key, label]) => {
+    const de = antiga.combat?.saving_throws?.[key];
+    const para = nova.combat?.saving_throws?.[key];
+    if (de !== para)
+      mudancas.push({ tipo: 'numero', campo: `saving_throws.${key}`, label, de, para });
+  });
+
+  // Features novas
+  const featuresAntigas = (antiga.features || []).map(f => f.nome || f.name);
+  const featuresNovas = (nova.features || []).filter(f => !featuresAntigas.includes(f.nome || f.name));
+  featuresNovas.forEach(f =>
+    mudancas.push({ tipo: 'feature', label: f.nome || f.name, descricao: f.descricao || f.description })
+  );
+
+  // Espaços de magia
+  const slotsAntigos = antiga.magias?.espacos || antiga.spell_slots || {};
+  const slotsNovos = nova.magias?.espacos || nova.spell_slots || {};
+  Object.entries(slotsNovos).forEach(([nivel, qtd]) => {
+    if (qtd !== slotsAntigos[nivel])
+      mudancas.push({ tipo: 'numero', campo: `spell_slots.${nivel}`, label: `Espaços de Magia Nv${nivel}`, de: slotsAntigos[nivel] ?? 0, para: qtd });
+  });
+
+  // Recursos novos
+  const recursosAntigos = (antiga.recursos || []).map(r => r.nome || r.name);
+  const recursosNovos = (nova.recursos || []).filter(r => !recursosAntigos.includes(r.nome || r.name));
+  recursosNovos.forEach(r =>
+    mudancas.push({ tipo: 'recurso', label: r.nome || r.name, max: r.max, recarga: r.recarga })
+  );
+
+  return mudancas;
+}
 
   async function confirmarLevelUpComClasse(classeName) {
     if (!classeName) {
@@ -502,175 +560,92 @@ async function marcarComoLida(id) {
 </div>
 
         {/* STATS DE COMBATE */}
-        <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
-          <div className="px-6 py-4 border-b border-[#c8a84b15]">
-            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">STATS DE COMBATE</p>
+<div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+  <div className="px-6 py-4 border-b border-[#c8a84b15]">
+    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">STATS DE COMBATE</p>
+  </div>
+  <div className="p-6">
+    {/* HP */}
+    <div className="flex items-center gap-4 mb-6 border border-[#c8a84b15] bg-[#0f0e0c] p-4 rounded">
+      <div className="flex-1">
+        <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">HP ATUAL</label>
+        <input type="number" value={combat.hp ?? 0} onChange={e => editarCombat('hp', e.target.value)}
+          className="bg-transparent border-b border-[#c8a84b30] text-[#f0e8d8] text-3xl font-light w-full focus:outline-none focus:border-[#c8a84b60] text-center pb-1"
+          style={cinzel} />
+      </div>
+      <span className="text-[#4a4030] text-2xl">/</span>
+      <div className="flex-1">
+        <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">HP MÁXIMO</label>
+        <input type="number" value={combat.hp_max ?? 0} onChange={e => editarCombat('hp_max', e.target.value)}
+          className="bg-transparent border-b border-[#c8a84b30] text-[#f0e8d8] text-3xl font-light w-full focus:outline-none focus:border-[#c8a84b60] text-center pb-1"
+          style={cinzel} />
+      </div>
+    </div>
+
+    {/* Outros campos de combate */}
+    <div className="grid grid-cols-3 gap-4 mb-6">
+      {combatFields.filter(f => !['hp', 'hp_max'].includes(f.campo)).map(({ label, campo, tipo }) => (
+        <div key={campo} className="flex flex-col items-center border border-[#c8a84b15] bg-[#0f0e0c] p-3 rounded">
+          <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest mb-2 text-center">{label}</label>
+          <input type={tipo} value={combat[campo] ?? (tipo === 'number' ? 0 : '')}
+            onChange={e => editarCombat(campo, e.target.value)}
+            className="bg-transparent text-[#c8a84b] text-xl font-light w-full focus:outline-none text-center"
+            style={cinzel} />
+        </div>
+      ))}
+    </div>
+
+    {/* Salvaguardas */}
+    <div>
+      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">SALVAGUARDAS</p>
+      <div className="grid grid-cols-6 gap-2">
+        {Object.entries(combat.saving_throws || {}).map(([attr, val]) => (
+          <div key={attr} className="flex flex-col items-center gap-1">
+            <label style={cinzel} className="text-[#4a4030] text-xs">{saveLabel[attr] || attr.toUpperCase()}</label>
+            <input type="number" value={val ?? 0} onChange={e => editarSavingThrow(attr, e.target.value)}
+              className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-sm w-full py-1.5 focus:outline-none focus:border-[#c8a84b50]"
+              style={{ borderRadius: '2px', ...cinzel }} />
           </div>
-          <div className="p-6">
-            <div className="flex items-center gap-4 mb-6 border border-[#c8a84b15] bg-[#0f0e0c] p-4 rounded">
-              <div className="flex-1">
-                <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">HP ATUAL</label>
-                <input 
-                  type="number" 
-                  value={combat.hp ?? 0}
-                  onChange={e => editarCombat('hp', e.target.value)}
-                  className="bg-transparent border-b border-[#c8a84b30] text-[#f0e8d8] text-3xl font-light w-full focus:outline-none focus:border-[#c8a84b60] text-center pb-1"
-                  style={cinzel} 
-                />
-              </div>
-              <span className="text-[#4a4030] text-2xl">/</span>
-              <div className="flex-1">
-                <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">HP MÁXIMO</label>
-                <input 
-                  type="number" 
-                  value={combat.hp_max ?? 0}
-                  onChange={e => editarCombat('hp_max', e.target.value)}
-                  className="bg-transparent border-b border-[#c8a84b30] text-[#f0e8d8] text-3xl font-light w-full focus:outline-none focus:border-[#c8a84b60] text-center pb-1"
-                  style={cinzel} 
-                />
-              </div>
-            </div>
+        ))}
+      </div>
+    </div>
 
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              {combatFields.filter(f => !['hp', 'hp_max'].includes(f.campo)).map(({ label, campo, tipo }) => (
-                <div key={campo} className="flex flex-col items-center border border-[#c8a84b15] bg-[#0f0e0c] p-3 rounded">
-                  <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest mb-2 text-center">{label}</label>
-                  <input
-                    type={tipo}
-                    value={combat[campo] ?? (tipo === 'number' ? 0 : '')}
-                    onChange={e => editarCombat(campo, e.target.value)}
-                    className="bg-transparent text-[#c8a84b] text-xl font-light w-full focus:outline-none text-center"
-                    style={cinzel}
-                  />
-                </div>
-              ))}
-            </div>
-
-            <div>
-              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">SALVAGUARDAS</p>
-              <div className="grid grid-cols-6 gap-2">
-                {Object.entries(combat.saving_throws || {}).map(([attr, val]) => (
-                  <div key={attr} className="flex flex-col items-center gap-1">
-                    <label style={cinzel} className="text-[#4a4030] text-xs">{saveLabel[attr] || attr.toUpperCase()}</label>
-                    <input 
-                      type="number" 
-                      value={val ?? 0}
-                      onChange={e => editarSavingThrow(attr, e.target.value)}
-                      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-sm w-full py-1.5 focus:outline-none focus:border-[#c8a84b50]"
-                      style={{ borderRadius: '2px', ...cinzel }} 
-                    />
-                  </div>
-                ))}
-              </div>
-              {/* STATS DE COMBATE */}
-        <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
-          <div className="px-6 py-4 border-b border-[#c8a84b15]">
-            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">STATS DE COMBATE</p>
-          </div>
-          <div className="p-6">
-            <div className="flex items-center gap-4 mb-6 border border-[#c8a84b15] bg-[#0f0e0c] p-4 rounded">
-              <div className="flex-1">
-                <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">HP ATUAL</label>
-                <input 
-                  type="number" 
-                  value={combat.hp ?? 0}
-                  onChange={e => editarCombat('hp', e.target.value)}
-                  className="bg-transparent border-b border-[#c8a84b30] text-[#f0e8d8] text-3xl font-light w-full focus:outline-none focus:border-[#c8a84b60] text-center pb-1"
-                  style={cinzel} 
-                />
-              </div>
-              <span className="text-[#4a4030] text-2xl">/</span>
-              <div className="flex-1">
-                <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">HP MÁXIMO</label>
-                <input 
-                  type="number" 
-                  value={combat.hp_max ?? 0}
-                  onChange={e => editarCombat('hp_max', e.target.value)}
-                  className="bg-transparent border-b border-[#c8a84b30] text-[#f0e8d8] text-3xl font-light w-full focus:outline-none focus:border-[#c8a84b60] text-center pb-1"
-                  style={cinzel} 
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              {combatFields.filter(f => !['hp', 'hp_max'].includes(f.campo)).map(({ label, campo, tipo }) => (
-                <div key={campo} className="flex flex-col items-center border border-[#c8a84b15] bg-[#0f0e0c] p-3 rounded">
-                  <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest mb-2 text-center">{label}</label>
-                  <input
-                    type={tipo}
-                    value={combat[campo] ?? (tipo === 'number' ? 0 : '')}
-                    onChange={e => editarCombat(campo, e.target.value)}
-                    className="bg-transparent text-[#c8a84b] text-xl font-light w-full focus:outline-none text-center"
-                    style={cinzel}
-                  />
-                </div>
-              ))}
-            </div>
-
-            <div>
-              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">SALVAGUARDAS</p>
-              <div className="grid grid-cols-6 gap-2">
-                {Object.entries(combat.saving_throws || {}).map(([attr, val]) => (
-                  <div key={attr} className="flex flex-col items-center gap-1">
-                    <label style={cinzel} className="text-[#4a4030] text-xs">{saveLabel[attr] || attr.toUpperCase()}</label>
-                    <input 
-                      type="number" 
-                      value={val ?? 0}
-                      onChange={e => editarSavingThrow(attr, e.target.value)}
-                      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-sm w-full py-1.5 focus:outline-none focus:border-[#c8a84b50]"
-                      style={{ borderRadius: '2px', ...cinzel }} 
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          {/* CONDIÇÕES */}
-<div className="mt-6">
-  <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">CONDIÇÕES</p>
-  <div className="flex flex-wrap gap-2">
-    {[
-      { label: 'Caído', cor: '#8a2020' },
-      { label: 'Envenenado', cor: '#4a8a20' },
-      { label: 'Paralisado', cor: '#8a6020' },
-      { label: 'Enfeitiçado', cor: '#8a4a8a' },
-      { label: 'Amedrontado', cor: '#6a4020' },
-      { label: 'Atordoado', cor: '#4a6a8a' },
-      { label: 'Invisível', cor: '#6a6a6a' },
-      { label: 'Surdo', cor: '#4a4030' },
-      { label: 'Cego', cor: '#303030' },
-      { label: 'Incapacitado', cor: '#8a2050' },
-      { label: 'Petrificado', cor: '#607060' },
-      { label: 'Inconsciente', cor: '#202020' },
-    ].map(({ label, cor }) => {
-      const ativo = (ficha.condicoes || []).includes(label);
-      return (
-        <button key={label}
-          onClick={() => {
-            const atual = ficha.condicoes || [];
-            const novo = ativo
-              ? atual.filter(c => c !== label)
-              : [...atual, label];
-            setFicha(prev => ({ ...prev, condicoes: novo }));
-          }}
-          className="px-3 py-1 text-xs border transition-all"
-          style={{
-            ...cinzel,
-            borderRadius: '2px',
-            borderColor: ativo ? cor : '#c8a84b15',
-            backgroundColor: ativo ? `${cor}25` : 'transparent',
-            color: ativo ? cor : '#4a4030',
-          }}>
-          {label}
-        </button>
-      );
-    })}
+    {/* Condições */}
+    <div className="mt-6">
+      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">CONDIÇÕES</p>
+      <div className="flex flex-wrap gap-2">
+        {[
+          { label: 'Caído', cor: '#8a2020' },
+          { label: 'Envenenado', cor: '#4a8a20' },
+          { label: 'Paralisado', cor: '#8a6020' },
+          { label: 'Enfeitiçado', cor: '#8a4a8a' },
+          { label: 'Amedrontado', cor: '#6a4020' },
+          { label: 'Atordoado', cor: '#4a6a8a' },
+          { label: 'Invisível', cor: '#6a6a6a' },
+          { label: 'Surdo', cor: '#4a4030' },
+          { label: 'Cego', cor: '#303030' },
+          { label: 'Incapacitado', cor: '#8a2050' },
+          { label: 'Petrificado', cor: '#607060' },
+          { label: 'Inconsciente', cor: '#202020' },
+        ].map(({ label, cor }) => {
+          const ativo = (ficha.condicoes || []).includes(label);
+          return (
+            <button key={label}
+              onClick={() => {
+                const atual = ficha.condicoes || [];
+                const novo = ativo ? atual.filter(c => c !== label) : [...atual, label];
+                setFicha(prev => ({ ...prev, condicoes: novo }));
+              }}
+              className="px-3 py-1 text-xs border transition-all"
+              style={{ ...cinzel, borderRadius: '2px', borderColor: ativo ? cor : '#c8a84b15', backgroundColor: ativo ? `${cor}25` : 'transparent', color: ativo ? cor : '#4a4030' }}>
+              {label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   </div>
 </div>
-        </div>
-            </div>
-          </div>
-        </div>
 
         {/* SPELLCASTING */}
         {ficha.spellcasting && (
@@ -1281,6 +1256,128 @@ async function marcarComoLida(id) {
             </div>
           </div>
         )}
+
+        {modalRevisao && fichaPreview && (
+  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
+    <div className="bg-[#161410] border border-[#c8a84b30] max-w-lg w-full max-h-[85vh] flex flex-col"
+      style={{ borderRadius: '2px' }}>
+
+      {/* Header */}
+      <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between flex-shrink-0">
+        <div>
+          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">REVISÃO DE LEVEL UP</p>
+          <p style={cinzel} className="text-[#4a4030] text-xs mt-1">
+            Nível {ficha.level} → {fichaPreview.level}
+          </p>
+        </div>
+        <button onClick={() => setModalRevisao(false)}
+          className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
+      </div>
+
+      {/* Lista de mudanças */}
+      <div className="px-6 py-4 overflow-y-auto flex-1 flex flex-col gap-4">
+        {levelUpDiff.length === 0 && (
+          <p style={cinzel} className="text-[#4a4030] text-xs text-center py-4">
+            Nenhuma mudança detectada.
+          </p>
+        )}
+
+        {/* Mudanças numéricas — editáveis */}
+        {levelUpDiff.filter(m => m.tipo === 'numero').length > 0 && (
+          <div>
+            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">ATRIBUTOS ALTERADOS</p>
+            <div className="flex flex-col gap-2">
+              {levelUpDiff.filter(m => m.tipo === 'numero').map((m, i) => (
+                <div key={i} className="flex items-center justify-between border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3">
+                  <span style={cinzel} className="text-[#6a6050] text-xs tracking-widest">{m.label}</span>
+                  <div className="flex items-center gap-3">
+                    <span style={cinzel} className="text-[#4a4030] text-sm line-through">{m.de ?? '—'}</span>
+                    <span className="text-[#4a4030]">→</span>
+                    <input
+                      type="number"
+                      defaultValue={m.para}
+                      onChange={e => {
+                        // atualiza fichaPreview em tempo real pelo campo
+                        const val = Number(e.target.value);
+                        setFichaPreview(prev => {
+                          const copia = structuredClone(prev);
+                          const partes = m.campo.split('.');
+                          if (partes.length === 1) copia[partes[0]] = val;
+                          else if (partes.length === 2) copia[partes[0]][partes[1]] = val;
+                          else if (partes.length === 3) copia[partes[0]][partes[1]][partes[2]] = val;
+                          return copia;
+                        });
+                      }}
+                      className="bg-[#161410] border border-[#c8a84b40] text-[#c8a84b] text-center text-sm w-16 py-1 focus:outline-none focus:border-[#c8a84b80]"
+                      style={{ ...cinzel, borderRadius: '2px' }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Features novas */}
+        {levelUpDiff.filter(m => m.tipo === 'feature').length > 0 && (
+          <div>
+            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">NOVAS HABILIDADES</p>
+            <div className="flex flex-col gap-2">
+              {levelUpDiff.filter(m => m.tipo === 'feature').map((m, i) => (
+                <div key={i} className="border border-[#c8a84b20] bg-[#0f0e0c] px-4 py-3">
+                  <p style={cinzel} className="text-[#c8a84b] text-xs mb-1">{m.label}</p>
+                  {m.descricao && (
+                    <p className="text-[#6a6050] text-xs leading-relaxed font-light">{m.descricao}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Recursos novos */}
+        {levelUpDiff.filter(m => m.tipo === 'recurso').length > 0 && (
+          <div>
+            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">NOVOS RECURSOS</p>
+            <div className="flex flex-col gap-2">
+              {levelUpDiff.filter(m => m.tipo === 'recurso').map((m, i) => (
+                <div key={i} className="flex items-center justify-between border border-[#c8a84b20] bg-[#0f0e0c] px-4 py-3">
+                  <span style={cinzel} className="text-[#c8a84b] text-xs">{m.label}</span>
+                  <span style={cinzel} className="text-[#4a4030] text-xs">
+                    {m.max && `${m.max}×`} {m.recarga && `· ${m.recarga}`}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="px-6 py-4 border-t border-[#c8a84b15] flex gap-3 flex-shrink-0">
+        <button
+          onClick={() => setModalRevisao(false)}
+          className="flex-1 border border-[#c8a84b20] text-[#4a4030] text-xs tracking-widest py-2 hover:border-[#c8a84b40] hover:text-[#6a6050] transition-colors"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          Descartar
+        </button>
+        <button
+          onClick={() => {
+            setFicha(fichaPreview);
+            setModalRevisao(false);
+            setFichaPreview(null);
+            setLevelUpDiff([]);
+            setSucesso(`${fichaPreview.name} subiu para nível ${fichaPreview.level}!`);
+            setTimeout(() => setSucesso(''), 4000);
+          }}
+          className="flex-1 bg-[#c8a84b] text-[#0f0e0c] text-xs tracking-widest py-2 font-bold hover:bg-[#e0c060] transition-colors"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          Confirmar Level Up ✦
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
         {/* MODAL ESCOLHER CLASSE (Multiclassing) */}
         {showClassLevelUpModal && (
