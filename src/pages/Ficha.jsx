@@ -302,7 +302,7 @@ export default function Ficha() {
       ficha_atual: ficha,
       system: personagem.system || 'D&D 5e',
       nivel_alvo: novoNivel,
-      arquetipo: arquetipo || ficha.arquetipo || null,
+      arquetipo: arquetipoSelecionado || ficha.arquetipo || null,
       ...(classNameAlvo && { class_name: classNameAlvo }),
     };
 
