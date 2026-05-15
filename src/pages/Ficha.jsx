@@ -282,7 +282,7 @@ export default function Ficha() {
 
       if (proximoNivel === arquInfo.nivel && !jaTemArquetipo) {
         setArquetiposDisponiveis(arquInfo.arquetipos);
-        setPendingLevelUp({ novoNivel: proximoNivel, classNameAlvo: null });
+        setPendingLevelUp({ novoNivel: proximoNivel, classNameAlvo: className });
         setModalArquetipo(true);
         return; // pausa aqui, espera o modal
       }
