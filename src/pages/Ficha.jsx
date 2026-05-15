@@ -82,12 +82,12 @@ export default function Ficha() {
   try {
     const res = await api.get(`/characters/${id}`);
     const fichaData = res.data.data.data; // ← define aqui
+    console.log("class:", fichaData?.class);
+    console.log("classes:", fichaData?.classes);
+
     setPersonagem(res.data.data);
     setFicha(fichaData);
     setNivelAlvo((fichaData?.level || 1) + 1);
-
-    console.log("class:", fichaData?.class);
-    console.log("classes:", fichaData?.classes);
 
     // Verifica arquétipo faltando
     const className = fichaData?.classes?.[0]?.name || fichaData?.class;
