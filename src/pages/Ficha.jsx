@@ -97,7 +97,7 @@ export default function Ficha() {
         const jaTemArquetipo = fichaData?.arquetipo || fichaData?.subclass;
         if (fichaData.level >= arquInfo.nivel && !jaTemArquetipo && arquInfo.arquetipos?.length) {
           setArquetiposDisponiveis(arquInfo.arquetipos);
-          setPendingLevelUp({ novoNivel: fichaData.level, classNameAlvo: null });
+          setPendingLevelUp({ novoNivel: fichaData.level, classNameAlvo: className, retroativo: true });
           setModalArquetipo(true);
         }
       } catch (e) {
@@ -1351,15 +1351,26 @@ async function marcarComoLida(id) {
         <button
           disabled={!arquetipoSelecionado}
           onClick={async () => {
-            setModalArquetipo(false);
-            await fazerLevelUpComClasse(
-              pendingLevelUp.novoNivel,
-              pendingLevelUp.classNameAlvo,
-              arquetipoSelecionado
-            );
-            setPendingLevelUp(null);
-            setArquetipoSelecionado('');
-          }}
+  setModalArquetipo(false);
+  
+  if (pendingLevelUp?.retroativo) {
+    // só salva o arquétipo, sem level up
+    const fichaAtualizada = { ...ficha, arquetipo: arquetipoSelecionado };
+    setFicha(fichaAtualizada);
+    await api.put(`/characters/${id}`, { data: fichaAtualizada });
+    setSucesso(`Arquétipo ${arquetipoSelecionado} salvo!`);
+    setTimeout(() => setSucesso(''), 4000);
+  } else {
+    await fazerLevelUpComClasse(
+      pendingLevelUp.novoNivel,
+      pendingLevelUp.classNameAlvo,
+      arquetipoSelecionado
+    );
+  }
+  
+  setPendingLevelUp(null);
+  setArquetipoSelecionado('');
+}}
           className="flex-1 bg-[#c8a84b] text-[#0f0e0c] text-xs tracking-widest py-2 font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
           style={{ ...cinzel, borderRadius: '2px' }}>
           Confirmar →
