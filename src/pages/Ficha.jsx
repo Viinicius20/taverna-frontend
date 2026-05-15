@@ -67,23 +67,45 @@ export default function Ficha() {
   const [levelUpDiff, setLevelUpDiff] = useState([]);
   const [modalRevisao, setModalRevisao] = useState(false);
 
+  const [modalArquetipo, setModalArquetipo] = useState(false);
+  const [arquetiposDisponiveis, setArquetiposDisponiveis] = useState([]);
+  const [arquetipoSelecionado, setArquetipoSelecionado] = useState('');
+  const [pendingLevelUp, setPendingLevelUp] = useState(null);
+
   useEffect(() => {
     buscarPersonagem();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   async function buscarPersonagem() {
-    setCarregando(true);
-    try {
-      const res = await api.get(`/characters/${id}`);
-      setPersonagem(res.data.data);
-      setFicha(res.data.data.data);
-      setNivelAlvo((res.data.data.data?.level || 1) + 1);
-    } catch {
-      setErro('Personagem não encontrado.');
+  setCarregando(true);
+  try {
+    const res = await api.get(`/characters/${id}`);
+    const fichaData = res.data.data.data; // ← define aqui
+    setPersonagem(res.data.data);
+    setFicha(fichaData);
+    setNivelAlvo((fichaData?.level || 1) + 1);
+
+    // Verifica arquétipo faltando
+    const className = fichaData?.classes?.[0]?.name || fichaData?.class;
+    if (className && fichaData?.level) {
+      try {
+        const { data: arquInfo } = await api.get(`/arquetipos/${encodeURIComponent(className)}`);
+        const jaTemArquetipo = fichaData?.arquetipo || fichaData?.subclass;
+        if (fichaData.level >= arquInfo.nivel && !jaTemArquetipo && arquInfo.arquetipos?.length) {
+          setArquetiposDisponiveis(arquInfo.arquetipos);
+          setPendingLevelUp({ novoNivel: fichaData.level, classNameAlvo: null });
+          setModalArquetipo(true);
+        }
+      } catch (e) {
+        console.warn("Arquétipos não encontrados para:", className);
+      }
     }
-    setCarregando(false);
+  } catch {
+    setErro('Personagem não encontrado.');
   }
+  setCarregando(false);
+}
 
   function editarCampo(campo, valor) {
     setFicha(prev => ({ ...prev, [campo]: valor }));
@@ -247,10 +269,26 @@ export default function Ficha() {
       return;
     }
 
-    // Se tem só 1 classe, faz level up direto
+    // Se tem só 1 classe, verifica arquétipo antes
     const proximoNivel = totalLevelAtual + 1;
-    await fazerLevelUpComClasse(proximoNivel, null);
+    const className = ficha.classes?.[0]?.name || ficha.class;
+
+    try {
+      const { data: arquInfo } = await api.get(`/arquetipos/${encodeURIComponent(className)}`);
+      const jaTemArquetipo = ficha.arquetipo || ficha.subclass;
+
+      if (proximoNivel === arquInfo.nivel && !jaTemArquetipo) {
+        setArquetiposDisponiveis(arquInfo.arquetipos);
+        setPendingLevelUp({ novoNivel: proximoNivel, classNameAlvo: null });
+        setModalArquetipo(true);
+        return; // pausa aqui, espera o modal
+      }
+  } catch (e) {
+    console.warn("Arquétipos não encontrados para:", className);
   }
+
+  await fazerLevelUpComClasse(proximoNivel, null);
+}
 
   async function fazerLevelUpComClasse(novoNivel, classNameAlvo) {
   setUpando(true);
@@ -261,6 +299,7 @@ export default function Ficha() {
       ficha_atual: ficha,
       system: personagem.system || 'D&D 5e',
       nivel_alvo: novoNivel,
+      arquetipo: arquetipo || ficha.arquetipo || null,
       ...(classNameAlvo && { class_name: classNameAlvo }),
     };
 
@@ -1273,6 +1312,58 @@ async function marcarComoLida(id) {
         <button onClick={() => setModalRevisao(false)}
           className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
       </div>
+
+      {modalArquetipo && (
+  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
+    <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full" style={{ borderRadius: '2px' }}>
+      <div className="px-6 py-4 border-b border-[#c8a84b15]">
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">ESCOLHA SEU ARQUÉTIPO</p>
+        <p style={cinzel} className="text-[#4a4030] text-xs mt-1">
+          Nível {pendingLevelUp?.novoNivel} — esta escolha é permanente
+        </p>
+      </div>
+      <div className="px-6 py-4 flex flex-col gap-2 max-h-80 overflow-y-auto">
+        {arquetiposDisponiveis.map(arq => (
+          <button key={arq}
+            onClick={() => setArquetipoSelecionado(arq)}
+            className="px-4 py-3 text-xs tracking-widest border text-left transition-all"
+            style={{
+              ...cinzel,
+              borderRadius: '2px',
+              borderColor: arquetipoSelecionado === arq ? '#c8a84b' : '#c8a84b20',
+              backgroundColor: arquetipoSelecionado === arq ? '#c8a84b15' : 'transparent',
+              color: arquetipoSelecionado === arq ? '#c8a84b' : '#6a6050',
+            }}>
+            {arq}
+          </button>
+        ))}
+      </div>
+      <div className="px-6 py-4 border-t border-[#c8a84b15] flex gap-3">
+        <button onClick={() => { setModalArquetipo(false); setPendingLevelUp(null); }}
+          className="flex-1 border border-[#c8a84b20] text-[#4a4030] text-xs tracking-widest py-2 hover:border-[#c8a84b40] transition-colors"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          Cancelar
+        </button>
+        <button
+          disabled={!arquetipoSelecionado}
+          onClick={async () => {
+            setModalArquetipo(false);
+            await fazerLevelUpComClasse(
+              pendingLevelUp.novoNivel,
+              pendingLevelUp.classNameAlvo,
+              arquetipoSelecionado
+            );
+            setPendingLevelUp(null);
+            setArquetipoSelecionado('');
+          }}
+          className="flex-1 bg-[#c8a84b] text-[#0f0e0c] text-xs tracking-widest py-2 font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          Confirmar →
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* Lista de mudanças */}
       <div className="px-6 py-4 overflow-y-auto flex-1 flex flex-col gap-4">
