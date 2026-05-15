@@ -86,6 +86,9 @@ export default function Ficha() {
     setFicha(fichaData);
     setNivelAlvo((fichaData?.level || 1) + 1);
 
+    console.log("class:", fichaData?.class);
+    console.log("classes:", fichaData?.classes);
+
     // Verifica arquétipo faltando
     const className = fichaData?.classes?.[0]?.name || fichaData?.class;
     if (className && fichaData?.level) {
