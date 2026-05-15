@@ -317,6 +317,7 @@ export default function Ficha() {
     setShowClassLevelUpModal(false);
     setModalRevisao(true); // abre modal de revisão
   } catch (error) {
+    console.log("erro completo:", error.response?.data);
     setErro('Erro ao fazer level up: ' + error.message);
   }
   setUpando(false);
