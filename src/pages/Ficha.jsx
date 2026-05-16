@@ -82,8 +82,9 @@ export default function Ficha() {
   try {
     const res = await api.get(`/characters/${id}`);
     const fichaData = res.data.data.data; // ← define aqui
-    console.log("class:", fichaData?.class);
-    console.log("classes:", fichaData?.classes);
+    console.log("className:", fichaData?.classes?.[0]?.name || fichaData?.class);
+    console.log("level:", fichaData?.level);
+    console.log("arquetipo:", fichaData?.arquetipo);
 
     setPersonagem(res.data.data);
     setFicha(fichaData);
