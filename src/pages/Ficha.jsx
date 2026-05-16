@@ -95,6 +95,7 @@ export default function Ficha() {
     if (className && fichaData?.level) {
       try {
         const { data: arquInfo } = await api.get(`/arquetipos/${encodeURIComponent(className)}`);
+        console.log("arquInfo:", arquInfo);
         const jaTemArquetipo = fichaData?.arquetipo || fichaData?.subclass;
         if (fichaData.level >= arquInfo.nivel && !jaTemArquetipo && arquInfo.arquetipos?.length) {
           setArquetiposDisponiveis(arquInfo.arquetipos);
