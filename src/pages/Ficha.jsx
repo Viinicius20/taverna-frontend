@@ -100,7 +100,7 @@ export default function Ficha() {
         console.log("arquetipo check:", !jaTemArquetipo);
         console.log("jaTemArquetipo valor:", jaTemArquetipo);
         console.log("arquetipos length:", arquInfo.arquetipos?.length);
-        console.log("ficha completa:", JSON.stringify(fichaData).substring(0, 500));
+        console.log("ficha completa:", JSON.stringify(fichaData).substring(0, 1500));
         if (fichaData.level >= arquInfo.nivel && !jaTemArquetipo && arquInfo.arquetipos?.length) {
           setArquetiposDisponiveis(arquInfo.arquetipos);
           setPendingLevelUp({ novoNivel: fichaData.level, classNameAlvo: className, retroativo: true });
