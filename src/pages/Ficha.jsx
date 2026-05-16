@@ -281,6 +281,8 @@ export default function Ficha() {
     // Se tem só 1 classe, verifica arquétipo antes
     const proximoNivel = totalLevelAtual + 1;
     const className = ficha.classes?.[0]?.name || ficha.class;
+    console.log("className no handleLevelUp:", className);
+  console.log("proximoNivel:", proximoNivel);
 
     try {
       const { data: arquInfo } = await api.get(`/arquetipos/${encodeURIComponent(className)}`);
@@ -1012,16 +1014,21 @@ async function marcarComoLida(id) {
               <p className="text-[#4a4030] text-xs mt-1">Clique para ver descrição</p>
             </div>
             <div className="p-6 flex flex-wrap gap-2">
-              {ficha.features.filter(f => !f.toLowerCase().includes('spellcasting')).map((f, i) => (
-                <button key={i} onClick={() => abrirSkill(f)}
-                  className="border border-[#c8a84b25] bg-[#c8a84b08] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b18] hover:border-[#c8a84b50] transition-all"
-                  style={{ ...cinzel, borderRadius: '2px', letterSpacing: '0.5px' }}>
-                  {f} ↗
-                </button>
-              ))}
+              {ficha.features
+                .filter(f => typeof f === 'string')
+                .filter(f => f.trim() !== '')
+                .filter(f => !f.startsWith('**') && !f.endsWith('**'))
+                .filter(f => !f.toLowerCase().includes('spellcasting'))
+                .map((f, i) => (
+                  <button key={i} onClick={() => abrirSkill(f)}
+                    className="border border-[#c8a84b25] bg-[#c8a84b08] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b18] hover:border-[#c8a84b50] transition-all"
+                    style={{ ...cinzel, borderRadius: '2px', letterSpacing: '0.5px' }}>
+                    {f} ↗
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
         {/* CONTADOR DE RECURSOS */}
 <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
