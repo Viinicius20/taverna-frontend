@@ -69,6 +69,7 @@ export default function Mestre() {
   const [descricaoSkillNpc, setDescricaoSkillNpc] = useState(null);
   const [carregandoSkillNpc, setCarregandoSkillNpc] = useState(false);
   const [novoItemContexto, setNovoItemContexto] = useState('');
+  const [nomeAberto, setNomeAberto] = useState(false);
 
   useEffect(() => {
     buscarNpcs();
@@ -1740,24 +1741,38 @@ function gerarNome() {
 
         {/* GERADOR DE NOMES — fixo */}
 <div className="fixed bottom-6 right-6 z-50">
-  <div className="bg-[#161410] border border-[#c8a84b30] p-4 shadow-lg" style={{ borderRadius: '2px' }}>
-    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">GERAR NOME</p>
-    <div className="flex gap-2 mb-2">
-      <select value={racaNome} onChange={e => setRacaNome(e.target.value)}
-        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#6a6050] px-2 py-1 text-xs focus:outline-none"
-        style={{ borderRadius: '2px' }}>
-        {['Humano','Elfo','Anão','Halfling','Gnomo','Meio-Orc','Tiefling','Draconato'].map(r => (
-          <option key={r} value={r}>{r}</option>
-        ))}
-      </select>
-      <button onClick={gerarNome}
-        className="bg-[#c8a84b] text-[#0f0e0c] px-3 py-1 text-xs font-bold hover:bg-[#e0c060] transition-colors"
-        style={{ ...cinzel, borderRadius: '2px' }}>
-        ⚄
-      </button>
-    </div>
-    {nomeGerado && (
-      <p style={cinzel} className="text-[#f0e8d8] text-sm text-center tracking-widest">{nomeGerado}</p>
+  <div className="bg-[#161410] border border-[#c8a84b30] shadow-lg" style={{ borderRadius: '2px' }}>
+    
+    {/* Header clicável */}
+    <button
+      onClick={() => setNomeAberto(prev => !prev)}
+      className="flex items-center justify-between gap-4 px-4 py-3 w-full hover:bg-[#c8a84b08] transition-colors">
+      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">GERAR NOME</p>
+      <span className="text-[#4a4030] text-xs transition-transform"
+        style={{ transform: nomeAberto ? 'rotate(180deg)' : 'rotate(0deg)' }}>▲</span>
+    </button>
+
+    {/* Conteúdo colapsável */}
+    {nomeAberto && (
+      <div className="px-4 pb-4 border-t border-[#c8a84b15]">
+        <div className="flex gap-2 mb-2 mt-3">
+          <select value={racaNome} onChange={e => setRacaNome(e.target.value)}
+            className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#6a6050] px-2 py-1 text-xs focus:outline-none"
+            style={{ borderRadius: '2px' }}>
+            {['Humano','Elfo','Anão','Halfling','Gnomo','Meio-Orc','Tiefling','Draconato'].map(r => (
+              <option key={r} value={r}>{r}</option>
+            ))}
+          </select>
+          <button onClick={gerarNome}
+            className="bg-[#c8a84b] text-[#0f0e0c] px-3 py-1 text-xs font-bold hover:bg-[#e0c060] transition-colors"
+            style={{ ...cinzel, borderRadius: '2px' }}>
+            ⚄
+          </button>
+        </div>
+        {nomeGerado && (
+          <p style={cinzel} className="text-[#f0e8d8] text-sm text-center tracking-widest">{nomeGerado}</p>
+        )}
+      </div>
     )}
   </div>
 </div>
