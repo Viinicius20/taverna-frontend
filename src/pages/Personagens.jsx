@@ -35,7 +35,7 @@ export default function Personagens() {
 
     // Se não tem nenhum vinculado, busca todos disponíveis
     if (meus.length === 0) {
-      const todos = await api.get('/characters');
+      const todos = await api.get('/characters', { params: { sem_dono: true } });
       setTodosPersonagens(todos.data.data || []);
       setEscolhendo(true);
     }
@@ -111,10 +111,22 @@ export default function Personagens() {
       <div className="max-w-5xl mx-auto px-8 py-12">
 
         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">ÁREA DO JOGADOR</p>
-        <h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold mb-2">Meus Personagens</h1>
-        <p className="text-[#7a7060] mb-10 font-light">
-          Todos os seus aventureiros em um só lugar. <span className="text-[#4a4030]">Clique em uma habilidade para ver sua descrição.</span>
-        </p>
+<h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold mb-2">Meus Personagens</h1>
+<p className="text-[#7a7060] mb-10 font-light">
+  Todos os seus aventureiros em um só lugar. <span className="text-[#4a4030]">Clique em uma habilidade para ver sua descrição.</span>
+</p>
+
+{personagens.length > 0 && (
+  <button onClick={async () => {
+    await api.patch(`/characters/${personagens[0].id}`, { user_id: null });
+    setPersonagens([]);
+    setEscolhendo(true);
+    buscarPersonagens();
+  }} style={cinzel}
+    className="text-[#4a4030] text-xs tracking-widest hover:text-[#c8a84b] transition-colors mb-6 block">
+    ↩ Trocar personagem
+  </button>
+)}
 
         {/* CARREGANDO */}
         {carregando && (
