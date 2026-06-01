@@ -32,14 +32,20 @@ export default function Home() {
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0]" style={crimson}>
 
       {/* NAV */}
-      <div className="flex gap-4 sm:gap-8">
-  {navLinks.map(({ label, rota }) => (
-    <button key={label} onClick={() => navigate(rota)} style={cinzel}
-      className="text-[#a09880] text-sm tracking-widest hover:text-[#c8a84b] transition-colors">
-      {label}
-    </button>
-  ))}
-</div>
+<nav className="flex items-center justify-between px-4 py-4 border-b border-[#c8a84b20]">
+  <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
+    onClick={() => navigate('/')}>
+    ⚔ TAVERNA
+  </span>
+  <div className="flex gap-4 sm:gap-8">
+    {navLinks.map(({ label, rota }) => (
+      <button key={label} onClick={() => navigate(rota)} style={cinzel}
+        className="text-[#a09880] text-sm tracking-widest hover:text-[#c8a84b] transition-colors">
+        {label}
+      </button>
+    ))}
+  </div>
+</nav>
 
       {/* HERO */}
       <div className="text-center px-8 py-24 relative">
