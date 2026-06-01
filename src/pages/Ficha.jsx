@@ -169,6 +169,7 @@ export default function Ficha() {
     setErro('');
     setSucesso('');
     try {
+      console.log("salvando:", { ...ficha, ataques, notas_privadas: notas });
       await api.put(`/characters/${id}`, {
         data: { ...ficha, ataques, notas_privadas: notas },
         name: ficha.name,
