@@ -77,6 +77,8 @@ export default function Ficha() {
   const [adicionandoAtaque, setAdicionandoAtaque] = useState(false);
   const [resultadoRolagem, setResultadoRolagem] = useState(null);
 
+  const [notas, setNotas] = useState(ficha?.notas_privadas || '');
+
   useEffect(() => {
     buscarPersonagem();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1419,6 +1421,44 @@ function rolarAtaque(ataque) {
           </div>
         )}
 
+        {/* HISTÓRIA */}
+        {ficha.background_story && (
+          <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+            <div className="px-6 py-4 border-b border-[#c8a84b15]">
+              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">HISTÓRIA</p>
+            </div>
+            <div className="p-6">
+              <textarea value={ficha.background_story} onChange={e => editarCampo('background_story', e.target.value)}
+                rows={4}
+                className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#a09880] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b50] resize-none"
+                style={{ fontSize: '1rem', borderRadius: '2px', lineHeight: '1.7' }} />
+            </div>
+          </div>
+        )}
+        
+        {/* NOTAS PRIVADAS */}
+<div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+  <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
+    <div>
+      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">NOTAS PRIVADAS</p>
+      <p style={cinzel} className="text-[#4a4030] text-xs mt-1">Só você vê isso</p>
+    </div>
+    <span className="text-[#4a4030] text-xs">🔒</span>
+  </div>
+  <div className="p-6">
+    <textarea
+      value={notas}
+      onChange={e => {
+        setNotas(e.target.value);
+        setFicha(prev => ({ ...prev, notas_privadas: e.target.value }));
+      }}
+      placeholder="Anotações, segredos, objetivos pessoais do personagem..."
+      rows={5}
+      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#a09880] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b50] resize-none placeholder-[#3a3020]"
+      style={{ fontSize: '1rem', borderRadius: '2px', lineHeight: '1.7' }} />
+  </div>
+</div>
+
         <div className="flex gap-4">
           <button onClick={salvarFicha} disabled={salvando}
             className="bg-[#c8a84b] text-[#0f0e0c] px-8 py-3 text-sm tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50"
@@ -1431,6 +1471,7 @@ function rolarAtaque(ataque) {
             ↑ Subir de Nível
           </button>
         </div>
+        
 
         {/* MODAL LEVEL UP COM IA */}
         {modalLevelUp && (
