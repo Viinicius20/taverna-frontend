@@ -425,6 +425,11 @@ export default function Ficha() {
   }
   }, []);
 
+  useEffect(() => {
+  if (ficha?.ataques) setAtaques(ficha.ataques);
+  if (ficha?.notas_privadas) setNotas(ficha.notas_privadas);
+}, [ficha]);
+
 
 async function buscarMensagensSecretas() {
   try {
