@@ -410,10 +410,37 @@ export default function Ficha() {
   return () => clearInterval(interval);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  useEffect(() => {
+  if (Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+  }, []);
+
+
 async function buscarMensagensSecretas() {
   try {
     const res = await api.get(`/secret-messages/${id}`);
-    setMensagensSecretas(res.data.data || []);
+    const novas = res.data.data || [];
+    
+    // Dispara notificação se chegou mensagem nova
+    if (novas.length > mensagensSecretas.length && Notification.permission === 'granted') {
+      const msg = novas[0];
+      const notif = new Notification('🔮 Sussurro do Mestre', {
+        body: msg.message,
+        icon: '/favicon.ico',
+        badge: '/favicon.ico',
+        tag: 'sussurro', // evita spam de notificações
+      });
+      
+      // Clicar na notificação foca a aba
+      notif.onclick = () => {
+        window.focus();
+        notif.close();
+      };
+    }
+    
+    setMensagensSecretas(novas);
   } catch {}
 }
 
