@@ -13,6 +13,8 @@ export default function Personagens() {
   const [erro, setErro] = useState('');
   const [deletando, setDeletando] = useState(null);
   const { user } = useUser();
+  const [todosPersonagens, setTodosPersonagens] = useState([]);
+  const [escolhendo, setEscolhendo] = useState(false);
 
   // Modal de habilidade
   const [modal, setModal] = useState(null); // { skill, system, context }
@@ -25,12 +27,20 @@ export default function Personagens() {
   }, [user]);
 
   async function buscarPersonagens() {
-    setCarregando(true);
-    try {
-      const res = await api.get('/characters', { params: { user_id: user?.id } });
-      setPersonagens(res.data.data || []);
+  setCarregando(true);
+  try {
+    const res = await api.get('/characters', { params: { user_id: user?.id } });
+    const meus = res.data.data || [];
+    setPersonagens(meus);
+
+    // Se não tem nenhum vinculado, busca todos disponíveis
+    if (meus.length === 0) {
+      const todos = await api.get('/characters');
+      setTodosPersonagens(todos.data.data || []);
+      setEscolhendo(true);
+    }
     } catch {
-      setErro('Erro ao buscar personagens. Verifique se o backend está rodando.');
+      setErro('Erro ao buscar personagens.');
     }
     setCarregando(false);
   }
@@ -123,16 +133,46 @@ export default function Personagens() {
 
         {/* VAZIO */}
         {!carregando && !erro && personagens.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-24 gap-4 border border-[#c8a84b15] bg-[#161410]">
-            <span className="text-4xl opacity-20">⚔</span>
-            <p style={cinzel} className="text-[#4a4030] text-sm tracking-widest">NENHUM PERSONAGEM AINDA</p>
-            <button onClick={() => navigate('/personagens/criar')}
-              className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors mt-2"
-              style={{ ...cinzel, borderRadius: '2px' }}>
-              Criar Primeiro Personagem
-            </button>
-          </div>
-        )}
+  <div className="flex flex-col gap-4">
+    {escolhendo && todosPersonagens.length > 0 ? (
+      <div>
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">QUAL É O SEU PERSONAGEM?</p>
+        <div className="flex flex-col gap-px bg-[#c8a84b15] border border-[#c8a84b15]">
+          {todosPersonagens.map(p => (
+            <div key={p.id} className="bg-[#161410] hover:bg-[#1a1814] transition-colors p-4 flex items-center justify-between">
+              <div>
+                <p style={cinzel} className="text-[#f0e8d8] text-sm">{p.data?.name || p.name}</p>
+                <p className="text-[#4a4030] text-xs mt-1">
+                  {[p.data?.race, p.data?.class, `Nível ${p.data?.level}`].filter(Boolean).join(' · ')}
+                </p>
+              </div>
+              <button
+                onClick={async () => {
+                  await api.patch(`/characters/${p.id}`, { user_id: user?.id });
+                  setEscolhendo(false);
+                  buscarPersonagens();
+                }}
+                className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-1.5 text-xs font-bold hover:bg-[#e0c060] transition-colors"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                Este é o meu →
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    ) : (
+      <div className="flex flex-col items-center justify-center py-24 gap-4 border border-[#c8a84b15] bg-[#161410]">
+        <span className="text-4xl opacity-20">⚔</span>
+        <p style={cinzel} className="text-[#4a4030] text-sm tracking-widest">NENHUM PERSONAGEM AINDA</p>
+        <button onClick={() => navigate('/personagens/criar')}
+          className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors mt-2"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          Criar Primeiro Personagem
+        </button>
+      </div>
+    )}
+  </div>
+)}
 
         {/* LISTA */}
         {!carregando && personagens.length > 0 && (
