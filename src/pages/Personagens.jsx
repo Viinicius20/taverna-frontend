@@ -21,6 +21,7 @@ export default function Personagens() {
 
   useEffect(() => {
     buscarPersonagens();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function buscarPersonagens() {
