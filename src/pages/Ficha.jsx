@@ -170,7 +170,7 @@ export default function Ficha() {
     setSucesso('');
     try {
       await api.put(`/characters/${id}`, {
-        data: ficha,
+        data: { ...ficha, ataques, notas_privadas: notas },
         name: ficha.name,
         system: personagem.system,
       });
