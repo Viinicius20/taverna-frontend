@@ -72,6 +72,11 @@ export default function Ficha() {
   const [arquetipoSelecionado, setArquetipoSelecionado] = useState('');
   const [pendingLevelUp, setPendingLevelUp] = useState(null);
 
+  const [ataques, setAtaques] = useState(ficha?.ataques || []);
+  const [novoAtaque, setNovoAtaque] = useState({ nome: '', bonus: '', dano: '', tipo: '' });
+  const [adicionandoAtaque, setAdicionandoAtaque] = useState(false);
+  const [resultadoRolagem, setResultadoRolagem] = useState(null);
+
   useEffect(() => {
     buscarPersonagem();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -452,6 +457,50 @@ async function marcarComoLida(id) {
     setMensagensSecretas(prev => prev.filter(m => m.id !== id));
   } catch {}
 }
+
+function adicionarAtaque() {
+  if (!novoAtaque.nome) return;
+  const novos = [...ataques, novoAtaque];
+  setAtaques(novos);
+  setFicha(prev => ({ ...prev, ataques: novos }));
+  setNovoAtaque({ nome: '', bonus: '', dano: '', tipo: '' });
+  setAdicionandoAtaque(false);
+}
+
+function removerAtaque(idx) {
+  const novos = ataques.filter((_, i) => i !== idx);
+  setAtaques(novos);
+  setFicha(prev => ({ ...prev, ataques: novos }));
+}
+
+function rolarAtaque(ataque) {
+  const bonus = parseInt(ataque.bonus) || 0;
+  const d20 = Math.floor(Math.random() * 20) + 1;
+  const total = d20 + bonus;
+  
+  // Rola o dano
+  let dano = null;
+  const danoMatch = ataque.dano.match(/(\d+)d(\d+)([+-]\d+)?/);
+  if (danoMatch) {
+    const qtd = parseInt(danoMatch[1]);
+    const faces = parseInt(danoMatch[2]);
+    const mod = parseInt(danoMatch[3]) || 0;
+    const rolls = Array.from({ length: qtd }, () => Math.floor(Math.random() * faces) + 1);
+    dano = rolls.reduce((a, b) => a + b, 0) + mod;
+  }
+
+  setResultadoRolagem({
+    nome: ataque.nome,
+    d20,
+    bonus,
+    total,
+    dano,
+    tipoDano: ataque.tipo,
+    critico: d20 === 20,
+    falha: d20 === 1,
+  });
+  setTimeout(() => setResultadoRolagem(null), 5000);
+}
   
 
   // ===== FIM FUNÇÕES LEVEL UP =====
@@ -661,6 +710,102 @@ async function marcarComoLida(id) {
           style={cinzel} />
       </div>
     </div>
+
+    {/* ATAQUES */}
+<div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+  <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
+    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">ATAQUES</p>
+    <button onClick={() => setAdicionandoAtaque(true)}
+      className="text-[#4a4030] text-xs tracking-widest hover:text-[#c8a84b] transition-colors"
+      style={cinzel}>
+      + Adicionar
+    </button>
+  </div>
+  <div className="p-6 flex flex-col gap-3">
+
+    {/* Resultado de rolagem */}
+    {resultadoRolagem && (
+      <div className={`border p-3 text-center mb-2 ${resultadoRolagem.critico ? 'border-[#c8a84b] bg-[#c8a84b10]' : resultadoRolagem.falha ? 'border-red-900 bg-red-950 bg-opacity-20' : 'border-[#c8a84b20] bg-[#0f0e0c]'}`}>
+        <p style={cinzel} className="text-[#4a4030] text-xs mb-1">{resultadoRolagem.nome}</p>
+        {resultadoRolagem.critico && <p style={cinzel} className="text-[#c8a84b] text-xs mb-1">⚔ CRÍTICO!</p>}
+        {resultadoRolagem.falha && <p style={cinzel} className="text-red-500 text-xs mb-1">✕ FALHA CRÍTICA</p>}
+        <p style={cinzel} className="text-[#f0e8d8] text-2xl">
+          {resultadoRolagem.total}
+          <span className="text-[#4a4030] text-sm ml-2">(d20:{resultadoRolagem.d20} {resultadoRolagem.bonus >= 0 ? '+' : ''}{resultadoRolagem.bonus})</span>
+        </p>
+        {resultadoRolagem.dano !== null && (
+          <p style={cinzel} className="text-[#c8a84b] text-sm mt-1">
+            Dano: {resultadoRolagem.dano} {resultadoRolagem.tipoDano}
+          </p>
+        )}
+      </div>
+    )}
+
+    {/* Lista de ataques */}
+    {ataques.length === 0 && !adicionandoAtaque && (
+      <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest text-center py-4">
+        Nenhum ataque cadastrado
+      </p>
+    )}
+
+    {ataques.map((ataque, idx) => (
+      <div key={idx} className="flex items-center gap-3 border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3">
+        <div className="flex-1">
+          <p style={cinzel} className="text-[#e8e0d0] text-sm">{ataque.nome}</p>
+          <p style={cinzel} className="text-[#4a4030] text-xs mt-0.5">
+            {ataque.bonus && `+${ataque.bonus} para acertar`} {ataque.dano && `· ${ataque.dano}`} {ataque.tipo && `· ${ataque.tipo}`}
+          </p>
+        </div>
+        <button onClick={() => rolarAtaque(ataque)}
+          className="bg-[#c8a84b] text-[#0f0e0c] px-3 py-1.5 text-xs font-bold hover:bg-[#e0c060] transition-colors"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          ⚄ Rolar
+        </button>
+        <button onClick={() => removerAtaque(idx)}
+          className="text-[#4a4030] hover:text-red-500 transition-colors text-lg leading-none">
+          ×
+        </button>
+      </div>
+    ))}
+
+    {/* Formulário de novo ataque */}
+    {adicionandoAtaque && (
+      <div className="border border-[#c8a84b30] bg-[#0f0e0c] p-4 flex flex-col gap-3">
+        <input placeholder="Nome do ataque" value={novoAtaque.nome}
+          onChange={e => setNovoAtaque(prev => ({ ...prev, nome: e.target.value }))}
+          className="bg-transparent border-b border-[#c8a84b20] text-[#e8e0d0] text-sm px-1 py-1 focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
+          style={cinzel} />
+        <div className="grid grid-cols-3 gap-2">
+          <input placeholder="Bônus (ex: 5)" value={novoAtaque.bonus}
+            onChange={e => setNovoAtaque(prev => ({ ...prev, bonus: e.target.value }))}
+            className="bg-transparent border-b border-[#c8a84b20] text-[#e8e0d0] text-sm px-1 py-1 focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020] text-center"
+            style={cinzel} />
+          <input placeholder="Dano (ex: 1d8+3)" value={novoAtaque.dano}
+            onChange={e => setNovoAtaque(prev => ({ ...prev, dano: e.target.value }))}
+            className="bg-transparent border-b border-[#c8a84b20] text-[#e8e0d0] text-sm px-1 py-1 focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020] text-center"
+            style={cinzel} />
+          <input placeholder="Tipo (ex: Cortante)" value={novoAtaque.tipo}
+            onChange={e => setNovoAtaque(prev => ({ ...prev, tipo: e.target.value }))}
+            className="bg-transparent border-b border-[#c8a84b20] text-[#e8e0d0] text-sm px-1 py-1 focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020] text-center"
+            style={cinzel} />
+        </div>
+        <div className="flex gap-2">
+          <button onClick={adicionarAtaque}
+            className="flex-1 bg-[#c8a84b] text-[#0f0e0c] py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors"
+            style={{ ...cinzel, borderRadius: '2px' }}>
+            Salvar Ataque
+          </button>
+          <button onClick={() => setAdicionandoAtaque(false)}
+            className="flex-1 border border-[#c8a84b20] text-[#4a4030] py-2 text-xs hover:border-[#c8a84b40] transition-colors"
+            style={{ ...cinzel, borderRadius: '2px' }}>
+            Cancelar
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
+</div>
+    
 
     {/* Outros campos de combate */}
     <div className="grid grid-cols-3 gap-4 mb-6">
