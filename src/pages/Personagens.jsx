@@ -15,6 +15,7 @@ export default function Personagens() {
   const { user } = useUser();
   const [todosPersonagens, setTodosPersonagens] = useState([]);
   const [escolhendo, setEscolhendo] = useState(false);
+  const [temMensagem, setTemMensagem] = useState(false);
 
   // Modal de habilidade
   const [modal, setModal] = useState(null); // { skill, system, context }
@@ -25,6 +26,20 @@ export default function Personagens() {
   if (user) buscarPersonagens();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+  useEffect(() => {
+  if (!personagens[0]?.id) return;
+  
+  const checarMensagens = async () => {
+    try {
+      const res = await api.get(`/secret-messages/${personagens[0].id}`);
+      setTemMensagem((res.data.data || []).length > 0);
+    } catch {}
+  };
+
+  checarMensagens();
+  const interval = setInterval(checarMensagens, 10000);
+  return () => clearInterval(interval);
+  }, [personagens]);
 
   async function buscarPersonagens() {
   setCarregando(true);
