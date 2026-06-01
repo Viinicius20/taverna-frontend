@@ -420,7 +420,9 @@ export default function Ficha() {
 
 async function buscarMensagensSecretas() {
   try {
+    console.log("buscando msgs para id:", id);
     const res = await api.get(`/secret-messages/${id}`);
+    console.log("msgs retornadas:", res.data.data);
     const novas = res.data.data || [];
     
     // Dispara notificação se chegou mensagem nova
