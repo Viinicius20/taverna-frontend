@@ -217,10 +217,13 @@ export default function Personagens() {
                       {/* Nome e badges */}
                       <div className="flex items-center gap-3 mb-2 flex-wrap">
                         <h2 style={cinzel}
-                          className="text-[#f0e8d8] text-lg font-semibold cursor-pointer hover:text-[#c8a84b] transition-colors"
-                          onClick={() => navigate(`/personagens/${p.id}`)}>
-                          {d.name || p.name || 'Sem nome'}
-                        </h2>
+  className="text-[#f0e8d8] text-lg font-semibold cursor-pointer hover:text-[#c8a84b] transition-colors"
+  onClick={() => navigate(`/personagens/${p.id}`)}>
+  {d.name || p.name || 'Sem nome'}
+  {temMensagem && (
+    <span className="ml-2 inline-block w-2 h-2 rounded-full bg-[#8a4a8a] animate-pulse" />
+  )}
+</h2>
                         <span className="border border-[#c8a84b25] text-[#c8a84b] px-2 py-0.5 text-xs"
                           style={{ ...cinzel, borderRadius: '2px' }}>
                           {p.system || 'D&D 5e'}
