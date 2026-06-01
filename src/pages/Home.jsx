@@ -1,17 +1,19 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useUser } from '../context/UserContext';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
 
 const navLinks = [
   { label: 'Personagens', rota: '/personagens' },
-  { label: 'Dados', rota: '/dados' },
   { label: 'Mestre', rota: '/mestre' },
+  { label: 'Entrar', rota: '/login' },
 ];
 
 export default function Home() {
   const navigate = useNavigate();
+  const { user, logout } = useUser();
   const [boato, setBoato] = useState(null);
   const [gerandoBoato, setGerandoBoato] = useState(false);
 
@@ -32,20 +34,30 @@ export default function Home() {
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0]" style={crimson}>
 
       {/* NAV */}
-      <nav className="flex items-center justify-between px-4 py-4 border-b border-[#c8a84b20]">
-        <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
-          onClick={() => navigate('/')}>
-          ⚔ TAVERNA
-        </span>
-        <div className="flex gap-4 sm:gap-8">
-          {navLinks.map(({ label, rota }) => (
-            <button key={label} onClick={() => navigate(rota)} style={cinzel}
-              className="text-[#a09880] text-sm tracking-widest hover:text-[#c8a84b] transition-colors">
-              {label}
-            </button>
-          ))}
-        </div>
-      </nav>
+      <div className="flex gap-4 sm:gap-8 items-center">
+  {navLinks.map(({ label, rota }) => (
+    <button key={label} onClick={() => navigate(rota)} style={cinzel}
+      className="text-[#a09880] text-sm tracking-widest hover:text-[#c8a84b] transition-colors">
+      {label}
+    </button>
+  ))}
+  {user ? (
+    <div className="flex items-center gap-3">
+      <span style={cinzel} className="text-[#4a4030] text-xs tracking-widest">{user.username}</span>
+      <button onClick={() => { logout(); navigate('/login'); }} style={cinzel}
+        className="text-xs border border-[#c8a84b20] text-[#4a4030] px-3 py-1 hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors"
+        style2={{ borderRadius: '2px' }}>
+        Sair
+      </button>
+    </div>
+  ) : (
+    <button onClick={() => navigate('/login')} style={cinzel}
+      className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-1.5 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors"
+      style2={{ borderRadius: '2px' }}>
+      Entrar
+    </button>
+  )}
+</div>
 
       {/* HERO */}
       <div className="text-center px-8 py-24 relative">

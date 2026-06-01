@@ -20,9 +20,9 @@ export default function Personagens() {
   const [carregandoSkill, setCarregandoSkill] = useState(false);
 
   useEffect(() => {
-    buscarPersonagens();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  if (user) buscarPersonagens();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   async function buscarPersonagens() {
     setCarregando(true);
