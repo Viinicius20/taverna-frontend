@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { useUser } from '../context/UserContext';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -11,6 +12,7 @@ export default function Personagens() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
   const [deletando, setDeletando] = useState(null);
+  const { user } = useUser();
 
   // Modal de habilidade
   const [modal, setModal] = useState(null); // { skill, system, context }
@@ -24,7 +26,7 @@ export default function Personagens() {
   async function buscarPersonagens() {
     setCarregando(true);
     try {
-      const res = await api.get('/characters');
+      const res = await api.get('/characters', { params: { user_id: user?.id } });
       setPersonagens(res.data.data || []);
     } catch {
       setErro('Erro ao buscar personagens. Verifique se o backend está rodando.');
