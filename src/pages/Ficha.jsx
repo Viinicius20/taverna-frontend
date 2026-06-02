@@ -79,6 +79,15 @@ export default function Ficha() {
 
   const [notas, setNotas] = useState(ficha?.notas_privadas || '');
 
+  const PERICIAS_ATTRS = {
+  acrobatics: 'dex', animal_handling: 'wis', arcana: 'int',
+  athletics: 'str', deception: 'cha', history: 'int',
+  insight: 'wis', intimidation: 'cha', investigation: 'int',
+  medicine: 'wis', nature: 'int', perception: 'wis',
+  performance: 'cha', persuasion: 'cha', religion: 'int',
+  sleight_of_hand: 'dex', stealth: 'dex', survival: 'wis'
+};
+
   useEffect(() => {
     buscarPersonagem();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -479,6 +488,18 @@ function removerAtaque(idx) {
   const novos = ataques.filter((_, i) => i !== idx);
   setAtaques(novos);
   setFicha(prev => ({ ...prev, ataques: novos }));
+}
+
+function calcularPericias() {
+  const attrs = ficha.attributes || {};
+  const profBonus = ficha.combat?.proficiency_bonus || 2;
+  const skillsSalvas = ficha.skills || {};
+  
+  return Object.entries(PERICIAS_ATTRS).reduce((acc, [skill, attr]) => {
+    const mod = Math.floor(((attrs[attr] || 10) - 10) / 2);
+    acc[skill] = skillsSalvas[skill] !== undefined ? skillsSalvas[skill] : mod;
+    return acc;
+  }, {});
 }
 
 function rolarAtaque(ataque) {
