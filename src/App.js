@@ -9,6 +9,7 @@ import RolarDados from './pages/RolarDados';
 import Quadro from './pages/Quadro';
 import Historico from './pages/Historico';
 import Login from './pages/Login'; // ← adiciona
+import Bestiario from './pages/Bestiario';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/dados" element={<RolarDados />} />
           <Route path="/quadro" element={<Quadro />} />
           <Route path="/historico" element={<Historico />} />
+          <Route path="/mestre/bestiario" element={<Bestiario />} />
         </Routes>
       </BrowserRouter>
     </UserProvider>

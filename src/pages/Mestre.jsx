@@ -528,20 +528,24 @@ function gerarNome() {
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0]" style={crimson}>
 
       <nav className="flex items-center justify-between px-8 py-4 border-b border-[#c8a84b20]">
-        <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
-          onClick={() => navigate('/')}>⚔ TAVERNA</span>
-        <div className="flex gap-6 items-center">
-          <button onClick={() => navigate('/')}
-            className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
-            ← Voltar
-          </button>
-          <button onClick={() => { setMostrarForm(f => !f); setErro(''); }}
-            className="bg-[#c8a84b] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors"
-            style={{ ...cinzel, borderRadius: '2px' }}>
-            + Novo NPC
-          </button>
-        </div>
-      </nav>
+  <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
+    onClick={() => navigate('/')}>⚔ TAVERNA</span>
+  <div className="flex gap-6 items-center">
+    <button onClick={() => navigate('/mestre/bestiario')}
+      className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+      🐉 Bestiário
+    </button>
+    <button onClick={() => navigate('/')}
+      className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+      ← Voltar
+    </button>
+    <button onClick={() => { setMostrarForm(f => !f); setErro(''); }}
+      className="bg-[#c8a84b] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      + Novo NPC
+    </button>
+  </div>
+</nav>
 
       <div className="max-w-5xl mx-auto px-8 py-12">
 
