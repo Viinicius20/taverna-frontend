@@ -79,6 +79,23 @@ export default function Mestre() {
     if (attrs) setAttrsLocais(JSON.parse(attrs));
   }, []);
 
+  useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const monsterName = params.get('addMonster');
+  const monsterHp = params.get('hp');
+  if (monsterName) {
+    setCombatentes(prev => [...prev, {
+      id: Date.now(),
+      nome: decodeURIComponent(monsterName),
+      tipo: 'monstro',
+      hpMax: Number(monsterHp) || 10,
+      hpAtual: Number(monsterHp) || 10,
+      iniciativa: 0,
+    }]);
+    window.history.replaceState({}, '', '/mestre');
+  }
+}, []);
+
   async function buscarNpcs() {
     setCarregando(true);
     try {
@@ -1025,20 +1042,27 @@ function gerarNome() {
     </div>
   )}
   {personagens.length > 0 && (
-    <div>
-      <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-2">JOGADORES</p>
-      <div className="flex flex-wrap gap-2">
-        {personagens.map(p => (
-          <button key={p.id} onClick={() => adicionarPersonagem(p)}
+  <div>
+    <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-2">JOGADORES</p>
+    <div className="flex flex-wrap gap-2">
+      {personagens.map(p => (
+        <div key={p.id} className="flex items-center gap-1">
+          <button onClick={() => adicionarPersonagem(p)}
             disabled={combatentes.some(c => c.id === p.id)}
             className="border border-[#7ab8d420] text-[#6a6050] px-3 py-1 text-xs hover:border-[#7ab8d450] hover:text-[#7ab8d4] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             style={{ ...cinzel, borderRadius: '2px' }}>
             + {p.name}
           </button>
-        ))}
-      </div>
+          <button onClick={() => window.open(`/ficha/${p.id}`, '_blank')}
+            className="text-[#4a4030] hover:text-[#c8a84b] text-xs transition-colors px-1"
+            title="Ver ficha">
+            👁
+          </button>
+        </div>
+      ))}
     </div>
-  )}
+  </div>
+)}
 </div>
 
   {/* Lista de combatentes */}

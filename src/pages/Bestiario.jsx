@@ -261,12 +261,17 @@ export default function Bestiario() {
                     )}
 
                     <div className="flex gap-2 pt-2 border-t border-[#c8a84b10]">
-                      <button onClick={() => deletarMonstro(m.id)}
-                        className="text-xs border border-red-900 text-red-900 px-3 py-1 hover:bg-red-900 hover:text-white transition-colors"
-                        style={{ ...cinzel, borderRadius: '2px' }}>
-                        🗑 DELETAR
-                      </button>
-                    </div>
+  <button onClick={() => navigate(`/mestre?addMonster=${encodeURIComponent(m.name)}&hp=${m.hp}`)}
+    className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 hover:bg-[#c8a84b10] transition-colors"
+    style={{ ...cinzel, borderRadius: '2px' }}>
+    ⚔ + COMBATE
+  </button>
+  <button onClick={() => deletarMonstro(m.id)}
+    className="text-xs border border-red-900 text-red-900 px-3 py-1 hover:bg-red-900 hover:text-white transition-colors"
+    style={{ ...cinzel, borderRadius: '2px' }}>
+    🗑 DELETAR
+  </button>
+</div>
                   </div>
                 )}
               </div>
