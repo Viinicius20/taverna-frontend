@@ -1172,21 +1172,26 @@ function rolarAtaque(ataque) {
         )}
 
         {/* PERÍCIAS */}
-        {ficha.skills && Object.keys(ficha.skills).length > 0 && (
-          <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
-            <div className="px-6 py-4 border-b border-[#c8a84b15]">
-              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">PERÍCIAS</p>
-            </div>
-            <div className="p-6 grid grid-cols-2 gap-2">
-              {Object.entries(ficha.skills).map(([skill, val]) => (
-                <div key={skill} className="flex items-center justify-between py-1 border-b border-[#c8a84b08]">
-                  <span className="text-[#8a8070] text-sm capitalize">{skill}</span>
-                  <span style={cinzel} className="text-[#c8a84b] text-sm">{val >= 0 ? '+' : ''}{val}</span>
-                </div>
-              ))}
-            </div>
+{ficha.attributes && (
+  <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+    <div className="px-6 py-4 border-b border-[#c8a84b15]">
+      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">PERÍCIAS</p>
+    </div>
+    <div className="p-6 grid grid-cols-2 gap-2">
+      {Object.entries(calcularPericias()).map(([skill, val]) => {
+        const temProficiencia = ficha.skills && ficha.skills[skill] !== undefined && ficha.skills[skill] !== Math.floor(((ficha.attributes[PERICIAS_ATTRS[skill]] || 10) - 10) / 2);
+        return (
+          <div key={skill} className="flex items-center justify-between py-1 border-b border-[#c8a84b08]">
+            <span className={`text-sm capitalize ${temProficiencia ? 'text-[#c8a84b]' : 'text-[#8a8070]'}`}>{skill}</span>
+            <span style={cinzel} className={`text-sm ${temProficiencia ? 'text-[#c8a84b]' : 'text-[#6a6050]'}`}>
+              {val >= 0 ? '+' : ''}{val}
+            </span>
           </div>
-        )}
+        );
+      })}
+    </div>
+  </div>
+)}
 
         {/* HABILIDADES */}
         {ficha.features && ficha.features.length > 0 && (
