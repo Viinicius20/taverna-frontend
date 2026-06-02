@@ -84,7 +84,7 @@ export default function Home() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-[#c8a84b25] border border-[#c8a84b25]">
           {[
             { icon: '✦', title: 'Criação com IA', desc: 'Descreva seu personagem em palavras e a IA monta a ficha completa com atributos, perícias e história.', rota: '/personagens/criar' },
-            { icon: '◈', title: 'Import de PDF', desc: 'Já tem uma ficha pronta? Importe direto do PDF e ela é lida e organizada automaticamente.', rota: '/personagens/criar' },
+            { icon: '⬢', title: 'Rolar Dados', desc: 'Role dados de qualquer tipo — d4, d6, d8, d10, d12, d20 e d100. Com modificadores e histórico.', rota: '/dados' },
             { icon: '◉', title: 'Habilidades', desc: 'Veja todas as magias, features e perícias com descrições detalhadas geradas pela IA.', rota: '/personagens' },
             { icon: '⬡', title: 'NPCs do Mestre', desc: 'Gere NPCs completos com personalidade, segredos e motivações. Visíveis só para o mestre.', rota: '/mestre' },
             { icon: '📋', title: 'Quadro de Rumores', desc: 'Mural visual de post-its com NPCs, locais e pistas descobertas na sessão. Visível para todos.', rota: '/quadro' },
