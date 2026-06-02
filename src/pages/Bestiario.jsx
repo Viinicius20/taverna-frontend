@@ -26,6 +26,7 @@ export default function Bestiario() {
 
   useEffect(() => {
     buscarMonstros();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [busca, filtroCR, filtroTipo]);
 
   async function buscarMonstros() {
