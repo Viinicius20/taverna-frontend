@@ -492,7 +492,6 @@ function removerAtaque(idx) {
 
 function calcularPericias() {
   const attrs = ficha.attributes || {};
-  const profBonus = ficha.combat?.proficiency_bonus || 2;
   const skillsSalvas = ficha.skills || {};
   
   return Object.entries(PERICIAS_ATTRS).reduce((acc, [skill, attr]) => {
