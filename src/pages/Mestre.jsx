@@ -1053,7 +1053,7 @@ function gerarNome() {
             style={{ ...cinzel, borderRadius: '2px' }}>
             + {p.name}
           </button>
-          <button onClick={() => window.open(`/ficha/${p.id}`, '_blank')}
+          <button onClick={() => window.open(`/personagens/${p.id}`, '_blank')}
             className="text-[#4a4030] hover:text-[#c8a84b] text-xs transition-colors px-1"
             title="Ver ficha">
             👁
