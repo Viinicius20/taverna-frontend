@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { UserProvider } from './context/UserContext'; // ← adiciona
+import { UserProvider } from './context/UserContext'; 
 import Home from './pages/Home';
 import CriarPersonagem from './pages/CriarPersonagem';
 import Personagens from './pages/Personagens';
@@ -8,8 +8,9 @@ import Ficha from './pages/Ficha';
 import RolarDados from './pages/RolarDados';
 import Quadro from './pages/Quadro';
 import Historico from './pages/Historico';
-import Login from './pages/Login'; // ← adiciona
+import Login from './pages/Login'; 
 import Bestiario from './pages/Bestiario';
+import Galeria from './pages/Galeria';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/quadro" element={<Quadro />} />
           <Route path="/historico" element={<Historico />} />
           <Route path="/mestre/bestiario" element={<Bestiario />} />
+          <Route path="/galeria" element={<Galeria />} />
         </Routes>
       </BrowserRouter>
     </UserProvider>

@@ -552,6 +552,10 @@ function gerarNome() {
       className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
       🐉 Bestiário
     </button>
+    <button onClick={() => navigate('/galeria')}
+  className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+  🗺 Galeria
+</button>
     <button onClick={() => navigate('/')}
       className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
       ← Voltar
