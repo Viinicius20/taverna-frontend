@@ -553,11 +553,6 @@ if (!isMestre) {
   const x = ((e.clientX - imgRect.left) / imgRect.width) * 100;
   const y = ((e.clientY - imgRect.top) / imgRect.height) * 100;
 
-
-  const rect = e.currentTarget.getBoundingClientRect();
-  const x = ((e.clientX - rect.left) / rect.width) * 100;
-  const y = ((e.clientY - rect.top) / rect.height) * 100;
-
   try {
     const res = await api.post('/map-tokens', {
       campaign_id: CAMPANHA_ID,
