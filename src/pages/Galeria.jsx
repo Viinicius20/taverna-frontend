@@ -311,25 +311,25 @@ if (!isMestre) {
         ) : imagemRevelada ? (
           <div className="w-full max-w-4xl relative">
             <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4 text-center">O MESTRE REVELOU</p>
-            <div className="relative w-full">
-              <img src={imagemRevelada.url} alt={imagemRevelada.name}
-                className="w-full"
-                style={{ borderRadius: '2px', maxHeight: '80vh', objectFit: 'contain' }} />
-              {tokensNoMapa.map(token => (
-                <img key={token.id} src={token.token_url} alt="token"
-                  style={{
-                    position: 'absolute',
-                    left: `${token.x}%`,
-                    top: `${token.y}%`,
-                    width: '60px',
-                    height: '60px',
-                    objectFit: 'cover',
-                    borderRadius: '50%',
-                    transform: `translate(-50%, -50%) scale(${token.scale || 1}) rotate(${token.rotation || 0}deg)`,
-                    pointerEvents: 'none',
-                  }} />
-              ))}
-            </div>
+            <div className="relative" style={{ display: 'inline-block', width: '100%' }}>
+  <img src={imagemRevelada.url} alt={imagemRevelada.name}
+    className="w-full"
+    style={{ borderRadius: '2px', maxHeight: '80vh', objectFit: 'contain', display: 'block' }} />
+  {tokensNoMapa.map(token => (
+    <img key={token.id} src={token.token_url} alt="token"
+      style={{
+        position: 'absolute',
+        left: `${token.x}%`,
+        top: `${token.y}%`,
+        width: '40px',
+        height: '40px',
+        objectFit: 'cover',
+        borderRadius: '50%',
+        transform: `translate(-50%, -50%) scale(${token.scale || 1}) rotate(${token.rotation || 0}deg)`,
+        pointerEvents: 'none',
+      }} />
+  ))}
+</div>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-4 text-center">
@@ -533,9 +533,26 @@ if (!isMestre) {
     <div className="flex flex-1 overflow-hidden">
       {/* Mapa */}
       <div className="flex-1 relative overflow-hidden"
-        onDragOver={e => e.preventDefault()}
+        onDragEnd={async e => {
+  const mapContainer = e.currentTarget.parentElement;
+  const imgEl = mapContainer.querySelector('img');
+  const imgRect = imgEl.getBoundingClientRect();
+  const x = ((e.clientX - imgRect.left) / imgRect.width) * 100;
+  const y = ((e.clientY - imgRect.top) / imgRect.height) * 100;
+  await api.patch(`/map-tokens/${t.id}/position`, { x, y });
+  setTokensNoMapa(prev => prev.map(tk => tk.id === t.id ? { ...tk, x, y } : tk));
+}}
         onDrop={async e => {
   e.preventDefault();
+  
+  const tokenId = e.dataTransfer.getData('tokenId');
+  const tokenUrl = e.dataTransfer.getData('tokenUrl');
+
+  const imgEl = e.currentTarget.querySelector('img');
+  const imgRect = imgEl.getBoundingClientRect();
+  const x = ((e.clientX - imgRect.left) / imgRect.width) * 100;
+  const y = ((e.clientY - imgRect.top) / imgRect.height) * 100;
+
   
   const tokenId = e.dataTransfer.getData('tokenId');
   // eslint-disable-next-line no-unused-vars
