@@ -351,9 +351,9 @@ export default function Galeria() {
   map_id: mapaAtivo.id,
   token_id: tokenId,
   token_url: tokenUrl,
-  x: Math.round(x),           // arredonda para inteiro
-  y: Math.round(y),           // arredonda para inteiro
-  label: label || ""          // evita undefined
+  x: Math.round(x || 0),
+  y: Math.round(y || 0),
+  label: ''   // ou você pode colocar um nome se quiser
 });
           setTokensNoMapa(prev => [...prev, res.data.data]);
         }}>
