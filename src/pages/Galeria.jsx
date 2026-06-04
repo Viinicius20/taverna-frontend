@@ -347,12 +347,14 @@ export default function Galeria() {
           const x = ((e.clientX - rect.left) / rect.width) * 100;
           const y = ((e.clientY - rect.top) / rect.height) * 100;
           const res = await api.post('/map-tokens', {
-            campaign_id: CAMPANHA_ID,
-            map_id: mapaAtivo.id,
-            token_id: tokenId,
-            token_url: tokenUrl,
-            x, y, label: ''
-          });
+  campaign_id: CAMPANHA_ID,
+  map_id: mapaAtivo.id,
+  token_id: tokenId,
+  token_url: tokenUrl,
+  x: Math.round(x),           // arredonda para inteiro
+  y: Math.round(y),           // arredonda para inteiro
+  label: label || ""          // evita undefined
+});
           setTokensNoMapa(prev => [...prev, res.data.data]);
         }}>
         <img src={mapaAtivo.url} alt={mapaAtivo.name} className="w-full h-full object-contain" />
