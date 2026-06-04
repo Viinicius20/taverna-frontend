@@ -350,14 +350,9 @@ export default function Galeria() {
   campaign_id: CAMPANHA_ID,
   map_id: mapaAtivo.id,
   token_id: tokenId,
-  token_url: tokenUrl,
   x: Math.round(x),
   y: Math.round(y),
-  label: '',
-  rotation: 0,
-  scale: 1.0,
-  is_visible: true,
-  z_index: 1
+  label: ''
 });
           setTokensNoMapa(prev => [...prev, res.data.data]);
         }}>
