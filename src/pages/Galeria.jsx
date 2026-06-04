@@ -34,6 +34,9 @@ export default function Galeria() {
   const [rotatingTokenId, setRotatingTokenId] = useState(null);
   const [initialAngle, setInitialAngle] = useState(0);
   const [initialMouseAngle, setInitialMouseAngle] = useState(0);
+  const [resizingTokenId, setResizingTokenId] = useState(null);
+  const [initialScale, setInitialScale] = useState(1);
+  const [initialDistance, setInitialDistance] = useState(0);
 
   useEffect(() => {
     buscarImagens();
@@ -113,14 +116,16 @@ export default function Galeria() {
   const categorias = [...new Set(tokens.map(t => t.category).filter(Boolean))];
   const tokensFiltrados = categoriaAtiva ? tokens.filter(t => t.category === categoriaAtiva) : tokens;
 
-// ======================== FUNÇÕES DE ROTAÇÃO ========================
+// ======================== FUNÇÕES DE INTERAÇÃO COM TOKENS ========================
 
+// Função auxiliar
 const getMouseAngle = (mouseX, mouseY, centerX, centerY) => {
   const dx = mouseX - centerX;
   const dy = mouseY - centerY;
   return Math.atan2(dy, dx) * (180 / Math.PI);
 };
 
+// ==================== ROTAÇÃO ====================
 const handleRotationStart = (e, tokenId) => {
   e.stopPropagation();
   e.preventDefault();
@@ -167,7 +172,7 @@ const handleRotationMove = (e) => {
 };
 
 const handleRotationEnd = async () => {
-  if (!rotatingTokenId) return;
+  if (!rotatingTokenId) return
 
   const tokenElement = document.querySelector(`[data-token-id="${rotatingTokenId}"]`);
   if (!tokenElement) return;
@@ -199,6 +204,83 @@ const handleRotationEnd = async () => {
 
   document.removeEventListener('mousemove', handleRotationMove);
   document.removeEventListener('mouseup', handleRotationEnd);
+};
+
+// ==================== RESIZE / ESCALA ====================
+const [resizingTokenId, setResizingTokenId] = useState(null);   // ← adicione este estado também
+const [initialScale, setInitialScale] = useState(1);
+const [initialDistance, setInitialDistance] = useState(0);
+
+const handleResizeStart = (e, tokenId) => {
+  e.stopPropagation();
+  e.preventDefault();
+
+  const token = tokensNoMapa.find(t => t.id === tokenId);
+  if (!token) return;
+
+  setResizingTokenId(tokenId);
+  setInitialScale(token.scale || 1);
+
+  const tokenElement = e.currentTarget.closest(`[data-token-id="${tokenId}"]`);
+  const rect = tokenElement.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  const startDistance = Math.hypot(e.clientX - centerX, e.clientY - centerY);
+  setInitialDistance(startDistance);
+
+  document.addEventListener('mousemove', handleResizeMove);
+  document.addEventListener('mouseup', handleResizeEnd);
+};
+
+const handleResizeMove = (e) => {
+  if (!resizingTokenId) return;
+
+  const tokenElement = document.querySelector(`[data-token-id="${resizingTokenId}"]`);
+  if (!tokenElement) return;
+
+  const rect = tokenElement.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  const currentDistance = Math.hypot(e.clientX - centerX, e.clientY - centerY);
+  
+  let newScale = initialScale * (currentDistance / initialDistance);
+  newScale = Math.max(0.3, Math.min(newScale, 5)); // limites
+
+  const currentRotation = tokensNoMapa.find(t => t.id === resizingTokenId)?.rotation || 0;
+
+  tokenElement.style.transform = `translate(-50%, -50%) scale(${newScale}) rotate(${currentRotation}deg)`;
+};
+
+const handleResizeEnd = async () => {
+  if (!resizingTokenId) return;
+
+  const tokenElement = document.querySelector(`[data-token-id="${resizingTokenId}"]`);
+  if (!tokenElement) return;
+
+  const transform = tokenElement.style.transform;
+  const scaleMatch = transform.match(/scale\(([^)]+)\)/);
+  const finalScale = scaleMatch ? parseFloat(scaleMatch[1]) : 1;
+
+  try {
+    await api.patch(`/map-tokens/${resizingTokenId}/scale`, { 
+      scale: parseFloat(finalScale.toFixed(2)) 
+    });
+
+    setTokensNoMapa(prev => 
+      prev.map(t => t.id === resizingTokenId 
+        ? { ...t, scale: parseFloat(finalScale.toFixed(2)) } 
+        : t
+      )
+    );
+  } catch (error) {
+    console.error("Erro ao salvar escala:", error);
+  }
+
+  setResizingTokenId(null);
+  document.removeEventListener('mousemove', handleResizeMove);
+  document.removeEventListener('mouseup', handleResizeEnd);
 };
 
   // VISÃO DO JOGADOR
@@ -496,6 +578,14 @@ const handleRotationEnd = async () => {
                 onMouseDown={(e) => handleRotationStart(e, t.id)}
               >
                 ↻
+              </div>
+
+              {/* Novo: Alça de Resize (Escala) */}
+              <div 
+                className="absolute bottom-[-8px] right-[-8px] w-5 h-5 bg-green-500 hover:bg-green-600 rounded-full border-2 border-white cursor-nwse-resize shadow-lg z-20"
+                onMouseDown={(e) => handleResizeStart(e, t.id)}
+              >
+                ⤢
               </div>
 
               {/* Label */}
