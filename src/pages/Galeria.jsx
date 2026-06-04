@@ -1,8 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useUser } from '../context/UserContext';
-import { useState, useEffect, useRef, useCallback } from 'react';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const CAMPANHA_ID = '00000000-0000-0000-0000-000000000001';
