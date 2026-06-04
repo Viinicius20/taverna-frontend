@@ -113,6 +113,8 @@ export default function Galeria() {
   const categorias = [...new Set(tokens.map(t => t.category).filter(Boolean))];
   const tokensFiltrados = categoriaAtiva ? tokens.filter(t => t.category === categoriaAtiva) : tokens;
 
+// ======================== FUNÇÕES DE ROTAÇÃO ========================
+
 const getMouseAngle = useCallback((mouseX, mouseY, centerX, centerY) => {
   const dx = mouseX - centerX;
   const dy = mouseY - centerY;
@@ -142,7 +144,7 @@ const handleRotationStart = useCallback((e, tokenId) => {
 
   document.addEventListener('mousemove', handleRotationMove);
   document.addEventListener('mouseup', handleRotationEnd);
-}, [tokensNoMapa, getMouseAngle]);
+}, [tokensNoMapa, getMouseAngle]);   // ← removemos as funções aqui
 
 const handleRotationMove = useCallback((e) => {
   if (!rotatingTokenId) return;
@@ -174,7 +176,6 @@ const handleRotationEnd = useCallback(async () => {
   const match = transform.match(/rotate\(([^)]+)deg\)/);
   let finalRotation = match ? parseFloat(match[1]) : 0;
 
-  // Normaliza entre 0 e 360
   finalRotation = ((finalRotation % 360) + 360) % 360;
 
   try {
@@ -192,7 +193,6 @@ const handleRotationEnd = useCallback(async () => {
     console.error("Erro ao salvar rotação:", error);
   }
 
-  // Limpeza
   setRotatingTokenId(null);
   setInitialAngle(0);
   setInitialMouseAngle(0);
