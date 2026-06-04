@@ -29,9 +29,8 @@ export default function Galeria() {
   const fileRef = useRef();
   const isMestre = user?.role === 'mestre';
   const [modoMapa, setModoMapa] = useState(false);
-    const [mapaAtivo, setMapaAtivo] = useState(null);
-    const [tokensNoMapa, setTokensNoMapa] = useState([]);
-    const [tokenArrastando, setTokenArrastando] = useState(null);
+  const [mapaAtivo, setMapaAtivo] = useState(null);
+  const [tokensNoMapa, setTokensNoMapa] = useState([]);
 
   useEffect(() => {
     buscarImagens();
