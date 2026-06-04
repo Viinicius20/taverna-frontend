@@ -207,10 +207,6 @@ const handleRotationEnd = async () => {
 };
 
 // ==================== RESIZE / ESCALA ====================
-const [resizingTokenId, setResizingTokenId] = useState(null);   // ← adicione este estado também
-const [initialScale, setInitialScale] = useState(1);
-const [initialDistance, setInitialDistance] = useState(0);
-
 const handleResizeStart = (e, tokenId) => {
   e.stopPropagation();
   e.preventDefault();
