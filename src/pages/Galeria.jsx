@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useUser } from '../context/UserContext';
@@ -115,13 +115,13 @@ export default function Galeria() {
 
 // ======================== FUNÇÕES DE ROTAÇÃO ========================
 
-const getMouseAngle = useCallback((mouseX, mouseY, centerX, centerY) => {
+const getMouseAngle = (mouseX, mouseY, centerX, centerY) => {
   const dx = mouseX - centerX;
   const dy = mouseY - centerY;
   return Math.atan2(dy, dx) * (180 / Math.PI);
-}, []);
+};
 
-const handleRotationStart = useCallback((e, tokenId) => {
+const handleRotationStart = (e, tokenId) => {
   e.stopPropagation();
   e.preventDefault();
 
@@ -144,10 +144,9 @@ const handleRotationStart = useCallback((e, tokenId) => {
 
   document.addEventListener('mousemove', handleRotationMove);
   document.addEventListener('mouseup', handleRotationEnd);
-}, [tokensNoMapa, getMouseAngle]);
-// eslint-disable-next-line react-hooks/exhaustive-deps
+};
 
-const handleRotationMove = useCallback((e) => {
+const handleRotationMove = (e) => {
   if (!rotatingTokenId) return;
 
   const tokenElement = document.querySelector(`[data-token-id="${rotatingTokenId}"]`);
@@ -165,9 +164,9 @@ const handleRotationMove = useCallback((e) => {
   const scale = currentToken?.scale || 1;
 
   tokenElement.style.transform = `translate(-50%, -50%) scale(${scale}) rotate(${newRotation}deg)`;
-}, [rotatingTokenId, tokensNoMapa, initialAngle, initialMouseAngle, getMouseAngle]);
+};
 
-const handleRotationEnd = useCallback(async () => {
+const handleRotationEnd = async () => {
   if (!rotatingTokenId) return;
 
   const tokenElement = document.querySelector(`[data-token-id="${rotatingTokenId}"]`);
@@ -200,8 +199,7 @@ const handleRotationEnd = useCallback(async () => {
 
   document.removeEventListener('mousemove', handleRotationMove);
   document.removeEventListener('mouseup', handleRotationEnd);
-}, [rotatingTokenId, tokensNoMapa]);
-// eslint-disable-next-line react-hooks/exhaustive-deps
+};
 
   // VISÃO DO JOGADOR
   if (!isMestre) {
