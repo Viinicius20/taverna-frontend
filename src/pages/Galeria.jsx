@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useUser } from '../context/UserContext';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const CAMPANHA_ID = '00000000-0000-0000-0000-000000000001';
@@ -31,6 +32,9 @@ export default function Galeria() {
   const [modoMapa, setModoMapa] = useState(false);
   const [mapaAtivo, setMapaAtivo] = useState(null);
   const [tokensNoMapa, setTokensNoMapa] = useState([]);
+  const [rotatingTokenId, setRotatingTokenId] = useState(null);
+  const [initialAngle, setInitialAngle] = useState(0);
+  const [initialMouseAngle, setInitialMouseAngle] = useState(0);
 
   useEffect(() => {
     buscarImagens();
@@ -109,6 +113,94 @@ export default function Galeria() {
   const tokens = imagens.filter(i => i.type === 'token');
   const categorias = [...new Set(tokens.map(t => t.category).filter(Boolean))];
   const tokensFiltrados = categoriaAtiva ? tokens.filter(t => t.category === categoriaAtiva) : tokens;
+
+const getMouseAngle = useCallback((mouseX, mouseY, centerX, centerY) => {
+  const dx = mouseX - centerX;
+  const dy = mouseY - centerY;
+  return Math.atan2(dy, dx) * (180 / Math.PI);
+}, []);
+
+const handleRotationStart = useCallback((e, tokenId) => {
+  e.stopPropagation();
+  e.preventDefault();
+
+  const token = tokensNoMapa.find(t => t.id === tokenId);
+  if (!token) return;
+
+  setRotatingTokenId(tokenId);
+
+  const tokenElement = e.currentTarget.closest(`[data-token-id="${tokenId}"]`);
+  if (!tokenElement) return;
+
+  const rect = tokenElement.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  const mouseAngle = getMouseAngle(e.clientX, e.clientY, centerX, centerY);
+
+  setInitialMouseAngle(mouseAngle);
+  setInitialAngle(token.rotation || 0);
+
+  document.addEventListener('mousemove', handleRotationMove);
+  document.addEventListener('mouseup', handleRotationEnd);
+}, [tokensNoMapa, getMouseAngle]);
+
+const handleRotationMove = useCallback((e) => {
+  if (!rotatingTokenId) return;
+
+  const tokenElement = document.querySelector(`[data-token-id="${rotatingTokenId}"]`);
+  if (!tokenElement) return;
+
+  const rect = tokenElement.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  const currentMouseAngle = getMouseAngle(e.clientX, e.clientY, centerX, centerY);
+
+  let newRotation = initialAngle + (currentMouseAngle - initialMouseAngle);
+
+  const currentToken = tokensNoMapa.find(t => t.id === rotatingTokenId);
+  const scale = currentToken?.scale || 1;
+
+  tokenElement.style.transform = `translate(-50%, -50%) scale(${scale}) rotate(${newRotation}deg)`;
+}, [rotatingTokenId, tokensNoMapa, initialAngle, initialMouseAngle, getMouseAngle]);
+
+const handleRotationEnd = useCallback(async () => {
+  if (!rotatingTokenId) return;
+
+  const tokenElement = document.querySelector(`[data-token-id="${rotatingTokenId}"]`);
+  if (!tokenElement) return;
+
+  const transform = tokenElement.style.transform;
+  const match = transform.match(/rotate\(([^)]+)deg\)/);
+  let finalRotation = match ? parseFloat(match[1]) : 0;
+
+  // Normaliza entre 0 e 360
+  finalRotation = ((finalRotation % 360) + 360) % 360;
+
+  try {
+    await api.patch(`/map-tokens/${rotatingTokenId}/rotation`, { 
+      rotation: Math.round(finalRotation) 
+    });
+
+    setTokensNoMapa(prev => 
+      prev.map(t => t.id === rotatingTokenId 
+        ? { ...t, rotation: Math.round(finalRotation) } 
+        : t
+      )
+    );
+  } catch (error) {
+    console.error("Erro ao salvar rotação:", error);
+  }
+
+  // Limpeza
+  setRotatingTokenId(null);
+  setInitialAngle(0);
+  setInitialMouseAngle(0);
+
+  document.removeEventListener('mousemove', handleRotationMove);
+  document.removeEventListener('mouseup', handleRotationEnd);
+}, [rotatingTokenId, tokensNoMapa]);
 
   // VISÃO DO JOGADOR
   if (!isMestre) {
@@ -358,7 +450,9 @@ export default function Galeria() {
       token_url: tokenUrl,
       x: Math.round(x),
       y: Math.round(y),
-      label: ''
+      label: '',
+      scale: 1.0,      
+      rotation: 0      
     });
 
     setTokensNoMapa(prev => [...prev, res.data.data]);
@@ -367,9 +461,19 @@ export default function Galeria() {
   }
 }}>
         <img src={mapaAtivo.url} alt={mapaAtivo.name} className="w-full h-full object-contain" />
-        {tokensNoMapa.map(t => (
-          <div key={t.id}
-            style={{ position: 'absolute', left: `${t.x}%`, top: `${t.y}%`, transform: 'translate(-50%, -50%)', cursor: 'grab' }}
+                {tokensNoMapa.map(t => (
+          <div 
+            key={t.id}
+            data-token-id={t.id}
+            style={{ 
+              position: 'absolute', 
+              left: `${t.x}%`, 
+              top: `${t.y}%`, 
+              transform: `translate(-50%, -50%) scale(${t.scale || 1}) rotate(${t.rotation || 0}deg)`,
+              transformOrigin: 'center',
+              cursor: 'grab',
+              pointerEvents: 'auto'
+            }}
             draggable
             onDragEnd={async e => {
               const rect = e.currentTarget.parentElement.getBoundingClientRect();
@@ -377,14 +481,38 @@ export default function Galeria() {
               const y = ((e.clientY - rect.top) / rect.height) * 100;
               await api.patch(`/map-tokens/${t.id}/position`, { x, y });
               setTokensNoMapa(prev => prev.map(tk => tk.id === t.id ? { ...tk, x, y } : tk));
-            }}>
+            }}
+          >
             <div className="relative">
-              <img src={t.token_url} alt="" className="w-10 h-10 rounded-full border-2 border-[#c8a84b]" />
+              {/* Imagem do Token */}
+              <img 
+                src={t.token_url} 
+                alt="" 
+                className="w-10 h-10 rounded-full border-2 border-[#c8a84b]" 
+              />
+
+              {/* Alça de Rotação */}
+              <div 
+                className="absolute -top-6 left-1/2 -translate-x-1/2 w-6 h-6 bg-blue-500 hover:bg-blue-600 rounded-full border-2 border-white cursor-pointer flex items-center justify-center text-sm shadow-lg z-20 select-none"
+                onMouseDown={(e) => handleRotationStart(e, t.id)}
+              >
+                ↻
+              </div>
+
+              {/* Label */}
               {t.label && (
-                <p style={cinzel} className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-white text-xs whitespace-nowrap bg-black bg-opacity-70 px-1">{t.label}</p>
+                <p style={cinzel} className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-white text-xs whitespace-nowrap bg-black bg-opacity-70 px-1">
+                  {t.label}
+                </p>
               )}
-              <button onClick={() => api.delete(`/map-tokens/${t.id}`).then(() => setTokensNoMapa(prev => prev.filter(tk => tk.id !== t.id)))}
-                className="absolute -top-1 -right-1 w-4 h-4 bg-red-900 text-white text-xs rounded-full flex items-center justify-center">×</button>
+
+              {/* Botão Deletar */}
+              <button 
+                onClick={() => api.delete(`/map-tokens/${t.id}`).then(() => setTokensNoMapa(prev => prev.filter(tk => tk.id !== t.id)))}
+                className="absolute -top-1 -right-1 w-4 h-4 bg-red-900 text-white text-xs rounded-full flex items-center justify-center"
+              >
+                ×
+              </button>
             </div>
           </div>
         ))}
