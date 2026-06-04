@@ -27,7 +27,7 @@ export default function Galeria() {
 
   async function buscarImagens() {
     try {
-      const res = await api.get('/gallery');
+      const res = await api.get('/gallery', { params: { campaign_id: CAMPANHA_ID } });
       const todas = res.data.data || [];
       setImagens(todas);
       setImagemRevelada(todas.find(i => i.revealed) || null);
@@ -46,9 +46,9 @@ export default function Galeria() {
       formData.append('file', file);
       formData.append('campaign_id', CAMPANHA_ID);
       formData.append('type', 'map');
-      await api.post('/gallery/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      await api.post(`/gallery/upload?campaign_id=${CAMPANHA_ID}`, formData, {
+  headers: { 'Content-Type': 'multipart/form-data' }
+});
       buscarImagens();
     } catch {
       alert('Erro ao fazer upload.');
