@@ -39,12 +39,21 @@ export default function Galeria() {
   const [initialDistance, setInitialDistance] = useState(0);
 
   useEffect(() => {
-    buscarImagens();
-    if (!isMestre) {
-      const interval = setInterval(buscarImagens, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [isMestre]);
+  buscarImagens();
+  if (!isMestre) {
+    const interval = setInterval(async () => {
+      const res = await api.get('/gallery', { params: { campaign_id: CAMPANHA_ID } });
+      const todas = res.data.data || [];
+      setImagens(todas);
+      const revelada = todas.find(i => i.revealed);
+      setImagemRevelada(revelada || null);
+      if (revelada) {
+        buscarTokensNoMapa(revelada.id);
+      }
+    }, 3000);
+    return () => clearInterval(interval);
+  }
+}, [isMestre]);
 
   async function buscarImagens() {
     try {
@@ -283,49 +292,63 @@ const handleResizeEnd = async () => {
 };
 
   // VISÃO DO JOGADOR
-  if (!isMestre) {
-    return (
-      <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] flex flex-col">
-        <nav className="flex items-center justify-between px-8 py-4 border-b border-[#c8a84b20]">
-          <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
-            onClick={() => navigate('/')}>⚔ TAVERNA</span>
-          <button onClick={() => navigate(-1)} style={cinzel}
-            className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors">← Voltar</button>
-        </nav>
+if (!isMestre) {
+  return (
+    <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] flex flex-col">
+      <nav className="flex items-center justify-between px-8 py-4 border-b border-[#c8a84b20]">
+        <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
+          onClick={() => navigate('/')}>⚔ TAVERNA</span>
+        <button onClick={() => navigate(-1)} style={cinzel}
+          className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors">← Voltar</button>
+      </nav>
 
-        <div className="flex-1 flex flex-col items-center justify-center px-4">
-          {carregando ? (
-            <div className="flex flex-col items-center gap-4">
-              <div className="w-8 h-8 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-              <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">AGUARDANDO...</p>
-            </div>
-          ) : imagemRevelada ? (
-            <div className="w-full max-w-4xl">
-              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4 text-center">O MESTRE REVELOU</p>
+      <div className="flex-1 flex flex-col items-center justify-center px-4">
+        {carregando ? (
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-8 h-8 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
+            <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">AGUARDANDO...</p>
+          </div>
+        ) : imagemRevelada ? (
+          <div className="w-full max-w-4xl relative">
+            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4 text-center">O MESTRE REVELOU</p>
+            <div className="relative w-full">
               <img src={imagemRevelada.url} alt={imagemRevelada.name}
-                className="w-full cursor-pointer"
-                style={{ borderRadius: '2px', maxHeight: '80vh', objectFit: 'contain' }}
-                onClick={() => setImagemAberta(imagemRevelada)} />
-              <p style={cinzel} className="text-[#4a4030] text-xs text-center mt-3">Clique para expandir</p>
+                className="w-full"
+                style={{ borderRadius: '2px', maxHeight: '80vh', objectFit: 'contain' }} />
+              {tokensNoMapa.map(token => (
+                <img key={token.id} src={token.token_url} alt="token"
+                  style={{
+                    position: 'absolute',
+                    left: `${token.x}%`,
+                    top: `${token.y}%`,
+                    width: '60px',
+                    height: '60px',
+                    objectFit: 'cover',
+                    borderRadius: '50%',
+                    transform: `translate(-50%, -50%) scale(${token.scale || 1}) rotate(${token.rotation || 0}deg)`,
+                    pointerEvents: 'none',
+                  }} />
+              ))}
             </div>
-          ) : (
-            <div className="flex flex-col items-center gap-4 text-center">
-              <span className="text-4xl opacity-20">🗺</span>
-              <p style={cinzel} className="text-[#4a4030] text-sm tracking-widest">NENHUMA IMAGEM REVELADA</p>
-              <p className="text-[#3a3020] text-xs">Aguarde o Mestre revelar algo...</p>
-            </div>
-          )}
-        </div>
-
-        {imagemAberta && (
-          <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50"
-            onClick={() => setImagemAberta(null)}>
-            <img src={imagemAberta.url} alt={imagemAberta.name} className="max-w-full max-h-full object-contain" />
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-4 text-center">
+            <span className="text-4xl opacity-20">🗺</span>
+            <p style={cinzel} className="text-[#4a4030] text-sm tracking-widest">NENHUMA IMAGEM REVELADA</p>
+            <p className="text-[#3a3020] text-xs">Aguarde o Mestre revelar algo...</p>
           </div>
         )}
       </div>
-    );
-  }
+
+      {imagemAberta && (
+        <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50"
+          onClick={() => setImagemAberta(null)}>
+          <img src={imagemAberta.url} alt={imagemAberta.name} className="max-w-full max-h-full object-contain" />
+        </div>
+      )}
+    </div>
+  );
+}
 
   // VISÃO DO MESTRE
   return (
