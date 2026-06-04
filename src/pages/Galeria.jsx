@@ -553,10 +553,6 @@ if (!isMestre) {
   const x = ((e.clientX - imgRect.left) / imgRect.width) * 100;
   const y = ((e.clientY - imgRect.top) / imgRect.height) * 100;
 
-  
-  const tokenId = e.dataTransfer.getData('tokenId');
-  // eslint-disable-next-line no-unused-vars
-  const tokenUrl = e.dataTransfer.getData('tokenUrl');
 
   const rect = e.currentTarget.getBoundingClientRect();
   const x = ((e.clientX - rect.left) / rect.width) * 100;
