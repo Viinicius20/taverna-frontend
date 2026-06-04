@@ -533,109 +533,83 @@ if (!isMestre) {
     <div className="flex flex-1 overflow-hidden">
       {/* Mapa */}
       <div className="flex-1 relative overflow-hidden"
-        onDragEnd={async e => {
-  const mapContainer = e.currentTarget.parentElement;
-  const imgEl = mapContainer.querySelector('img');
-  const imgRect = imgEl.getBoundingClientRect();
-  const x = ((e.clientX - imgRect.left) / imgRect.width) * 100;
-  const y = ((e.clientY - imgRect.top) / imgRect.height) * 100;
-  await api.patch(`/map-tokens/${t.id}/position`, { x, y });
-  setTokensNoMapa(prev => prev.map(tk => tk.id === t.id ? { ...tk, x, y } : tk));
-}}
-        onDrop={async e => {
-  e.preventDefault();
-  
-  const tokenId = e.dataTransfer.getData('tokenId');
-  const tokenUrl = e.dataTransfer.getData('tokenUrl');
-
-  const imgEl = e.currentTarget.querySelector('img');
-  const imgRect = imgEl.getBoundingClientRect();
-  const x = ((e.clientX - imgRect.left) / imgRect.width) * 100;
-  const y = ((e.clientY - imgRect.top) / imgRect.height) * 100;
-
-  try {
-    const res = await api.post('/map-tokens', {
-      campaign_id: CAMPANHA_ID,
-      map_id: mapaAtivo.id,
-      token_id: tokenId,
-      token_url: tokenUrl,
-      x: Math.round(x),
-      y: Math.round(y),
-      label: '',
-      scale: 1.0,      
-      rotation: 0      
-    });
-
-    setTokensNoMapa(prev => [...prev, res.data.data]);
-  } catch (error) {
-    console.error("Erro ao adicionar token:", error);
-  }
-}}>
-        <img src={mapaAtivo.url} alt={mapaAtivo.name} className="w-full h-full object-contain" />
-                {tokensNoMapa.map(t => (
-          <div 
-            key={t.id}
-            data-token-id={t.id}
-            style={{ 
-              position: 'absolute', 
-              left: `${t.x}%`, 
-              top: `${t.y}%`, 
-              transform: `translate(-50%, -50%) scale(${t.scale || 1}) rotate(${t.rotation || 0}deg)`,
-              transformOrigin: 'center',
-              cursor: 'grab',
-              pointerEvents: 'auto'
-            }}
-            draggable
-            onDragEnd={async e => {
-              const rect = e.currentTarget.parentElement.getBoundingClientRect();
-              const x = ((e.clientX - rect.left) / rect.width) * 100;
-              const y = ((e.clientY - rect.top) / rect.height) * 100;
-              await api.patch(`/map-tokens/${t.id}/position`, { x, y });
-              setTokensNoMapa(prev => prev.map(tk => tk.id === t.id ? { ...tk, x, y } : tk));
-            }}
-          >
-            <div className="relative">
-              {/* Imagem do Token */}
-              <img 
-                src={t.token_url} 
-                alt="" 
-                className="w-10 h-10 rounded-full border-2 border-[#c8a84b]" 
-              />
-
-              {/* Alça de Rotação */}
-              <div 
-                className="absolute -top-6 left-1/2 -translate-x-1/2 w-6 h-6 bg-blue-500 hover:bg-blue-600 rounded-full border-2 border-white cursor-pointer flex items-center justify-center text-sm shadow-lg z-20 select-none"
-                onMouseDown={(e) => handleRotationStart(e, t.id)}
-              >
-                ↻
-              </div>
-
-              {/* Novo: Alça de Resize (Escala) */}
-              <div 
-                className="absolute bottom-[-8px] right-[-8px] w-5 h-5 bg-green-500 hover:bg-green-600 rounded-full border-2 border-white cursor-nwse-resize shadow-lg z-20"
-                onMouseDown={(e) => handleResizeStart(e, t.id)}
-              >
-                ⤢
-              </div>
-
-              {/* Label */}
-              {t.label && (
-                <p style={cinzel} className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-white text-xs whitespace-nowrap bg-black bg-opacity-70 px-1">
-                  {t.label}
-                </p>
-              )}
-
-              {/* Botão Deletar */}
-              <button 
-                onClick={() => api.delete(`/map-tokens/${t.id}`).then(() => setTokensNoMapa(prev => prev.filter(tk => tk.id !== t.id)))}
-                className="absolute -top-1 -right-1 w-4 h-4 bg-red-900 text-white text-xs rounded-full flex items-center justify-center"
-              >
-                ×
-              </button>
-            </div>
-          </div>
-        ))}
+  onDragOver={e => e.preventDefault()}
+  onDrop={async e => {
+    e.preventDefault();
+    const tokenId = e.dataTransfer.getData('tokenId');
+    const tokenUrl = e.dataTransfer.getData('tokenUrl');
+    const imgEl = e.currentTarget.querySelector('img');
+    const imgRect = imgEl.getBoundingClientRect();
+    const x = ((e.clientX - imgRect.left) / imgRect.width) * 100;
+    const y = ((e.clientY - imgRect.top) / imgRect.height) * 100;
+    try {
+      const res = await api.post('/map-tokens', {
+        campaign_id: CAMPANHA_ID,
+        map_id: mapaAtivo.id,
+        token_id: tokenId,
+        token_url: tokenUrl,
+        x: Math.round(x),
+        y: Math.round(y),
+        label: '',
+        scale: 1.0,
+        rotation: 0
+      });
+      setTokensNoMapa(prev => [...prev, res.data.data]);
+    } catch (error) {
+      console.error("Erro ao adicionar token:", error);
+    }
+  }}>
+  <img src={mapaAtivo.url} alt={mapaAtivo.name} className="w-full h-full object-contain" />
+  {tokensNoMapa.map(t => (
+    <div
+      key={t.id}
+      data-token-id={t.id}
+      style={{
+        position: 'absolute',
+        left: `${t.x}%`,
+        top: `${t.y}%`,
+        transform: `translate(-50%, -50%) scale(${t.scale || 1}) rotate(${t.rotation || 0}deg)`,
+        transformOrigin: 'center',
+        cursor: 'grab',
+        pointerEvents: 'auto'
+      }}
+      draggable
+      onDragEnd={async e => {
+        const mapContainer = e.currentTarget.parentElement;
+        const imgEl = mapContainer.querySelector('img');
+        const imgRect = imgEl.getBoundingClientRect();
+        const x = ((e.clientX - imgRect.left) / imgRect.width) * 100;
+        const y = ((e.clientY - imgRect.top) / imgRect.height) * 100;
+        await api.patch(`/map-tokens/${t.id}/position`, { x, y });
+        setTokensNoMapa(prev => prev.map(tk => tk.id === t.id ? { ...tk, x, y } : tk));
+      }}
+    >
+      <div className="relative">
+        <img src={t.token_url} alt="" className="w-10 h-10 rounded-full border-2 border-[#c8a84b]" />
+        <div
+          className="absolute -top-6 left-1/2 -translate-x-1/2 w-6 h-6 bg-blue-500 hover:bg-blue-600 rounded-full border-2 border-white cursor-pointer flex items-center justify-center text-sm shadow-lg z-20 select-none"
+          onMouseDown={(e) => handleRotationStart(e, t.id)}>
+          ↻
+        </div>
+        <div
+          className="absolute bottom-[-8px] right-[-8px] w-5 h-5 bg-green-500 hover:bg-green-600 rounded-full border-2 border-white cursor-nwse-resize shadow-lg z-20"
+          onMouseDown={(e) => handleResizeStart(e, t.id)}>
+          ⤢
+        </div>
+        {t.label && (
+          <p style={cinzel} className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-white text-xs whitespace-nowrap bg-black bg-opacity-70 px-1">
+            {t.label}
+          </p>
+        )}
+        <button
+          onClick={() => api.delete(`/map-tokens/${t.id}`).then(() => setTokensNoMapa(prev => prev.filter(tk => tk.id !== t.id)))}
+          className="absolute -top-1 -right-1 w-4 h-4 bg-red-900 text-white text-xs rounded-full flex items-center justify-center">
+          ×
+        </button>
       </div>
+    </div>
+  ))}
+</div>
 
       {/* Sidebar tokens */}
       <div className="w-48 bg-[#161410] border-l border-[#c8a84b20] overflow-y-auto p-3">
