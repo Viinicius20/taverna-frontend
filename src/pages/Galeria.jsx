@@ -27,7 +27,7 @@ export default function Galeria() {
 
   async function buscarImagens() {
     try {
-      const res = await api.get('/gallery', { params: { campaign_id: CAMPANHA_ID } });
+      const res = await api.get('/gallery');
       const todas = res.data.data || [];
       setImagens(todas);
       setImagemRevelada(todas.find(i => i.revealed) || null);
