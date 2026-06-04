@@ -50,10 +50,11 @@ export default function Galeria() {
   }
 
   async function uploadImagem(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    setUploading(true);
-    try {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+  setUploading(true);
+  try {
+    for (const file of files) {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('type', aba === 'tokens' ? 'token' : 'map');
@@ -61,13 +62,14 @@ export default function Galeria() {
       await api.post(`/gallery/upload?campaign_id=${CAMPANHA_ID}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      buscarImagens();
-    } catch {
-      alert('Erro ao fazer upload.');
     }
-    setUploading(false);
-    fileRef.current.value = '';
+    buscarImagens();
+  } catch {
+    alert('Erro ao fazer upload.');
   }
+  setUploading(false);
+  fileRef.current.value = '';
+}
 
   async function revelarImagem(id) {
     try {
@@ -163,7 +165,7 @@ export default function Galeria() {
           <label className="bg-[#c8a84b] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors cursor-pointer"
             style={{ ...cinzel, borderRadius: '2px' }}>
             {uploading ? '⟳ ENVIANDO...' : '+ UPLOAD'}
-            <input ref={fileRef} type="file" accept="image/*" onChange={uploadImagem} className="hidden" />
+            <input ref={fileRef} type="file" accept="image/*" multiple onChange={uploadImagem} className="hidden" />
           </label>
         </div>
       </nav>
