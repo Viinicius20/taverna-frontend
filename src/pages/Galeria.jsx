@@ -28,6 +28,10 @@ export default function Galeria() {
   const [uploadCategoria, setUploadCategoria] = useState('Outro');
   const fileRef = useRef();
   const isMestre = user?.role === 'mestre';
+  const [modoMapa, setModoMapa] = useState(false);
+    const [mapaAtivo, setMapaAtivo] = useState(null);
+    const [tokensNoMapa, setTokensNoMapa] = useState([]);
+    const [tokenArrastando, setTokenArrastando] = useState(null);
 
   useEffect(() => {
     buscarImagens();
@@ -84,6 +88,15 @@ export default function Galeria() {
       buscarImagens();
     } catch {}
   }
+
+  async function buscarTokensNoMapa(mapId) {
+  try {
+    const res = await api.get(`/map-tokens/${CAMPANHA_ID}`);
+    setTokensNoMapa(res.data.data.filter(t => t.map_id === mapId));
+  } catch {
+    setTokensNoMapa([]);
+  }
+}
 
   async function deletarImagem(id) {
     if (!window.confirm('Deletar esta imagem?')) return;
@@ -229,19 +242,22 @@ export default function Galeria() {
                     <div className="p-3">
                       <p style={cinzel} className="text-[#6a6050] text-xs truncate mb-2">{img.name}</p>
                       <div className="flex gap-2">
-                        {img.revealed ? (
-                          <button onClick={() => esconderImagem(img.id)}
-                            className="flex-1 border border-[#c8a84b30] text-[#4a4030] py-1.5 text-xs hover:border-[#c8a84b60] hover:text-[#c8a84b] transition-colors"
-                            style={{ ...cinzel, borderRadius: '2px' }}>Esconder</button>
-                        ) : (
-                          <button onClick={() => revelarImagem(img.id)}
-                            className="flex-1 bg-[#c8a84b] text-[#0f0e0c] py-1.5 text-xs font-bold hover:bg-[#e0c060] transition-colors"
-                            style={{ ...cinzel, borderRadius: '2px' }}>Revelar</button>
-                        )}
-                        <button onClick={() => deletarImagem(img.id)}
-                          className="border border-red-900 text-red-900 px-2 py-1.5 text-xs hover:border-red-600 hover:text-red-600 transition-colors"
-                          style={{ ...cinzel, borderRadius: '2px' }}>×</button>
-                      </div>
+  {img.revealed ? (
+    <button onClick={() => esconderImagem(img.id)}
+      className="flex-1 border border-[#c8a84b30] text-[#4a4030] py-1.5 text-xs hover:border-[#c8a84b60] hover:text-[#c8a84b] transition-colors"
+      style={{ ...cinzel, borderRadius: '2px' }}>Esconder</button>
+  ) : (
+    <button onClick={() => revelarImagem(img.id)}
+      className="flex-1 bg-[#c8a84b] text-[#0f0e0c] py-1.5 text-xs font-bold hover:bg-[#e0c060] transition-colors"
+      style={{ ...cinzel, borderRadius: '2px' }}>Revelar</button>
+  )}
+  <button onClick={() => { setMapaAtivo(img); setModoMapa(true); buscarTokensNoMapa(img.id); }}
+    className="border border-[#c8a84b30] text-[#c8a84b] px-2 py-1.5 text-xs hover:bg-[#c8a84b10] transition-colors"
+    style={{ ...cinzel, borderRadius: '2px' }}>🎯</button>
+  <button onClick={() => deletarImagem(img.id)}
+    className="border border-red-900 text-red-900 px-2 py-1.5 text-xs hover:border-red-600 hover:text-red-600 transition-colors"
+    style={{ ...cinzel, borderRadius: '2px' }}>×</button>
+</div>
                     </div>
                   </div>
                 ))}
@@ -309,6 +325,83 @@ export default function Galeria() {
           </>
         )}
       </div>
+
+      {/* MODO MAPA */}
+{modoMapa && mapaAtivo && (
+  <div className="fixed inset-0 bg-[#0f0e0c] z-50 flex flex-col">
+    {/* Header */}
+    <div className="flex items-center justify-between px-4 py-3 border-b border-[#c8a84b20] bg-[#161410]">
+      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">🎯 MODO MAPA — {mapaAtivo.name}</p>
+      <button onClick={() => setModoMapa(false)}
+        className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">✕</button>
+    </div>
+
+    <div className="flex flex-1 overflow-hidden">
+      {/* Mapa */}
+      <div className="flex-1 relative overflow-hidden"
+        onDragOver={e => e.preventDefault()}
+        onDrop={async e => {
+          e.preventDefault();
+          const tokenId = e.dataTransfer.getData('tokenId');
+          const tokenUrl = e.dataTransfer.getData('tokenUrl');
+          const rect = e.currentTarget.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width) * 100;
+          const y = ((e.clientY - rect.top) / rect.height) * 100;
+          const res = await api.post('/map-tokens', {
+            campaign_id: CAMPANHA_ID,
+            map_id: mapaAtivo.id,
+            token_id: tokenId,
+            token_url: tokenUrl,
+            x, y, label: ''
+          });
+          setTokensNoMapa(prev => [...prev, res.data.data]);
+        }}>
+        <img src={mapaAtivo.url} alt={mapaAtivo.name} className="w-full h-full object-contain" />
+        {tokensNoMapa.map(t => (
+          <div key={t.id}
+            style={{ position: 'absolute', left: `${t.x}%`, top: `${t.y}%`, transform: 'translate(-50%, -50%)', cursor: 'grab' }}
+            draggable
+            onDragEnd={async e => {
+              const rect = e.currentTarget.parentElement.getBoundingClientRect();
+              const x = ((e.clientX - rect.left) / rect.width) * 100;
+              const y = ((e.clientY - rect.top) / rect.height) * 100;
+              await api.patch(`/map-tokens/${t.id}/position`, { x, y });
+              setTokensNoMapa(prev => prev.map(tk => tk.id === t.id ? { ...tk, x, y } : tk));
+            }}>
+            <div className="relative">
+              <img src={t.token_url} alt="" className="w-10 h-10 rounded-full border-2 border-[#c8a84b]" />
+              {t.label && (
+                <p style={cinzel} className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-white text-xs whitespace-nowrap bg-black bg-opacity-70 px-1">{t.label}</p>
+              )}
+              <button onClick={() => api.delete(`/map-tokens/${t.id}`).then(() => setTokensNoMapa(prev => prev.filter(tk => tk.id !== t.id)))}
+                className="absolute -top-1 -right-1 w-4 h-4 bg-red-900 text-white text-xs rounded-full flex items-center justify-center">×</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Sidebar tokens */}
+      <div className="w-48 bg-[#161410] border-l border-[#c8a84b20] overflow-y-auto p-3">
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-3">TOKENS</p>
+        <div className="grid grid-cols-2 gap-2">
+          {tokens.map(token => (
+            <div key={token.id}
+              draggable
+              onDragStart={e => {
+                e.dataTransfer.setData('tokenId', token.id);
+                e.dataTransfer.setData('tokenUrl', token.url);
+              }}
+              className="flex flex-col items-center gap-1 cursor-grab">
+              <img src={token.url} alt={token.name}
+                className="w-12 h-12 rounded-full object-cover border border-[#c8a84b20]" />
+              <p style={cinzel} className="text-[#4a4030] text-xs text-center truncate w-full">{token.category}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
       {imagemAberta && (
         <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50"
