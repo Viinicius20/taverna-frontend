@@ -144,7 +144,7 @@ const handleRotationStart = useCallback((e, tokenId) => {
 
   document.addEventListener('mousemove', handleRotationMove);
   document.addEventListener('mouseup', handleRotationEnd);
-}, [tokensNoMapa, getMouseAngle]);   // ← removemos as funções aqui
+}, [tokensNoMapa, getMouseAngle]);   // eslint-disable-line react-hooks/exhaustive-deps
 
 const handleRotationMove = useCallback((e) => {
   if (!rotatingTokenId) return;
