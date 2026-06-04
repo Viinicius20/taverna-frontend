@@ -340,22 +340,31 @@ export default function Galeria() {
       <div className="flex-1 relative overflow-hidden"
         onDragOver={e => e.preventDefault()}
         onDrop={async e => {
-          e.preventDefault();
-          const tokenId = e.dataTransfer.getData('tokenId');
-          const tokenUrl = e.dataTransfer.getData('tokenUrl');
-          const rect = e.currentTarget.getBoundingClientRect();
-          const x = ((e.clientX - rect.left) / rect.width) * 100;
-          const y = ((e.clientY - rect.top) / rect.height) * 100;
-          const res = await api.post('/map-tokens', {
-            campaign_id: CAMPANHA_ID,
-            map_id: mapaAtivo.id,
-            token_id: tokenId,
-            x: Math.round(x),
-            y: Math.round(y),
-            label: ''
-          });
-          setTokensNoMapa(prev => [...prev, res.data.data]);
-        }}>
+  e.preventDefault();
+  
+  const tokenId = e.dataTransfer.getData('tokenId');
+  // eslint-disable-next-line no-unused-vars
+  const tokenUrl = e.dataTransfer.getData('tokenUrl');
+
+  const rect = e.currentTarget.getBoundingClientRect();
+  const x = ((e.clientX - rect.left) / rect.width) * 100;
+  const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+  try {
+    const res = await api.post('/map-tokens', {
+      campaign_id: CAMPANHA_ID,
+      map_id: mapaAtivo.id,
+      token_id: tokenId,
+      x: Math.round(x),
+      y: Math.round(y),
+      label: ''
+    });
+
+    setTokensNoMapa(prev => [...prev, res.data.data]);
+  } catch (error) {
+    console.error("Erro ao adicionar token:", error);
+  }
+}}>
         <img src={mapaAtivo.url} alt={mapaAtivo.name} className="w-full h-full object-contain" />
         {tokensNoMapa.map(t => (
           <div key={t.id}
