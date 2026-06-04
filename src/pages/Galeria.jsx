@@ -165,8 +165,9 @@ const handleRotationMove = (e) => {
 
   let newRotation = initialAngle + (currentMouseAngle - initialMouseAngle);
 
-  const currentToken = tokensNoMapa.find(t => t.id === rotatingTokenId);
-  const scale = currentToken?.scale || 1;
+  const currentTransform = tokenElement.style.transform;
+  const scaleMatch = currentTransform.match(/scale\(([^)]+)\)/);
+  const scale = scaleMatch ? parseFloat(scaleMatch[1]) : (tokensNoMapa.find(t => t.id === rotatingTokenId)?.scale || 1);
 
   tokenElement.style.transform = `translate(-50%, -50%) scale(${scale}) rotate(${newRotation}deg)`;
 };
@@ -244,7 +245,9 @@ const handleResizeMove = (e) => {
   let newScale = initialScale * (currentDistance / initialDistance);
   newScale = Math.max(0.3, Math.min(newScale, 5)); // limites
 
-  const currentRotation = tokensNoMapa.find(t => t.id === resizingTokenId)?.rotation || 0;
+  const currentTransform = tokenElement.style.transform;
+  const rotMatch = currentTransform.match(/rotate\(([^)]+)deg\)/);
+  const currentRotation = rotMatch ? parseFloat(rotMatch[1]) : (tokensNoMapa.find(t => t.id === resizingTokenId)?.rotation || 0);
 
   tokenElement.style.transform = `translate(-50%, -50%) scale(${newScale}) rotate(${currentRotation}deg)`;
 };
