@@ -347,13 +347,13 @@ export default function Galeria() {
           const x = ((e.clientX - rect.left) / rect.width) * 100;
           const y = ((e.clientY - rect.top) / rect.height) * 100;
           const res = await api.post('/map-tokens', {
-  campaign_id: CAMPANHA_ID,
-  map_id: mapaAtivo.id,
-  token_id: tokenId,
-  x: Math.round(x),
-  y: Math.round(y),
-  label: ''
-});
+            campaign_id: CAMPANHA_ID,
+            map_id: mapaAtivo.id,
+            token_id: tokenId,
+            x: Math.round(x),
+            y: Math.round(y),
+            label: ''
+          });
           setTokensNoMapa(prev => [...prev, res.data.data]);
         }}>
         <img src={mapaAtivo.url} alt={mapaAtivo.name} className="w-full h-full object-contain" />
