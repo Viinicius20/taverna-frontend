@@ -144,7 +144,7 @@ const handleRotationStart = useCallback((e, tokenId) => {
 
   document.addEventListener('mousemove', handleRotationMove);
   document.addEventListener('mouseup', handleRotationEnd);
-}, [tokensNoMapa, getMouseAngle]);   // eslint-disable-line react-hooks/exhaustive-deps
+}, [tokensNoMapa, getMouseAngle]);
 
 const handleRotationMove = useCallback((e) => {
   if (!rotatingTokenId) return;
@@ -199,7 +199,8 @@ const handleRotationEnd = useCallback(async () => {
 
   document.removeEventListener('mousemove', handleRotationMove);
   document.removeEventListener('mouseup', handleRotationEnd);
-}, [rotatingTokenId, tokensNoMapa]);
+}, [rotatingTokenId, tokensNoMapa]); 
+// eslint-disable-line react-hooks/exhaustive-deps
 
   // VISÃO DO JOGADOR
   if (!isMestre) {
