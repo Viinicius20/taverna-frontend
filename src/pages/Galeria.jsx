@@ -309,28 +309,32 @@ if (!isMestre) {
             <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">AGUARDANDO...</p>
           </div>
         ) : imagemRevelada ? (
-          <div className="w-full max-w-4xl relative">
-            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4 text-center">O MESTRE REVELOU</p>
-            <div className="relative" style={{ display: 'inline-block', width: '100%' }}>
-  <img src={imagemRevelada.url} alt={imagemRevelada.name}
-    className="w-full"
-    style={{ borderRadius: '2px', maxHeight: '80vh', objectFit: 'contain', display: 'block' }} />
-  {tokensNoMapa.map(token => (
-    <img key={token.id} src={token.token_url} alt="token"
-      style={{
-        position: 'absolute',
-        left: `${token.x}%`,
-        top: `${token.y}%`,
-        width: '40px',
-        height: '40px',
-        objectFit: 'cover',
-        borderRadius: '50%',
-        transform: `translate(-50%, -50%) scale(${token.scale || 1}) rotate(${token.rotation || 0}deg)`,
-        pointerEvents: 'none',
-      }} />
-  ))}
+          <div className="w-full max-w-4xl relative mx-auto">
+  <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4 text-center">O MESTRE REVELOU</p>
+  <div className="relative w-full">
+    <img 
+      src={imagemRevelada.url} 
+      alt={imagemRevelada.name}
+      id="mapa-jogador"
+      className="w-full block"
+      style={{ borderRadius: '2px', maxHeight: '80vh', objectFit: 'contain' }} 
+    />
+    {tokensNoMapa.map(token => (
+      <img key={token.id} src={token.token_url} alt="token"
+        style={{
+          position: 'absolute',
+          left: `${token.x}%`,
+          top: `${token.y}%`,
+          width: '40px',
+          height: '40px',
+          objectFit: 'cover',
+          borderRadius: '50%',
+          transform: `translate(-50%, -50%) scale(${token.scale || 1}) rotate(${token.rotation || 0}deg)`,
+          pointerEvents: 'none',
+        }} />
+    ))}
+  </div>
 </div>
-          </div>
         ) : (
           <div className="flex flex-col items-center gap-4 text-center">
             <span className="text-4xl opacity-20">🗺</span>
