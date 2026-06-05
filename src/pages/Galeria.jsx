@@ -31,12 +31,12 @@ export default function Galeria() {
   const [modoMapa, setModoMapa] = useState(false);
   const [mapaAtivo, setMapaAtivo] = useState(null);
   const [tokensNoMapa, setTokensNoMapa] = useState([]);
-  const [rotatingTokenId, setRotatingTokenId] = useState(null);
-  const [initialAngle, setInitialAngle] = useState(0);
-  const [initialMouseAngle, setInitialMouseAngle] = useState(0);
-  const [resizingTokenId, setResizingTokenId] = useState(null);
-  const [initialScale, setInitialScale] = useState(1);
-  const [initialDistance, setInitialDistance] = useState(0);
+  const rotatingTokenIdRef = useRef(null);
+  const initialAngleRef = useRef(0);
+  const initialMouseAngleRef = useRef(0);
+  const resizingTokenIdRef = useRef(null);
+  const initialScaleRef = useRef(1);
+  const initialDistanceRef = useRef(0);
 
   useEffect(() => {
   buscarImagens();
@@ -142,7 +142,8 @@ const handleRotationStart = (e, tokenId) => {
   const token = tokensNoMapa.find(t => t.id === tokenId);
   if (!token) return;
 
-  setRotatingTokenId(tokenId);
+  rotatingTokenIdRef.current = tokenId;
+  initialAngleRef.current = token.rotation || 0;
 
   const tokenElement = e.currentTarget.closest(`[data-token-id="${tokenId}"]`);
   if (!tokenElement) return;
@@ -153,17 +154,17 @@ const handleRotationStart = (e, tokenId) => {
 
   const mouseAngle = getMouseAngle(e.clientX, e.clientY, centerX, centerY);
 
-  setInitialMouseAngle(mouseAngle);
-  setInitialAngle(token.rotation || 0);
+  initialMouseAngleRef.current = mouseAngle;
 
   document.addEventListener('mousemove', handleRotationMove);
   document.addEventListener('mouseup', handleRotationEnd);
 };
 
 const handleRotationMove = (e) => {
-  if (!rotatingTokenId) return;
+  const tokenId = rotatingTokenIdRef.current;
+  if (!tokenId) return;
 
-  const tokenElement = document.querySelector(`[data-token-id="${rotatingTokenId}"]`);
+  const tokenElement = document.querySelector(`[data-token-id="${tokenId}"]`);
   if (!tokenElement) return;
 
   const rect = tokenElement.getBoundingClientRect();
@@ -172,19 +173,21 @@ const handleRotationMove = (e) => {
 
   const currentMouseAngle = getMouseAngle(e.clientX, e.clientY, centerX, centerY);
 
-  let newRotation = initialAngle + (currentMouseAngle - initialMouseAngle);
+  let newRotation = initialAngleRef.current + (currentMouseAngle - initialMouseAngleRef.current);
 
-  const currentTransform = tokenElement.style.transform;
-  const scaleMatch = currentTransform.match(/scale\(([^)]+)\)/);
-  const scale = scaleMatch ? parseFloat(scaleMatch[1]) : (tokensNoMapa.find(t => t.id === rotatingTokenId)?.scale || 1);
+  newRotation = Math.round(newRotation / 5) * 5;
 
-  tokenElement.style.transform = `translate(-50%, -50%) scale(${scale}) rotate(${newRotation}deg)`;
+  const token = tokensNoMapa.find(t => t.id === tokenId);
+  const currentScale = token?.scale || 1;
+
+  tokenElement.style.transform = `translate(-50%, -50%) scale(${currentScale}) rotate(${newRotation}deg)`;
 };
 
 const handleRotationEnd = async () => {
-  if (!rotatingTokenId) return
+  const tokenId = rotatingTokenIdRef.current;
+  if (!tokenId) return;
 
-  const tokenElement = document.querySelector(`[data-token-id="${rotatingTokenId}"]`);
+  const tokenElement = document.querySelector(`[data-token-id="${tokenId}"]`);
   if (!tokenElement) return;
 
   const transform = tokenElement.style.transform;
@@ -194,12 +197,12 @@ const handleRotationEnd = async () => {
   finalRotation = ((finalRotation % 360) + 360) % 360;
 
   try {
-    await api.patch(`/map-tokens/${rotatingTokenId}/rotation`, { 
+    await api.patch(`/map-tokens/${tokenId}/rotation`, { 
       rotation: Math.round(finalRotation) 
     });
 
     setTokensNoMapa(prev => 
-      prev.map(t => t.id === rotatingTokenId 
+      prev.map(t => t.id === tokenId 
         ? { ...t, rotation: Math.round(finalRotation) } 
         : t
       )
@@ -208,9 +211,10 @@ const handleRotationEnd = async () => {
     console.error("Erro ao salvar rotação:", error);
   }
 
-  setRotatingTokenId(null);
-  setInitialAngle(0);
-  setInitialMouseAngle(0);
+  // Limpeza
+  rotatingTokenIdRef.current = null;
+  initialAngleRef.current = 0;
+  initialMouseAngleRef.current = 0;
 
   document.removeEventListener('mousemove', handleRotationMove);
   document.removeEventListener('mouseup', handleRotationEnd);
