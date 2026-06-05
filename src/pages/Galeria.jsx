@@ -228,25 +228,28 @@ const handleResizeStart = (e, tokenId) => {
   const token = tokensNoMapa.find(t => t.id === tokenId);
   if (!token) return;
 
-  setResizingTokenId(tokenId);
-  setInitialScale(token.scale || 1);
+  resizingTokenIdRef.current = tokenId;
+  initialScaleRef.current = token.scale || 1;
 
   const tokenElement = e.currentTarget.closest(`[data-token-id="${tokenId}"]`);
+  if (!tokenElement) return;
+
   const rect = tokenElement.getBoundingClientRect();
   const centerX = rect.left + rect.width / 2;
   const centerY = rect.top + rect.height / 2;
 
   const startDistance = Math.hypot(e.clientX - centerX, e.clientY - centerY);
-  setInitialDistance(startDistance);
+  initialDistanceRef.current = startDistance;
 
   document.addEventListener('mousemove', handleResizeMove);
   document.addEventListener('mouseup', handleResizeEnd);
 };
 
 const handleResizeMove = (e) => {
-  if (!resizingTokenId) return;
+  const tokenId = resizingTokenIdRef.current;
+  if (!tokenId) return;
 
-  const tokenElement = document.querySelector(`[data-token-id="${resizingTokenId}"]`);
+  const tokenElement = document.querySelector(`[data-token-id="${tokenId}"]`);
   if (!tokenElement) return;
 
   const rect = tokenElement.getBoundingClientRect();
@@ -255,20 +258,20 @@ const handleResizeMove = (e) => {
 
   const currentDistance = Math.hypot(e.clientX - centerX, e.clientY - centerY);
   
-  let newScale = initialScale * (currentDistance / initialDistance);
+  let newScale = initialScaleRef.current * (currentDistance / initialDistanceRef.current);
   newScale = Math.max(0.3, Math.min(newScale, 5)); // limites
 
-  const currentTransform = tokenElement.style.transform;
-  const rotMatch = currentTransform.match(/rotate\(([^)]+)deg\)/);
-  const currentRotation = rotMatch ? parseFloat(rotMatch[1]) : (tokensNoMapa.find(t => t.id === resizingTokenId)?.rotation || 0);
+  const token = tokensNoMapa.find(t => t.id === tokenId);
+  const currentRotation = token?.rotation || 0;
 
   tokenElement.style.transform = `translate(-50%, -50%) scale(${newScale}) rotate(${currentRotation}deg)`;
 };
 
 const handleResizeEnd = async () => {
-  if (!resizingTokenId) return;
+  const tokenId = resizingTokenIdRef.current;
+  if (!tokenId) return;
 
-  const tokenElement = document.querySelector(`[data-token-id="${resizingTokenId}"]`);
+  const tokenElement = document.querySelector(`[data-token-id="${tokenId}"]`);
   if (!tokenElement) return;
 
   const transform = tokenElement.style.transform;
@@ -276,12 +279,12 @@ const handleResizeEnd = async () => {
   const finalScale = scaleMatch ? parseFloat(scaleMatch[1]) : 1;
 
   try {
-    await api.patch(`/map-tokens/${resizingTokenId}/scale`, { 
+    await api.patch(`/map-tokens/${tokenId}/scale`, { 
       scale: parseFloat(finalScale.toFixed(2)) 
     });
 
     setTokensNoMapa(prev => 
-      prev.map(t => t.id === resizingTokenId 
+      prev.map(t => t.id === tokenId 
         ? { ...t, scale: parseFloat(finalScale.toFixed(2)) } 
         : t
       )
@@ -290,7 +293,11 @@ const handleResizeEnd = async () => {
     console.error("Erro ao salvar escala:", error);
   }
 
-  setResizingTokenId(null);
+  // Limpeza
+  resizingTokenIdRef.current = null;
+  initialScaleRef.current = 1;
+  initialDistanceRef.current = 0;
+
   document.removeEventListener('mousemove', handleResizeMove);
   document.removeEventListener('mouseup', handleResizeEnd);
 };
