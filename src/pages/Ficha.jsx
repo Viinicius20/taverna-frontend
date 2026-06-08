@@ -79,6 +79,13 @@ export default function Ficha() {
 
   const [notas, setNotas] = useState(ficha?.notas_privadas || '');
 
+  const [moedas, setMoedas] = useState({
+  po: ficha?.moedas?.po || 0,
+  pp: ficha?.moedas?.pp || 0,
+  pe: ficha?.moedas?.pe || 0,
+  pc: ficha?.moedas?.pc || 0,
+});
+
   const PERICIAS_ATTRS = {
   acrobatics: 'dex', animal_handling: 'wis', arcana: 'int',
   athletics: 'str', deception: 'cha', history: 'int',
@@ -438,6 +445,10 @@ export default function Ficha() {
   if (ficha?.ataques) setAtaques(ficha.ataques);
   if (ficha?.notas_privadas) setNotas(ficha.notas_privadas);
 }, [ficha]);
+
+  useEffect(() => {
+  if (ficha?.moedas) setMoedas(ficha.moedas);
+}, [ficha?.moedas]);
 
 
 async function buscarMensagensSecretas() {
@@ -1341,6 +1352,37 @@ function rolarAtaque(ataque) {
       style={{ ...cinzel, borderRadius: '2px' }}>
       ☀ DESCANSO LONGO
     </button>
+  </div>
+</div>
+
+{/* MOEDAS */}
+<div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+  <div className="px-6 py-4 border-b border-[#c8a84b15]">
+    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">MOEDAS</p>
+  </div>
+  <div className="p-6 grid grid-cols-4 gap-4">
+    {[
+      { label: 'PO', key: 'po', cor: '#c8a84b' },
+      { label: 'PP', key: 'pp', cor: '#a0a0b0' },
+      { label: 'PE', key: 'pe', cor: '#6a9a6a' },
+      { label: 'PC', key: 'pc', cor: '#a07050' },
+    ].map(({ label, key, cor }) => (
+      <div key={key} className="flex flex-col items-center border border-[#c8a84b15] bg-[#0f0e0c] p-3">
+        <label style={{ ...cinzel, color: cor }} className="text-xs tracking-widest mb-2">{label}</label>
+        <input
+          type="number"
+          min={0}
+          value={moedas[key]}
+          onChange={e => {
+            const novo = { ...moedas, [key]: Number(e.target.value) };
+            setMoedas(novo);
+            setFicha(prev => ({ ...prev, moedas: novo }));
+          }}
+          className="bg-transparent text-xl font-light w-full focus:outline-none text-center"
+          style={{ color: cor, ...cinzel }}
+        />
+      </div>
+    ))}
   </div>
 </div>
 
