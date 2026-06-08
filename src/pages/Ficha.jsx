@@ -1362,10 +1362,10 @@ function rolarAtaque(ataque) {
   </div>
   <div className="p-6 grid grid-cols-4 gap-4">
     {[
-      { label: 'PO', key: 'po', cor: '#c8a84b' },
-      { label: 'PP', key: 'pp', cor: '#a0a0b0' },
-      { label: 'PE', key: 'pe', cor: '#6a9a6a' },
       { label: 'PC', key: 'pc', cor: '#a07050' },
+      { label: 'PE', key: 'pe', cor: '#6a9a6a' },
+      { label: 'PP', key: 'pp', cor: '#a0a0b0' },
+      { label: 'PO', key: 'po', cor: '#c8a84b' },
     ].map(({ label, key, cor }) => (
       <div key={key} className="flex flex-col items-center border border-[#c8a84b15] bg-[#0f0e0c] p-3">
         <label style={{ ...cinzel, color: cor }} className="text-xs tracking-widest mb-2">{label}</label>
