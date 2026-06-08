@@ -12,6 +12,7 @@ import Login from './pages/Login';
 import Bestiario from './pages/Bestiario';
 import Galeria from './pages/Galeria';
 import FichaPublica from './pages/FichaPublica';
+import Campanhas from './pages/Campanhas';
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
           <Route path="/mestre/bestiario" element={<Bestiario />} />
           <Route path="/galeria" element={<Galeria />} />
           <Route path="/personagens/:id/publica" element={<FichaPublica />} />
+          <Route path="/campanhas" element={<Campanhas />} />
         </Routes>
       </BrowserRouter>
     </UserProvider>
