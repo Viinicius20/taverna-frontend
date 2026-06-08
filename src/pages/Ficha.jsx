@@ -1384,6 +1384,45 @@ function rolarAtaque(ataque) {
       </div>
     ))}
   </div>
+  {/* Conversões */}
+<div className="px-6 pb-4 flex flex-wrap gap-2">
+  <button
+    onClick={() => {
+      if (moedas.pc < 100) return;
+      const novo = { ...moedas, pc: moedas.pc - 100, pp: moedas.pp + 1 };
+      setMoedas(novo);
+      setFicha(prev => ({ ...prev, moedas: novo }));
+    }}
+    disabled={moedas.pc < 100}
+    className="text-xs border border-[#c8a84b20] text-[#4a4030] px-3 py-1 hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors disabled:opacity-30"
+    style={{ ...cinzel, borderRadius: '2px' }}>
+    100 PC → 1 PP
+  </button>
+  <button
+    onClick={() => {
+      if (moedas.pp < 100) return;
+      const novo = { ...moedas, pp: moedas.pp - 100, pe: moedas.pe + 1 };
+      setMoedas(novo);
+      setFicha(prev => ({ ...prev, moedas: novo }));
+    }}
+    disabled={moedas.pp < 100}
+    className="text-xs border border-[#c8a84b20] text-[#4a4030] px-3 py-1 hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors disabled:opacity-30"
+    style={{ ...cinzel, borderRadius: '2px' }}>
+    100 PP → 1 PE
+  </button>
+  <button
+    onClick={() => {
+      if (moedas.pe < 100) return;
+      const novo = { ...moedas, pe: moedas.pe - 100, po: moedas.po + 1 };
+      setMoedas(novo);
+      setFicha(prev => ({ ...prev, moedas: novo }));
+    }}
+    disabled={moedas.pe < 100}
+    className="text-xs border border-[#c8a84b20] text-[#4a4030] px-3 py-1 hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors disabled:opacity-30"
+    style={{ ...cinzel, borderRadius: '2px' }}>
+    100 PE → 1 PO
+  </button>
+</div>
 </div>
 
         {/* INVENTÁRIO */}
