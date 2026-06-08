@@ -11,6 +11,8 @@ import Historico from './pages/Historico';
 import Login from './pages/Login'; 
 import Bestiario from './pages/Bestiario';
 import Galeria from './pages/Galeria';
+import FichaPublica from './pages/FichaPublica';
+
 
 function App() {
   return (
@@ -28,6 +30,7 @@ function App() {
           <Route path="/historico" element={<Historico />} />
           <Route path="/mestre/bestiario" element={<Bestiario />} />
           <Route path="/galeria" element={<Galeria />} />
+          <Route path="/personagens/:id/publica" element={<FichaPublica />} />
         </Routes>
       </BrowserRouter>
     </UserProvider>

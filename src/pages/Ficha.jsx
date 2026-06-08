@@ -602,6 +602,15 @@ function rolarAtaque(ataque) {
               style={{ ...cinzel, borderRadius: '2px' }}>
               {salvando ? 'Salvando...' : 'Salvar'}
             </button>
+            <button
+  onClick={() => {
+    navigator.clipboard.writeText(`${window.location.origin}/personagens/${id}/publica`);
+    alert('Link copiado!');
+  }}
+  className="border border-[#c8a84b20] text-[#4a4030] px-4 py-2 text-xs tracking-widest hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors"
+  style={{ ...cinzel, borderRadius: '2px' }}>
+  🔗 Compartilhar
+</button>
           </div>
         </div>
 
