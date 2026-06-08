@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../context/UserContext';
 import api from '../services/api';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
