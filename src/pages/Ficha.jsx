@@ -1363,8 +1363,8 @@ function rolarAtaque(ataque) {
   <div className="p-6 grid grid-cols-4 gap-4">
     {[
       { label: 'PC', key: 'pc', cor: '#a07050' },
-      { label: 'PE', key: 'pe', cor: '#6a9a6a' },
       { label: 'PP', key: 'pp', cor: '#a0a0b0' },
+      { label: 'PE', key: 'pe', cor: '#6a9a6a' },
       { label: 'PO', key: 'po', cor: '#c8a84b' },
     ].map(({ label, key, cor }) => (
       <div key={key} className="flex flex-col items-center border border-[#c8a84b15] bg-[#0f0e0c] p-3">
