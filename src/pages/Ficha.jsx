@@ -284,6 +284,12 @@ export default function Ficha() {
 }
 
 function exportarPDF() {
+  // Esconde elementos que não devem ir pro PDF
+  const botoes = document.querySelector('.flex.gap-3.flex-wrap');
+  const nav = document.querySelector('nav');
+  if (botoes) botoes.style.display = 'none';
+  if (nav) nav.style.display = 'none';
+
   const element = document.getElementById('ficha-conteudo');
   const opt = {
     margin: 10,
@@ -292,7 +298,12 @@ function exportarPDF() {
     html2canvas: { scale: 2, backgroundColor: '#0f0e0c' },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
-  html2pdf().set(opt).from(element).save();
+
+  html2pdf().set(opt).from(element).save().then(() => {
+    // Mostra de volta após gerar
+    if (botoes) botoes.style.display = '';
+    if (nav) nav.style.display = '';
+  });
 }
 
   // ===== FUNÇÕES DE LEVEL UP COM MULTICLASSING =====
@@ -1543,21 +1554,6 @@ function rolarAtaque(ataque) {
   </div>
 )}
 
-
-        {/* HISTÓRIA */}
-        {ficha.background_story && (
-          <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
-            <div className="px-6 py-4 border-b border-[#c8a84b15]">
-              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">HISTÓRIA</p>
-            </div>
-            <div className="p-6">
-              <textarea value={ficha.background_story} onChange={e => editarCampo('background_story', e.target.value)}
-                rows={4}
-                className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#a09880] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b50] resize-none"
-                style={{ fontSize: '1rem', borderRadius: '2px', lineHeight: '1.7' }} />
-            </div>
-          </div>
-        )}
 
         {/* HISTÓRIA */}
         {ficha.background_story && (
