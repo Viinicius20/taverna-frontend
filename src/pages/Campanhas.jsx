@@ -20,10 +20,11 @@ export default function Campanhas() {
 
   const isMestre = user?.role === 'mestre';
 
-  useEffect(() => {
-    buscarCampanhas();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+ useEffect(() => {
+  buscarCampanhas().then(() => {
+    if (isMestre && campanhas.length === 0) setAba('criar');
+  });
+}, []);
 
   async function buscarCampanhas() {
     setLoading(true);
