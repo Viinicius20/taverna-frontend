@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../services/api';
-
+import html2pdf from 'html2pdf.js';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -281,6 +281,18 @@ export default function Ficha() {
     setErro('Erro ao criar magia: ' + error.message);
   }
   setCriandoHomebrew(false);
+}
+
+function exportarPDF() {
+  const element = document.getElementById('ficha-conteudo');
+  const opt = {
+    margin: 10,
+    filename: `${ficha.name || 'ficha'}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, backgroundColor: '#0f0e0c' },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  html2pdf().set(opt).from(element).save();
 }
 
   // ===== FUNÇÕES DE LEVEL UP COM MULTICLASSING =====
@@ -572,7 +584,7 @@ function rolarAtaque(ataque) {
         </button>
       </nav>
 
-      <div className="max-w-3xl mx-auto px-8 py-12">
+      <div id="ficha-conteudo" className="max-w-3xl mx-auto px-8 py-12">
 
         <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
           <div>
@@ -610,6 +622,11 @@ function rolarAtaque(ataque) {
   className="border border-[#c8a84b20] text-[#4a4030] px-4 py-2 text-xs tracking-widest hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors"
   style={{ ...cinzel, borderRadius: '2px' }}>
   🔗 Compartilhar
+</button>
+<button onClick={exportarPDF}
+  className="border border-[#c8a84b20] text-[#4a4030] px-4 py-2 text-xs tracking-widest hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors"
+  style={{ ...cinzel, borderRadius: '2px' }}>
+  ↓ PDF
 </button>
           </div>
         </div>
