@@ -284,25 +284,34 @@ export default function Ficha() {
 }
 
 function exportarPDF() {
-  // Esconde elementos que não devem ir pro PDF
-  const botoes = document.querySelector('.flex.gap-3.flex-wrap');
-  const nav = document.querySelector('nav');
-  if (botoes) botoes.style.display = 'none';
-  if (nav) nav.style.display = 'none';
+  const esconder = [
+    document.querySelector('.flex.gap-3.flex-wrap'),
+    document.querySelector('nav'),
+    document.querySelector('[data-pdf-hide]'),
+  ].filter(Boolean);
+  
+  esconder.forEach(el => el.style.display = 'none');
 
   const element = document.getElementById('ficha-conteudo');
   const opt = {
-    margin: 10,
+    margin: [5, 5, 5, 5],
     filename: `${ficha.name || 'ficha'}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, backgroundColor: '#0f0e0c' },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    image: { type: 'jpeg', quality: 1 },
+    html2canvas: { 
+      scale: 3,
+      backgroundColor: '#0f0e0c',
+      useCORS: true,
+      letterRendering: true,
+      scrollX: 0,
+      scrollY: -window.scrollY,
+      windowWidth: document.documentElement.scrollWidth,
+    },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
   };
 
   html2pdf().set(opt).from(element).save().then(() => {
-    // Mostra de volta após gerar
-    if (botoes) botoes.style.display = '';
-    if (nav) nav.style.display = '';
+    esconder.forEach(el => el.style.display = '');
   });
 }
 
@@ -1578,6 +1587,7 @@ function rolarAtaque(ataque) {
       <p style={cinzel} className="text-[#4a4030] text-xs mt-1">Só você vê isso</p>
     </div>
     <span className="text-[#4a4030] text-xs">🔒</span>
+    <div className="border border-[#c8a84b20] bg-[#161410] mb-6" data-pdf-hide></div>
   </div>
   <div className="p-6">
     <textarea
