@@ -177,24 +177,24 @@ export default function Campanhas() {
 
         {/* Entrar com código (jogador) */}
         {!isMestre && (
-          <div className="border border-[#c8a84b20] bg-[#161410] p-6">
-            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">CÓDIGO DA CAMPANHA</p>
-            <div className="flex gap-3">
-              <input value={codigo}
-                onChange={e => setCodigo(e.target.value.toUpperCase())}
-                placeholder="Ex: TVRN42"
-                maxLength={6}
-                className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] px-4 py-3 flex-1 text-center text-xl tracking-widest font-bold focus:outline-none focus:border-[#c8a84b50]"
-                style={{ ...cinzel, borderRadius: '2px' }} />
-              <button onClick={entrarCampanha} disabled={entrando || codigo.length !== 6}
-                className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-3 text-xs font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50"
-                style={{ ...cinzel, borderRadius: '2px' }}>
-                {entrando ? '⟳' : 'ENTRAR →'}
-              </button>
-            </div>
-            {erro && <p className="text-red-400 text-sm mt-3">{erro}</p>}
-          </div>
-        )}
+  <div className="border border-[#c8a84b20] bg-[#161410] p-6">
+    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">CÓDIGO DA CAMPANHA</p>
+    <div className="flex flex-col sm:flex-row gap-3">
+      <input value={codigo}
+        onChange={e => setCodigo(e.target.value.toUpperCase())}
+        placeholder="Ex: TVRN42"
+        maxLength={6}
+        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] px-4 py-3 flex-1 text-center text-xl tracking-widest font-bold focus:outline-none focus:border-[#c8a84b50]"
+        style={{ ...cinzel, borderRadius: '2px' }} />
+      <button onClick={entrarCampanha} disabled={entrando || codigo.length !== 6}
+        className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-3 text-xs font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50 w-full sm:w-auto"
+        style={{ ...cinzel, borderRadius: '2px' }}>
+        {entrando ? '⟳' : 'ENTRAR →'}
+      </button>
+    </div>
+    {erro && <p className="text-red-400 text-sm mt-3">{erro}</p>}
+  </div>
+)}
       </div>
     </div>
   );
