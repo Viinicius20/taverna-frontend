@@ -9,6 +9,7 @@ const crimson = { fontFamily: "'Crimson Pro', serif" };
 export default function Campanhas() {
   const navigate = useNavigate();
   const { user } = useUser();
+  const isMestre = user?.role === 'mestre';
   const [campanhas, setCampanhas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [criando, setCriando] = useState(false);
@@ -17,8 +18,6 @@ export default function Campanhas() {
   const [codigo, setCodigo] = useState('');
   const [aba, setAba] = useState(isMestre ? 'criar' : 'entrar');
   const [erro, setErro] = useState('');
-
-  const isMestre = user?.role === 'mestre';
 
  useEffect(() => {
   buscarCampanhas();
