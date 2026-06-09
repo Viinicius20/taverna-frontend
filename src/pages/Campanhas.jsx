@@ -16,18 +16,15 @@ export default function Campanhas() {
   const [entrando, setEntrando] = useState(false);
   const [novaCampanha, setNovaCampanha] = useState({ name: '', description: '' });
   const [codigo, setCodigo] = useState('');
-  const [aba, setAba] = useState('minhas');
+  const [aba, setAba] = useState('loading');
   const [erro, setErro] = useState('');
 
  useEffect(() => {
-  buscarCampanhas();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, []);
-
-useEffect(() => {
+  if (user === null) return; // ainda carregando
   if (isMestre) setAba('criar');
   else setAba('entrar');
-}, [isMestre]);
+  buscarCampanhas();
+}, [user]); // eslint-disable-line
 
   async function buscarCampanhas() {
     setLoading(true);
