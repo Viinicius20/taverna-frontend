@@ -284,12 +284,29 @@ export default function Ficha() {
 }
 
 function exportarPDF() {
+  // Substitui inputs por spans temporariamente
+  const inputs = document.querySelectorAll('#ficha-conteudo input, #ficha-conteudo textarea, #ficha-conteudo select');
+  const valoresOriginais = [];
+  
+  inputs.forEach(input => {
+    valoresOriginais.push({ el: input, display: input.style.display, parent: input.parentNode });
+    const span = document.createElement('span');
+    span.textContent = input.value;
+    span.style.cssText = input.style.cssText;
+    span.style.display = 'block';
+    span.style.color = window.getComputedStyle(input).color;
+    span.style.fontFamily = window.getComputedStyle(input).fontFamily;
+    span.style.fontSize = window.getComputedStyle(input).fontSize;
+    span.dataset.pdfTemp = 'true';
+    input.parentNode.insertBefore(span, input);
+    input.style.display = 'none';
+  });
+
   const esconder = [
     document.querySelector('.flex.gap-3.flex-wrap'),
     document.querySelector('nav'),
     document.querySelector('[data-pdf-hide]'),
   ].filter(Boolean);
-  
   esconder.forEach(el => el.style.display = 'none');
 
   const element = document.getElementById('ficha-conteudo');
@@ -297,20 +314,21 @@ function exportarPDF() {
     margin: [5, 5, 5, 5],
     filename: `${ficha.name || 'ficha'}.pdf`,
     image: { type: 'jpeg', quality: 1 },
-    html2canvas: { 
+    html2canvas: {
       scale: 3,
       backgroundColor: '#0f0e0c',
       useCORS: true,
-      letterRendering: true,
       scrollX: 0,
       scrollY: -window.scrollY,
-      windowWidth: document.documentElement.scrollWidth,
     },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
     pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
   };
 
   html2pdf().set(opt).from(element).save().then(() => {
+    // Restaura inputs
+    document.querySelectorAll('[data-pdf-temp]').forEach(el => el.remove());
+    valoresOriginais.forEach(({ el }) => el.style.display = '');
     esconder.forEach(el => el.style.display = '');
   });
 }
