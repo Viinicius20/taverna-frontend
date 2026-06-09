@@ -20,7 +20,8 @@ export default function Campanhas() {
   const [erro, setErro] = useState('');
 
  useEffect(() => {
-  if (user === null) return; // ainda carregando
+  console.log("user:", user, "isMestre:", isMestre);
+  if (user === null) return;
   if (isMestre) setAba('criar');
   else setAba('entrar');
   buscarCampanhas();
