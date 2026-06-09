@@ -8,7 +8,7 @@ const crimson = { fontFamily: "'Crimson Pro', serif" };
 
 export default function Campanhas() {
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, carregandoUser } = useUser();
   const isMestre = user?.role === 'mestre';
   const [campanhas, setCampanhas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,12 +20,12 @@ export default function Campanhas() {
   const [erro, setErro] = useState('');
 
  useEffect(() => {
-  console.log("user:", user, "isMestre:", isMestre);
-  if (user === null) return;
+  if (carregandoUser) return; // espera carregar
+  if (!user) { navigate('/login'); return; }
   if (isMestre) setAba('criar');
   else setAba('entrar');
   buscarCampanhas();
-}, [user]); // eslint-disable-line
+}, [user, carregandoUser]); // eslint-disable-line
 
   async function buscarCampanhas() {
     setLoading(true);

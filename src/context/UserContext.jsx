@@ -5,10 +5,12 @@ const UserContext = createContext(null);
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [carregandoUser, setCarregandoUser] = useState(true); // ← novo
 
   useEffect(() => {
     const salvo = localStorage.getItem('taverna_user');
     if (salvo) setUser(JSON.parse(salvo));
+    setCarregandoUser(false); // ← após carregar
   }, []);
 
   async function login(username) {
@@ -25,7 +27,7 @@ export function UserProvider({ children }) {
   }
 
   return (
-    <UserContext.Provider value={{ user, login, logout }}>
+    <UserContext.Provider value={{ user, login, logout, carregandoUser }}>
       {children}
     </UserContext.Provider>
   );
