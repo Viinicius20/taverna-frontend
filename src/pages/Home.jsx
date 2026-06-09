@@ -86,7 +86,7 @@ export default function Home() {
             { icon: '✦', title: 'Criação com IA', desc: 'Descreva seu personagem em palavras e a IA monta a ficha completa com atributos, perícias e história.', rota: '/personagens/criar' },
             { icon: '⬢', title: 'Rolar Dados', desc: 'Role dados de qualquer tipo — d4, d6, d8, d10, d12, d20 e d100. Com modificadores e histórico.', rota: '/dados' },
             { icon: '🗺', title: 'Galeria', desc: 'O mestre revela mapas e imagens pra mesa em tempo real. Abra durante a sessão.', rota: '/galeria' },
-            { icon: '📖', title: 'Bestiário', desc: 'Consulte fichas completas de monstros e criaturas. Stats, ataques e habilidades.', rota: '/mestre/bestiario' },
+            { icon: '⚔', title: 'Campanhas', desc: 'Crie ou entre em campanhas com um código de convite. Gerencie seus grupos de aventureiros.', rota: '/campanhas' },
             { icon: '📋', title: 'Quadro de Rumores', desc: 'Mural visual de post-its com NPCs, locais e pistas descobertas na sessão. Visível para todos.', rota: '/quadro' },
             { icon: '📜', title: 'Histórico', desc: 'Consulte o resumo de todas as sessões anteriores da campanha.', rota: '/Historico' },
           ].map(({ icon, title, desc, rota }) => (
