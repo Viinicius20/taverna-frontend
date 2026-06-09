@@ -15,15 +15,14 @@ export default function Campanhas() {
   const [entrando, setEntrando] = useState(false);
   const [novaCampanha, setNovaCampanha] = useState({ name: '', description: '' });
   const [codigo, setCodigo] = useState('');
-  const [aba, setAba] = useState('minhas');
+  const [aba, setAba] = useState(isMestre ? 'criar' : 'entrar');
   const [erro, setErro] = useState('');
 
   const isMestre = user?.role === 'mestre';
 
  useEffect(() => {
-  buscarCampanhas().then(() => {
-    if (isMestre && campanhas.length === 0) setAba('criar');
-  });
+  buscarCampanhas();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
 
   async function buscarCampanhas() {
