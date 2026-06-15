@@ -377,12 +377,20 @@ if (!isMestre) {
 
           {/* Categoria ao subir token */}
           {aba === 'tokens' && (
-            <select value={uploadCategoria} onChange={e => setUploadCategoria(e.target.value)}
-              className="bg-[#161410] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-xs focus:outline-none"
-              style={{ ...cinzel, borderRadius: '2px' }}>
-              {CATEGORIAS_TOKEN.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-          )}
+  <>
+    <input
+      value={uploadCategoria}
+      onChange={e => setUploadCategoria(e.target.value)}
+      placeholder="Categoria..."
+      list="categorias-lista"
+      className="bg-[#161410] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-xs focus:outline-none w-36"
+      style={{ ...cinzel, borderRadius: '2px' }}
+    />
+    <datalist id="categorias-lista">
+      {CATEGORIAS_TOKEN.map(c => <option key={c} value={c} />)}
+    </datalist>
+  </>
+)}
 
           <label className="bg-[#c8a84b] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors cursor-pointer"
             style={{ ...cinzel, borderRadius: '2px' }}>
