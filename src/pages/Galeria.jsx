@@ -37,6 +37,7 @@ export default function Galeria() {
   const resizingTokenIdRef = useRef(null);
   const initialScaleRef = useRef(1);
   const initialDistanceRef = useRef(0);
+  const [buscaToken, setBuscaToken] = useState('');
 
   useEffect(() => {
   buscarImagens();
@@ -641,10 +642,18 @@ if (!isMestre) {
 </div>
 
       {/* Sidebar tokens */}
-      <div className="w-48 bg-[#161410] border-l border-[#c8a84b20] overflow-y-auto p-3">
-        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-3">TOKENS</p>
-        <div className="grid grid-cols-2 gap-2">
-          {tokens.map(token => (
+<div className="w-48 bg-[#161410] border-l border-[#c8a84b20] overflow-y-auto p-3">
+  <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-3">TOKENS</p>
+  <input
+    placeholder="Buscar..."
+    onChange={e => setBuscaToken(e.target.value)}
+    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-2 py-1 text-xs w-full focus:outline-none focus:border-[#c8a84b50] mb-3 placeholder-[#3a3020]"
+    style={{ borderRadius: '2px' }}
+  />
+  <div className="grid grid-cols-2 gap-2">
+    {tokens
+      .filter(t => !buscaToken || t.category?.toLowerCase().includes(buscaToken.toLowerCase()) || t.name?.toLowerCase().includes(buscaToken.toLowerCase()))
+      .map(token => (
             <div key={token.id}
               draggable
               onDragStart={e => {
