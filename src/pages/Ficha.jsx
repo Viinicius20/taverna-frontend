@@ -549,10 +549,10 @@ async function buscarMensagensSecretas() {
   } catch {}
 }
 
-async function marcarComoLida(id) {
+async function marcarComoLida(msgId) {
   try {
-    await api.patch(`/secret-messages/${id}/lida`);
-    setMensagensSecretas(prev => prev.filter(m => m.id !== id));
+    await api.patch(`/secret-messages/${msgId}/lida`);
+    setMensagensSecretas(prev => prev.filter(m => m.id !== msgId));
   } catch {}
 }
 
