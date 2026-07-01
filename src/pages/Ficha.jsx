@@ -500,6 +500,17 @@ function exportarPDF() {
   if (ficha?.moedas) setMoedas(ficha.moedas);
 }, [ficha?.moedas]);
 
+useEffect(() => {
+  const handleVisibility = () => {
+    if (document.visibilityState === 'visible') {
+      buscarMensagensSecretas();
+    }
+  };
+  document.addEventListener('visibilitychange', handleVisibility);
+  return () => document.removeEventListener('visibilitychange', handleVisibility);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
+
 
 async function buscarMensagensSecretas() {
   try {
