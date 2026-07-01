@@ -506,8 +506,17 @@ useEffect(() => {
       buscarMensagensSecretas();
     }
   };
+  const handleFocus = () => {
+    buscarMensagensSecretas();
+  };
+  
   document.addEventListener('visibilitychange', handleVisibility);
-  return () => document.removeEventListener('visibilitychange', handleVisibility);
+  window.addEventListener('focus', handleFocus);
+  
+  return () => {
+    document.removeEventListener('visibilitychange', handleVisibility);
+    window.removeEventListener('focus', handleFocus);
+  };
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
 
