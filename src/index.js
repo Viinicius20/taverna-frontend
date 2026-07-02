@@ -20,6 +20,11 @@ async function configurarPush() {
     const res = await fetch(`${API_URL}/push/vapid-public-key`);
     const { public_key } = await res.json();
 
+    const res = await fetch(`${API_URL}/push/vapid-public-key`);
+    const { public_key } = await res.json();
+    console.log('Public key recebida:', public_key);
+    console.log('Tamanho:', public_key.length);
+
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
       console.log('Permissão negada');
