@@ -15,16 +15,19 @@ root.render(
 // Pede permissão de notificação e salva assinatura no backend
 async function configurarPush() {
   try {
-    const res = await fetch(`${process.env.REACT_APP_API_URL}/push/vapid-public-key`);
+    const API_URL = process.env.REACT_APP_API_URL || 'https://taverna-backend-eq3b.onrender.com';
+    
+    const res = await fetch(`${API_URL}/push/vapid-public-key`);
     const { public_key } = await res.json();
 
     const permission = await Notification.requestPermission();
-    if (permission !== 'granted') return;
+    if (permission !== 'granted') {
+      console.log('Permissão negada');
+      return;
+    }
 
     const registration = await navigator.serviceWorker.ready;
 
-    // Converte a chave pública de base64 pra Uint8Array
-    // O browser exige esse formato específico — base64 puro não funciona
     function urlBase64ToUint8Array(base64String) {
       const padding = '='.repeat((4 - base64String.length % 4) % 4);
       const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -41,21 +44,25 @@ async function configurarPush() {
       applicationServerKey: urlBase64ToUint8Array(public_key)
     });
 
-    const user = JSON.parse(localStorage.getItem('taverna_user'));
-    if (!user) return;
+    console.log('Subscription criada:', JSON.stringify(subscription));
 
-    await fetch(`${process.env.REACT_APP_API_URL}/push/subscribe`, {
+    const user = JSON.parse(localStorage.getItem('taverna_user'));
+    if (!user) {
+      console.log('Usuário não encontrado no localStorage');
+      return;
+    }
+
+    const saveRes = await fetch(`${API_URL}/push/subscribe`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: user.id, subscription })
     });
 
-    console.log('Push configurado com sucesso!');
+    console.log('Subscription salva:', await saveRes.json());
   } catch (e) {
     console.error('Erro ao configurar push:', e);
   }
 }
-
 // Roda após o service worker ser registrado
 serviceWorkerRegistration.register({
   onSuccess: () => {
