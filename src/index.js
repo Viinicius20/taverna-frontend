@@ -67,11 +67,15 @@ async function configurarPush() {
 serviceWorkerRegistration.register({
   onSuccess: () => {
     console.log('Service worker registrado!');
-    configurarPush();
   },
   onUpdate: () => {
     console.log('Nova versão disponível.');
   }
+});
+
+// Roda sempre que a página carrega, não só na primeira instalação
+window.addEventListener('load', () => {
+  configurarPush();
 });
 
 reportWebVitals();
