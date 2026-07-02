@@ -15,37 +15,42 @@ root.render(
 // Pede permissão de notificação e salva assinatura no backend
 async function configurarPush() {
   try {
-    // Busca a chave pública VAPID do backend
-    // O browser precisa dela pra criar a assinatura do dispositivo
     const res = await fetch(`${process.env.REACT_APP_API_URL}/push/vapid-public-key`);
     const { public_key } = await res.json();
 
-    // Pede permissão pro usuário
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') return;
 
-    // Espera o service worker estar pronto
     const registration = await navigator.serviceWorker.ready;
 
-    // Cria a assinatura do dispositivo usando a chave pública
-    // Isso é único por dispositivo — cada celular/PC tem uma assinatura diferente
+    // Converte a chave pública de base64 pra Uint8Array
+    // O browser exige esse formato específico — base64 puro não funciona
+    function urlBase64ToUint8Array(base64String) {
+      const padding = '='.repeat((4 - base64String.length % 4) % 4);
+      const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+      const rawData = window.atob(base64);
+      const outputArray = new Uint8Array(rawData.length);
+      for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+      }
+      return outputArray;
+    }
+
     const subscription = await registration.pushManager.subscribe({
-      userVisibleOnly: true, // obrigatório — toda notificação precisa ser visível pro usuário
-      applicationServerKey: public_key
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(public_key)
     });
 
-    // Busca o usuário salvo no localStorage
     const user = JSON.parse(localStorage.getItem('taverna_user'));
     if (!user) return;
 
-    // Salva a assinatura no backend
     await fetch(`${process.env.REACT_APP_API_URL}/push/subscribe`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: user.id, subscription })
     });
 
-    console.log('Push notification configurado!');
+    console.log('Push configurado com sucesso!');
   } catch (e) {
     console.error('Erro ao configurar push:', e);
   }
