@@ -701,7 +701,10 @@ function rolarAtaque(ataque) {
   style={{ ...cinzel, borderRadius: '2px' }}>
   ↓ PDF
 </button>
-<button onClick={() => setCaixaMensagens(true)}
+<button onClick={() => { 
+  buscarMensagensSecretas(); // busca imediatamente ao abrir
+  setCaixaMensagens(true); 
+}}
   className="relative border border-[#8a4a8a50] text-[#8a4a8a] px-4 py-2 text-xs tracking-widest hover:bg-[#8a4a8a10] transition-colors"
   style={{ ...cinzel, borderRadius: '2px' }}>
   🔮 Sussurros
