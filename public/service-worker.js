@@ -42,10 +42,13 @@ self.addEventListener('push', event => {
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   event.waitUntil(
-    clients.matchAll({ type: 'window' }).then(clientList => {
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
       for (const client of clientList) {
         if (client.url.includes('taverna') && 'focus' in client) {
-          return client.focus();
+          client.focus();
+          // Manda sinal pra página buscar mensagens
+          client.postMessage({ type: 'BUSCAR_MENSAGENS' });
+          return;
         }
       }
       if (clients.openWindow) {

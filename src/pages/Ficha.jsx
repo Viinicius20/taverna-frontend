@@ -509,6 +509,17 @@ useEffect(() => {
   const handleFocus = () => {
     buscarMensagensSecretas();
   };
+
+useEffect(() => {
+  const handleMessage = (event) => {
+    if (event.data?.type === 'BUSCAR_MENSAGENS') {
+      buscarMensagensSecretas();
+    }
+  };
+  navigator.serviceWorker.addEventListener('message', handleMessage);
+  return () => navigator.serviceWorker.removeEventListener('message', handleMessage);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
   
   document.addEventListener('visibilitychange', handleVisibility);
   window.addEventListener('focus', handleFocus);
