@@ -28,6 +28,17 @@ export default function Personagens() {
   }, [user]);
   useEffect(() => {
   if (!personagens[0]?.id) return;
+
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('abrir_ficha')) {
+    const fichaId = localStorage.getItem('taverna_ficha_atual');
+    if (fichaId) {
+      navigate(`/personagens/${fichaId}`);
+    }
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
   
   const checarMensagens = async () => {
     try {

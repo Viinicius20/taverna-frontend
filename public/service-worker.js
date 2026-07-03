@@ -50,10 +50,9 @@ self.addEventListener('notificationclick', event => {
           return;
         }
       }
-      // Se não tiver nenhuma aba aberta, abre na ficha do personagem
-      if (clients.openWindow) {
-        return clients.openWindow('/personagens');
-      }
+      // Abre na ficha — o service worker não acessa localStorage
+      // mas passa uma mensagem pra página redirecionar
+      return clients.openWindow('/personagens?abrir_ficha=1');
     })
   );
 });

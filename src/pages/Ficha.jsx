@@ -95,10 +95,11 @@ export default function Ficha() {
   sleight_of_hand: 'dex', stealth: 'dex', survival: 'wis'
 };
 
-  useEffect(() => {
-    buscarPersonagem();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+useEffect(() => {
+  buscarPersonagem();
+  localStorage.setItem('taverna_ficha_atual', id); // salva o id da ficha atual
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [id]);
 
   async function buscarPersonagem() {
   setCarregando(true);
