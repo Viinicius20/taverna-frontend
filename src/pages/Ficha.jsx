@@ -77,6 +77,8 @@ export default function Ficha() {
   const [adicionandoAtaque, setAdicionandoAtaque] = useState(false);
   const [resultadoRolagem, setResultadoRolagem] = useState(null);
 
+  const [caixaMensagens, setCaixaMensagens] = useState(false);
+
   const [notas, setNotas] = useState(ficha?.notas_privadas || '');
 
   const [moedas, setMoedas] = useState({
@@ -698,6 +700,16 @@ function rolarAtaque(ataque) {
   className="border border-[#c8a84b20] text-[#4a4030] px-4 py-2 text-xs tracking-widest hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors"
   style={{ ...cinzel, borderRadius: '2px' }}>
   ↓ PDF
+</button>
+<button onClick={() => setCaixaMensagens(true)}
+  className="relative border border-[#8a4a8a50] text-[#8a4a8a] px-4 py-2 text-xs tracking-widest hover:bg-[#8a4a8a10] transition-colors"
+  style={{ ...cinzel, borderRadius: '2px' }}>
+  🔮 Sussurros
+  {mensagensSecretas.length > 0 && (
+    <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#8a4a8a] text-white text-xs rounded-full flex items-center justify-center">
+      {mensagensSecretas.length}
+    </span>
+  )}
 </button>
           </div>
         </div>
@@ -2013,19 +2025,33 @@ function rolarAtaque(ataque) {
           </div>
         )}
       </div>
-      {mensagensSecretas.length > 0 && (
-  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
-    <div className="bg-[#0f0e0c] border border-[#8a4a8a] max-w-md w-full p-6 animate-pulse"
-      style={{ borderRadius: '2px', boxShadow: '0 0 30px #8a4a8a40' }}>
-      <p style={cinzel} className="text-[#8a4a8a] text-xs tracking-[4px] mb-4">🔮 SUSSURRO DO MESTRE</p>
-      <p className="text-[#e8e0d0] text-base leading-relaxed mb-6 font-light italic">
-        "{mensagensSecretas[0].message}"
-      </p>
-      <button onClick={() => marcarComoLida(mensagensSecretas[0].id)}
-        className="border border-[#8a4a8a50] text-[#8a4a8a] px-4 py-2 text-xs hover:bg-[#8a4a8a10] transition-colors w-full"
-        style={{ ...cinzel, borderRadius: '2px' }}>
-        ENTENDIDO
-      </button>
+      {caixaMensagens && (
+  <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 px-4"
+    onClick={() => setCaixaMensagens(false)}>
+    <div className="bg-[#0f0e0c] border border-[#8a4a8a50] max-w-md w-full p-6 mb-4 sm:mb-0"
+      style={{ borderRadius: '2px', boxShadow: '0 0 30px #8a4a8a20' }}
+      onClick={e => e.stopPropagation()}>
+      <div className="flex items-center justify-between mb-4">
+        <p style={cinzel} className="text-[#8a4a8a] text-xs tracking-[4px]">🔮 SUSSURROS DO MESTRE</p>
+        <button onClick={() => setCaixaMensagens(false)}
+          className="text-[#4a4030] hover:text-[#c8a84b] transition-colors">✕</button>
+      </div>
+      {mensagensSecretas.length === 0 ? (
+        <p className="text-[#4a4030] text-sm text-center py-4">Nenhum sussurro novo.</p>
+      ) : (
+        <div className="flex flex-col gap-3">
+          {mensagensSecretas.map(msg => (
+            <div key={msg.id} className="border border-[#8a4a8a30] bg-[#161410] p-4">
+              <p className="text-[#e8e0d0] text-sm leading-relaxed italic mb-3">"{msg.message}"</p>
+              <button onClick={() => marcarComoLida(msg.id)}
+                className="border border-[#8a4a8a50] text-[#8a4a8a] px-3 py-1 text-xs hover:bg-[#8a4a8a10] transition-colors w-full"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                ENTENDIDO
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   </div>
 )}
