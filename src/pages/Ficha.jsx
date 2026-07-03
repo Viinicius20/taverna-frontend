@@ -509,6 +509,16 @@ useEffect(() => {
   const handleFocus = () => {
     buscarMensagensSecretas();
   };
+  
+  document.addEventListener('visibilitychange', handleVisibility);
+  window.addEventListener('focus', handleFocus);
+  
+  return () => {
+    document.removeEventListener('visibilitychange', handleVisibility);
+    window.removeEventListener('focus', handleFocus);
+  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
 
 useEffect(() => {
   const handleMessage = (event) => {
@@ -518,16 +528,6 @@ useEffect(() => {
   };
   navigator.serviceWorker.addEventListener('message', handleMessage);
   return () => navigator.serviceWorker.removeEventListener('message', handleMessage);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, []);
-  
-  document.addEventListener('visibilitychange', handleVisibility);
-  window.addEventListener('focus', handleFocus);
-  
-  return () => {
-    document.removeEventListener('visibilitychange', handleVisibility);
-    window.removeEventListener('focus', handleFocus);
-  };
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
 
