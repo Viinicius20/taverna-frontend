@@ -46,13 +46,13 @@ self.addEventListener('notificationclick', event => {
       for (const client of clientList) {
         if (client.url.includes('taverna') && 'focus' in client) {
           client.focus();
-          // Manda sinal pra página buscar mensagens
           client.postMessage({ type: 'BUSCAR_MENSAGENS' });
           return;
         }
       }
+      // Se não tiver nenhuma aba aberta, abre na ficha do personagem
       if (clients.openWindow) {
-        return clients.openWindow('/');
+        return clients.openWindow('/personagens');
       }
     })
   );
