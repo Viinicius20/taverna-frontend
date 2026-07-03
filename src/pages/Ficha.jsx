@@ -522,10 +522,11 @@ useEffect(() => {
 
 useEffect(() => {
   const handleMessage = (event) => {
-    if (event.data?.type === 'BUSCAR_MENSAGENS') {
-      buscarMensagensSecretas();
-    }
-  };
+  console.log('Mensagem do SW:', event.data);
+  if (event.data?.type === 'BUSCAR_MENSAGENS') {
+    buscarMensagensSecretas();
+  }
+};
   navigator.serviceWorker.addEventListener('message', handleMessage);
   return () => navigator.serviceWorker.removeEventListener('message', handleMessage);
   // eslint-disable-next-line react-hooks/exhaustive-deps
