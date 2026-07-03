@@ -23,13 +23,6 @@ export default function Personagens() {
   const [carregandoSkill, setCarregandoSkill] = useState(false);
 
   useEffect(() => {
-  if (user) buscarPersonagens();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
-  useEffect(() => {
-  if (!personagens[0]?.id) return;
-
-useEffect(() => {
   const params = new URLSearchParams(window.location.search);
   if (params.get('abrir_ficha')) {
     const fichaId = localStorage.getItem('taverna_ficha_atual');
@@ -39,6 +32,13 @@ useEffect(() => {
   }
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
+
+  useEffect(() => {
+  if (user) buscarPersonagens();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+  useEffect(() => {
+  if (!personagens[0]?.id) return;
   
   const checarMensagens = async () => {
     try {
