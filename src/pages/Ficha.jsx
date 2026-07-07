@@ -538,28 +538,10 @@ useEffect(() => {
 
 async function buscarMensagensSecretas() {
   try {
-    console.log("buscando msgs para id:", id);
-    const res = await api.get(`/secret-messages/${id}`);
-    console.log("msgs retornadas:", res.data.data);
+    const res = await api.get(`/secret-messages/${id}`, {
+      params: { _t: Date.now() }
+    });
     const novas = res.data.data || [];
-    
-    // Dispara notificação se chegou mensagem nova
-    if (novas.length > mensagensSecretas.length && Notification.permission === 'granted') {
-      const msg = novas[0];
-      const notif = new Notification('🔮 Sussurro do Mestre', {
-        body: msg.message,
-        icon: '/favicon.ico',
-        badge: '/favicon.ico',
-        tag: 'sussurro', // evita spam de notificações
-      });
-      
-      // Clicar na notificação foca a aba
-      notif.onclick = () => {
-        window.focus();
-        notif.close();
-      };
-    }
-    
     setMensagensSecretas(novas);
   } catch {}
 }
