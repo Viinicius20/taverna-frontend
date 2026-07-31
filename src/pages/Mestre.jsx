@@ -254,39 +254,6 @@ async function entregarItemModal() {
   setEntregandoItem(false);
 }
 
-{modalEntregarItem && (
-  <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 px-4"
-    onClick={() => setModalEntregarItem(null)}>
-    <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full p-6"
-      style={{ borderRadius: '2px' }}
-      onClick={e => e.stopPropagation()}>
-      <div className="flex justify-between items-start mb-4">
-        <p style={cinzel} className="text-[#c8a84b] text-sm font-bold">
-          📦 Entregar Item para {modalEntregarItem.personagem.name}
-        </p>
-        <button onClick={() => setModalEntregarItem(null)}
-          className="text-[#4a4030] hover:text-[#c8a84b] text-xl">✕</button>
-      </div>
-
-      <input
-        value={nomeItemEntregar}
-        onChange={e => setNomeItemEntregar(e.target.value)}
-        placeholder="Nome do item..."
-        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-4 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50] mb-4"
-        style={{ borderRadius: '2px' }}
-        onKeyDown={e => e.key === 'Enter' && entregarItemModal()}
-      />
-
-      <button onClick={entregarItemModal}
-        className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs font-bold w-full hover:bg-[#e0c060] transition-colors disabled:opacity-50"
-        style={{ ...cinzel, borderRadius: '2px' }}>
-        {entregandoItem ? '⟳ ENTREGANDO...' : '✦ ENTREGAR'}
-      </button>
-    </div>
-  </div>
-)}
-
-
 useEffect(() => {
   buscarMagicItems();
 }, []);
@@ -1929,6 +1896,37 @@ function gerarNome() {
     </div>
   </div>
 )}
+
+      {modalEntregarItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 px-4"
+          onClick={() => setModalEntregarItem(null)}>
+          <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full p-6"
+            style={{ borderRadius: '2px' }}
+            onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-start mb-4">
+              <p style={cinzel} className="text-[#c8a84b] text-sm font-bold">
+                📦 Entregar Item para {modalEntregarItem.personagem.name}
+              </p>
+              <button onClick={() => setModalEntregarItem(null)}
+                className="text-[#4a4030] hover:text-[#c8a84b] text-xl">✕</button>
+            </div>
+            <input
+              value={nomeItemEntregar}
+              onChange={e => setNomeItemEntregar(e.target.value)}
+              placeholder="Nome do item..."
+              className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-4 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50] mb-4"
+              style={{ borderRadius: '2px' }}
+              onKeyDown={e => e.key === 'Enter' && entregarItemModal()}
+            />
+            <button onClick={entregarItemModal}
+              disabled={entregandoItem || !nomeItemEntregar.trim()}
+              className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs font-bold w-full hover:bg-[#e0c060] transition-colors disabled:opacity-50"
+              style={{ ...cinzel, borderRadius: '2px' }}>
+              {entregandoItem ? '⟳ ENTREGANDO...' : '✦ ENTREGAR'}
+            </button>
+          </div>
+        </div>
+      )}
 
       </div>
     </div>
