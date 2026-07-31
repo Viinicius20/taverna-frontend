@@ -81,9 +81,9 @@ export default function Ficha() {
 
   const [notas, setNotas] = useState(ficha?.notas_privadas || '');
 
-  const [modalEnviarItem, setModalEnviarItem] = useState(null); 
-  const [personagens, setPersonagens] = useState([]); 
-  const [enviarCopia, setEnviarCopia] = useState(false); 
+  const [modalEnviarItem, setModalEnviarItem] = useState(null); // item selecionado pra enviar
+  const [personagens, setPersonagens] = useState([]); // lista de personagens pra enviar
+  const [enviarCopia, setEnviarCopia] = useState(false); // toggle remover/copiar
   const [enviandoItem, setEnviandoItem] = useState(false);
 
   const [moedas, setMoedas] = useState({
@@ -1603,7 +1603,6 @@ style={{
   backgroundColor: isMagico ? '#c8a84b08' : 'transparent',
   cursor: 'pointer',
 }}>
-    {nome}
   </span>
   <button
     onClick={() => {
