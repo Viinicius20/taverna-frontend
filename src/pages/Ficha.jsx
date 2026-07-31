@@ -1589,7 +1589,7 @@ function rolarAtaque(ataque) {
   <span
     onClick={() => {
   if (isObj && item.is_magic) {
-    setItemInventarioDetalhes(item);
+    setItemInventarioDetalhes({ ...item, _index: i }); // guarda o index
   } else {
     setModalEnviarItem({ item, index: i });
     setEnviarCopia(false);
@@ -1658,10 +1658,13 @@ style={{
       <div className="mt-4 pt-4 border-t border-[#c8a84b15]">
         <button
           onClick={() => {
-            setModalEnviarItem({ item: itemInventarioDetalhes, index: null });
-            setItemInventarioDetalhes(null);
-            setEnviarCopia(false);
-          }}
+  setModalEnviarItem({ 
+    item: itemInventarioDetalhes, 
+    index: itemInventarioDetalhes._index ?? null 
+  });
+  setItemInventarioDetalhes(null);
+  setEnviarCopia(false);
+}}
           className="border border-[#c8a84b30] text-[#c8a84b] px-4 py-2 text-xs w-full hover:bg-[#c8a84b10] transition-colors"
           style={{ ...cinzel, borderRadius: '2px' }}>
           📦 Enviar Item
