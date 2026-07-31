@@ -73,6 +73,9 @@ export default function Mestre() {
   const [modalEntregarItem, setModalEntregarItem] = useState(null);
   const [nomeItemEntregar, setNomeItemEntregar] = useState('');
   const [entregandoItem, setEntregandoItem] = useState(false);
+  const [abaEntregarItem, setAbaEntregarItem] = useState('digitar'); // 'digitar' | 'inventario'
+  const [jogadorOrigem, setJogadorOrigem] = useState(null);
+  const [itemSelecionado, setItemSelecionado] = useState(null);
 
   useEffect(() => {
     buscarNpcs();
@@ -1898,35 +1901,151 @@ function gerarNome() {
 )}
 
       {modalEntregarItem && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 px-4"
-          onClick={() => setModalEntregarItem(null)}>
-          <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full p-6"
+  <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 px-4"
+    onClick={() => { setModalEntregarItem(null); setAbaEntregarItem('digitar'); setJogadorOrigem(null); setItemSelecionado(null); }}>
+    <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full p-6"
+      style={{ borderRadius: '2px' }}
+      onClick={e => e.stopPropagation()}>
+      
+      <div className="flex justify-between items-start mb-4">
+        <p style={cinzel} className="text-[#c8a84b] text-sm font-bold">
+          📦 Entregar Item para {modalEntregarItem.personagem.name}
+        </p>
+        <button onClick={() => { setModalEntregarItem(null); setAbaEntregarItem('digitar'); setJogadorOrigem(null); setItemSelecionado(null); }}
+          className="text-[#4a4030] hover:text-[#c8a84b] text-xl">✕</button>
+      </div>
+
+      {/* Abas */}
+      <div className="flex gap-px mb-4 border-b border-[#c8a84b15]">
+        <button onClick={() => setAbaEntregarItem('digitar')}
+          className="px-4 py-2 text-xs transition-colors"
+          style={{ ...cinzel, borderBottom: abaEntregarItem === 'digitar' ? '2px solid #c8a84b' : '2px solid transparent', color: abaEntregarItem === 'digitar' ? '#c8a84b' : '#4a4030' }}>
+          Digitar Item
+        </button>
+        <button onClick={() => setAbaEntregarItem('inventario')}
+          className="px-4 py-2 text-xs transition-colors"
+          style={{ ...cinzel, borderBottom: abaEntregarItem === 'inventario' ? '2px solid #c8a84b' : '2px solid transparent', color: abaEntregarItem === 'inventario' ? '#c8a84b' : '#4a4030' }}>
+          Do Inventário
+        </button>
+      </div>
+
+      {/* Aba digitar */}
+      {abaEntregarItem === 'digitar' && (
+        <>
+          <input
+            value={nomeItemEntregar}
+            onChange={e => setNomeItemEntregar(e.target.value)}
+            placeholder="Nome do item..."
+            className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-4 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50] mb-4"
             style={{ borderRadius: '2px' }}
-            onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-start mb-4">
-              <p style={cinzel} className="text-[#c8a84b] text-sm font-bold">
-                📦 Entregar Item para {modalEntregarItem.personagem.name}
-              </p>
-              <button onClick={() => setModalEntregarItem(null)}
-                className="text-[#4a4030] hover:text-[#c8a84b] text-xl">✕</button>
-            </div>
-            <input
-              value={nomeItemEntregar}
-              onChange={e => setNomeItemEntregar(e.target.value)}
-              placeholder="Nome do item..."
-              className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-4 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50] mb-4"
-              style={{ borderRadius: '2px' }}
-              onKeyDown={e => e.key === 'Enter' && entregarItemModal()}
-            />
-            <button onClick={entregarItemModal}
-              disabled={entregandoItem || !nomeItemEntregar.trim()}
-              className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs font-bold w-full hover:bg-[#e0c060] transition-colors disabled:opacity-50"
-              style={{ ...cinzel, borderRadius: '2px' }}>
-              {entregandoItem ? '⟳ ENTREGANDO...' : '✦ ENTREGAR'}
-            </button>
-          </div>
-        </div>
+            onKeyDown={e => e.key === 'Enter' && entregarItemModal()}
+          />
+          <button onClick={entregarItemModal}
+            disabled={entregandoItem || !nomeItemEntregar.trim()}
+            className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs font-bold w-full hover:bg-[#e0c060] transition-colors disabled:opacity-50"
+            style={{ ...cinzel, borderRadius: '2px' }}>
+            {entregandoItem ? '⟳ ENTREGANDO...' : '✦ ENTREGAR'}
+          </button>
+        </>
       )}
+
+      {/* Aba inventário */}
+      {abaEntregarItem === 'inventario' && (
+        <>
+          {/* Seleciona jogador de origem */}
+          {!jogadorOrigem ? (
+            <>
+              <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-2">TIRAR DE QUAL JOGADOR:</p>
+              <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
+                {personagens
+                  .filter(p => p.id !== modalEntregarItem.personagem.id)
+                  .map(p => (
+                    <button key={p.id}
+                      onClick={() => setJogadorOrigem(p)}
+                      className="border border-[#c8a84b20] text-[#e8e0d0] px-4 py-2 text-sm text-left hover:border-[#c8a84b50] hover:bg-[#c8a84b08] transition-colors"
+                      style={{ borderRadius: '2px' }}>
+                      {p.data?.name || p.name}
+                    </button>
+                  ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center gap-2 mb-3">
+                <button onClick={() => { setJogadorOrigem(null); setItemSelecionado(null); }}
+                  className="text-[#4a4030] hover:text-[#c8a84b] text-xs">← Voltar</button>
+                <p style={cinzel} className="text-[#c8a84b] text-xs">
+                  Inventário de {jogadorOrigem.data?.name || jogadorOrigem.name}
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 max-h-48 overflow-y-auto mb-4">
+                {(jogadorOrigem.data?.inventory || []).map((item, i) => {
+                  const nome = typeof item === 'object' ? item.name : item;
+                  return (
+                    <button key={i}
+                      onClick={() => setItemSelecionado({ item, index: i })}
+                      className="border px-4 py-2 text-sm text-left transition-colors"
+                      style={{
+                        borderRadius: '2px',
+                        borderColor: itemSelecionado?.index === i ? '#c8a84b' : '#c8a84b20',
+                        backgroundColor: itemSelecionado?.index === i ? '#c8a84b15' : 'transparent',
+                        color: itemSelecionado?.index === i ? '#c8a84b' : '#e8e0d0',
+                      }}>
+                      {nome}
+                    </button>
+                  );
+                })}
+              </div>
+              {itemSelecionado && (
+                <button
+                  onClick={async () => {
+                    setEntregandoItem(true);
+                    try {
+                      const destinatario = modalEntregarItem.personagem;
+                      const item = itemSelecionado.item;
+                      const nome = typeof item === 'object' ? item.name : item;
+
+                      // Adiciona no destinatário
+                      const invDest = [...(destinatario.data?.inventory || []), item];
+                      await api.put(`/characters/${destinatario.id}`, {
+                        data: { ...destinatario.data, inventory: invDest }
+                      });
+
+                      // Remove do jogador de origem
+                      const invOrigem = (jogadorOrigem.data?.inventory || []).filter((_, i) => i !== itemSelecionado.index);
+                      await api.put(`/characters/${jogadorOrigem.id}`, {
+                        data: { ...jogadorOrigem.data, inventory: invOrigem }
+                      });
+
+                      // Notifica destinatário
+                      await api.post('/notify/item', {
+                        character_id: destinatario.id,
+                        item_nome: nome
+                      });
+
+                      setModalEntregarItem(null);
+                      setJogadorOrigem(null);
+                      setItemSelecionado(null);
+                      setAbaEntregarItem('digitar');
+                      alert(`Item transferido com sucesso!`);
+                    } catch {
+                      alert('Erro ao transferir item.');
+                    }
+                    setEntregandoItem(false);
+                  }}
+                  disabled={entregandoItem}
+                  className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs font-bold w-full hover:bg-[#e0c060] transition-colors disabled:opacity-50"
+                  style={{ ...cinzel, borderRadius: '2px' }}>
+                  {entregandoItem ? '⟳ TRANSFERINDO...' : '✦ TRANSFERIR'}
+                </button>
+              )}
+            </>
+          )}
+        </>
+      )}
+    </div>
+  </div>
+)}
 
       </div>
     </div>
