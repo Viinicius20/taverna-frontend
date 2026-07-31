@@ -563,6 +563,34 @@ async function marcarComoLida(msgId) {
   } catch {}
 }
 
+async function enviarItemParaPersonagem(destinatario) {
+  setEnviandoItem(true);
+  try {
+    const item = modalEnviarItem.item;
+    const inventarioDestinatario = [...(destinatario.data?.inventory || []), item];
+
+    // Atualiza inventário do destinatário
+    await api.put(`/characters/${destinatario.id}`, {
+      data: { ...destinatario.data, inventory: inventarioDestinatario }
+    });
+
+    // Se não for cópia, remove do inventário atual
+    if (!enviarCopia && modalEnviarItem.index !== null) {
+      const novosItens = ficha.inventory.filter((_, idx) => idx !== modalEnviarItem.index);
+      setFicha(prev => ({ ...prev, inventory: novosItens }));
+      await api.put(`/characters/${id}`, {
+        data: { ...ficha, inventory: novosItens }
+      });
+    }
+
+    setModalEnviarItem(null);
+    alert(`Item enviado para ${destinatario.data?.name || destinatario.name}!`);
+  } catch {
+    alert('Erro ao enviar item.');
+  }
+  setEnviandoItem(false);
+}
+
 function adicionarAtaque() {
   if (!novoAtaque.nome) return;
   const novos = [...ataques, novoAtaque];
