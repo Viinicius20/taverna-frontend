@@ -81,6 +81,11 @@ export default function Ficha() {
 
   const [notas, setNotas] = useState(ficha?.notas_privadas || '');
 
+  const [modalEnviarItem, setModalEnviarItem] = useState(null); 
+  const [personagens, setPersonagens] = useState([]); 
+  const [enviarCopia, setEnviarCopia] = useState(false); 
+  const [enviandoItem, setEnviandoItem] = useState(false);
+
   const [moedas, setMoedas] = useState({
   po: ficha?.moedas?.po || 0,
   pp: ficha?.moedas?.pp || 0,
@@ -98,8 +103,13 @@ export default function Ficha() {
 };
 
 useEffect(() => {
-  buscarPersonagem();
-  localStorage.setItem('taverna_ficha_atual', id); // salva o id da ficha atual
+  async function init() {
+    buscarPersonagem();
+    localStorage.setItem('taverna_ficha_atual', id);
+    const resPersonagens = await api.get('/characters');
+    setPersonagens(resPersonagens.data.data || []);
+  }
+  init();
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [id]);
 
@@ -1549,15 +1559,22 @@ function rolarAtaque(ataque) {
     return (
       <div key={i} className="flex items-center gap-1 group">
   <span
-    onClick={() => isObj && item.is_magic && setItemInventarioDetalhes(item)}
-    className="border px-3 py-1 text-sm"
-    style={{
-      borderRadius: '2px',
-      borderColor: isMagico ? '#c8a84b40' : '#c8a84b15',
-      color: isMagico ? '#c8a84b' : '#6a6050',
-      backgroundColor: isMagico ? '#c8a84b08' : 'transparent',
-      cursor: isObj && item.is_magic ? 'pointer' : 'default',
-    }}>
+    onClick={() => {
+  if (isObj && item.is_magic) {
+    setItemInventarioDetalhes(item);
+  } else {
+    setModalEnviarItem({ item, index: i });
+    setEnviarCopia(false);
+  }
+}}
+className="border px-3 py-1 text-sm"
+style={{
+  borderRadius: '2px',
+  borderColor: isMagico ? '#c8a84b40' : '#c8a84b15',
+  color: isMagico ? '#c8a84b' : '#6a6050',
+  backgroundColor: isMagico ? '#c8a84b08' : 'transparent',
+  cursor: 'pointer',
+}}>
     {nome}
   </span>
   <button
@@ -1607,6 +1624,21 @@ function rolarAtaque(ataque) {
           <p className="text-[#4a4030] text-sm">As propriedades deste item são desconhecidas.</p>
         </div>
       )}
+
+      {/* Botão enviar — adicionado aqui */}
+      <div className="mt-4 pt-4 border-t border-[#c8a84b15]">
+        <button
+          onClick={() => {
+            setModalEnviarItem({ item: itemInventarioDetalhes, index: null });
+            setItemInventarioDetalhes(null);
+            setEnviarCopia(false);
+          }}
+          className="border border-[#c8a84b30] text-[#c8a84b] px-4 py-2 text-xs w-full hover:bg-[#c8a84b10] transition-colors"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          📦 Enviar Item
+        </button>
+      </div>
+
     </div>
   </div>
 )}
