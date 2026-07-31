@@ -573,6 +573,10 @@ async function enviarItemParaPersonagem(destinatario) {
     await api.put(`/characters/${destinatario.id}`, {
       data: { ...destinatario.data, inventory: inventarioDestinatario }
     });
+    await api.post('/notify/item', {
+  character_id: destinatario.id,
+  item_nome: typeof item === 'object' ? item.name : item
+});
 
     // Se não for cópia, remove do inventário atual
     if (!enviarCopia && modalEnviarItem.index !== null) {
