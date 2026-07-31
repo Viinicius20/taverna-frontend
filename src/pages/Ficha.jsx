@@ -1603,6 +1603,7 @@ style={{
   backgroundColor: isMagico ? '#c8a84b08' : 'transparent',
   cursor: 'pointer',
 }}>
+    {nome}
   </span>
   <button
     onClick={() => {
@@ -1651,8 +1652,9 @@ style={{
           <p className="text-[#4a4030] text-sm">As propriedades deste item são desconhecidas.</p>
         </div>
       )}
+      
 
-      {/* Botão enviar — adicionado aqui */}
+      {/* Botão enviar */}
       <div className="mt-4 pt-4 border-t border-[#c8a84b15]">
         <button
           onClick={() => {
@@ -1666,6 +1668,59 @@ style={{
         </button>
       </div>
 
+    </div>
+  </div>
+)}
+
+{/* MODAL ENVIAR ITEM */}
+{modalEnviarItem && (
+  <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 px-4"
+    onClick={() => setModalEnviarItem(null)}>
+    <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full p-6"
+      style={{ borderRadius: '2px' }}
+      onClick={e => e.stopPropagation()}>
+      <div className="flex justify-between items-start mb-4">
+        <p style={cinzel} className="text-[#c8a84b] text-sm font-bold">📦 Enviar Item</p>
+        <button onClick={() => setModalEnviarItem(null)}
+          className="text-[#4a4030] hover:text-[#c8a84b] text-xl">✕</button>
+      </div>
+
+      <p className="text-[#e8e0d0] text-sm mb-4">
+        {typeof modalEnviarItem.item === 'object'
+          ? modalEnviarItem.item.name
+          : modalEnviarItem.item}
+      </p>
+
+      <div className="flex gap-2 mb-4">
+        <button onClick={() => setEnviarCopia(false)}
+          className={`flex-1 px-3 py-2 text-xs transition-colors ${!enviarCopia ? 'bg-[#c8a84b] text-[#0f0e0c]' : 'border border-[#c8a84b30] text-[#4a4030]'}`}
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          Enviar e Remover
+        </button>
+        <button onClick={() => setEnviarCopia(true)}
+          className={`flex-1 px-3 py-2 text-xs transition-colors ${enviarCopia ? 'bg-[#c8a84b] text-[#0f0e0c]' : 'border border-[#c8a84b30] text-[#4a4030]'}`}
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          Enviar Cópia
+        </button>
+      </div>
+
+      <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-2">ENVIAR PARA:</p>
+      <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
+        {personagens
+          .filter(p => p.id !== id)
+          .map(p => (
+            <button key={p.id}
+              onClick={() => enviarItemParaPersonagem(p)}
+              disabled={enviandoItem}
+              className="border border-[#c8a84b20] text-[#e8e0d0] px-4 py-2 text-sm text-left hover:border-[#c8a84b50] hover:bg-[#c8a84b08] transition-colors disabled:opacity-50"
+              style={{ borderRadius: '2px' }}>
+              {p.data?.name || p.name}
+              <span className="text-[#4a4030] text-xs ml-2">
+                {p.data?.race} · Nível {p.data?.level}
+              </span>
+            </button>
+          ))}
+      </div>
     </div>
   </div>
 )}
