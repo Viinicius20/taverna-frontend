@@ -86,6 +86,8 @@ export default function Ficha() {
   const [enviarCopia, setEnviarCopia] = useState(false); // toggle remover/copiar
   const [enviandoItem, setEnviandoItem] = useState(false);
 
+  const [uploadandoAvatar, setUploadandoAvatar] = useState(false);
+
   const [moedas, setMoedas] = useState({
   po: ficha?.moedas?.po || 0,
   pp: ficha?.moedas?.pp || 0,
@@ -563,6 +565,23 @@ async function marcarComoLida(msgId) {
   } catch {}
 }
 
+async function uploadAvatar(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  setUploadandoAvatar(true);
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await api.post(`/characters/${id}/avatar`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    setPersonagem(prev => ({ ...prev, avatar_url: res.data.url }));
+  } catch {
+    alert('Erro ao fazer upload do avatar.');
+  }
+  setUploadandoAvatar(false);
+}
+
 async function enviarItemParaPersonagem(destinatario) {
   setEnviandoItem(true);
   try {
@@ -684,22 +703,46 @@ function rolarAtaque(ataque) {
       <div id="ficha-conteudo" className="max-w-3xl mx-auto px-8 py-12">
 
         <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
-          <div>
-            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">FICHA DO PERSONAGEM</p>
-            <h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold">{ficha.name}</h1>
-            <p className="text-[#6a6050] mt-1">{[
-  ficha.race, 
-  ficha.class ? (() => {
-    try {
-      const parsed = typeof ficha.class === 'string' ? JSON.parse(ficha.class) : ficha.class;
-      return Array.isArray(parsed) ? `${parsed[0]?.name} ${parsed[0]?.level}` : ficha.class;
-    } catch {
-      return ficha.class;
-    }
-  })() : '',
-  ficha.background
-].filter(Boolean).join(' · ')}</p>
-          </div>
+  <div className="flex items-start gap-4">
+    {/* Avatar */}
+    <div className="relative flex-shrink-0">
+      <div className="w-20 h-20 rounded border border-[#c8a84b20] overflow-hidden bg-[#161410] flex items-center justify-center">
+        {personagem?.avatar_url ? (
+          <img src={personagem.avatar_url} alt="avatar"
+            className="w-full h-full object-cover" />
+        ) : (
+          <span className="text-2xl opacity-20">⚔</span>
+        )}
+      </div>
+      <label className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#c8a84b] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#e0c060] transition-colors"
+        title="Trocar foto">
+        <span className="text-[#0f0e0c] text-xs">+</span>
+        <input type="file" accept="image/jpeg,image/png,image/webp"
+          onChange={uploadAvatar} className="hidden" />
+      </label>
+      {uploadandoAvatar && (
+        <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center rounded">
+          <div className="w-4 h-4 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
+        </div>
+      )}
+    </div>
+
+    {/* Nome e classe */}
+    <div>
+      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">FICHA DO PERSONAGEM</p>
+      <h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold">{ficha.name}</h1>
+      <p className="text-[#6a6050] mt-1">{[
+        ficha.race,
+        ficha.class ? (() => {
+          try {
+            const parsed = typeof ficha.class === 'string' ? JSON.parse(ficha.class) : ficha.class;
+            return Array.isArray(parsed) ? `${parsed[0]?.name} ${parsed[0]?.level}` : ficha.class;
+          } catch { return ficha.class; }
+        })() : '',
+        ficha.background
+      ].filter(Boolean).join(' · ')}</p>
+    </div>
+  </div>
           <div className="flex gap-3 flex-wrap">
             <button onClick={handleLevelUp}
               className="border border-[#c8a84b40] text-[#c8a84b] px-5 py-2 text-xs tracking-widest hover:bg-[#c8a84b10] transition-colors"
