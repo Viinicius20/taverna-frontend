@@ -225,6 +225,12 @@ export default function Personagens() {
                   <div className="p-6 flex items-start justify-between gap-4">
 
                     <div className="flex-1 min-w-0">
+  {/* Avatar */}
+  {p.avatar_url && (
+    <img src={p.avatar_url} alt={d.name}
+      className="w-14 h-14 rounded object-cover mb-3 border border-[#c8a84b20]"
+      style={{ borderRadius: '2px' }} />
+  )}
                       {/* Nome e badges */}
                       <div className="flex items-center gap-3 mb-2 flex-wrap">
                         <h2 style={cinzel}
