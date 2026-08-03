@@ -516,7 +516,7 @@ async function abrirSkillNpc(skillName, npcData) {
 function adicionarPersonagem(npc) {
   const d = npc.data || {};
   const hp = d.combat?.hp_max || d.combat?.hp || 10;
-  const isJogador = !!npc.user_id; // personagens de jogadores têm user_id
+  const isJogador = !!npc.user_id;
   setCombatentes(prev => [...prev, {
     id: npc.id,
     nome: npc.name,
@@ -524,6 +524,7 @@ function adicionarPersonagem(npc) {
     hpMax: hp,
     hpAtual: hp,
     iniciativa: d.combat?.initiative || 0,
+    avatar_url: npc.avatar_url || null, // ← adiciona isso
   }]);
 }
 
@@ -1138,10 +1139,16 @@ function gerarNome() {
               </div>
 
               {/* Nome e tipo */}
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  {isAtivo && <span className="text-[#c8a84b] text-xs">▶</span>}
-                  <span style={cinzel} className="text-[#e8e0d0] text-sm">{c.nome}</span>
+<div className="flex-1">
+  <div className="flex items-center gap-2 mb-2">
+    {isAtivo && <span className="text-[#c8a84b] text-xs">▶</span>}
+    {/* Avatar do jogador */}
+    {c.tipo === 'jogador' && c.avatar_url && (
+      <img src={c.avatar_url} alt={c.nome}
+        className="w-6 h-6 rounded object-cover border border-[#c8a84b20]"
+        style={{ borderRadius: '2px' }} />
+    )}
+    <span style={cinzel} className="text-[#e8e0d0] text-sm">{c.nome}</span>
                   <span style={{ ...cinzel, borderRadius: '2px' }}
                     className={[
                       'text-xs px-2 py-0.5 border',
