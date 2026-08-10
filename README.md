@@ -8,7 +8,6 @@ Plataforma web fullstack para mesas de RPG presencial com IA generativa, fichas 
 
 ## 📸 Screenshots
 
-> Adicione prints na pasta `/screenshots` e descomente as linhas abaixo
 
 
 ![Home](./screenshots/home.png)
