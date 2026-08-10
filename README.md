@@ -1,70 +1,151 @@
-# Getting Started with Create React App
+# ⚔ Taverna RPG
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Plataforma web fullstack para mesas de RPG presencial com IA generativa, fichas interativas, battle map com tokens em tempo real e painel exclusivo para o mestre da campanha.
 
-## Available Scripts
+🔗 **[taverna-frontend.vercel.app](https://taverna-frontend.vercel.app)**
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## 📸 Screenshots
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+> Adicione prints na pasta `/screenshots` e descomente as linhas abaixo
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
 
-### `npm test`
+![Home](./screenshots/home.png)
+![Ficha](./screenshots/ficha.png)
+![Mestre](./screenshots/mestre.png)
+![Galeria](./screenshots/galeria.png)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## ✨ Funcionalidades
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 🎲 Jogador
+- Criação de personagem via IA (descrição em linguagem natural) ou importação de PDF
+- Ficha interativa completa — atributos, combate, magias, inventário, condições, recursos e descanso
+- Foto de perfil do personagem (upload)
+- Contador de moedas com conversão (PC → PP → PE → PO)
+- Ataques salvos com rolagem de dado integrada
+- Notas privadas por personagem
+- Recursos com rastreamento de usos (descanso curto/longo)
+- Exportação da ficha em PDF
+- Compartilhamento de link público da ficha (leitura sem login)
+- Envio de itens entre personagens
+- Notificações push de sussurros do Mestre (funciona com app minimizado)
+- Level up com IA e seleção de arquétipo por classe
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 🧙 Mestre
+- Painel com NPCs, painel de combate, ferramentas e histórico
+- Gerador de NPCs com IA (personalidade, segredos, motivações)
+- Painel de combate com iniciativa, HP e barra de vida
+- Bestiário com 60+ monstros canônicos D&D 5e e geração via IA
+- Gerador de loot por nível e contexto
+- Almanaque de itens mágicos com sistema de identificação e entrega para jogadores
+- Battle map com tokens arrastáveis, rotação e escala em tempo real
+- Galeria de mapas e imagens reveladas para jogadores em tempo real
+- Transferência de itens entre jogadores
+- Resumo de regras via IA
+- Relógio de pressão (countdown por turno)
+- Histórico de sessões
+- Calculadora e distribuição de XP
+- Gerador de encontros aleatórios
+- Sussurros — mensagens secretas por personagem com notificação push
+- Gerador de nomes por raça
 
-### `npm run eject`
+### 🌐 Geral
+- Login leve por apelido (sem senha, sem cadastro)
+- Quadro de Rumores (post-its por categoria, visível para jogadores)
+- Boatos de Taverna na Home
+- PWA — instalável como app no celular
+- Sistema de campanhas com código de convite
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+---
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🛠 Stack
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+| Camada | Tecnologia |
+|--------|-----------|
+| Frontend | React, Tailwind CSS |
+| Backend | FastAPI (Python) |
+| Banco de dados | Supabase (PostgreSQL) |
+| Storage | Supabase Storage |
+| IA | Google Gemini 2.5 Flash |
+| Notificações | Web Push API (VAPID) |
+| Deploy Frontend | Vercel |
+| Deploy Backend | Render |
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
+## 🗄 Estrutura do Banco
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```
+characters         — fichas dos personagens (JSONB)
+profiles           — usuários (login leve por apelido)
+campaigns          — campanhas
+campaign_members   — membros por campanha
+npcs               — NPCs gerados pelo mestre
+sessions           — histórico de sessões
+magic_items        — almanaque de itens mágicos
+bestiary           — bestiário de monstros
+map_tokens         — tokens posicionados no battle map
+gallery            — mapas e imagens da galeria
+secret_messages    — mensagens secretas por personagem
+rumors             — quadro de rumores
+push_subscriptions — assinaturas de notificação por dispositivo
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+## 🚀 Rodando Localmente
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```bash
+# Instalar dependências
+npm install
 
-### Analyzing the Bundle Size
+# Iniciar em desenvolvimento
+npm start
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+# Build de produção
+npm run build
+```
 
-### Making a Progressive Web App
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## ⚙ Variáveis de Ambiente
 
-### Advanced Configuration
+```env
+REACT_APP_API_URL=https://taverna-backend-eq3b.onrender.com
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+---
 
-### Deployment
+## 📁 Estrutura do Projeto
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```
+src/
+├── components/       # Componentes reutilizáveis
+├── context/          # UserContext (autenticação leve)
+├── pages/
+│   ├── Home.jsx
+│   ├── Login.jsx
+│   ├── Personagens.jsx
+│   ├── Ficha.jsx
+│   ├── FichaPublica.jsx
+│   ├── CriarPersonagem.jsx
+│   ├── Mestre.jsx
+│   ├── Bestiario.jsx
+│   ├── Galeria.jsx
+│   ├── Quadro.jsx
+│   ├── Historico.jsx
+│   ├── Campanhas.jsx
+│   └── RolarDados.jsx
+└── services/
+    └── api.js
+```
 
-### `npm run build` fails to minify
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 🔗 Repositório do Backend
+
+[github.com/Viinicius20/taverna-backend](https://github.com/Viinicius20/taverna-backend)
