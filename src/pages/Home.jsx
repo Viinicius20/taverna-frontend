@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser } from '../context/UserContext';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
@@ -11,7 +11,35 @@ export default function Home() {
   const [boato, setBoato] = useState(null);
   const [gerandoBoato, setGerandoBoato] = useState(false);
   const [drawerAberto, setDrawerAberto] = useState(false);
+  const [monstro, setMonstro] = useState(null);
+  const [imagemRevelada, setImagemRevelada] = useState(null);
   const isMestre = user?.role === 'mestre';
+
+  useEffect(() => {
+    buscarMonstroAleatorio();
+    buscarImagemRevelada();
+  }, []);
+
+  async function buscarMonstroAleatorio() {
+    try {
+      const res = await fetch('https://taverna-backend-eq3b.onrender.com/bestiary/random-description');
+      const json = await res.json();
+      setMonstro(json.data);
+    } catch {
+      setMonstro(null);
+    }
+  }
+
+  async function buscarImagemRevelada() {
+    try {
+      const res = await fetch('https://taverna-backend-eq3b.onrender.com/gallery?campaign_id=00000000-0000-0000-0000-000000000001');
+      const json = await res.json();
+      const revelada = (json.data || []).find(i => i.revealed);
+      setImagemRevelada(revelada || null);
+    } catch {
+      setImagemRevelada(null);
+    }
+  }
 
   async function gerarBoato() {
     setGerandoBoato(true);
@@ -27,15 +55,17 @@ export default function Home() {
   }
 
   const menuItems = [
-    { label: 'Personagens', rota: '/personagens', sempre: true },
-    { label: 'Galeria', rota: '/galeria', sempre: true },
-    { label: 'Quadro de Rumores', rota: '/quadro', sempre: true },
-    { label: 'Histórico', rota: '/historico', sempre: true },
-    { label: 'Rolar Dados', rota: '/dados', sempre: true },
-    { label: 'Campanhas', rota: '/campanhas', sempre: true },
-    { label: 'Mestre', rota: '/mestre', sempre: false, apenasM: true },
-    { label: 'Bestiário', rota: '/mestre/bestiario', sempre: false, apenasM: true },
-  ].filter(item => item.sempre || (item.apenasM && isMestre));
+    { label: 'Personagens', rota: '/personagens' },
+    { label: 'Galeria', rota: '/galeria' },
+    { label: 'Quadro de Rumores', rota: '/quadro' },
+    { label: 'Histórico', rota: '/historico' },
+    { label: 'Rolar Dados', rota: '/dados' },
+    { label: 'Campanhas', rota: '/campanhas' },
+    ...(isMestre ? [
+      { label: 'Mestre', rota: '/mestre', destaque: true },
+      { label: 'Bestiário', rota: '/mestre/bestiario', destaque: true },
+    ] : []),
+  ];
 
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0]" style={crimson}>
@@ -47,8 +77,7 @@ export default function Home() {
           ⚔ TAVERNA
         </span>
         <button onClick={() => setDrawerAberto(true)}
-          className="text-[#a09880] hover:text-[#c8a84b] transition-colors p-2"
-          style={cinzel}>
+          className="text-[#a09880] hover:text-[#c8a84b] transition-colors p-2">
           <div className="flex flex-col gap-1.5">
             <span className="block w-5 h-px bg-current" />
             <span className="block w-5 h-px bg-current" />
@@ -57,51 +86,52 @@ export default function Home() {
         </button>
       </nav>
 
-      {/* DRAWER OVERLAY */}
+      {/* DRAWER */}
       {drawerAberto && (
         <div className="fixed inset-0 z-50 flex justify-end">
-          {/* Fundo escuro */}
           <div className="absolute inset-0 bg-black bg-opacity-60"
             onClick={() => setDrawerAberto(false)} />
-
-          {/* Painel lateral */}
           <div className="relative w-72 bg-[#0f0e0c] border-l border-[#c8a84b20] h-full flex flex-col"
             style={{ animation: 'slideIn 0.2s ease' }}>
-
-            {/* Header do drawer */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-[#c8a84b20]">
               <span style={cinzel} className="text-[#c8a84b] text-sm tracking-widest">⚔ TAVERNA</span>
               <button onClick={() => setDrawerAberto(false)}
                 className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">✕</button>
             </div>
 
-            {/* Usuário logado */}
             {user && (
               <div className="px-6 py-4 border-b border-[#c8a84b15]">
                 <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-1">LOGADO COMO</p>
                 <p style={cinzel} className="text-[#c8a84b] text-sm">{user.username}</p>
-                {isMestre && (
-                  <span style={cinzel} className="text-[#3a3020] text-xs">Mestre</span>
-                )}
+                {isMestre && <span style={cinzel} className="text-[#3a3020] text-xs">Mestre</span>}
               </div>
             )}
 
-            {/* Links */}
             <div className="flex-1 overflow-y-auto py-4">
-              {menuItems.map(({ label, rota, apenasM }) => (
-                <button key={label}
-                  onClick={() => { navigate(rota); setDrawerAberto(false); }}
-                  className="w-full text-left px-6 py-3 text-sm hover:bg-[#161410] transition-colors flex items-center justify-between group"
-                  style={cinzel}>
-                  <span className={apenasM ? 'text-[#c8a84b]' : 'text-[#a09880] group-hover:text-[#c8a84b] transition-colors'}>
-                    {label}
-                  </span>
-                  <span className="text-[#4a4030] group-hover:text-[#c8a84b] transition-colors text-xs">→</span>
-                </button>
-              ))}
+              {user ? (
+                menuItems.map(({ label, rota, destaque }) => (
+                  <button key={label}
+                    onClick={() => { navigate(rota); setDrawerAberto(false); }}
+                    className="w-full text-left px-6 py-3 text-sm hover:bg-[#161410] transition-colors flex items-center justify-between group"
+                    style={cinzel}>
+                    <span className={destaque ? 'text-[#c8a84b]' : 'text-[#a09880] group-hover:text-[#c8a84b] transition-colors'}>
+                      {label}
+                    </span>
+                    <span className="text-[#4a4030] group-hover:text-[#c8a84b] transition-colors text-xs">→</span>
+                  </button>
+                ))
+              ) : (
+                <div className="px-6 py-8 text-center">
+                  <p style={cinzel} className="text-[#4a4030] text-xs mb-4">Entre na mesa para acessar todas as ferramentas.</p>
+                  <button onClick={() => { navigate('/login'); setDrawerAberto(false); }}
+                    className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs font-bold w-full hover:bg-[#e0c060] transition-colors"
+                    style={{ ...cinzel, borderRadius: '2px' }}>
+                    → Entrar na Mesa
+                  </button>
+                </div>
+              )}
             </div>
 
-            {/* Rodapé do drawer */}
             <div className="px-6 py-4 border-t border-[#c8a84b15]">
               {user ? (
                 <button onClick={() => { logout(); setDrawerAberto(false); }}
@@ -139,72 +169,47 @@ export default function Home() {
         </button>
       </div>
 
-      {/* DIVISOR */}
       <div className="w-16 h-px bg-[#c8a84b60] mx-auto mb-16" />
 
-      {/* FEATURES */}
-      <div className="max-w-5xl mx-auto px-8 mb-20">
-        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">O QUE VOCÊ PODE FAZER</p>
-        <h2 style={cinzel} className="text-2xl text-[#f0e8d8] mb-1 font-semibold">Ferramentas para a mesa</h2>
-        <p className="text-[#7a7060] mb-8 font-light">Tudo que você precisa, em um só lugar.</p>
+      {/* CONTEÚDO VISUAL */}
+      <div className="max-w-5xl mx-auto px-8 mb-20 grid grid-cols-1 sm:grid-cols-2 gap-8">
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-[#c8a84b25] border border-[#c8a84b25]">
-          {[
-            { icon: '✦', title: 'Criação com IA', desc: 'Descreva seu personagem em palavras e a IA monta a ficha completa com atributos, perícias e história.', rota: '/personagens/criar' },
-            { icon: '⬢', title: 'Rolar Dados', desc: 'Role dados de qualquer tipo — d4, d6, d8, d10, d12, d20 e d100. Com modificadores e histórico.', rota: '/dados' },
-            { icon: '🗺', title: 'Galeria', desc: 'O mestre revela mapas e imagens pra mesa em tempo real. Abra durante a sessão.', rota: '/galeria' },
-            { icon: '⚔', title: 'Campanhas', desc: 'Crie ou entre em campanhas com um código de convite. Gerencie seus grupos de aventureiros.', rota: '/campanhas' },
-            { icon: '📋', title: 'Quadro de Rumores', desc: 'Mural visual de post-its com NPCs, locais e pistas descobertas na sessão. Visível para todos.', rota: '/quadro' },
-            { icon: '📜', title: 'Histórico', desc: 'Consulte o resumo de todas as sessões anteriores da campanha.', rota: '/historico' },
-          ].map(({ icon, title, desc, rota }) => (
-            <div key={title} onClick={() => navigate(rota)}
-              className="bg-[#161410] p-8 group cursor-pointer hover:bg-[#1c1a16] transition-colors relative overflow-hidden">
-              <span className="text-2xl block mb-5">{icon}</span>
-              <span className="absolute top-6 right-6 text-[#c8a84b] opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-              <h3 style={cinzel} className="text-[#e8dcc8] text-base mb-2 font-semibold tracking-wide">{title}</h3>
-              <p className="text-[#6a6050] text-sm leading-relaxed font-light">{desc}</p>
+        {/* MONSTRO ALEATÓRIO */}
+        <div className="border border-[#c8a84b20] bg-[#161410] p-8" style={{ borderRadius: '2px' }}>
+          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-4 opacity-70">AMEAÇA DO DIA</p>
+          {monstro ? (
+            <>
+              <h3 style={cinzel} className="text-[#f0e8d8] text-xl font-bold mb-1">{monstro.nome}</h3>
+              <p style={cinzel} className="text-[#4a4030] text-xs mb-4">{monstro.tipo} · CR {monstro.cr}</p>
+              <p className="text-[#8a8070] text-sm leading-relaxed font-light italic">{monstro.descricao}</p>
+            </>
+          ) : (
+            <div className="flex items-center gap-3">
+              <div className="w-5 h-5 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
+              <p style={cinzel} className="text-[#4a4030] text-xs">INVOCANDO...</p>
             </div>
-          ))}
+          )}
+          <button onClick={buscarMonstroAleatorio}
+            className="mt-6 text-xs text-[#4a4030] hover:text-[#c8a84b] transition-colors"
+            style={cinzel}>
+            ↻ Outro monstro
+          </button>
         </div>
-      </div>
 
-      {/* ROLES */}
-      <div className="max-w-5xl mx-auto px-8 mb-20">
-        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">ACESSO</p>
-        <h2 style={cinzel} className="text-2xl text-[#f0e8d8] mb-8 font-semibold">Quem é você na mesa?</h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-[#c8a84b25] border border-[#c8a84b25]">
-          <div className="bg-[#161410] p-10 hover:bg-[#1c1a16] transition-colors cursor-pointer" onClick={() => navigate('/mestre')}>
-            <span className="inline-block text-[#c8a84b] border border-[#c8a84b40] bg-[#c8a84b10] px-3 py-1 text-xs tracking-[3px] mb-5"
-              style={cinzel}>MESTRE</span>
-            <h3 style={cinzel} className="text-[#f0e8d8] text-xl mb-3 font-semibold">Área do Mestre</h3>
-            <p className="text-[#6a6050] text-sm leading-relaxed mb-6 font-light">
-              Controle total da campanha. Crie e gerencie NPCs, anotações e informações secretas que só você vê.
-            </p>
-            <ul className="flex flex-col gap-2">
-              {['Painel de NPCs com segredos', 'Notas de sessão privadas', 'Rolagens secretas', 'Visão geral da campanha'].map(f => (
-                <li key={f} className="text-[#8a8070] text-xs pl-4 relative" style={{ ...cinzel, letterSpacing: '0.5px' }}>
-                  <span className="absolute left-0 text-[#c8a84b80]">—</span>{f}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="bg-[#161410] p-10 hover:bg-[#1c1a16] transition-colors cursor-pointer" onClick={() => navigate('/personagens')}>
-            <span className="inline-block text-[#7ab8d4] border border-[#7ab8d440] bg-[#7ab8d410] px-3 py-1 text-xs tracking-[3px] mb-5"
-              style={cinzel}>JOGADOR</span>
-            <h3 style={cinzel} className="text-[#f0e8d8] text-xl mb-3 font-semibold">Área do Jogador</h3>
-            <p className="text-[#6a6050] text-sm leading-relaxed mb-6 font-light">
-              Crie e gerencie seus personagens com ajuda da IA. Acesse suas habilidades e ficha a qualquer hora.
-            </p>
-            <ul className="flex flex-col gap-2">
-              {['Criação de personagem com IA', 'Ficha interativa completa', 'Descrição de habilidades', 'Import de PDF'].map(f => (
-                <li key={f} className="text-[#8a8070] text-xs pl-4 relative" style={{ ...cinzel, letterSpacing: '0.5px' }}>
-                  <span className="absolute left-0 text-[#7ab8d480]">—</span>{f}
-                </li>
-              ))}
-            </ul>
-          </div>
+        {/* IMAGEM REVELADA */}
+        <div className="border border-[#c8a84b20] bg-[#161410] p-8" style={{ borderRadius: '2px' }}>
+          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-4 opacity-70">CENA ATUAL</p>
+          {imagemRevelada ? (
+            <img src={imagemRevelada.url} alt={imagemRevelada.name}
+              className="w-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+              style={{ borderRadius: '2px', maxHeight: '220px' }}
+              onClick={() => navigate('/galeria')} />
+          ) : (
+            <div className="flex flex-col items-center justify-center h-40 gap-3">
+              <span className="text-3xl opacity-10">🗺</span>
+              <p style={cinzel} className="text-[#3a3020] text-xs">NENHUMA CENA REVELADA</p>
+            </div>
+          )}
         </div>
       </div>
 
