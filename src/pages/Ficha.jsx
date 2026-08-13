@@ -537,7 +537,6 @@ useEffect(() => {
 
 useEffect(() => {
   const handleMessage = (event) => {
-  console.log('Mensagem do SW:', event.data);
   if (event.data?.type === 'BUSCAR_MENSAGENS') {
     buscarMensagensSecretas();
   }

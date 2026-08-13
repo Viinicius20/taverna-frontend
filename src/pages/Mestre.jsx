@@ -76,6 +76,7 @@ export default function Mestre() {
   const [abaEntregarItem, setAbaEntregarItem] = useState('digitar'); // 'digitar' | 'inventario'
   const [jogadorOrigem, setJogadorOrigem] = useState(null);
   const [itemSelecionado, setItemSelecionado] = useState(null);
+  const [sugestoesMonstro, setSugestoesMonstro] = useState([]);
 
   useEffect(() => {
     buscarNpcs();
@@ -1042,26 +1043,42 @@ function gerarNome() {
   </div>
 
   {/* Adicionar monstro genérico */}
-  <div className="flex flex-col sm:flex-row gap-2 mb-4 mt-6">
-  <input value={novoMonstro.nome} onChange={e => setNovoMonstro(p => ({ ...p, nome: e.target.value }))}
+  <div className="relative w-full">
+  <input value={novoMonstro.nome}
+    onChange={async e => {
+      const val = e.target.value;
+      setNovoMonstro(p => ({ ...p, nome: val }));
+      if (val.length >= 2) {
+        try {
+          const res = await api.get(`/bestiary?name=${encodeURIComponent(val)}`);
+          setSugestoesMonstro((res.data.data || []).slice(0, 5));
+        } catch {
+          setSugestoesMonstro([]);
+        }
+      } else {
+        setSugestoesMonstro([]);
+      }
+    }}
     placeholder="Nome do monstro..."
     className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
     style={{ borderRadius: '2px' }} />
-  <div className="flex gap-2">
-    <input value={novoMonstro.hp} onChange={e => setNovoMonstro(p => ({ ...p, hp: e.target.value }))}
-      placeholder="HP" type="number" min={1}
-      className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-20 text-sm text-center focus:outline-none focus:border-[#c8a84b50]"
-      style={{ borderRadius: '2px' }} />
-    <input value={novoMonstro.qtd} onChange={e => setNovoMonstro(p => ({ ...p, qtd: Math.max(1, Number(e.target.value)) }))}
-      type="number" min={1} max={20}
-      className="bg-[#161410] border border-[#c8a84b20] text-[#c8a84b] px-3 py-2 w-16 text-sm text-center focus:outline-none focus:border-[#c8a84b50]"
-      style={{ borderRadius: '2px' }} />
-    <button onClick={adicionarMonstro}
-      className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors"
-      style={{ ...cinzel, borderRadius: '2px' }}>
-      + MONSTRO
-    </button>
-  </div>
+  {sugestoesMonstro.length > 0 && (
+    <div className="absolute top-full left-0 right-0 bg-[#161410] border border-[#c8a84b20] z-10"
+      style={{ borderRadius: '2px' }}>
+      {sugestoesMonstro.map(m => (
+        <button key={m.id}
+          onClick={() => {
+            setNovoMonstro(p => ({ ...p, nome: m.name, hp: m.hp }));
+            setSugestoesMonstro([]);
+          }}
+          className="w-full text-left px-3 py-2 text-sm hover:bg-[#c8a84b10] transition-colors flex items-center justify-between"
+          style={cinzel}>
+          <span className="text-[#e8e0d0]">{m.name}</span>
+          <span className="text-[#4a4030] text-xs">CR {m.cr} · HP {m.hp}</span>
+        </button>
+      ))}
+    </div>
+  )}
 </div>
 
   {/* Adicionar NPCs e Personagens */}
