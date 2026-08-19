@@ -199,7 +199,7 @@ export default function CriarPersonagem() {
                 </div>
                 {erro && <p className="text-red-400 text-sm">{erro}</p>}
                 <button onClick={gerarPersonagem} disabled={!descricao.trim()}
-                  className="bg-[#c8a84b] text-[#0f0e0c] px-8 py-3 text-sm tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30 disabled:cursor-not-allowed self-start"
+                  className="bg-[#c8a84b] text-[#0f0e0c] px-8 py-3 text-sm tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30 disabled:cursor-not-allowed self-start btn-shimmer"
                   style={{ ...cinzel, borderRadius: '2px' }}>
                   Gerar com IA →
                 </button>

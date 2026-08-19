@@ -1816,7 +1816,7 @@ style={{
 
         <div className="flex gap-4">
           <button onClick={salvarFicha} disabled={salvando}
-            className="bg-[#c8a84b] text-[#0f0e0c] px-8 py-3 text-sm tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50"
+            className="bg-[#c8a84b] text-[#0f0e0c] px-8 py-3 text-sm tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50 btn-shimmer"
             style={{ ...cinzel, borderRadius: '2px' }}>
             {salvando ? 'Salvando...' : 'Salvar Ficha'}
           </button>

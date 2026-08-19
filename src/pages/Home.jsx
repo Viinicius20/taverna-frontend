@@ -124,7 +124,7 @@ export default function Home() {
                 <div className="px-6 py-8 text-center">
                   <p style={cinzel} className="text-[#4a4030] text-xs mb-4">Entre na mesa para acessar todas as ferramentas.</p>
                   <button onClick={() => { navigate('/login'); setDrawerAberto(false); }}
-                    className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs font-bold w-full hover:bg-[#e0c060] transition-colors"
+                    className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs font-bold w-full hover:bg-[#e0c060] transition-colors btn-shimmer"
                     style={{ ...cinzel, borderRadius: '2px' }}>
                     → Entrar na Mesa
                   </button>
