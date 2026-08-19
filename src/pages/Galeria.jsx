@@ -306,7 +306,7 @@ const handleResizeEnd = async () => {
   // VISÃO DO JOGADOR
 if (!isMestre) {
   return (
-    <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] flex flex-col">
+    <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] flex flex-col page-fade">
       <nav className="flex items-center justify-between px-8 py-4 border-b border-[#c8a84b20]">
         <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
           onClick={() => navigate('/')}>⚔ TAVERNA</span>

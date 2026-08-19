@@ -24,7 +24,7 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0f0e0c] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#0f0e0c] flex items-center justify-center px-4 page-fade">
       <div className="bg-[#161410] border border-[#c8a84b30] max-w-sm w-full p-8" style={{ borderRadius: '2px' }}>
         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 text-center">TAVERNA</p>
         <h1 style={cinzel} className="text-2xl text-[#f0e8d8] font-bold mb-8 text-center">Entrar na Mesa</h1>

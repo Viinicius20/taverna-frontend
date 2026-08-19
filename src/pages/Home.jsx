@@ -68,7 +68,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0]" style={crimson}>
+    <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
 
       {/* NAV */}
       <nav className="flex items-center justify-between px-6 py-4 border-b border-[#c8a84b20]">
@@ -141,7 +141,7 @@ export default function Home() {
                 </button>
               ) : (
                 <button onClick={() => { navigate('/login'); setDrawerAberto(false); }}
-                  className="w-full text-left text-xs tracking-widest text-[#c8a84b] hover:text-[#e0c060] transition-colors"
+                  className="w-full text-left text-xs tracking-widest text-[#c8a84b] hover:text-[#e0c060] transition-colors btn-shimmer"
                   style={cinzel}>
                   → Entrar na Mesa
                 </button>

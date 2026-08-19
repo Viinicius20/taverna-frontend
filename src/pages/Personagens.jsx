@@ -113,7 +113,7 @@ export default function Personagens() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0]" style={crimson}>
+    <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
 
       {/* NAV */}
       <nav className="flex items-center justify-between px-8 py-4 border-b border-[#c8a84b20]">
