@@ -108,7 +108,7 @@ export default function Personagens() {
   const tipoColor = {
     'magia': '#7ab8d4',
     'feature racial': '#a8c87a',
-    'feature de classe': '#c8a84b',
+    'feature de classe': '#c8a84b', 
     'perícia': '#c87ab8',
   };
 
@@ -155,12 +155,27 @@ export default function Personagens() {
 )}
 
         {/* CARREGANDO */}
-        {carregando && (
-          <div className="flex flex-col items-center justify-center py-24 gap-6">
-            <div className="w-10 h-10 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-            <p style={cinzel} className="text-[#c8a84b] text-sm tracking-widest">CARREGANDO...</p>
+{carregando && (
+  <div className="flex flex-col gap-px border border-[#c8a84b15]">
+    {[1, 2, 3].map(i => (
+      <div key={i} className="bg-[#161410] p-6 flex items-start gap-4">
+        <div className="skeleton w-14 h-14 flex-shrink-0" />
+        <div className="flex-1 flex flex-col gap-3">
+          <div className="skeleton h-5 w-48" />
+          <div className="skeleton h-3 w-72" />
+          <div className="flex gap-4 mt-2">
+            {[1,2,3,4,5,6].map(j => (
+              <div key={j} className="flex flex-col items-center gap-1">
+                <div className="skeleton h-3 w-8" />
+                <div className="skeleton h-5 w-8" />
+              </div>
+            ))}
           </div>
-        )}
+        </div>
+      </div>
+    ))}
+  </div>
+)}
 
         {/* ERRO */}
         {erro && !carregando && (
