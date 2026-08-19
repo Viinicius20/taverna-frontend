@@ -32,7 +32,6 @@
   to { left: 150%; }
 }
 
-/* Fade de entrada nas páginas */
 .page-fade {
   animation: fadeIn 0.3s ease;
 }
@@ -42,7 +41,6 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Skeleton loading */
 .skeleton {
   background: linear-gradient(
     90deg,
@@ -59,3 +57,17 @@
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+/* Temas por classe */
+.tema-guerreiro { --cor-classe: #c84b4b; --cor-classe-20: #c84b4b20; --cor-classe-40: #c84b4b40; }
+.tema-mago      { --cor-classe: #4b7ac8; --cor-classe-20: #4b7ac820; --cor-classe-40: #4b7ac840; }
+.tema-druida    { --cor-classe: #4bc87a; --cor-classe-20: #4bc87a20; --cor-classe-40: #4bc87a40; }
+.tema-ladino    { --cor-classe: #8a4bc8; --cor-classe-20: #8a4bc820; --cor-classe-40: #8a4bc840; }
+.tema-paladino  { --cor-classe: #c8a84b; --cor-classe-20: #c8a84b20; --cor-classe-40: #c8a84b40; }
+.tema-barbaro   { --cor-classe: #c8614b; --cor-classe-20: #c8614b20; --cor-classe-40: #c8614b40; }
+.tema-bardo     { --cor-classe: #c84b8a; --cor-classe-20: #c84b8a20; --cor-classe-40: #c84b8a40; }
+.tema-clerigo   { --cor-classe: #c8c84b; --cor-classe-20: #c8c84b20; --cor-classe-40: #c8c84b40; }
+.tema-monge     { --cor-classe: #4bc8c8; --cor-classe-20: #4bc8c820; --cor-classe-40: #4bc8c840; }
+.tema-cacador   { --cor-classe: #7ac84b; --cor-classe-20: #7ac84b20; --cor-classe-40: #7ac84b40; }
+.tema-feiticeiro{ --cor-classe: #c84b4b; --cor-classe-20: #c84b4b20; --cor-classe-40: #c84b4b40; }
+.tema-bruxo     { --cor-classe: #6b4bc8; --cor-classe-20: #6b4bc820; --cor-classe-40: #6b4bc840; }

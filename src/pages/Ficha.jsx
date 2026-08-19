@@ -687,10 +687,29 @@ function rolarAtaque(ataque) {
 
   const combat = ficha.combat || {};
 
-  return (
-    <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
+function getTemaClasse(classe) {
+  if (!classe) return '';
+  const c = classe.toLowerCase();
+  if (c.includes('fighter') || c.includes('guerreiro')) return 'tema-guerreiro';
+  if (c.includes('wizard') || c.includes('mago')) return 'tema-mago';
+  if (c.includes('druid') || c.includes('druida')) return 'tema-druida';
+  if (c.includes('rogue') || c.includes('ladino')) return 'tema-ladino';
+  if (c.includes('paladin') || c.includes('paladino')) return 'tema-paladino';
+  if (c.includes('barbarian') || c.includes('bárbaro')) return 'tema-barbaro';
+  if (c.includes('bard') || c.includes('bardo')) return 'tema-bardo';
+  if (c.includes('cleric') || c.includes('clérigo')) return 'tema-clerigo';
+  if (c.includes('monk') || c.includes('monge')) return 'tema-monge';
+  if (c.includes('ranger') || c.includes('caçador')) return 'tema-cacador';
+  if (c.includes('sorcerer') || c.includes('feiticeiro')) return 'tema-feiticeiro';
+  if (c.includes('warlock') || c.includes('bruxo')) return 'tema-bruxo';
+  return '';
+}
 
-      <nav className="flex items-center justify-between px-8 py-4 border-b border-[#c8a84b20]">
+  return (
+    <div className={`min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade ${getTemaClasse(ficha?.class)}`} style={crimson}>
+
+      <nav className="flex items-center justify-between px-8 py-4 border-b" 
+          style={{ borderColor: 'var(--cor-classe-20, #c8a84b20)' }}>
         <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
           onClick={() => navigate('/')}>⚔ TAVERNA</span>
         <button onClick={() => navigate('/personagens')}
