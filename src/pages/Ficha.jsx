@@ -110,6 +110,19 @@ export default function Ficha() {
   sleight_of_hand: 'dex', stealth: 'dex', survival: 'wis'
 };
 
+function temArquetipoValido(valor) {
+  if (!valor) return false;
+  const normalizado = valor.trim().toLowerCase();
+  if (normalizado.startsWith('nenhum')) return false;
+  return true;
+}
+
+const jaTemArquetipo = arquetiposExistentes[className] ??
+  (!multiclasse ? (
+    (temArquetipoValido(fichaData?.arquetipo) && fichaData.arquetipo) ||
+    (temArquetipoValido(fichaData?.subclass) && fichaData.subclass)
+  ) : undefined);
+
 useEffect(() => {
   async function init() {
     buscarPersonagem();
@@ -193,19 +206,6 @@ function abrirProximaPendencia(fila) {
     setModalAsi(true);
   }
 }
-
-function temArquetipoValido(valor) {
-  if (!valor) return false;
-  const normalizado = valor.trim().toLowerCase();
-  if (normalizado.startsWith('nenhum')) return false;
-  return true;
-}
-
-const jaTemArquetipo = arquetiposExistentes[className] ??
-  (!multiclasse ? (
-    (temArquetipoValido(fichaData?.arquetipo) && fichaData.arquetipo) ||
-    (temArquetipoValido(fichaData?.subclass) && fichaData.subclass)
-  ) : undefined);
 
 
 function ModalAsi({ aberto, onFechar, onConfirmar, atributos }) {
