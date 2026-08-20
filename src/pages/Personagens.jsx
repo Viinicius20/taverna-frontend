@@ -196,8 +196,14 @@ export default function Personagens() {
               <div>
                 <p style={cinzel} className="text-[#f0e8d8] text-sm">{p.data?.name || p.name}</p>
                 <p className="text-[#4a4030] text-xs mt-1">
-                  {[p.data?.race, p.data?.class, `Nível ${p.data?.level}`].filter(Boolean).join(' · ')}
-                </p>
+  {[
+    p.data?.race,
+    p.data?.classes?.length
+      ? p.data.classes.map(c => `${c.name} ${c.level}`).join(" / ")
+      : p.data?.class,
+    `Nível ${p.data?.total_level || p.data?.level || 1}`
+  ].filter(Boolean).join(' · ')}
+</p>
               </div>
               <button
                 onClick={async () => {
