@@ -233,7 +233,13 @@ export default function Personagens() {
             {personagens.map(p => {
               const d = p.data || {};
               const attrs = d.attributes || {};
-              const context = `${d.race || ''} ${d.class || ''} nível ${d.level || 1}`;
+              const classesTexto = d.classes?.length
+                ? d.classes.map(c => `${c.name} ${c.level}`).join(" / ")
+                : (d.class || '');
+
+              const nivelTexto = d.total_level || d.level || 1;
+              
+              const context = `${d.race || ''} ${classesTexto} nível ${nivelTexto}`;
 
               return (
                 <div key={p.id} className="bg-[#161410] hover:bg-[#1a1814] transition-colors group">
