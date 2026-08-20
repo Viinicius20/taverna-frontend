@@ -154,10 +154,7 @@ useEffect(() => {
       try {
         const { data: arquInfo } = await api.get(`/arquetipos/${encodeURIComponent(className)}`);
         const jaTemArquetipo = arquetiposExistentes[className] ??
-  (!multiclasse ? (
-    (temArquetipoValido(fichaData?.arquetipo) && fichaData.arquetipo) ||
-    (temArquetipoValido(fichaData?.subclass) && fichaData.subclass)
-  ) : undefined);
+          (!multiclasse ? (fichaData?.arquetipo || fichaData?.subclass) : undefined);
 
         if (classLevel >= arquInfo.nivel && !jaTemArquetipo && arquInfo.arquetipos?.length) {
           pendencias.push({
@@ -516,20 +513,20 @@ function exportarPDF() {
   console.log("proximoNivel:", proximoNivel);
 
     try {
-      const { data: arquInfo } = await api.get(`/arquetipos/${encodeURIComponent(className)}`);
-      const jaTemArquetipo = ficha.arquetipo || ficha.subclass;
+  const { data: arquInfo } = await api.get(`/arquetipos/${encodeURIComponent(className)}`);
+  const jaTemArquetipo = ficha.arquetipo || ficha.subclass;
 
-      if (proximoNivel === arquInfo.nivel && !jaTemArquetipo) {
-        setArquetiposDisponiveis(arquInfo.arquetipos);
-        setPendingLevelUp({ novoNivel: proximoNivel, classNameAlvo: className });
-        setModalArquetipo(true);
-        return; // pausa aqui, espera o modal
-      }
-  } catch (e) {
-    console.warn("Arquétipos não encontrados para:", className);
+  if (proximoNivel === arquInfo.nivel && !jaTemArquetipo && arquInfo.arquetipos?.length) {
+    setArquetiposDisponiveis(arquInfo.arquetipos);
+    setPendingLevelUp({ novoNivel: proximoNivel, classNameAlvo: className });
+    setModalArquetipo(true);
+    return;
   }
+} catch (e) {
+  console.warn("Arquétipos não encontrados para:", className);
+}
 
-  await fazerLevelUpComClasse(proximoNivel, null);
+await fazerLevelUpComClasse(proximoNivel, null);
 }
 
   async function fazerLevelUpComClasse(novoNivel, classNameAlvo) {
@@ -847,10 +844,12 @@ function getTemaClasse(classe) {
   return '';
 }
 
-console.log('CLASSE:', ficha?.class)
+const classeParaTema = ficha?.classes?.length
+  ? ficha.classes[0]?.name
+  : ficha?.class;
 
   return (
-    <div className={`min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade ${getTemaClasse(ficha?.class)}`} style={crimson}>
+    <div className={`min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade ${getTemaClasse(classeParaTema)}`} style={crimson}>
 
       <nav className="flex items-center justify-between px-8 py-4 border-b" 
           style={{ borderColor: 'var(--cor-classe-20, #c8a84b20)' }}>
@@ -894,15 +893,12 @@ console.log('CLASSE:', ficha?.class)
       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">FICHA DO PERSONAGEM</p>
       <h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold">{ficha.name}</h1>
       <p className="text-[#6a6050] mt-1">{[
-        ficha.race,
-        ficha.class ? (() => {
-          try {
-            const parsed = typeof ficha.class === 'string' ? JSON.parse(ficha.class) : ficha.class;
-            return Array.isArray(parsed) ? `${parsed[0]?.name} ${parsed[0]?.level}` : ficha.class;
-          } catch { return ficha.class; }
-        })() : '',
-        ficha.background
-      ].filter(Boolean).join(' · ')}</p>
+  ficha.race,
+  ficha.classes?.length
+    ? ficha.classes.map(c => `${c.name} ${c.level}`).join(' / ')
+    : ficha.class,
+  ficha.background
+].filter(Boolean).join(' · ')}</p>
     </div>
   </div>
           <div className="flex gap-3 flex-wrap">
