@@ -953,34 +953,30 @@ console.log('CLASSE:', ficha?.class)
           </div>
           <div className="p-6 grid grid-cols-2 gap-4">
             {[
-              { label: 'NOME', campo: 'name' },
-              { label: 'RAÇA', campo: 'race' },
-              { label: 'ANTECEDENTE', campo: 'background' },
-              { label: 'ALINHAMENTO', campo: 'alignment' },
-            ].map(({ label, campo }) => (
-              <div key={campo}>
-                <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">{label}</label>
-                <input 
-  disabled={campo === 'class' || campo === 'subclass'}
-  readOnly={campo === 'class' || campo === 'subclass'}
-  value={
-    campo === 'class'
-      ? ficha.class ? (() => {
-          try {
-            const parsed = typeof ficha.class === 'string' ? JSON.parse(ficha.class) : ficha.class;
-            return Array.isArray(parsed) ? `${parsed[0]?.name} ${parsed[0]?.level}` : ficha.class;
-          } catch {
-            return ficha.class;
-          }
-        })() : ''
-      : (ficha[campo] || '')
-  }
-  onChange={e => editarCampo(campo, e.target.value)}
-  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm disabled:opacity-50"
-  style={{ borderRadius: '2px' }}
-/> 
-              </div>
-            ))}
+  { label: 'NOME', campo: 'name' },
+  { label: 'RAÇA', campo: 'race' },
+  { label: 'CLASSE', campo: 'class' },
+  { label: 'ANTECEDENTE', campo: 'background' },
+  { label: 'ALINHAMENTO', campo: 'alignment' },
+].map(({ label, campo }) => (
+  <div key={campo}>
+    <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">{label}</label>
+    <input 
+      disabled={campo === 'class' || campo === 'subclass'}
+      readOnly={campo === 'class' || campo === 'subclass'}
+      value={
+        campo === 'class'
+          ? (ficha.classes?.length
+              ? ficha.classes.map(c => `${c.name} ${c.level}`).join(' / ')
+              : (ficha.class || ''))
+          : (ficha[campo] || '')
+      }
+      onChange={e => editarCampo(campo, e.target.value)}
+      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm disabled:opacity-50"
+      style={{ borderRadius: '2px' }}
+    />
+  </div>
+))}
             <div>
               <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">NÍVEL</label>
               <input type="number" min={1} max={20} value={ficha.level || 1}
