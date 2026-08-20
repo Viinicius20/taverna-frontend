@@ -705,6 +705,8 @@ function getTemaClasse(classe) {
   return '';
 }
 
+console.log('CLASSE:', ficha?.class)
+
   return (
     <div className={`min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade ${getTemaClasse(ficha?.class)}`} style={crimson}>
 

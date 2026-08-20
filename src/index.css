@@ -58,7 +58,6 @@
   100% { background-position: -200% 0; }
 }
 
-/* Temas por classe */
 .tema-guerreiro { --cor-classe: #c84b4b; --cor-classe-20: #c84b4b20; --cor-classe-40: #c84b4b40; }
 .tema-mago      { --cor-classe: #4b7ac8; --cor-classe-20: #4b7ac820; --cor-classe-40: #4b7ac840; }
 .tema-druida    { --cor-classe: #4bc87a; --cor-classe-20: #4bc87a20; --cor-classe-40: #4bc87a40; }
