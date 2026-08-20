@@ -194,6 +194,19 @@ function abrirProximaPendencia(fila) {
   }
 }
 
+function temArquetipoValido(valor) {
+  if (!valor) return false;
+  const normalizado = valor.trim().toLowerCase();
+  if (normalizado.startsWith('nenhum')) return false;
+  return true;
+}
+
+const jaTemArquetipo = arquetiposExistentes[className] ??
+  (!multiclasse ? (
+    (temArquetipoValido(fichaData?.arquetipo) && fichaData.arquetipo) ||
+    (temArquetipoValido(fichaData?.subclass) && fichaData.subclass)
+  ) : undefined);
+
 
 function ModalAsi({ aberto, onFechar, onConfirmar, atributos }) {
   const [modo, setModo] = useState("atributos"); // "atributos" | "feat"
