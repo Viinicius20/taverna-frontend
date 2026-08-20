@@ -533,6 +533,7 @@ await fazerLevelUpComClasse(proximoNivel, null);
 }
 
   async function fazerLevelUpComClasse(novoNivel, classNameAlvo) {
+  console.log("fazerLevelUpComClasse CHAMADA:", novoNivel, classNameAlvo);
   setUpando(true);
   setErro('');
   try {
@@ -556,9 +557,10 @@ await fazerLevelUpComClasse(proximoNivel, null);
     setShowClassLevelUpModal(false);
     setModalRevisao(true); // abre modal de revisão
   } catch (error) {
-    console.log("erro completo:", error.response?.data);
-    setErro('Erro ao fazer level up: ' + error.message);
-  }
+  console.error("ERRO NO LEVEL UP:", error);
+  console.log("erro completo:", error.response?.data);
+  setErro('Erro ao fazer level up: ' + error.message);
+}
   setUpando(false);
 }
 
