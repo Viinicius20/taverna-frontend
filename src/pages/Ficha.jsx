@@ -528,6 +528,8 @@ function exportarPDF() {
 } catch (e) {
   console.warn("Arquétipos não encontrados para:", className);
 }
+console.log("chegou até aqui, vai chamar fazerLevelUpComClasse");
+await fazerLevelUpComClasse(proximoNivel, null);
 
 await fazerLevelUpComClasse(proximoNivel, null);
 }
