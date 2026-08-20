@@ -119,32 +119,34 @@ useEffect(() => {
   setCarregando(true);
   try {
     const res = await api.get(`/characters/${id}`);
-    const fichaData = res.data.data.data; // ← define aqui
-    console.log("className:", fichaData?.classes?.[0]?.name || fichaData?.class);
-    console.log("level:", fichaData?.level);
-    console.log("arquetipo:", fichaData?.arquetipo);
+    const fichaData = res.data.data.data;
 
     setPersonagem(res.data.data);
     setFicha(fichaData);
     setNivelAlvo((fichaData?.level || 1) + 1);
 
-    // Verifica arquétipo faltando
-    const className = fichaData?.classes?.[0]?.name || fichaData?.class;
-    if (className && fichaData?.level) {
+    const classes = fichaData?.classes || [];
+    const arquetiposExistentes = fichaData?.arquetipos || {};
+    const multiclasse = classes.length > 1;
+
+    for (const classeObj of classes) {
+      const className = classeObj.name;
+      const classLevel = classeObj.level;
+      if (!className || !classLevel) continue;
+
       try {
         const { data: arquInfo } = await api.get(`/arquetipos/${encodeURIComponent(className)}`);
-        const jaTemArquetipo = fichaData?.arquetipo || fichaData?.subclass;
-        console.log("nivel check:", fichaData.level >= arquInfo.nivel);
-        console.log("arquetipo check:", !jaTemArquetipo);
-        console.log("jaTemArquetipo valor:", jaTemArquetipo);
-        console.log("arquetipos length:", arquInfo.arquetipos?.length);
-        console.log("ficha completa:", JSON.stringify(fichaData).substring(0, 1500));
-        if (fichaData.level >= arquInfo.nivel && !jaTemArquetipo && arquInfo.arquetipos?.length) {
+
+        const jaTemArquetipo = arquetiposExistentes[className] ??
+          (!multiclasse ? (fichaData?.arquetipo || fichaData?.subclass) : undefined);
+
+        if (classLevel >= arquInfo.nivel && !jaTemArquetipo && arquInfo.arquetipos?.length) {
           setArquetiposDisponiveis(arquInfo.arquetipos);
-          setPendingLevelUp({ novoNivel: fichaData.level, classNameAlvo: className, retroativo: true });
+          setPendingLevelUp({ novoNivel: classLevel, classNameAlvo: className, retroativo: true });
           setModalArquetipo(true);
+          break; // pode manter — só abre um modal por vez, próxima checagem cobre a outra classe
         }
-      } catch (e) {
+      } catch {
         console.warn("Arquétipos não encontrados para:", className);
       }
     }
