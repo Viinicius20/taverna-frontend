@@ -88,6 +88,12 @@ export default function Ficha() {
 
   const [uploadandoAvatar, setUploadandoAvatar] = useState(false);
 
+  const ASI_LEVELS = [4, 8, 12, 16, 19];
+
+  const [filaPendencias, setFilaPendencias] = useState([]);
+  const [modalAsi, setModalAsi] = useState(false);
+  const [asiPendente, setAsiPendente] = useState(null);
+
   const [moedas, setMoedas] = useState({
   po: ficha?.moedas?.po || 0,
   pp: ficha?.moedas?.pp || 0,
@@ -127,33 +133,131 @@ useEffect(() => {
 
     const classes = fichaData?.classes || [];
     const arquetiposExistentes = fichaData?.arquetipos || {};
+    const asiHistorico = fichaData?.asi_historico || {};
     const multiclasse = classes.length > 1;
+    const pendencias = [];
 
     for (const classeObj of classes) {
       const className = classeObj.name;
       const classLevel = classeObj.level;
       if (!className || !classLevel) continue;
 
+      // checa arquétipo
       try {
         const { data: arquInfo } = await api.get(`/arquetipos/${encodeURIComponent(className)}`);
-
         const jaTemArquetipo = arquetiposExistentes[className] ??
           (!multiclasse ? (fichaData?.arquetipo || fichaData?.subclass) : undefined);
 
         if (classLevel >= arquInfo.nivel && !jaTemArquetipo && arquInfo.arquetipos?.length) {
-          setArquetiposDisponiveis(arquInfo.arquetipos);
-          setPendingLevelUp({ novoNivel: classLevel, classNameAlvo: className, retroativo: true });
-          setModalArquetipo(true);
-          break; // pode manter — só abre um modal por vez, próxima checagem cobre a outra classe
+          pendencias.push({
+            tipo: "arquetipo",
+            classNameAlvo: className,
+            arquetiposDisponiveis: arquInfo.arquetipos
+          });
         }
-      } catch {
-        console.warn("Arquétipos não encontrados para:", className);
+      } catch {}
+
+      // checa ASI
+      const niveisResolvidos = asiHistorico[className] || [];
+      const asiPendente = ASI_LEVELS.find(lvl => lvl <= classLevel && !niveisResolvidos.includes(lvl));
+      if (asiPendente) {
+        pendencias.push({
+          tipo: "asi",
+          classNameAlvo: className,
+          nivelAlvo: asiPendente
+        });
       }
+    }
+
+    setFilaPendencias(pendencias);
+    if (pendencias.length > 0) {
+      abrirProximaPendencia(pendencias);
     }
   } catch {
     setErro('Personagem não encontrado.');
   }
   setCarregando(false);
+}
+
+function abrirProximaPendencia(fila) {
+  const [proxima, ...resto] = fila;
+  setFilaPendencias(resto);
+  if (!proxima) return;
+
+  if (proxima.tipo === "arquetipo") {
+    setArquetiposDisponiveis(proxima.arquetiposDisponiveis);
+    setPendingLevelUp({ classNameAlvo: proxima.classNameAlvo, retroativo: true });
+    setModalArquetipo(true);
+  } else if (proxima.tipo === "asi") {
+    setAsiPendente({ classNameAlvo: proxima.classNameAlvo, nivelAlvo: proxima.nivelAlvo });
+    setModalAsi(true);
+  }
+}
+
+function ModalAsi({ aberto, onFechar, onConfirmar, atributos }) {
+  const [modo, setModo] = useState("atributos"); // "atributos" | "feat"
+  const [alocacao, setAlocacao] = useState({});
+  const [featNome, setFeatNome] = useState("");
+  const [featDescricao, setFeatDescricao] = useState("");
+
+  const totalAlocado = Object.values(alocacao).reduce((a, b) => a + b, 0);
+
+  function ajustar(attr, delta) {
+    setAlocacao(prev => {
+      const atual = prev[attr] || 0;
+      const novo = atual + delta;
+      if (novo < 0) return prev;
+      if (totalAlocado + delta > 2) return prev;
+      if (novo > 2) return prev;
+      return { ...prev, [attr]: novo };
+    });
+  }
+
+  if (!aberto) return null;
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <h3>Melhoria de Atributo (ASI)</h3>
+        <div className="modo-toggle">
+          <button className={modo === "atributos" ? "ativo" : ""} onClick={() => setModo("atributos")}>
+            Atributos
+          </button>
+          <button className={modo === "feat" ? "ativo" : ""} onClick={() => setModo("feat")}>
+            Feat
+          </button>
+        </div>
+
+        {modo === "atributos" ? (
+          <>
+            <p>Distribua 2 pontos (máx +2 num só, ou +1 em dois)</p>
+            {Object.entries(atributos).map(([attr, valor]) => (
+              <div key={attr} className="atributo-linha">
+                <span>{attr.toUpperCase()}: {valor} → {valor + (alocacao[attr] || 0)}</span>
+                <button onClick={() => ajustar(attr, -1)}>-</button>
+                <span>{alocacao[attr] || 0}</span>
+                <button onClick={() => ajustar(attr, 1)} disabled={valor + (alocacao[attr] || 0) >= 20}>+</button>
+              </div>
+            ))}
+            <button
+              disabled={totalAlocado !== 2}
+              onClick={() => onConfirmar("atributos", alocacao)}
+            >
+              Confirmar
+            </button>
+          </>
+        ) : (
+          <>
+            <input placeholder="Nome do Feat" value={featNome} onChange={e => setFeatNome(e.target.value)} />
+            <textarea placeholder="Descrição" value={featDescricao} onChange={e => setFeatDescricao(e.target.value)} />
+            <button disabled={!featNome} onClick={() => onConfirmar("feat", null, featNome, featDescricao)}>
+              Confirmar
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
 }
 
   function editarCampo(campo, valor) {
