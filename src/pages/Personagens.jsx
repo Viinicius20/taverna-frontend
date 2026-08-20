@@ -272,14 +272,14 @@ export default function Personagens() {
                           style={{ ...cinzel, borderRadius: '2px' }}>
                           {p.system || 'D&D 5e'}
                         </span>
-                        {d.level && (
-                          <span className="text-[#4a4030] text-xs" style={cinzel}>Nível {d.level}</span>
-                        )}
+                        {(d.total_level || d.level) && (
+  <span className="text-[#4a4030] text-xs" style={cinzel}>Nível {d.total_level || d.level}</span>
+)}
                       </div>
 
                       <p className="text-[#6a6050] text-sm mb-4">
-                        {[d.race, d.class, d.background].filter(Boolean).join(' · ')}
-                      </p>
+  {[d.race, classesTexto, d.background].filter(Boolean).join(' · ')}
+</p>
 
                       {/* Atributos */}
                       {Object.keys(attrs).length > 0 && (
