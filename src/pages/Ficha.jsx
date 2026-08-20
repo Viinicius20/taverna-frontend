@@ -819,7 +819,8 @@ function rolarAtaque(ataque) {
   });
   setTimeout(() => setResultadoRolagem(null), 5000);
 }
-  
+
+  console.log("RENDER — modalArquetipo:", modalArquetipo);
 
   // ===== FIM FUNÇÕES LEVEL UP =====
   if (carregando) return (
