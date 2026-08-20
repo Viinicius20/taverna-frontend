@@ -194,6 +194,7 @@ function abrirProximaPendencia(fila) {
   }
 }
 
+
 function ModalAsi({ aberto, onFechar, onConfirmar, atributos }) {
   const [modo, setModo] = useState("atributos"); // "atributos" | "feat"
   const [alocacao, setAlocacao] = useState({});
@@ -258,6 +259,30 @@ function ModalAsi({ aberto, onFechar, onConfirmar, atributos }) {
       </div>
     </div>
   );
+}
+
+  async function confirmarAsi(tipo, alocacao, featNome, featDescricao) {
+  try {
+    await api.post("/aplicar-asi", {
+      character_id: id,
+      ficha_atual: ficha,
+      class_name: asiPendente.classNameAlvo,
+      nivel_alvo: asiPendente.nivelAlvo,
+      tipo,
+      alocacao,
+      feat_nome: featNome,
+      feat_descricao: featDescricao
+    });
+    setModalAsi(false);
+
+    if (filaPendencias.length > 0) {
+      abrirProximaPendencia(filaPendencias);
+    } else {
+      buscarPersonagem();
+    }
+  } catch (e) {
+    setErro("Erro ao aplicar ASI.");
+  }
 }
 
   function editarCampo(campo, valor) {
@@ -2026,6 +2051,13 @@ style={{
         <button onClick={() => setModalRevisao(false)}
           className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
       </div>
+
+      <ModalAsi
+  aberto={modalAsi}
+  atributos={ficha?.atributos || ficha?.attributes || {}}
+  onFechar={() => setModalAsi(false)}
+  onConfirmar={confirmarAsi}
+/>
 
       {modalArquetipo && (
   <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
