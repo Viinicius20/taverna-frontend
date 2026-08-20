@@ -117,11 +117,6 @@ function temArquetipoValido(valor) {
   return true;
 }
 
-const jaTemArquetipo = arquetiposExistentes[className] ??
-  (!multiclasse ? (
-    (temArquetipoValido(fichaData?.arquetipo) && fichaData.arquetipo) ||
-    (temArquetipoValido(fichaData?.subclass) && fichaData.subclass)
-  ) : undefined);
 
 useEffect(() => {
   async function init() {
@@ -159,7 +154,10 @@ useEffect(() => {
       try {
         const { data: arquInfo } = await api.get(`/arquetipos/${encodeURIComponent(className)}`);
         const jaTemArquetipo = arquetiposExistentes[className] ??
-          (!multiclasse ? (fichaData?.arquetipo || fichaData?.subclass) : undefined);
+  (!multiclasse ? (
+    (temArquetipoValido(fichaData?.arquetipo) && fichaData.arquetipo) ||
+    (temArquetipoValido(fichaData?.subclass) && fichaData.subclass)
+  ) : undefined);
 
         if (classLevel >= arquInfo.nivel && !jaTemArquetipo && arquInfo.arquetipos?.length) {
           pendencias.push({
