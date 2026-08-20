@@ -516,22 +516,28 @@ function exportarPDF() {
   console.log("proximoNivel:", proximoNivel);
 
     try {
+  console.log("1 - antes do fetch arquetipos");
   const { data: arquInfo } = await api.get(`/arquetipos/${encodeURIComponent(className)}`);
+  console.log("2 - depois do fetch, arquInfo:", arquInfo);
+  
   const jaTemArquetipo = ficha.arquetipo || ficha.subclass;
+  console.log("3 - jaTemArquetipo:", jaTemArquetipo);
 
   if (proximoNivel === arquInfo.nivel && !jaTemArquetipo && arquInfo.arquetipos?.length) {
+    console.log("4 - vai abrir modal de arquetipo");
     setArquetiposDisponiveis(arquInfo.arquetipos);
     setPendingLevelUp({ novoNivel: proximoNivel, classNameAlvo: className });
     setModalArquetipo(true);
     return;
   }
+  console.log("5 - não entrou no if do modal");
 } catch (e) {
-  console.warn("Arquétipos não encontrados para:", className);
+  console.log("6 - caiu no catch:", e);
 }
-console.log("chegou até aqui, vai chamar fazerLevelUpComClasse");
+
+console.log("7 - vai chamar fazerLevelUpComClasse");
 await fazerLevelUpComClasse(proximoNivel, null);
 
-await fazerLevelUpComClasse(proximoNivel, null);
 }
 
   async function fazerLevelUpComClasse(novoNivel, classNameAlvo) {
