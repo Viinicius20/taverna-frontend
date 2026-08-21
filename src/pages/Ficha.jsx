@@ -2081,12 +2081,13 @@ style={{
     justifyContent: 'center',
     fontSize: '40px',
     color: 'white'
-  }}>
-    TESTE MODAL
+  }}
+  onClick={() => { setArquetipoSelecionado(''); setPendingLevelUp(null); }}
+  >
+    TESTE MODAL — {arquetiposDisponiveis?.length || 0} opções
   </div>,
   document.body
 )}
-
 <ModalAsi
   aberto={modalAsi}
   atributos={ficha?.atributos || ficha?.attributes || {}}
