@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';>
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
@@ -166,7 +166,7 @@ export default function Bestiario() {
           <div className="space-y-2">
             {monstros.map((m, idx) => (
               <div key={idx}>
-                <div className="border border-[#c8a84b15] bg-[#161410] p-4 cursor-pointer hover:border-[#c8a84b30] transition-all"
+                <div className="border border-[#c8a84b15] bg-[#161410] p-4 cursor-pointer transition-all duration-300 hover:border-[#c8a84b60] hover:shadow-[0_0_16px_#c8a84b30] hover:-translate-y-0.5"
                   style={{ borderRadius: '2px' }}
                   onClick={() => setMonstroDetalhes(monstroDetalhes?.id === m.id ? null : m)}>
                   <div className="flex flex-wrap items-center justify-between gap-2">
