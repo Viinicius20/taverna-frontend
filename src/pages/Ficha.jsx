@@ -27,7 +27,49 @@ const combatFields = [
 
 const saveLabel = { str: 'FOR', dex: 'DES', con: 'CON', int: 'INT', wis: 'SAB', cha: 'CAR' };
 
-export default function Ficha() {
+function getTemaClasse(classe) {
+  if (!classe) return '';
+  const c = classe.toLowerCase();
+  if (c.includes('fighter') || c.includes('guerreiro')) return 'tema-guerreiro';
+  if (c.includes('wizard') || c.includes('mago')) return 'tema-mago';
+  if (c.includes('druid') || c.includes('druida')) return 'tema-druida';
+  if (c.includes('rogue') || c.includes('ladino')) return 'tema-ladino';
+  if (c.includes('paladin') || c.includes('paladino')) return 'tema-paladino';
+  if (c.includes('barbarian') || c.includes('bárbaro')) return 'tema-barbaro';
+  if (c.includes('bard') || c.includes('bardo')) return 'tema-bardo';
+  if (c.includes('cleric') || c.includes('clérigo')) return 'tema-clerigo';
+  if (c.includes('monk') || c.includes('monge')) return 'tema-monge';
+  if (c.includes('ranger') || c.includes('caçador')) return 'tema-cacador';
+  if (c.includes('sorcerer') || c.includes('feiticeiro')) return 'tema-feiticeiro';
+  if (c.includes('warlock') || c.includes('bruxo')) return 'tema-bruxo';
+  return '';
+}
+
+const classeParaTema = ficha?.classes?.length
+  ? ficha.classes[0]?.name
+  : ficha?.class;
+
+  function ModalAsi({ aberto, onFechar, onConfirmar, atributos }) {
+  const [modo, setModo] = useState("atributos");
+  const [alocacao, setAlocacao] = useState({});
+  const [featNome, setFeatNome] = useState("");
+  const [featDescricao, setFeatDescricao] = useState("");
+
+  const totalAlocado = Object.values(alocacao).reduce((a, b) => a + b, 0);
+
+  function ajustar(attr, delta) {
+    setAlocacao(prev => {
+      const atual = prev[attr] || 0;
+      const novoValorAttr = (atributos[attr] || 10) + atual + delta;
+      if (novoValorAttr > 20) return prev;
+      const novo = atual + delta;
+      if (novo < 0) return prev;
+      if (totalAlocado + delta > 2) return prev;
+      return { ...prev, [attr]: novo };
+    });
+  }
+
+function Ficha() {
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -424,25 +466,7 @@ function exportarPDF() {
   });
 }
 
-function ModalAsi({ aberto, onFechar, onConfirmar, atributos }) {
-  const [modo, setModo] = useState("atributos");
-  const [alocacao, setAlocacao] = useState({});
-  const [featNome, setFeatNome] = useState("");
-  const [featDescricao, setFeatDescricao] = useState("");
 
-  const totalAlocado = Object.values(alocacao).reduce((a, b) => a + b, 0);
-
-  function ajustar(attr, delta) {
-    setAlocacao(prev => {
-      const atual = prev[attr] || 0;
-      const novoValorAttr = (atributos[attr] || 10) + atual + delta;
-      if (novoValorAttr > 20) return prev;
-      const novo = atual + delta;
-      if (novo < 0) return prev;
-      if (totalAlocado + delta > 2) return prev;
-      return { ...prev, [attr]: novo };
-    });
-  }
 
   if (!aberto) return null;
 
@@ -892,27 +916,6 @@ function rolarAtaque(ataque) {
   setTimeout(() => setResultadoRolagem(null), 5000);
 }
 
-function getTemaClasse(classe) {
-  if (!classe) return '';
-  const c = classe.toLowerCase();
-  if (c.includes('fighter') || c.includes('guerreiro')) return 'tema-guerreiro';
-  if (c.includes('wizard') || c.includes('mago')) return 'tema-mago';
-  if (c.includes('druid') || c.includes('druida')) return 'tema-druida';
-  if (c.includes('rogue') || c.includes('ladino')) return 'tema-ladino';
-  if (c.includes('paladin') || c.includes('paladino')) return 'tema-paladino';
-  if (c.includes('barbarian') || c.includes('bárbaro')) return 'tema-barbaro';
-  if (c.includes('bard') || c.includes('bardo')) return 'tema-bardo';
-  if (c.includes('cleric') || c.includes('clérigo')) return 'tema-clerigo';
-  if (c.includes('monk') || c.includes('monge')) return 'tema-monge';
-  if (c.includes('ranger') || c.includes('caçador')) return 'tema-cacador';
-  if (c.includes('sorcerer') || c.includes('feiticeiro')) return 'tema-feiticeiro';
-  if (c.includes('warlock') || c.includes('bruxo')) return 'tema-bruxo';
-  return '';
-}
-
-const classeParaTema = ficha?.classes?.length
-  ? ficha.classes[0]?.name
-  : ficha?.class;
 
   console.log("RENDER — modalArquetipo:", modalArquetipo);
 
