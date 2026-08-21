@@ -5,6 +5,13 @@ import { useUser } from '../context/UserContext';
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
 
+const particles = Array.from({ length: 18 }, (_, i) => ({
+  id: i,
+  left: Math.random() * 100,
+  delay: Math.random() * 8,
+  duration: 6 + Math.random() * 6,
+}));
+
 export default function Home() {
   const navigate = useNavigate();
   const { user, logout } = useUser();
@@ -14,6 +21,7 @@ export default function Home() {
   const [monstro, setMonstro] = useState(null);
   const [imagemRevelada, setImagemRevelada] = useState(null);
   const isMestre = user?.role === 'mestre';
+  
 
   useEffect(() => {
     buscarMonstroAleatorio();
@@ -66,6 +74,8 @@ export default function Home() {
       { label: 'Bestiário', rota: '/mestre/bestiario', destaque: true },
     ] : []),
   ];
+
+  
 
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
@@ -152,9 +162,20 @@ export default function Home() {
       )}
 
       {/* HERO */}
-      <div className="text-center px-8 py-24 relative">
+      <div className="text-center px-8 py-24 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none"
           style={{ background: 'radial-gradient(ellipse 60% 40% at 50% 0%, rgba(200,168,75,0.07) 0%, transparent 70%)' }} />
+
+          {particles.map(p => (
+    <span key={p.id} className="particle"
+      style={{
+        left: `${p.left}%`,
+        bottom: '10%',
+        animationDelay: `${p.delay}s`,
+        animationDuration: `${p.duration}s`,
+      }} />
+  ))}
+  
         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-6 opacity-80">RPG</p>
         <h1 style={cinzel} className="text-3xl sm:text-5xl font-bold text-[#f0e8d8] leading-tight mb-4">
           Sua aventura<br />começa <span className="text-[#c8a84b]">aqui</span>
