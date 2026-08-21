@@ -2084,10 +2084,11 @@ style={{
   }}
   onClick={() => { setArquetipoSelecionado(''); setPendingLevelUp(null); }}
   >
-    TESTE MODAL — {arquetiposDisponiveis?.length || 0} opções
+    TESTE MODAL — {arquetiposDisponiveis?.length || 0} opções — nível {pendingLevelUp?.novoNivel}
   </div>,
   document.body
 )}
+
 <ModalAsi
   aberto={modalAsi}
   atributos={ficha?.atributos || ficha?.attributes || {}}
