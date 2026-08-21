@@ -58,18 +58,18 @@
   100% { background-position: -200% 0; }
 }
 
-.tema-guerreiro { --cor-classe: #c84b4b; --cor-classe-20: #c84b4b20; --cor-classe-40: #c84b4b40; }
-.tema-mago      { --cor-classe: #4b7ac8; --cor-classe-20: #4b7ac820; --cor-classe-40: #4b7ac840; }
-.tema-druida    { --cor-classe: #4bc87a; --cor-classe-20: #4bc87a20; --cor-classe-40: #4bc87a40; }
-.tema-ladino    { --cor-classe: #8a4bc8; --cor-classe-20: #8a4bc820; --cor-classe-40: #8a4bc840; }
-.tema-paladino  { --cor-classe: #c8a84b; --cor-classe-20: #c8a84b20; --cor-classe-40: #c8a84b40; }
-.tema-barbaro   { --cor-classe: #c8614b; --cor-classe-20: #c8614b20; --cor-classe-40: #c8614b40; }
-.tema-bardo     { --cor-classe: #c84b8a; --cor-classe-20: #c84b8a20; --cor-classe-40: #c84b8a40; }
-.tema-clerigo   { --cor-classe: #c8c84b; --cor-classe-20: #c8c84b20; --cor-classe-40: #c8c84b40; }
-.tema-monge     { --cor-classe: #4bc8c8; --cor-classe-20: #4bc8c820; --cor-classe-40: #4bc8c840; }
-.tema-cacador   { --cor-classe: #7ac84b; --cor-classe-20: #7ac84b20; --cor-classe-40: #7ac84b40; }
-.tema-feiticeiro{ --cor-classe: #c84b4b; --cor-classe-20: #c84b4b20; --cor-classe-40: #c84b4b40; }
-.tema-bruxo     { --cor-classe: #6b4bc8; --cor-classe-20: #6b4bc820; --cor-classe-40: #6b4bc840; }
+.tema-guerreiro { --cor-classe: #e07a7a; --cor-classe-20: #c84b4b20; --cor-classe-40: #c84b4b40; }
+.tema-mago      { --cor-classe: #7aa8e0; --cor-classe-20: #4b7ac820; --cor-classe-40: #4b7ac840; }
+.tema-druida    { --cor-classe: #7ae0a8; --cor-classe-20: #4bc87a20; --cor-classe-40: #4bc87a40; }
+.tema-ladino    { --cor-classe: #b07ae0; --cor-classe-20: #8a4bc820; --cor-classe-40: #8a4bc840; }
+.tema-paladino  { --cor-classe: #e0c87a; --cor-classe-20: #c8a84b20; --cor-classe-40: #c8a84b40; }
+.tema-barbaro   { --cor-classe: #e0917a; --cor-classe-20: #c8614b20; --cor-classe-40: #c8614b40; }
+.tema-bardo     { --cor-classe: #e07ab0; --cor-classe-20: #c84b8a20; --cor-classe-40: #c84b8a40; }
+.tema-clerigo   { --cor-classe: #e0e07a; --cor-classe-20: #c8c84b20; --cor-classe-40: #c8c84b40; }
+.tema-monge     { --cor-classe: #7ae0e0; --cor-classe-20: #4bc8c820; --cor-classe-40: #4bc8c840; }
+.tema-cacador   { --cor-classe: #a8e07a; --cor-classe-20: #7ac84b20; --cor-classe-40: #7ac84b40; }
+.tema-feiticeiro{ --cor-classe: #e07a7a; --cor-classe-20: #c84b4b20; --cor-classe-40: #c84b4b40; }
+.tema-bruxo     { --cor-classe: #9b7ae0; --cor-classe-20: #6b4bc820; --cor-classe-40: #6b4bc840; }
 
 
 .page-fade .text-\[\#c8a84b\] {
