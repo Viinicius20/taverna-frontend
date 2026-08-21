@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../services/api';
 import html2pdf from 'html2pdf.js';
+import { createPortal } from 'react-dom';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -2076,7 +2077,7 @@ style={{
   onConfirmar={confirmarAsi}
 />
 
-      {modalArquetipo && (
+      {modalArquetipo && createPortal(
   <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
     <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full" style={{ borderRadius: '2px' }}>
       <div className="px-6 py-4 border-b border-[#c8a84b15]">
@@ -2111,10 +2112,24 @@ style={{
           disabled={!arquetipoSelecionado}
           onClick={async () => {
   setModalArquetipo(false);
-  
+
   if (pendingLevelUp?.retroativo) {
-    // só salva o arquétipo, sem level up
-    const fichaAtualizada = { ...ficha, arquetipo: arquetipoSelecionado };
+    const multiclasse = Array.isArray(ficha.classes) && ficha.classes.length > 1;
+    const classNameAlvo = pendingLevelUp.classNameAlvo;
+
+    let fichaAtualizada;
+    if (multiclasse && classNameAlvo) {
+      fichaAtualizada = {
+        ...ficha,
+        arquetipos: {
+          ...(ficha.arquetipos || {}),
+          [classNameAlvo]: arquetipoSelecionado
+        }
+      };
+    } else {
+      fichaAtualizada = { ...ficha, arquetipo: arquetipoSelecionado };
+    }
+
     setFicha(fichaAtualizada);
     await api.put(`/characters/${id}`, { data: fichaAtualizada });
     setSucesso(`Arquétipo ${arquetipoSelecionado} salvo!`);
@@ -2126,7 +2141,7 @@ style={{
       arquetipoSelecionado
     );
   }
-  
+
   setPendingLevelUp(null);
   setArquetipoSelecionado('');
 }}
@@ -2136,7 +2151,8 @@ style={{
         </button>
       </div>
     </div>
-  </div>
+  </div>,
+  document.body
 )}
 
       {/* Lista de mudanças */}
