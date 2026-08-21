@@ -2325,6 +2325,16 @@ style={{
   document.body
 )}
 
+{modalAsi && createPortal(
+  <ModalAsi
+    aberto={modalAsi}
+    atributos={ficha?.atributos || ficha?.attributes || {}}
+    onFechar={() => setModalAsi(false)}
+    onConfirmar={confirmarAsi}
+  />,
+  document.body
+)}
+
         {/* MODAL ESCOLHER CLASSE (Multiclassing) */}
         {showClassLevelUpModal && (
           <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
