@@ -1671,6 +1671,35 @@ function rolarAtaque(ataque) {
             </div>
           )}
 
+          {/* FEATS */}
+{ficha.feats && ficha.feats.length > 0 && (
+  <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+    <div className="px-6 py-4 border-b border-[#c8a84b15]">
+      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">FEATS</p>
+      <p className="text-[#4a4030] text-xs mt-1">Talentos escolhidos em melhorias de atributo</p>
+    </div>
+    <div className="p-6 flex flex-col gap-3">
+      {ficha.feats.map((feat, idx) => (
+        <div key={idx} className="border border-[#c8a84b15] bg-[#0f0e0c] p-4 flex items-start justify-between gap-3">
+          <div>
+            <p style={cinzel} className="text-[#c8a84b] text-sm font-bold mb-1">{feat.nome}</p>
+            {feat.descricao && (
+              <p className="text-[#6a6050] text-xs leading-relaxed">{feat.descricao}</p>
+            )}
+          </div>
+          <button onClick={() => {
+            const novos = ficha.feats.filter((_, i) => i !== idx);
+            setFicha(prev => ({ ...prev, feats: novos }));
+          }}
+            className="text-red-900 hover:text-red-600 text-sm transition-colors flex-shrink-0">
+            ×
+          </button>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
         {/* CONTADOR DE RECURSOS */}
 <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
   <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
