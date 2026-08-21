@@ -945,10 +945,25 @@ function rolarAtaque(ataque) {
           style={{ borderColor: 'var(--cor-classe-20, #c8a84b20)' }}>
         <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
           onClick={() => navigate('/')}>⚔ TAVERNA</span>
-        <button onClick={() => navigate('/personagens')}
-          className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
-          ← Meus Personagens
-        </button>
+
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full overflow-hidden border flex items-center justify-center flex-shrink-0"
+              style={{ borderColor: 'var(--cor-classe-40, #c8a84b40)' }}>
+              {personagem?.avatar_url ? (
+                <img src={personagem.avatar_url} alt="avatar" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-xs opacity-30">⚔</span>
+              )}
+            </div>
+            <span style={cinzel} className="text-[#e8e0d0] text-sm hidden sm:inline">{ficha?.name}</span>
+          </div>
+
+          <button onClick={() => navigate('/personagens')}
+            className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+            ← Meus Personagens
+          </button>
+        </div>
       </nav>
 
       <div id="ficha-conteudo" className="max-w-3xl mx-auto px-8 py-12">
