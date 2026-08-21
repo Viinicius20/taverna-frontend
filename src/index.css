@@ -70,3 +70,14 @@
 .tema-cacador   { --cor-classe: #7ac84b; --cor-classe-20: #7ac84b20; --cor-classe-40: #7ac84b40; }
 .tema-feiticeiro{ --cor-classe: #c84b4b; --cor-classe-20: #c84b4b20; --cor-classe-40: #c84b4b40; }
 .tema-bruxo     { --cor-classe: #6b4bc8; --cor-classe-20: #6b4bc820; --cor-classe-40: #6b4bc840; }
+
+
+.page-fade .text-\[\#c8a84b\] {
+  color: var(--cor-classe, #c8a84b);
+}
+.page-fade .border-\[\#c8a84b20\] {
+  border-color: var(--cor-classe-20, #c8a84b20);
+}
+.page-fade .border-\[\#c8a84b30\] {
+  border-color: var(--cor-classe-40, #c8a84b40);
+}
