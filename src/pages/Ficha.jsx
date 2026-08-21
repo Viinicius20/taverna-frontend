@@ -2070,90 +2070,29 @@ style={{
           className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
       </div>
 
-      <ModalAsi
+      {modalArquetipo && createPortal(
+  <div style={{
+    position: 'fixed',
+    top: 0, left: 0, right: 0, bottom: 0,
+    background: 'red',
+    zIndex: 99999,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '40px',
+    color: 'white'
+  }}>
+    TESTE MODAL
+  </div>,
+  document.body
+)}
+
+<ModalAsi
   aberto={modalAsi}
   atributos={ficha?.atributos || ficha?.attributes || {}}
   onFechar={() => setModalAsi(false)}
   onConfirmar={confirmarAsi}
 />
-
-      {modalArquetipo && createPortal(
-  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
-    <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full" style={{ borderRadius: '2px' }}>
-      <div className="px-6 py-4 border-b border-[#c8a84b15]">
-        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">ESCOLHA SEU ARQUÉTIPO</p>
-        <p style={cinzel} className="text-[#4a4030] text-xs mt-1">
-          Nível {pendingLevelUp?.novoNivel} — esta escolha é permanente
-        </p>
-      </div>
-      <div className="px-6 py-4 flex flex-col gap-2 max-h-80 overflow-y-auto">
-        {arquetiposDisponiveis.map(arq => (
-          <button key={arq}
-            onClick={() => setArquetipoSelecionado(arq)}
-            className="px-4 py-3 text-xs tracking-widest border text-left transition-all"
-            style={{
-              ...cinzel,
-              borderRadius: '2px',
-              borderColor: arquetipoSelecionado === arq ? '#c8a84b' : '#c8a84b20',
-              backgroundColor: arquetipoSelecionado === arq ? '#c8a84b15' : 'transparent',
-              color: arquetipoSelecionado === arq ? '#c8a84b' : '#6a6050',
-            }}>
-            {arq}
-          </button>
-        ))}
-      </div>
-      <div className="px-6 py-4 border-t border-[#c8a84b15] flex gap-3">
-        <button onClick={() => { setModalArquetipo(false); setPendingLevelUp(null); }}
-          className="flex-1 border border-[#c8a84b20] text-[#4a4030] text-xs tracking-widest py-2 hover:border-[#c8a84b40] transition-colors"
-          style={{ ...cinzel, borderRadius: '2px' }}>
-          Cancelar
-        </button>
-        <button
-          disabled={!arquetipoSelecionado}
-          onClick={async () => {
-  setModalArquetipo(false);
-
-  if (pendingLevelUp?.retroativo) {
-    const multiclasse = Array.isArray(ficha.classes) && ficha.classes.length > 1;
-    const classNameAlvo = pendingLevelUp.classNameAlvo;
-
-    let fichaAtualizada;
-    if (multiclasse && classNameAlvo) {
-      fichaAtualizada = {
-        ...ficha,
-        arquetipos: {
-          ...(ficha.arquetipos || {}),
-          [classNameAlvo]: arquetipoSelecionado
-        }
-      };
-    } else {
-      fichaAtualizada = { ...ficha, arquetipo: arquetipoSelecionado };
-    }
-
-    setFicha(fichaAtualizada);
-    await api.put(`/characters/${id}`, { data: fichaAtualizada });
-    setSucesso(`Arquétipo ${arquetipoSelecionado} salvo!`);
-    setTimeout(() => setSucesso(''), 4000);
-  } else {
-    await fazerLevelUpComClasse(
-      pendingLevelUp.novoNivel,
-      pendingLevelUp.classNameAlvo,
-      arquetipoSelecionado
-    );
-  }
-
-  setPendingLevelUp(null);
-  setArquetipoSelecionado('');
-}}
-          className="flex-1 bg-[#c8a84b] text-[#0f0e0c] text-xs tracking-widest py-2 font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
-          style={{ ...cinzel, borderRadius: '2px' }}>
-          Confirmar →
-        </button>
-      </div>
-    </div>
-  </div>,
-  document.body
-)}
 
       {/* Lista de mudanças */}
       <div className="px-6 py-4 overflow-y-auto flex-1 flex flex-col gap-4">
