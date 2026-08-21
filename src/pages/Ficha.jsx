@@ -45,16 +45,6 @@ function getTemaClasse(classe) {
   return '';
 }
 
-const classeParaTema = ficha?.classes?.length
-  ? ficha.classes[0]?.name
-  : ficha?.class;
-
-  function ModalAsi({ aberto, onFechar, onConfirmar, atributos }) {
-  const [modo, setModo] = useState("atributos");
-  const [alocacao, setAlocacao] = useState({});
-  const [featNome, setFeatNome] = useState("");
-  const [featDescricao, setFeatDescricao] = useState("");
-
   const totalAlocado = Object.values(alocacao).reduce((a, b) => a + b, 0);
 
   function ajustar(attr, delta) {
@@ -69,7 +59,17 @@ const classeParaTema = ficha?.classes?.length
     });
   }
 
-function Ficha() {
+export default function Ficha() {
+  const classeParaTema = ficha?.classes?.length
+  ? ficha.classes[0]?.name
+  : ficha?.class;
+
+  function ModalAsi({ aberto, onFechar, onConfirmar, atributos }) {
+  const [modo, setModo] = useState("atributos");
+  const [alocacao, setAlocacao] = useState({});
+  const [featNome, setFeatNome] = useState("");
+  const [featDescricao, setFeatDescricao] = useState("");
+
   const { id } = useParams();
   const navigate = useNavigate();
 
