@@ -45,10 +45,6 @@ function getTemaClasse(classe) {
   return '';
 }
 
-const classeParaTema = ficha?.classes?.length
-  ? ficha.classes[0]?.name
-  : ficha?.class;
-
   function ModalAsi({ aberto, onFechar, onConfirmar, atributos }) {
   const [modo, setModo] = useState("atributos");
   const [alocacao, setAlocacao] = useState({});
@@ -935,6 +931,10 @@ function rolarAtaque(ataque) {
       <p className="text-red-400">{erro || 'Personagem não encontrado.'}</p>
     </div>
   );
+
+  const classeParaTema = ficha?.classes?.length
+    ? ficha.classes[0]?.name
+    : ficha?.class;
 
   const combat = ficha.combat || {};
 
