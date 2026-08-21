@@ -81,3 +81,12 @@
 .page-fade .border-\[\#c8a84b30\] {
   border-color: var(--cor-classe-40, #c8a84b40);
 }
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-anim {
+  animation: modalIn 0.2s ease-out;
+}

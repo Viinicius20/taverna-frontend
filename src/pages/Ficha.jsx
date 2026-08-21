@@ -1517,7 +1517,7 @@ function rolarAtaque(ataque) {
         {modalAddSpell && (
   <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
     onClick={() => setModalAddSpell(false)}>
-    <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full"
+    <div className="modal-anim bg-[#161410] border border-[#c8a84b30] max-w-md w-full"
       style={{ borderRadius: '2px' }}
       onClick={e => e.stopPropagation()}>
       
@@ -2121,7 +2121,7 @@ style={{
         {modalLevelUp && (
           <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
             onClick={() => !upando && setModalLevelUp(false)}>
-            <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full"
+            <div className="modal-anim bg-[#161410] border border-[#c8a84b30] max-w-md w-full"
               style={{ borderRadius: '2px' }}
               onClick={e => e.stopPropagation()}>
               <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
@@ -2174,7 +2174,7 @@ style={{
 
         {modalRevisao && fichaPreview && (
   <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
-    <div className="bg-[#161410] border border-[#c8a84b30] max-w-lg w-full max-h-[85vh] flex flex-col"
+    <div className="modal-anim bg-[#161410] border border-[#c8a84b30] max-w-lg w-full max-h-[85vh] flex flex-col"
       style={{ borderRadius: '2px' }}>
 
       {/* Header */}
@@ -2298,7 +2298,7 @@ style={{
 {modalArquetipo && createPortal(
   <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
     <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full" style={{ borderRadius: '2px' }}>
-      <div className="px-6 py-4 border-b border-[#c8a84b15]">
+      <div className="modal-anim bg-[#161410] border border-[#c8a84b30] max-w-md w-full" style={{ borderRadius: '2px' }}>
         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">ESCOLHA SEU ARQUÉTIPO</p>
         <p style={cinzel} className="text-[#4a4030] text-xs mt-1">
           Nível {pendingLevelUp?.novoNivel} — esta escolha é permanente
@@ -2420,7 +2420,7 @@ style={{
         {modal && (
           <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
             onClick={() => { setModal(null); setDescricaoSkill(null); }}>
-            <div className="bg-[#161410] border border-[#c8a84b30] max-w-lg w-full max-h-[80vh] overflow-y-auto"
+            <div className="modal-anim bg-[#161410] border border-[#c8a84b30] max-w-lg w-full max-h-[80vh] overflow-y-auto"
               style={{ borderRadius: '2px' }}
               onClick={e => e.stopPropagation()}>
               <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
