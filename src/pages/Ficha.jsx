@@ -69,9 +69,9 @@ export default function Ficha() {
   const [modalRevisao, setModalRevisao] = useState(false);
 
   const [modalArquetipo, setModalArquetipo] = useState(false);
-  //const [arquetiposDisponiveis, setArquetiposDisponiveis] = useState([]);
-  //const [arquetipoSelecionado, setArquetipoSelecionado] = useState('');
-  //const [pendingLevelUp, setPendingLevelUp] = useState(null);
+  const [arquetiposDisponiveis, setArquetiposDisponiveis] = useState([]);
+  const [arquetipoSelecionado, setArquetipoSelecionado] = useState('');
+  const [pendingLevelUp, setPendingLevelUp] = useState(null);
 
   const [ataques, setAtaques] = useState(ficha?.ataques || []);
   const [novoAtaque, setNovoAtaque] = useState({ nome: '', bonus: '', dano: '', tipo: '' });
