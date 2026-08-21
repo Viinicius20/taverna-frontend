@@ -2069,32 +2069,7 @@ style={{
         <button onClick={() => setModalRevisao(false)}
           className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
       </div>
-
-      {modalArquetipo && createPortal(
-  <div style={{
-    position: 'fixed',
-    top: 0, left: 0, right: 0, bottom: 0,
-    background: 'red',
-    zIndex: 99999,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '40px',
-    color: 'white'
-  }}
-  onClick={() => { setArquetipoSelecionado(''); setPendingLevelUp(null); }}
-  >
-    TESTE MODAL — {arquetiposDisponiveis?.length || 0} opções — nível {pendingLevelUp?.novoNivel}
-  </div>,
-  document.body
-)}
-
-<ModalAsi
-  aberto={modalAsi}
-  atributos={ficha?.atributos || ficha?.attributes || {}}
-  onFechar={() => setModalAsi(false)}
-  onConfirmar={confirmarAsi}
-/>
+        
 
       {/* Lista de mudanças */}
       <div className="px-6 py-4 overflow-y-auto flex-1 flex flex-col gap-4">
@@ -2200,6 +2175,32 @@ style={{
     </div>
   </div>
 )}
+
+{modalArquetipo && createPortal(
+  <div style={{
+    position: 'fixed',
+    top: 0, left: 0, right: 0, bottom: 0,
+    background: 'red',
+    zIndex: 99999,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '40px',
+    color: 'white'
+  }}
+  onClick={() => { setArquetipoSelecionado(''); setPendingLevelUp(null); }}
+  >
+    TESTE MODAL — {arquetiposDisponiveis?.length || 0} opções — nível {pendingLevelUp?.novoNivel}
+  </div>,
+  document.body
+)}
+
+<ModalAsi
+  aberto={modalAsi}
+  atributos={ficha?.atributos || ficha?.attributes || {}}
+  onFechar={() => setModalAsi(false)}
+  onConfirmar={confirmarAsi}
+/>
 
         {/* MODAL ESCOLHER CLASSE (Multiclassing) */}
         {showClassLevelUpModal && (
