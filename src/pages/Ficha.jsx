@@ -208,7 +208,7 @@ function abrirProximaPendencia(fila) {
 
 
 function ModalAsi({ aberto, onFechar, onConfirmar, atributos }) {
-  const [modo, setModo] = useState("atributos"); // "atributos" | "feat"
+  const [modo, setModo] = useState("atributos"); 
   const [alocacao, setAlocacao] = useState({});
   const [featNome, setFeatNome] = useState("");
   const [featDescricao, setFeatDescricao] = useState("");
@@ -489,6 +489,123 @@ function exportarPDF() {
     valoresOriginais.forEach(({ el }) => el.style.display = '');
     esconder.forEach(el => el.style.display = '');
   });
+}
+
+function ModalAsi({ aberto, onFechar, onConfirmar, atributos }) {
+  const [modo, setModo] = useState("atributos");
+  const [alocacao, setAlocacao] = useState({});
+  const [featNome, setFeatNome] = useState("");
+  const [featDescricao, setFeatDescricao] = useState("");
+
+  const totalAlocado = Object.values(alocacao).reduce((a, b) => a + b, 0);
+
+  function ajustar(attr, delta) {
+    setAlocacao(prev => {
+      const atual = prev[attr] || 0;
+      const novoValorAttr = (atributos[attr] || 10) + atual + delta;
+      if (novoValorAttr > 20) return prev;
+      const novo = atual + delta;
+      if (novo < 0) return prev;
+      if (totalAlocado + delta > 2) return prev;
+      return { ...prev, [attr]: novo };
+    });
+  }
+
+  if (!aberto) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
+      <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full" style={{ borderRadius: '2px' }}>
+        <div className="px-6 py-4 border-b border-[#c8a84b15]">
+          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">MELHORIA DE ATRIBUTO (ASI)</p>
+        </div>
+
+        <div className="px-6 py-4 flex gap-2 border-b border-[#c8a84b15]">
+          <button onClick={() => setModo("atributos")}
+            className="flex-1 text-xs tracking-widest py-2 border transition-colors"
+            style={{
+              ...cinzel, borderRadius: '2px',
+              borderColor: modo === "atributos" ? '#c8a84b' : '#c8a84b20',
+              color: modo === "atributos" ? '#c8a84b' : '#6a6050',
+            }}>
+            Atributos
+          </button>
+          <button onClick={() => setModo("feat")}
+            className="flex-1 text-xs tracking-widest py-2 border transition-colors"
+            style={{
+              ...cinzel, borderRadius: '2px',
+              borderColor: modo === "feat" ? '#c8a84b' : '#c8a84b20',
+              color: modo === "feat" ? '#c8a84b' : '#6a6050',
+            }}>
+            Feat
+          </button>
+        </div>
+
+        {modo === "atributos" ? (
+          <>
+            <div className="px-6 py-4 flex flex-col gap-3">
+              <p className="text-[#6a6050] text-xs mb-1">Distribua 2 pontos (máx +2 num só, ou +1 em dois)</p>
+              {Object.entries(atributos).map(([attr, valor]) => (
+                <div key={attr} className="flex items-center justify-between">
+                  <span className="text-[#e8e0d0] text-sm">
+                    {attr.toUpperCase()}: {valor} → {valor + (alocacao[attr] || 0)}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => ajustar(attr, -1)}
+                      className="w-7 h-7 border border-[#c8a84b30] text-[#c8a84b] hover:bg-[#c8a84b10]"
+                      style={{ borderRadius: '2px' }}>−</button>
+                    <span className="text-[#c8a84b] text-sm w-4 text-center">{alocacao[attr] || 0}</span>
+                    <button onClick={() => ajustar(attr, 1)}
+                      disabled={valor + (alocacao[attr] || 0) >= 20}
+                      className="w-7 h-7 border border-[#c8a84b30] text-[#c8a84b] hover:bg-[#c8a84b10] disabled:opacity-30"
+                      style={{ borderRadius: '2px' }}>+</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="px-6 py-4 border-t border-[#c8a84b15] flex gap-3">
+              <button onClick={onFechar}
+                className="flex-1 border border-[#c8a84b20] text-[#4a4030] text-xs tracking-widest py-2 hover:border-[#c8a84b40] transition-colors"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                Cancelar
+              </button>
+              <button
+                disabled={totalAlocado !== 2}
+                onClick={() => onConfirmar("atributos", alocacao)}
+                className="flex-1 bg-[#c8a84b] text-[#0f0e0c] text-xs tracking-widest py-2 font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                Confirmar → ({totalAlocado}/2)
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="px-6 py-4 flex flex-col gap-3">
+              <input placeholder="Nome do Feat" value={featNome} onChange={e => setFeatNome(e.target.value)}
+                className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+                style={{ borderRadius: '2px' }} />
+              <textarea placeholder="Descrição" value={featDescricao} onChange={e => setFeatDescricao(e.target.value)}
+                className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50] min-h-20"
+                style={{ borderRadius: '2px' }} />
+            </div>
+            <div className="px-6 py-4 border-t border-[#c8a84b15] flex gap-3">
+              <button onClick={onFechar}
+                className="flex-1 border border-[#c8a84b20] text-[#4a4030] text-xs tracking-widest py-2 hover:border-[#c8a84b40] transition-colors"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                Cancelar
+              </button>
+              <button disabled={!featNome}
+                onClick={() => onConfirmar("feat", null, featNome, featDescricao)}
+                className="flex-1 bg-[#c8a84b] text-[#0f0e0c] text-xs tracking-widest py-2 font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                Confirmar →
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
 }
 
   // ===== FUNÇÕES DE LEVEL UP COM MULTICLASSING =====
@@ -842,26 +959,6 @@ function rolarAtaque(ataque) {
   setTimeout(() => setResultadoRolagem(null), 5000);
 }
 
-  console.log("RENDER — modalArquetipo:", modalArquetipo);
-
-  // ===== FIM FUNÇÕES LEVEL UP =====
-  if (carregando) return (
-    <div className="min-h-screen bg-[#0f0e0c] flex items-center justify-center" style={crimson}>
-      <div className="flex flex-col items-center gap-4">
-        <div className="w-10 h-10 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-        <p style={cinzel} className="text-[#c8a84b] text-sm tracking-widest">CARREGANDO...</p>
-      </div>
-    </div>
-  );
-
-  if (!ficha) return (
-    <div className="min-h-screen bg-[#0f0e0c] flex items-center justify-center" style={crimson}>
-      <p className="text-red-400">{erro || 'Personagem não encontrado.'}</p>
-    </div>
-  );
-
-  const combat = ficha.combat || {};
-
 function getTemaClasse(classe) {
   if (!classe) return '';
   const c = classe.toLowerCase();
@@ -883,6 +980,26 @@ function getTemaClasse(classe) {
 const classeParaTema = ficha?.classes?.length
   ? ficha.classes[0]?.name
   : ficha?.class;
+
+  console.log("RENDER — modalArquetipo:", modalArquetipo);
+
+  // ===== FIM FUNÇÕES LEVEL UP =====
+  if (carregando) return (
+    <div className="min-h-screen bg-[#0f0e0c] flex items-center justify-center" style={crimson}>
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-10 h-10 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
+        <p style={cinzel} className="text-[#c8a84b] text-sm tracking-widest">CARREGANDO...</p>
+      </div>
+    </div>
+  );
+
+  if (!ficha) return (
+    <div className="min-h-screen bg-[#0f0e0c] flex items-center justify-center" style={crimson}>
+      <p className="text-red-400">{erro || 'Personagem não encontrado.'}</p>
+    </div>
+  );
+
+  const combat = ficha.combat || {};
 
   return (
     <div className={`min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade ${getTemaClasse(classeParaTema)}`} style={crimson}>
@@ -2274,13 +2391,6 @@ style={{
   </div>,
   document.body
 )}
-
-<ModalAsi
-  aberto={modalAsi}
-  atributos={ficha?.atributos || ficha?.attributes || {}}
-  onFechar={() => setModalAsi(false)}
-  onConfirmar={confirmarAsi}
-/>
 
         {/* MODAL ESCOLHER CLASSE (Multiclassing) */}
         {showClassLevelUpModal && (
