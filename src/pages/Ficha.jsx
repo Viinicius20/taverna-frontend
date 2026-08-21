@@ -636,14 +636,35 @@ await fazerLevelUpComClasse(proximoNivel, null);
 }
 
   async function confirmarLevelUpComClasse(classeName) {
-    if (!classeName) {
-      alert("Escolha uma classe");
+  if (!classeName) {
+    alert("Escolha uma classe");
+    return;
+  }
+
+  setShowClassLevelUpModal(false);
+
+  const classeObj = ficha.classes.find(c => c.name === classeName);
+  const proximoNivelClasse = (classeObj?.level || 1) + 1;
+  const proximoNivelTotal = (ficha.level || ficha.total_level || 1) + 1;
+
+  // checa arquétipo pendente pra essa classe específica (antes do level up)
+  try {
+    const { data: arquInfo } = await api.get(`/arquetipos/${encodeURIComponent(classeName)}`);
+    const jaTemArquetipo = ficha.arquetipos?.[classeName] || ficha.arquetipo;
+
+    if (proximoNivelClasse === arquInfo.nivel && !jaTemArquetipo && arquInfo.arquetipos?.length) {
+      setArquetiposDisponiveis(arquInfo.arquetipos);
+      setPendingLevelUp({ novoNivel: proximoNivelTotal, classNameAlvo: classeName });
+      setModalArquetipo(true);
       return;
     }
-
-    const proximoNivel = (ficha.level || 1) + 1;
-    await fazerLevelUpComClasse(proximoNivel, classeName);
+  } catch (e) {
+    console.warn("Arquétipos não encontrados para:", classeName);
   }
+
+  // ASI é verificado depois, quando a ficha recarregar (buscarPersonagem já cobre isso)
+  await fazerLevelUpComClasse(proximoNivelTotal, classeName);
+}
 
   useEffect(() => {
   if (!id) return;
