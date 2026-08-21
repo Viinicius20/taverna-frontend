@@ -5,12 +5,15 @@ import { useUser } from '../context/UserContext';
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
 
-const particles = Array.from({ length: 18 }, (_, i) => ({
-  id: i,
-  left: Math.random() * 100,
-  delay: Math.random() * 8,
-  duration: 6 + Math.random() * 6,
-}));
+const particles = Array.from({ length: 18 }, (_, i) => {
+  const faixa = 100 / 18;
+  return {
+    id: i,
+    left: faixa * i + Math.random() * faixa * 0.7,
+    delay: Math.random() * 8,
+    duration: 6 + Math.random() * 6,
+  };
+});
 
 export default function Home() {
   const navigate = useNavigate();
@@ -175,7 +178,7 @@ export default function Home() {
         animationDuration: `${p.duration}s`,
       }} />
   ))}
-  
+
         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-6 opacity-80">RPG</p>
         <h1 style={cinzel} className="text-3xl sm:text-5xl font-bold text-[#f0e8d8] leading-tight mb-4">
           Sua aventura<br />começa <span className="text-[#c8a84b]">aqui</span>
