@@ -217,9 +217,9 @@ export default function Ficha() {
 
   const [notas, setNotas] = useState(ficha?.notas_privadas || '');
 
-  const [modalEnviarItem, setModalEnviarItem] = useState(null); // item selecionado pra enviar
-  const [personagens, setPersonagens] = useState([]); // lista de personagens pra enviar
-  const [enviarCopia, setEnviarCopia] = useState(false); // toggle remover/copiar
+  const [modalEnviarItem, setModalEnviarItem] = useState(null); 
+  const [personagens, setPersonagens] = useState([]); 
+  const [enviarCopia, setEnviarCopia] = useState(false); 
   const [enviandoItem, setEnviandoItem] = useState(false);
 
   const [uploadandoAvatar, setUploadandoAvatar] = useState(false);
@@ -229,6 +229,11 @@ export default function Ficha() {
   const [filaPendencias, setFilaPendencias] = useState([]);
   const [modalAsi, setModalAsi] = useState(false);
   const [asiPendente, setAsiPendente] = useState(null);
+
+  const [manualSpell, setManualSpell] = useState({
+  name: '', level: 0, school: '', description: '', mechanics: '', range: '', duration: '', components: ''
+  });
+  const [criandoManual, setCriandoManual] = useState(false);
 
   const [moedas, setMoedas] = useState({
   po: ficha?.moedas?.po || 0,
@@ -456,6 +461,31 @@ function abrirProximaPendencia(fila) {
     setLoadingSpells(false);
   }
 
+  async function criarMagiaManual() {
+  if (!manualSpell.name.trim()) {
+    alert("Digite o nome da magia");
+    return;
+  }
+
+  setCriandoManual(true);
+  try {
+    const className = ficha.classes?.[0]?.name || ficha.class || 'Wizard';
+    const res = await api.post('/spells/manual', {
+      ...manualSpell,
+      class_name: className
+    });
+
+    adicionarFeiticoDoDropdown(res.data.data);
+    setManualSpell({ name: '', level: 0, school: '', description: '', mechanics: '', range: '', duration: '', components: '' });
+
+    setSucesso(`Magia "${res.data.data.name}" criada!`);
+    setTimeout(() => setSucesso(''), 3000);
+  } catch (error) {
+    setErro('Erro ao criar magia: ' + error.message);
+  }
+  setCriandoManual(false);
+}
+
   function adicionarFeiticoDoDropdown(spell) {
     setFicha(prev => ({
       ...prev,
@@ -510,7 +540,6 @@ function abrirProximaPendencia(fila) {
 }
 
 function exportarPDF() {
-  // Substitui inputs por spans temporariamente
   const inputs = document.querySelectorAll('#ficha-conteudo input, #ficha-conteudo textarea, #ficha-conteudo select');
   const valoresOriginais = [];
   
@@ -552,7 +581,6 @@ function exportarPDF() {
   };
 
   html2pdf().set(opt).from(element).save().then(() => {
-    // Restaura inputs
     document.querySelectorAll('[data-pdf-temp]').forEach(el => el.remove());
     valoresOriginais.forEach(({ el }) => el.style.display = '');
     esconder.forEach(el => el.style.display = '');
@@ -1540,6 +1568,11 @@ function rolarAtaque(ataque) {
             style={{ ...cinzel, borderRadius: '2px' }}>
             PROCURAR
           </button>
+          <button onClick={() => setTab('manual')}
+            className={`flex-1 px-3 py-2 text-xs tracking-widest transition-colors ${tab === 'manual' ? 'bg-[#c8a84b] text-[#0f0e0c]' : 'border border-[#c8a84b30] text-[#c8a84b]'}`}
+            style={{ ...cinzel, borderRadius: '2px' }}>
+            MANUAL
+          </button>
           <button 
             onClick={() => setTab('criar')}
             className={`flex-1 px-3 py-2 text-xs tracking-widest transition-colors ${
@@ -1570,6 +1603,91 @@ function rolarAtaque(ataque) {
             )}
           </div>
         )}
+
+        {tab === 'manual' && (
+  <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+    <div>
+      <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">NOME</label>
+      <input value={manualSpell.name}
+        onChange={e => setManualSpell(prev => ({ ...prev, name: e.target.value }))}
+        placeholder="ex: Beijo do Desespero"
+        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
+        style={{ borderRadius: '2px' }} />
+    </div>
+
+    <div className="grid grid-cols-2 gap-2">
+      <div>
+        <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">NÍVEL</label>
+        <input type="number" min={0} max={9} value={manualSpell.level}
+          onChange={e => setManualSpell(prev => ({ ...prev, level: Number(e.target.value) }))}
+          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
+          style={{ borderRadius: '2px' }} />
+      </div>
+      <div>
+        <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">ESCOLA</label>
+        <input value={manualSpell.school}
+          onChange={e => setManualSpell(prev => ({ ...prev, school: e.target.value }))}
+          placeholder="ex: Enchantment"
+          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
+          style={{ borderRadius: '2px' }} />
+      </div>
+    </div>
+
+    <div>
+      <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">DESCRIÇÃO</label>
+      <textarea value={manualSpell.description}
+        onChange={e => setManualSpell(prev => ({ ...prev, description: e.target.value }))}
+        placeholder="ex: Usa carisma para enfeitiçar o alvo..."
+        rows={2}
+        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm resize-none"
+        style={{ borderRadius: '2px' }} />
+    </div>
+
+    <div>
+      <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">MECÂNICA</label>
+      <textarea value={manualSpell.mechanics}
+        onChange={e => setManualSpell(prev => ({ ...prev, mechanics: e.target.value }))}
+        placeholder="ex: Se falhar num teste de Destreza, fica enfeitiçado por 1 minuto..."
+        rows={2}
+        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm resize-none"
+        style={{ borderRadius: '2px' }} />
+    </div>
+
+    <div className="grid grid-cols-3 gap-2">
+      <div>
+        <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">ALCANCE</label>
+        <input value={manualSpell.range}
+          onChange={e => setManualSpell(prev => ({ ...prev, range: e.target.value }))}
+          placeholder="60 feet"
+          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
+          style={{ borderRadius: '2px' }} />
+      </div>
+      <div>
+        <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">DURAÇÃO</label>
+        <input value={manualSpell.duration}
+          onChange={e => setManualSpell(prev => ({ ...prev, duration: e.target.value }))}
+          placeholder="1 minute"
+          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
+          style={{ borderRadius: '2px' }} />
+      </div>
+      <div>
+        <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">COMPONENTES</label>
+        <input value={manualSpell.components}
+          onChange={e => setManualSpell(prev => ({ ...prev, components: e.target.value }))}
+          placeholder="V, S"
+          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
+          style={{ borderRadius: '2px' }} />
+      </div>
+    </div>
+
+    <button onClick={criarMagiaManual}
+      disabled={criandoManual || !manualSpell.name.trim()}
+      className="w-full bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      {criandoManual ? 'Salvando...' : 'ADICIONAR MAGIA →'}
+    </button>
+  </div>
+)}
 
         {tab === 'criar' && (
           <div className="space-y-3">
