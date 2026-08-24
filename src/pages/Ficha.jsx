@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import api from '../services/api';
 import html2pdf from 'html2pdf.js';
 import { createPortal } from 'react-dom';
+import { normalizarClasseParaEN } from '../utils/classTranslation';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -450,9 +451,10 @@ function abrirProximaPendencia(fila) {
     setModalAddSpell(true);
     setLoadingSpells(true);
     try {
-      const className = (ficha.classes && ficha.classes.length > 0) 
+      const classNameOriginal = (ficha.classes && ficha.classes.length > 0) 
         ? ficha.classes[0].name 
         : 'Wizard';
+      const className = normalizarClasseParaEN(classNameOriginal);
       const res = await api.get(`/spells?class_name=${className}`);
       setAvailableSpells(res.data.data);
     } catch {
