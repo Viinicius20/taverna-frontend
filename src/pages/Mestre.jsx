@@ -77,6 +77,9 @@ export default function Mestre() {
   const [jogadorOrigem, setJogadorOrigem] = useState(null);
   const [itemSelecionado, setItemSelecionado] = useState(null);
   const [sugestoesMonstro, setSugestoesMonstro] = useState([]);
+  const [modalGerarArte, setModalGerarArte] = useState(null); // { tipo, id }
+  const [descricaoArteCustom, setDescricaoArteCustom] = useState('');
+  const [gerandoArte, setGerandoArte] = useState(false);
 
   useEffect(() => {
     buscarNpcs();
@@ -514,6 +517,28 @@ async function abrirSkillNpc(skillName, npcData) {
   setCarregandoSkillNpc(false);
 }
 
+async function confirmarGerarArte() {
+  setGerandoArte(true);
+  try {
+    const res = await api.post('/gerar-arte', {
+      tipo: modalGerarArte.tipo,
+      id: modalGerarArte.id,
+      descricao_customizada: descricaoArteCustom
+    });
+    // atualiza o item/npc local com a nova art_url
+    if (modalGerarArte.tipo === 'npc') {
+      setNpcs(prev => prev.map(n => n.id === modalGerarArte.id ? { ...n, art_url: res.data.art_url } : n));
+    } else {
+      setItens(prev => prev.map(i => i.id === modalGerarArte.id ? { ...i, art_url: res.data.art_url } : i));
+    }
+    setModalGerarArte(null);
+    setDescricaoArteCustom('');
+  } catch {
+    alert('Erro ao gerar arte.');
+  }
+  setGerandoArte(false);
+}
+
 function adicionarPersonagem(npc) {
   const d = npc.data || {};
   const hp = d.combat?.hp_max || d.combat?.hp || 10;
@@ -525,7 +550,7 @@ function adicionarPersonagem(npc) {
     hpMax: hp,
     hpAtual: hp,
     iniciativa: d.combat?.initiative || 0,
-    avatar_url: npc.avatar_url || null, // ← adiciona isso
+    avatar_url: npc.avatar_url || null, 
   }]);
 }
 
@@ -777,6 +802,7 @@ function gerarNome() {
                     </div>
                     <span style={cinzel} className="text-[#4a4030] text-lg">{expandido ? '∧' : '∨'}</span>
                   </div>
+                  
 
                   {expandido && (
                     <div className="border-t border-[#c8a84b10] px-6 pb-6 flex flex-col gap-6 pt-6">
@@ -988,6 +1014,11 @@ function gerarNome() {
                           style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
                           Deletar NPC
                         </button>
+                        <button onClick={() => deletarNpc(npc.id)}
+    className="text-red-900 hover:text-red-600 text-xs border border-red-900 hover:border-red-600 px-4 py-1.5 transition-colors"
+    style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
+    Deletar NPC
+  </button>
                       </div>
                     </div>
                   )}
@@ -1508,6 +1539,11 @@ function gerarNome() {
       style={{ ...cinzel, borderRadius: '2px' }}>
       🗑 DELETAR ITEM
     </button>
+    <button onClick={() => setModalGerarArte({ tipo: 'item', id: item.id })}
+      className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 hover:bg-[#c8a84b10] transition-colors"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      🎨 Gerar Arte
+    </button>
   </div>
 )}
             </div>
@@ -1955,6 +1991,40 @@ function gerarNome() {
         <button onClick={() => { setModalEntregarItem(null); setAbaEntregarItem('digitar'); setJogadorOrigem(null); setItemSelecionado(null); }}
           className="text-[#4a4030] hover:text-[#c8a84b] text-xl">✕</button>
       </div>
+
+      {/* Gerar imagens */}
+      {modalGerarArte && (
+  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
+    onClick={() => setModalGerarArte(null)}>
+    <div className="modal-anim bg-[#161410] border border-[#c8a84b30] max-w-md w-full"
+      style={{ borderRadius: '2px' }}
+      onClick={e => e.stopPropagation()}>
+      <div className="px-6 py-4 border-b border-[#c8a84b15]">
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">GERAR ARTE</p>
+      </div>
+      <div className="px-6 py-6 flex flex-col gap-4">
+        <div className="border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3">
+          <p className="text-[#6a6050] text-xs font-light">
+            ✦ Deixe em branco pra usar os dados já salvos, ou escreva sua própria descrição pra ter mais controle.
+          </p>
+        </div>
+        <textarea
+          value={descricaoArteCustom}
+          onChange={e => setDescricaoArteCustom(e.target.value)}
+          placeholder="ex: um velho anão de barba prateada, cicatriz no olho esquerdo, armadura enferrujada..."
+          rows={4}
+          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm resize-none"
+          style={{ borderRadius: '2px' }} />
+        <button onClick={confirmarGerarArte}
+          disabled={gerandoArte}
+          className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          {gerandoArte ? 'Gerando...' : '🎨 Gerar Arte →'}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* Abas */}
       <div className="flex gap-px mb-4 border-b border-[#c8a84b15]">
