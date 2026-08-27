@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Dados from '../components/Dados';
+import { createPortal } from 'react-dom';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -2029,7 +2030,7 @@ function gerarNome() {
       )}
 
       {/* Gerar imagens */}
-      {modalGerarArte && (
+      {modalGerarArte && createPortal(
   <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
     onClick={() => setModalGerarArte(null)}>
     <div className="modal-anim bg-[#161410] border border-[#c8a84b30] max-w-md w-full"
@@ -2059,7 +2060,8 @@ function gerarNome() {
         </button>
       </div>
     </div>
-  </div>
+  </div>,
+  document.body
 )}
 
       {/* Aba inventário */}
