@@ -525,12 +525,13 @@ async function confirmarGerarArte() {
       id: modalGerarArte.id,
       descricao_customizada: descricaoArteCustom
     });
-    // atualiza o item/npc local com a nova art_url
+
     if (modalGerarArte.tipo === 'npc') {
       setNpcs(prev => prev.map(n => n.id === modalGerarArte.id ? { ...n, art_url: res.data.art_url } : n));
     } else {
-      setItens(prev => prev.map(i => i.id === modalGerarArte.id ? { ...i, art_url: res.data.art_url } : i));
+      setMagicItems(prev => prev.map(i => i.id === modalGerarArte.id ? { ...i, art_url: res.data.art_url } : i));
     }
+
     setModalGerarArte(null);
     setDescricaoArteCustom('');
   } catch {
