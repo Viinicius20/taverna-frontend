@@ -1010,11 +1010,12 @@ function gerarNome() {
                       )}
 
                       <div className="flex justify-end pt-2 border-t border-[#c8a84b10]">
-                        <button onClick={() => deletarNpc(npc.id)}
-                          className="text-red-900 hover:text-red-600 text-xs border border-red-900 hover:border-red-600 px-4 py-1.5 transition-colors"
-                          style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
-                          Deletar NPC
-                        </button>
+                        <button onClick={e => { e.stopPropagation(); setModalGerarArte({ tipo: 'npc', id: npc.id }); }}
+    className="text-[#c8a84b] hover:text-[#e0c060] text-xs border border-[#c8a84b30] hover:border-[#c8a84b60] px-4 py-1.5 transition-colors"
+    style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
+    🎨 Gerar Arte
+  </button>
+
                         <button onClick={() => deletarNpc(npc.id)}
     className="text-red-900 hover:text-red-600 text-xs border border-red-900 hover:border-red-600 px-4 py-1.5 transition-colors"
     style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
