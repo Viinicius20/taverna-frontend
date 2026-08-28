@@ -2036,41 +2036,7 @@ function gerarNome() {
         </>
       )}
 
-      {/* Gerar imagens */}
-      {modalGerarArte && createPortal(
-  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
-    onClick={() => setModalGerarArte(null)}>
-    <div className="modal-anim bg-[#161410] border border-[#c8a84b30] max-w-md w-full"
-      style={{ borderRadius: '2px' }}
-      onClick={e => e.stopPropagation()}>
-      <div className="px-6 py-4 border-b border-[#c8a84b15]">
-        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">GERAR ARTE</p>
-      </div>
-      <div className="px-6 py-6 flex flex-col gap-4">
-        <div className="border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3">
-          <p className="text-[#6a6050] text-xs font-light">
-            ✦ Deixe em branco pra usar os dados já salvos, ou escreva sua própria descrição pra ter mais controle.
-          </p>
-        </div>
-        <textarea
-          value={descricaoArteCustom}
-          onChange={e => setDescricaoArteCustom(e.target.value)}
-          placeholder="ex: um velho anão de barba prateada, cicatriz no olho esquerdo, armadura enferrujada..."
-          rows={4}
-          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm resize-none"
-          style={{ borderRadius: '2px' }} />
-        <button onClick={confirmarGerarArte}
-          disabled={gerandoArte}
-          className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
-          style={{ ...cinzel, borderRadius: '2px' }}>
-          {gerandoArte ? 'Gerando...' : '🎨 Gerar Arte →'}
-        </button>
-      </div>
-    </div>
-  </div>,
-  document.body
-)}
-
+      
       {/* Aba inventário */}
       {abaEntregarItem === 'inventario' && (
         <>
@@ -2168,6 +2134,42 @@ function gerarNome() {
     </div>
   </div>
 )}
+
+{/* Gerar imagens */}
+      {modalGerarArte && createPortal(
+  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
+    onClick={() => setModalGerarArte(null)}>
+    <div className="modal-anim bg-[#161410] border border-[#c8a84b30] max-w-md w-full"
+      style={{ borderRadius: '2px' }}
+      onClick={e => e.stopPropagation()}>
+      <div className="px-6 py-4 border-b border-[#c8a84b15]">
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">GERAR ARTE</p>
+      </div>
+      <div className="px-6 py-6 flex flex-col gap-4">
+        <div className="border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3">
+          <p className="text-[#6a6050] text-xs font-light">
+            ✦ Deixe em branco pra usar os dados já salvos, ou escreva sua própria descrição pra ter mais controle.
+          </p>
+        </div>
+        <textarea
+          value={descricaoArteCustom}
+          onChange={e => setDescricaoArteCustom(e.target.value)}
+          placeholder="ex: um velho anão de barba prateada, cicatriz no olho esquerdo, armadura enferrujada..."
+          rows={4}
+          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm resize-none"
+          style={{ borderRadius: '2px' }} />
+        <button onClick={confirmarGerarArte}
+          disabled={gerandoArte}
+          className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          {gerandoArte ? 'Gerando...' : '🎨 Gerar Arte →'}
+        </button>
+      </div>
+    </div>
+  </div>,
+  document.body
+)}
+
 
       </div>
     </div>
