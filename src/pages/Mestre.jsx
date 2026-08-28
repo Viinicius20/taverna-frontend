@@ -74,13 +74,15 @@ export default function Mestre() {
   const [modalEntregarItem, setModalEntregarItem] = useState(null);
   const [nomeItemEntregar, setNomeItemEntregar] = useState('');
   const [entregandoItem, setEntregandoItem] = useState(false);
-  const [abaEntregarItem, setAbaEntregarItem] = useState('digitar'); // 'digitar' | 'inventario'
+  const [abaEntregarItem, setAbaEntregarItem] = useState('digitar'); 
   const [jogadorOrigem, setJogadorOrigem] = useState(null);
   const [itemSelecionado, setItemSelecionado] = useState(null);
   const [sugestoesMonstro, setSugestoesMonstro] = useState([]);
-  const [modalGerarArte, setModalGerarArte] = useState(null); // { tipo, id }
+  const [modalGerarArte, setModalGerarArte] = useState(null); 
   const [descricaoArteCustom, setDescricaoArteCustom] = useState('');
   const [gerandoArte, setGerandoArte] = useState(false);
+  const [imagemVisualizando, setImagemVisualizando] = useState(null);
+  const [deletandoArte, setDeletandoArte] = useState(false);
 
   useEffect(() => {
     buscarNpcs();
@@ -528,9 +530,17 @@ async function confirmarGerarArte() {
     });
 
     if (modalGerarArte.tipo === 'npc') {
-      setNpcs(prev => prev.map(n => n.id === modalGerarArte.id ? { ...n, art_url: res.data.art_url } : n));
+      setNpcs(prev => prev.map(n => 
+        n.id === modalGerarArte.id 
+          ? { ...n, data: { ...n.data, art_url: res.data.art_url } } 
+          : n
+      ));
     } else {
-      setMagicItems(prev => prev.map(i => i.id === modalGerarArte.id ? { ...i, art_url: res.data.art_url } : i));
+      setMagicItems(prev => prev.map(i => 
+        i.id === modalGerarArte.id 
+          ? { ...i, art_url: res.data.art_url } 
+          : i
+      ));
     }
 
     setModalGerarArte(null);
@@ -539,6 +549,23 @@ async function confirmarGerarArte() {
     alert('Erro ao gerar arte.');
   }
   setGerandoArte(false);
+}
+
+async function deletarArte(tipo, id) {
+  if (!window.confirm('Deletar esta imagem?')) return;
+  setDeletandoArte(true);
+  try {
+    await api.post('/deletar-arte', { tipo, id });
+    if (tipo === 'npc') {
+      setNpcs(prev => prev.map(n => n.id === id ? { ...n, data: { ...n.data, art_url: undefined } } : n));
+    } else {
+      setMagicItems(prev => prev.map(i => i.id === id ? { ...i, art_url: undefined } : i));
+    }
+    setImagemVisualizando(null);
+  } catch {
+    alert('Erro ao deletar imagem.');
+  }
+  setDeletandoArte(false);
 }
 
 function adicionarPersonagem(npc) {
@@ -1014,19 +1041,26 @@ function gerarNome() {
                         </div>
                       )}
 
-                      <div className="flex justify-end pt-2 border-t border-[#c8a84b10]">
-                        <button onClick={e => { e.stopPropagation(); console.log('clicou gerar arte NPC'); setModalGerarArte({ tipo: 'npc', id: npc.id }); }}
-                          className="text-[#c8a84b] hover:text-[#e0c060] text-xs border border-[#c8a84b30] hover:border-[#c8a84b60] px-4 py-1.5 transition-colors"
-                        style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
-                        🎨 Gerar Arte
-                      </button>
-
-                        <button onClick={() => deletarNpc(npc.id)}
+                      <div className="flex justify-end gap-3 pt-2 border-t border-[#c8a84b10]">
+  {d.art_url ? (
+    <button onClick={e => { e.stopPropagation(); setImagemVisualizando({ url: d.art_url, tipo: 'npc', id: npc.id }); }}
+      className="text-[#c8a84b] hover:text-[#e0c060] text-xs border border-[#c8a84b30] hover:border-[#c8a84b60] px-4 py-1.5 transition-colors"
+      style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
+      🖼 Ver Imagem
+    </button>
+  ) : (
+    <button onClick={e => { e.stopPropagation(); setModalGerarArte({ tipo: 'npc', id: npc.id }); }}
+      className="text-[#c8a84b] hover:text-[#e0c060] text-xs border border-[#c8a84b30] hover:border-[#c8a84b60] px-4 py-1.5 transition-colors"
+      style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
+      🎨 Gerar Arte
+    </button>
+  )}
+  <button onClick={() => deletarNpc(npc.id)}
     className="text-red-900 hover:text-red-600 text-xs border border-red-900 hover:border-red-600 px-4 py-1.5 transition-colors"
     style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
     Deletar NPC
   </button>
-                      </div>
+</div>
                     </div>
                   )}
                 </div>
@@ -1549,11 +1583,19 @@ function gerarNome() {
       style={{ ...cinzel, borderRadius: '2px' }}>
       🗑 DELETAR ITEM
     </button>
-    <button onClick={() => setModalGerarArte({ tipo: 'item', id: item.id })}
-      className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 hover:bg-[#c8a84b10] transition-colors"
-      style={{ ...cinzel, borderRadius: '2px' }}>
-      🎨 Gerar Arte
-    </button>
+    {item.art_url ? (
+  <button onClick={e => { e.stopPropagation(); setImagemVisualizando({ url: item.art_url, tipo: 'item', id: item.id }); }}
+    className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 hover:bg-[#c8a84b10] transition-colors mt-2"
+    style={{ ...cinzel, borderRadius: '2px' }}>
+    🖼 Ver Imagem
+  </button>
+) : (
+  <button onClick={e => { e.stopPropagation(); setModalGerarArte({ tipo: 'item', id: item.id }); }}
+    className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 hover:bg-[#c8a84b10] transition-colors mt-2"
+    style={{ ...cinzel, borderRadius: '2px' }}>
+    🎨 Gerar Arte
+  </button>
+)}
   </div>
 )}
             </div>
@@ -2165,6 +2207,37 @@ function gerarNome() {
           {gerandoArte ? 'Gerando...' : '🎨 Gerar Arte →'}
         </button>
       </div>
+    </div>
+  </div>,
+  document.body
+)}
+
+{imagemVisualizando && createPortal(
+  <div className="fixed inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center z-50 px-4 gap-4"
+    onClick={() => setImagemVisualizando(null)}>
+    <img src={imagemVisualizando.url} alt="arte gerada" className="max-w-full max-h-[70vh] object-contain"
+      style={{ borderRadius: '2px' }}
+      onClick={e => e.stopPropagation()} />
+    <div className="flex gap-3" onClick={e => e.stopPropagation()}>
+      <button onClick={() => {
+        setModalGerarArte({ tipo: imagemVisualizando.tipo, id: imagemVisualizando.id });
+        setImagemVisualizando(null);
+      }}
+        className="border border-[#c8a84b40] text-[#c8a84b] px-5 py-2 text-xs tracking-widest hover:bg-[#c8a84b10] transition-colors"
+        style={{ ...cinzel, borderRadius: '2px' }}>
+        ↻ Refazer
+      </button>
+      <button onClick={() => deletarArte(imagemVisualizando.tipo, imagemVisualizando.id)}
+        disabled={deletandoArte}
+        className="border border-red-900 text-red-900 px-5 py-2 text-xs tracking-widest hover:bg-red-900 hover:text-white transition-colors disabled:opacity-50"
+        style={{ ...cinzel, borderRadius: '2px' }}>
+        {deletandoArte ? 'Deletando...' : '🗑 Deletar'}
+      </button>
+      <button onClick={() => setImagemVisualizando(null)}
+        className="border border-[#c8a84b20] text-[#4a4030] px-5 py-2 text-xs tracking-widest hover:border-[#c8a84b40] transition-colors"
+        style={{ ...cinzel, borderRadius: '2px' }}>
+        Fechar
+      </button>
     </div>
   </div>,
   document.body
