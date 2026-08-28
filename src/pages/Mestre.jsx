@@ -809,6 +809,10 @@ function gerarNome() {
                   {expandido && (
                     <div className="border-t border-[#c8a84b10] px-6 pb-6 flex flex-col gap-6 pt-6">
 
+                      {d.art_url && (
+                        <img src={d.art_url} alt={d.name} className="w-full max-h-64 object-cover mb-2" style={{ borderRadius: '2px' }} />
+                      )}
+
                     {/* STATS DE COMBATE */}
                       {d.combat && (
                         <div className="border border-[#c8a84b15] bg-[#c8a84b05] p-4">
@@ -1519,6 +1523,9 @@ function gerarNome() {
               {/* Expandido */}
               {itemDetalhes?.id === item.id && (
   <div className="mt-3 pt-3 border-t border-[#c8a84b10] space-y-2">
+    {item.art_url && (
+      <img src={item.art_url} alt={item.name} className="w-full max-h-48 object-cover" style={{ borderRadius: '2px' }} />
+    )}
     {!item.identificado && (
       <p style={cinzel} className="text-[#8a5030] text-xs tracking-[2px] mb-2">? NÃO IDENTIFICADO PELO JOGADOR</p>
     )}
