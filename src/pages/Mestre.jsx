@@ -1591,7 +1591,7 @@ function gerarNome() {
   </button>
 ) : (
   <button onClick={e => { e.stopPropagation(); setModalGerarArte({ tipo: 'item', id: item.id }); }}
-    className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 hover:bg-[#c8a84b10] transition-colors mt-2"
+    className="text-[10px] border border-[#c8a84b30] text-[#c8a84b] px-2 py-0.5 hover:bg-[#c8a84b10] transition-colors mt-2"
     style={{ ...cinzel, borderRadius: '2px' }}>
     🎨 Gerar Arte
   </button>
