@@ -10,6 +10,7 @@ export default function Historico() {
   const [sessoes, setSessoes] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [expandida, setExpandida] = useState(null);
+  const [encerrando, setEncerrando] = useState(false);
 
   useEffect(() => {
     buscarSessoes();
@@ -26,6 +27,26 @@ export default function Historico() {
     setCarregando(false);
   }
 
+  async function encerrarSessao() {
+  setEncerrando(true);
+  try {
+    const res = await fetch('https://taverna-backend-eq3b.onrender.com/sessions/encerrar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ campaign_id: CAMPANHA_ID })
+    });
+    const json = await res.json();
+    if (json.success) {
+      buscarSessoes(); // recarrega a lista com a nova sessão
+    } else {
+      alert(json.detail || 'Erro ao encerrar sessão');
+    }
+  } catch {
+    alert('Erro ao encerrar sessão.');
+  }
+  setEncerrando(false);
+}
+
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
       <nav className="flex items-center justify-between px-4 py-4 border-b border-[#c8a84b20]">
@@ -34,6 +55,12 @@ export default function Historico() {
         <button onClick={() => navigate('/')}
           className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
           ← Voltar
+        </button>
+        <button onClick={encerrarSessao}
+          disabled={encerrando}
+          className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30 mb-8"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          {encerrando ? 'Gerando resumo...' : '📖 Encerrar Sessão →'}
         </button>
       </nav>
 
