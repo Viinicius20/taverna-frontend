@@ -1941,6 +1941,7 @@ function rolarAtaque(ataque) {
 </div>
 
 {/* DESCANSO */}
+{abaAtiva === 'inventario' && (
 <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
   <div className="px-6 py-4 border-b border-[#c8a84b15]">
     <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">DESCANSO</p>
@@ -1975,8 +1976,10 @@ function rolarAtaque(ataque) {
     </button>
   </div>
 </div>
+)}
 
 {/* MOEDAS */}
+{abaAtiva === 'inventario' && (
 <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
   <div className="px-6 py-4 border-b border-[#c8a84b15]">
     <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">MOEDAS</p>
@@ -2045,9 +2048,10 @@ function rolarAtaque(ataque) {
   </button>
 </div>
 </div>
+)}
 
         {/* INVENTÁRIO */}
-{ficha.inventory && ficha.inventory.length > 0 && (
+{abaAtiva === 'inventario' && ficha.inventory && ficha.inventory.length > 0 && (
   <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
     <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">INVENTÁRIO</p>
