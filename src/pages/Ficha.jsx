@@ -1414,7 +1414,7 @@ function rolarAtaque(ataque) {
 )}
 
         {/* SPELLCASTING */}
-        {ficha.spellcasting && (
+        {abaAtiva === 'magias' && ficha.spellcasting && (
           <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
             <div className="px-6 py-4 border-b border-[#c8a84b15]">
               <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">LANÇAMENTO DE FEITIÇOS</p>
