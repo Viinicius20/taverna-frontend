@@ -5,6 +5,8 @@ import html2pdf from 'html2pdf.js';
 import { createPortal } from 'react-dom';
 import { normalizarClasseParaEN } from '../utils/classTranslation';
 
+const [abaAtiva, setAbaAtiva] = useState('principal');
+
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
 const attrLabel = { str: 'FOR', dex: 'DES', con: 'CON', int: 'INT', wis: 'SAB', cha: 'CAR' };
@@ -1000,6 +1002,8 @@ function rolarAtaque(ataque) {
 
         <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
   <div className="flex items-start gap-4">
+
+    
     {/* Avatar */}
     <div className="relative flex-shrink-0">
       <div className="w-20 h-20 rounded border border-[#c8a84b20] overflow-hidden bg-[#161410] flex items-center justify-center">
@@ -1087,6 +1091,32 @@ function rolarAtaque(ataque) {
             <p className="text-red-400 text-sm">{erro}</p>
           </div>
         )}
+
+        {/* NAVEGAÇÃO DE ABAS */}
+<div className="flex gap-1 border-b border-[#c8a84b20] mb-6 overflow-x-auto">
+  {[
+    { id: 'principal', label: 'PRINCIPAL' },
+    ...(ficha.spellcasting ? [{ id: 'magias', label: 'MAGIAS' }] : []),
+    { id: 'atributos', label: 'ATRIBUTOS' },
+    { id: 'habilidades', label: 'HABILIDADES' },
+    { id: 'inventario', label: 'INVENTÁRIO' },
+    { id: 'personagem', label: 'PERSONAGEM' },
+    { id: 'notas', label: 'NOTAS' },
+  ].map(({ id, label }) => (
+    <button key={id} onClick={() => setAbaAtiva(id)}
+      className="px-4 py-3 text-xs tracking-widest whitespace-nowrap transition-colors border-b-2"
+      style={{
+        ...cinzel,
+        borderColor: abaAtiva === id ? 'var(--cor-classe, #c8a84b)' : 'transparent',
+        color: abaAtiva === id ? 'var(--cor-classe, #c8a84b)' : '#6a6050',
+      }}>
+      {label}
+    </button>
+  ))}
+</div>
+
+{abaAtiva === 'principal' && (
+<>
 
         {/* INFOS BÁSICAS */}
         <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
@@ -1217,6 +1247,7 @@ function rolarAtaque(ataque) {
           style={cinzel} />
       </div>
     </div>
+
 
     {/* ATAQUES */}
 <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
@@ -1378,6 +1409,9 @@ function rolarAtaque(ataque) {
     </div>
   </div>
 </div>
+
+</>
+)}
 
         {/* SPELLCASTING */}
         {ficha.spellcasting && (
