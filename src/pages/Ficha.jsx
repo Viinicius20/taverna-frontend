@@ -1870,6 +1870,7 @@ function rolarAtaque(ataque) {
 )}
 
         {/* CONTADOR DE RECURSOS */}
+        {abaAtiva === 'inventario' && (
 <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
   <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
     <div>
@@ -1939,6 +1940,7 @@ function rolarAtaque(ataque) {
     )}
   </div>
 </div>
+)}
 
 {/* DESCANSO */}
 {abaAtiva === 'inventario' && (
@@ -2304,6 +2306,7 @@ style={{
 )}
         
         {/* NOTAS PRIVADAS */}
+{abaAtiva === 'notas' && (
 <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
   <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
     <div>
@@ -2326,6 +2329,7 @@ style={{
       style={{ fontSize: '1rem', borderRadius: '2px', lineHeight: '1.7' }} />
   </div>
 </div>
+)}
 
         <div className="flex gap-4">
           <button onClick={salvarFicha} disabled={salvando}
