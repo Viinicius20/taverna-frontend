@@ -2206,6 +2206,7 @@ style={{
   </div>
   <div className="p-6 flex flex-col gap-5">
     {[
+      { label: 'APARÊNCIA', campo: 'appearance', placeholder: 'Como você se parece fisicamente...' },
       { label: 'IDEAIS', campo: 'ideais', placeholder: 'O que guia suas ações e decisões...' },
       { label: 'VÍNCULOS', campo: 'vinculos', placeholder: 'Pessoas, lugares ou coisas que você protege...' },
       { label: 'DEFEITOS', campo: 'defeitos', placeholder: 'Suas fraquezas e vícios...' },
