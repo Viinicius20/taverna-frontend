@@ -2238,6 +2238,7 @@ style={{
         )}
 
         {/* PERSONALIDADE & MOTIVAÇÕES */}
+{abaAtiva === 'personagem' && (
 <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
   <div className="px-6 py-4 border-b border-[#c8a84b15]">
     <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">PERSONALIDADE & MOTIVAÇÕES</p>
@@ -2264,8 +2265,10 @@ style={{
     ))}
   </div>
 </div>
+)}
 
         {/* IDIOMAS */}
+        {abaAtiva === 'personagem' && (
 <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
   <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
     <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">IDIOMAS</p>
@@ -2298,6 +2301,7 @@ style={{
     )}
   </div>
 </div>
+)}
         
         {/* NOTAS PRIVADAS */}
 <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
