@@ -5,7 +5,6 @@ import html2pdf from 'html2pdf.js';
 import { createPortal } from 'react-dom';
 import { normalizarClasseParaEN } from '../utils/classTranslation';
 
-const [abaAtiva, setAbaAtiva] = useState('principal');
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -172,6 +171,7 @@ export default function Ficha() {
   const [personagem, setPersonagem] = useState(null);
   const [ficha, setFicha] = useState(null);
   const [carregando, setCarregando] = useState(true);
+  const [abaAtiva, setAbaAtiva] = useState('principal');
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState('');
