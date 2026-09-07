@@ -2198,6 +2198,67 @@ style={{
             </div>
           </div>
         )}
+
+        {/* PERSONALIDADE & MOTIVAÇÕES */}
+<div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+  <div className="px-6 py-4 border-b border-[#c8a84b15]">
+    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">PERSONALIDADE & MOTIVAÇÕES</p>
+  </div>
+  <div className="p-6 flex flex-col gap-5">
+    {[
+      { label: 'IDEAIS', campo: 'ideais', placeholder: 'O que guia suas ações e decisões...' },
+      { label: 'VÍNCULOS', campo: 'vinculos', placeholder: 'Pessoas, lugares ou coisas que você protege...' },
+      { label: 'DEFEITOS', campo: 'defeitos', placeholder: 'Suas fraquezas e vícios...' },
+      { label: 'OBJETIVO ATUAL', campo: 'objetivo_atual', placeholder: 'O que você busca alcançar agora...' },
+      { label: 'MEDOS E FOBIAS', campo: 'medos', placeholder: 'Aquilo que te assombra...' },
+    ].map(({ label, campo, placeholder }) => (
+      <div key={campo}>
+        <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-2">{label}</label>
+        <textarea
+          value={ficha[campo] || ''}
+          onChange={e => editarCampo(campo, e.target.value)}
+          placeholder={placeholder}
+          rows={2}
+          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#a09880] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b50] resize-none placeholder-[#3a3020] text-sm"
+          style={{ borderRadius: '2px', lineHeight: '1.7' }} />
+      </div>
+    ))}
+  </div>
+</div>
+
+        {/* IDIOMAS */}
+<div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+  <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
+    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">IDIOMAS</p>
+    <button onClick={() => {
+      const novo = prompt('Nome do idioma:');
+      if (!novo?.trim()) return;
+      const atuais = ficha.languages || [];
+      editarCampo('languages', [...atuais, novo.trim()]);
+    }}
+      className="text-[#4a4030] text-xs tracking-widest hover:text-[#c8a84b] transition-colors"
+      style={cinzel}>
+      + Adicionar
+    </button>
+  </div>
+  <div className="p-6 flex flex-wrap gap-2">
+    {(ficha.languages || []).length === 0 ? (
+      <p className="text-[#3a3020] text-sm">Nenhum idioma registrado.</p>
+    ) : (
+      ficha.languages.map((idioma, i) => (
+        <span key={i} className="border border-[#c8a84b15] text-[#6a6050] px-3 py-1 text-sm flex items-center gap-2"
+          style={{ borderRadius: '2px' }}>
+          {idioma}
+          <button onClick={() => {
+            const novos = ficha.languages.filter((_, idx) => idx !== i);
+            editarCampo('languages', novos);
+          }}
+            className="text-red-900 hover:text-red-600 text-xs">×</button>
+        </span>
+      ))
+    )}
+  </div>
+</div>
         
         {/* NOTAS PRIVADAS */}
 <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
