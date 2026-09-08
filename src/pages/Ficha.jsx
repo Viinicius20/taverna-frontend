@@ -1841,7 +1841,7 @@ function rolarAtaque(ataque) {
           )}
 
           {/* FEATS */}
-{abaAtiva === 'habilidades' && ficha.features && ficha.features.length > 0 && (
+{abaAtiva === 'habilidades' && ficha.feats && ficha.feats.length > 0 && (
   <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
     <div className="px-6 py-4 border-b border-[#c8a84b15]">
       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">FEATS</p>
@@ -1864,6 +1864,24 @@ function rolarAtaque(ataque) {
             ×
           </button>
         </div>
+      ))}
+    </div>
+  </div>
+)}
+
+{/* AÇÕES EM COMBATE */}
+{abaAtiva === 'habilidades' && (
+  <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+    <div className="px-6 py-4 border-b border-[#c8a84b15]">
+      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">AÇÕES EM COMBATE</p>
+      <p className="text-[#4a4030] text-xs mt-1">Ações padrão disponíveis para qualquer personagem</p>
+    </div>
+    <div className="p-6 flex flex-wrap gap-2">
+      {['Attack', 'Dash', 'Disengage', 'Dodge', 'Grapple', 'Help', 'Hide', 'Improvise', 'Influence', 'Magic', 'Ready', 'Search', 'Shove', 'Study', 'Utilize'].map((acao, i) => (
+        <span key={i} className="border border-[#c8a84b15] text-[#6a6050] px-3 py-1 text-xs"
+          style={{ borderRadius: '2px', ...cinzel, letterSpacing: '0.5px' }}>
+          {acao}
+        </span>
       ))}
     </div>
   </div>
