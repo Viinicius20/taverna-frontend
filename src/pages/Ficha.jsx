@@ -47,6 +47,24 @@ function getTemaClasse(classe) {
   return '';
 }
 
+function getIconeClasse(classe) {
+  if (!classe) return '⚔';
+  const c = classe.toLowerCase();
+  if (c.includes('fighter') || c.includes('guerreiro')) return '⚔';
+  if (c.includes('wizard') || c.includes('mago')) return '📖';
+  if (c.includes('druid') || c.includes('druida')) return '🌿';
+  if (c.includes('rogue') || c.includes('ladino')) return '🗡';
+  if (c.includes('paladin') || c.includes('paladino')) return '🛡';
+  if (c.includes('barbarian') || c.includes('bárbaro')) return '🪓';
+  if (c.includes('bard') || c.includes('bardo')) return '🎵';
+  if (c.includes('cleric') || c.includes('clérigo')) return '✟';
+  if (c.includes('monk') || c.includes('monge')) return '☯';
+  if (c.includes('ranger') || c.includes('caçador')) return '🏹';
+  if (c.includes('sorcerer') || c.includes('feiticeiro')) return '✦';
+  if (c.includes('warlock') || c.includes('bruxo')) return '👁';
+  return '⚔';
+}
+
   function ModalAsi({ aberto, onFechar, onConfirmar, atributos }) {
   const [modo, setModo] = useState("atributos");
   const [alocacao, setAlocacao] = useState({});
@@ -1030,7 +1048,10 @@ function rolarAtaque(ataque) {
     {/* Nome e classe */}
     <div>
       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">FICHA DO PERSONAGEM</p>
-      <h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold">{ficha.name}</h1>
+      <h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold">
+        <span style={{ color: 'var(--cor-classe, #c8a84b)' }} className="mr-2">{getIconeClasse(classeParaTema)}</span>
+        {ficha.name}
+      </h1>
       <p className="text-[#6a6050] mt-1">{[
   ficha.race,
   ficha.classes?.length
@@ -2097,12 +2118,16 @@ function rolarAtaque(ataque) {
     const isObj = typeof item === 'object';
     const nome = isObj ? item.name : item;
     const isMagico = isObj ? item.is_magic : ['(comum)','(incomum)','(raro)','(muito raro)','(lendário)'].some(r => item.toLowerCase().includes(r));
+    const rarCor = {
+      'Comum': '#a09880', 'Incomum': '#4a8a4a', 'Raro': '#4a6aaa',
+      'Muito Raro': '#8a4aaa', 'Lendário': '#c8a84b'
+    }[isObj ? item.rarity : null] || (isMagico ? '#c8a84b' : '#6a6050');
     return (
       <div key={i} className="flex items-center gap-1 group">
   <span
     onClick={() => {
   if (isObj && item.is_magic) {
-    setItemInventarioDetalhes({ ...item, _index: i }); // guarda o index
+    setItemInventarioDetalhes({ ...item, _index: i });
   } else {
     setModalEnviarItem({ item, index: i });
     setEnviarCopia(false);
@@ -2111,9 +2136,9 @@ function rolarAtaque(ataque) {
 className="border px-3 py-1 text-sm"
 style={{
   borderRadius: '2px',
-  borderColor: isMagico ? '#c8a84b40' : '#c8a84b15',
-  color: isMagico ? '#c8a84b' : '#6a6050',
-  backgroundColor: isMagico ? '#c8a84b08' : 'transparent',
+  borderColor: `${rarCor}40`,
+  color: rarCor,
+  backgroundColor: `${rarCor}10`,
   cursor: 'pointer',
 }}>
     {nome}
