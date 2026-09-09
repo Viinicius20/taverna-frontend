@@ -1837,55 +1837,51 @@ function rolarAtaque(ataque) {
   </div>
 )}
 
-        {/* HABILIDADES */}
-        {abaAtiva === 'habilidades' && ficha.features && ficha.features.length > 0 && (
-          <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
-            <div className="px-6 py-4 border-b border-[#c8a84b15]">
-              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">HABILIDADES & FEATURES</p>
-              <p className="text-[#4a4030] text-xs mt-1">Clique para ver descrição</p>
-            </div>
-            <div className="p-6 flex flex-wrap gap-2">
-              {ficha.features
-                .filter(f => typeof f === 'string')
-                .filter(f => f.trim() !== '')
-                .filter(f => !f.startsWith('**') && !f.endsWith('**'))
-                .filter(f => !f.toLowerCase().includes('spellcasting'))
-                .map((f, i) => (
-                  <button key={i} onClick={() => abrirSkill(f)}
-                    className="border border-[#c8a84b25] bg-[#c8a84b08] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b18] hover:border-[#c8a84b50] transition-all"
-                    style={{ ...cinzel, borderRadius: '2px', letterSpacing: '0.5px' }}>
-                    {f} ↗
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* FEATS */}
-{abaAtiva === 'habilidades' && ficha.feats && ficha.feats.length > 0 && (
+        {/* HABILIDADES DE CLASSE */}
+{abaAtiva === 'habilidades' && ficha.features && ficha.features.length > 0 && (
   <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
     <div className="px-6 py-4 border-b border-[#c8a84b15]">
-      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">FEATS</p>
-      <p className="text-[#4a4030] text-xs mt-1">Talentos escolhidos em melhorias de atributo</p>
+      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">HABILIDADES DE CLASSE</p>
+      <p className="text-[#4a4030] text-xs mt-1">Clique para ver descrição</p>
     </div>
-    <div className="p-6 flex flex-col gap-3">
-      {ficha.feats.map((feat, idx) => (
-        <div key={idx} className="border border-[#c8a84b15] bg-[#0f0e0c] p-4 flex items-start justify-between gap-3">
-          <div>
-            <p style={cinzel} className="text-[#c8a84b] text-sm font-bold mb-1">{feat.nome}</p>
-            {feat.descricao && (
-              <p className="text-[#6a6050] text-xs leading-relaxed">{feat.descricao}</p>
-            )}
-          </div>
-          <button onClick={() => {
-            const novos = ficha.feats.filter((_, i) => i !== idx);
-            setFicha(prev => ({ ...prev, feats: novos }));
-          }}
-            className="text-red-900 hover:text-red-600 text-sm transition-colors flex-shrink-0">
-            ×
+    <div className="p-6 flex flex-wrap gap-2">
+      {ficha.features
+        .filter(f => typeof f === 'object' ? f.origem === 'classe' : true)
+        .filter(f => {
+          const nome = typeof f === 'object' ? f.nome : f;
+          return nome && nome.trim() !== '' && !nome.startsWith('**') && !nome.endsWith('**') && !nome.toLowerCase().includes('spellcasting');
+        })
+        .map((f, i) => {
+          const nome = typeof f === 'object' ? f.nome : f;
+          return (
+            <button key={i} onClick={() => abrirSkill(nome)}
+              className="border border-[#c8a84b25] bg-[#c8a84b08] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b18] hover:border-[#c8a84b50] transition-all"
+              style={{ ...cinzel, borderRadius: '2px', letterSpacing: '0.5px' }}>
+              {nome} ↗
+            </button>
+          );
+        })}
+    </div>
+  </div>
+)}
+
+{/* FEATURES RACIAIS & ANTECEDENTE */}
+{abaAtiva === 'habilidades' && ficha.features && ficha.features.some(f => typeof f === 'object' && (f.origem === 'racial' || f.origem === 'antecedente')) && (
+  <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+    <div className="px-6 py-4 border-b border-[#c8a84b15]">
+      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">RAÇA & ANTECEDENTE</p>
+      <p className="text-[#4a4030] text-xs mt-1">Clique para ver descrição</p>
+    </div>
+    <div className="p-6 flex flex-wrap gap-2">
+      {ficha.features
+        .filter(f => typeof f === 'object' && (f.origem === 'racial' || f.origem === 'antecedente'))
+        .map((f, i) => (
+          <button key={i} onClick={() => abrirSkill(f.nome)}
+            className="border border-[#a8c87a25] bg-[#a8c87a08] text-[#a8c87a] px-3 py-1 text-xs hover:bg-[#a8c87a18] hover:border-[#a8c87a50] transition-all"
+            style={{ ...cinzel, borderRadius: '2px', letterSpacing: '0.5px' }}>
+            {f.nome} ↗
           </button>
-        </div>
-      ))}
+        ))}
     </div>
   </div>
 )}
