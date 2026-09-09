@@ -65,6 +65,12 @@ function getIconeClasse(classe) {
   return '⚔';
 }
 
+function abrirAcaoFixa(nome, descricao) {
+  setModal({ skill: nome });
+  setDescricaoSkill({ description: descricao, type: 'ação' });
+  setCarregandoSkill(false);
+}
+
   function ModalAsi({ aberto, onFechar, onConfirmar, atributos }) {
   const [modo, setModo] = useState("atributos");
   const [alocacao, setAlocacao] = useState({});
@@ -255,6 +261,24 @@ export default function Ficha() {
   name: '', level: 0, school: '', description: '', mechanics: '', range: '', duration: '', components: ''
   });
   const [criandoManual, setCriandoManual] = useState(false);
+
+  const ACOES_COMBATE = {
+  'Attack': 'Faça um ataque corpo a corpo ou à distância.',
+  'Dash': 'Ganhe movimento extra igual à sua velocidade neste turno.',
+  'Disengage': 'Seu movimento não provoca ataques de oportunidade neste turno.',
+  'Dodge': 'Até seu próximo turno, ataques contra você têm desvantagem, e você tem vantagem em testes de Destreza.',
+  'Grapple': 'Tente agarrar uma criatura, restringindo seu movimento.',
+  'Help': 'Ajude outra criatura, dando vantagem no próximo teste ou ataque dela.',
+  'Hide': 'Tente se esconder, fazendo um teste de Furtividade.',
+  'Improvise': 'Tente fazer algo não coberto por outra ação, como um teste de habilidade.',
+  'Influence': 'Tente persuadir, enganar ou intimidar uma criatura.',
+  'Magic': 'Lance um feitiço ou use uma habilidade mágica.',
+  'Ready': 'Prepare uma ação para ser usada em resposta a um gatilho específico.',
+  'Search': 'Procure por algo, fazendo um teste de Percepção ou Investigação.',
+  'Shove': 'Tente empurrar uma criatura, derrubando-a ou afastando-a.',
+  'Study': 'Examine uma criatura ou objeto para aprender mais sobre ele.',
+  'Utilize': 'Use um objeto que exija uma ação para ativar.',
+};
 
   const [moedas, setMoedas] = useState({
   po: ficha?.moedas?.po || 0,
@@ -1891,14 +1915,15 @@ function rolarAtaque(ataque) {
   <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
     <div className="px-6 py-4 border-b border-[#c8a84b15]">
       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">AÇÕES EM COMBATE</p>
-      <p className="text-[#4a4030] text-xs mt-1">Ações padrão disponíveis para qualquer personagem</p>
+      <p className="text-[#4a4030] text-xs mt-1">Clique para ver descrição</p>
     </div>
     <div className="p-6 flex flex-wrap gap-2">
-      {['Attack', 'Dash', 'Disengage', 'Dodge', 'Grapple', 'Help', 'Hide', 'Improvise', 'Influence', 'Magic', 'Ready', 'Search', 'Shove', 'Study', 'Utilize'].map((acao, i) => (
-        <span key={i} className="border border-[#c8a84b15] text-[#6a6050] px-3 py-1 text-xs"
+      {Object.keys(ACOES_COMBATE).map((acao, i) => (
+        <button key={i} onClick={() => abrirAcaoFixa(acao, ACOES_COMBATE[acao])}
+          className="border border-[#c8a84b15] text-[#6a6050] px-3 py-1 text-xs hover:bg-[#c8a84b10] hover:border-[#c8a84b40] hover:text-[#c8a84b] transition-all"
           style={{ borderRadius: '2px', ...cinzel, letterSpacing: '0.5px' }}>
           {acao}
-        </span>
+        </button>
       ))}
     </div>
   </div>
