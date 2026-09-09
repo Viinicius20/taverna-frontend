@@ -65,11 +65,6 @@ function getIconeClasse(classe) {
   return '⚔';
 }
 
-function abrirAcaoFixa(nome, descricao) {
-  setModal({ skill: nome });
-  setDescricaoSkill({ description: descricao, type: 'ação' });
-  setCarregandoSkill(false);
-}
 
   function ModalAsi({ aberto, onFechar, onConfirmar, atributos }) {
   const [modo, setModo] = useState("atributos");
@@ -490,6 +485,12 @@ function abrirProximaPendencia(fila) {
     }
     setCarregandoSkill(false);
   }
+
+  function abrirAcaoFixa(nome, descricao) {
+  setModal({ skill: nome });
+  setDescricaoSkill({ description: descricao, type: 'ação' });
+  setCarregandoSkill(false);
+}
 
   async function abrirModalAddSpell() {
     setModalAddSpell(true);
