@@ -304,17 +304,22 @@ export default function Personagens() {
                           <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest mb-2">
                             HABILIDADES — clique para ver descrição
                           </p>
-                          {d.features.map((f, i) => {
+                          <div className="flex flex-wrap gap-2">
+                            {d.features.map((f, i) => {
                             const nome = typeof f === 'object' ? f.nome : f;
                             return (
-                            <button key={i}
-                            onClick={() => abrirSkill(nome, p.system || 'D&D 5e', context)}
-                            className="border border-[#c8a84b25] bg-[#c8a84b08] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b18] hover:border-[#c8a84b50] transition-all cursor-pointer"
-                            style={{ ...cinzel, borderRadius: '2px', letterSpacing: '0.5px' }}>
-                            {nome} ↗
-                            </button>
-                          );
-                        })}
+                              <button key={i}
+                              onClick={() => abrirSkill(nome, p.system || 'D&D 5e', context)}
+                              className="border border-[#c8a84b25] bg-[#c8a84b08] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b18] hover:border-[#c8a84b50] transition-all cursor-pointer"
+                              style={{ ...cinzel, borderRadius: '2px', letterSpacing: '0.5px' }}>
+                              {nome} ↗
+                              </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
 
                     {/* Deletar */}
                     <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
