@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html, body {
+  background-color: #0f0e0c;
+}
+
 .btn-shimmer {
   position: relative;
   overflow: hidden;

@@ -594,6 +594,7 @@ function exportarPDF() {
 
   // Espera o React renderizar todas as abas antes de continuar
   setTimeout(() => {
+    console.log('Elementos no ficha-conteudo:', document.getElementById('ficha-conteudo').innerText.length);
     const inputs = document.querySelectorAll('#ficha-conteudo input, #ficha-conteudo textarea, #ficha-conteudo select');
     const valoresOriginais = [];
 
@@ -641,7 +642,7 @@ function exportarPDF() {
       setExportandoPDF(false);
       setAbaAtiva(abaAnterior);
     });
-  }, 100); 
+  }, 300); 
 }
 
 
