@@ -1206,13 +1206,14 @@ function rolarAtaque(ataque) {
     />
   </div>
 ))}
-            <div>
+          <div>
               <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">NÍVEL</label>
               <input type="number" min={1} max={20} value={ficha.level || 1}
                 onChange={e => editarCampo('level', Number(e.target.value))}
                 className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
                 style={{ borderRadius: '2px' }} />
             </div>
+          {false && (
           <div>
               <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">XP</label>
               <input type="number" min={0} value={ficha.xp || 0}
@@ -1226,14 +1227,15 @@ function rolarAtaque(ataque) {
                 className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
                 style={{ borderRadius: '2px' }} />
             </div>
+          )}
             {(() => {
   const xpAtual = ficha.xp || 0;
   const tabela = [0,300,900,2700,6500,14000,23000,34000,48000,64000,85000,100000,120000,140000,165000,195000,225000,265000,305000,355000];
-  const nivelAtual = ficha.level || 1;  // ← usa o nível da ficha
+  const nivelAtual = ficha.level || 1;
   const xpAtualNivel = tabela[nivelAtual - 1] || 0;
   const xpProxNivel = tabela[nivelAtual] || tabela[tabela.length - 1];
   const pct = Math.min(100, ((xpAtual - xpAtualNivel) / (xpProxNivel - xpAtualNivel)) * 100);
-  return nivelAtual < 20 ? (
+  return false && nivelAtual < 20 ? (
     <div className="col-span-2 mt-1">
       <div className="h-0.5 bg-[#c8a84b15] w-full">
         <div className="h-full bg-[#c8a84b40] transition-all" style={{ width: `${pct}%` }} />
