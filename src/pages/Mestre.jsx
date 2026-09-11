@@ -441,10 +441,6 @@ useEffect(() => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [combateAtivo, combatentes]);
 
-  window.addEventListener('keydown', handleKeyDown);
-  return () => window.removeEventListener('keydown', handleKeyDown);
-}, [combateAtivo, combatentes, proximoTurno]);
-
 async function buscarSessoes() {
   try {
     const res = await api.get(`/sessions/${CAMPANHA_ID}`);
