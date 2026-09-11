@@ -418,7 +418,6 @@ useEffect(() => {
 
 useEffect(() => {
   function handleKeyDown(e) {
-    // Ignora se o foco estiver num input/textarea (não quer atrapalhar digitação)
     const tag = document.activeElement.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA') return;
 
@@ -436,6 +435,11 @@ useEffect(() => {
       }
     }
   }
+
+  window.addEventListener('keydown', handleKeyDown);
+  return () => window.removeEventListener('keydown', handleKeyDown);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [combateAtivo, combatentes]);
 
   window.addEventListener('keydown', handleKeyDown);
   return () => window.removeEventListener('keydown', handleKeyDown);
