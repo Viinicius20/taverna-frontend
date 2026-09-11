@@ -257,6 +257,8 @@ export default function Ficha() {
   });
   const [criandoManual, setCriandoManual] = useState(false);
 
+  const [exportandoPDF, setExportandoPDF] = useState(false);
+
   const ACOES_COMBATE = {
   'Attack': 'Faça um ataque corpo a corpo ou à distância.',
   'Dash': 'Ganhe movimento extra igual à sua velocidade neste turno.',
@@ -587,51 +589,59 @@ function abrirProximaPendencia(fila) {
 }
 
 function exportarPDF() {
-  const inputs = document.querySelectorAll('#ficha-conteudo input, #ficha-conteudo textarea, #ficha-conteudo select');
-  const valoresOriginais = [];
-  
-  inputs.forEach(input => {
-    valoresOriginais.push({ el: input, display: input.style.display, parent: input.parentNode });
-    const span = document.createElement('span');
-    span.textContent = input.value;
-    span.style.cssText = input.style.cssText;
-    span.style.display = 'block';
-    span.style.color = window.getComputedStyle(input).color;
-    span.style.fontFamily = window.getComputedStyle(input).fontFamily;
-    span.style.fontSize = window.getComputedStyle(input).fontSize;
-    span.dataset.pdfTemp = 'true';
-    input.parentNode.insertBefore(span, input);
-    input.style.display = 'none';
-  });
+  const abaAnterior = abaAtiva;
+  setExportandoPDF(true);
 
-  const esconder = [
-    document.querySelector('.flex.gap-3.flex-wrap'),
-    document.querySelector('nav'),
-    document.querySelector('[data-pdf-hide]'),
-  ].filter(Boolean);
-  esconder.forEach(el => el.style.display = 'none');
+  // Espera o React renderizar todas as abas antes de continuar
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('#ficha-conteudo input, #ficha-conteudo textarea, #ficha-conteudo select');
+    const valoresOriginais = [];
 
-  const element = document.getElementById('ficha-conteudo');
-  const opt = {
-    margin: [5, 5, 5, 5],
-    filename: `${ficha.name || 'ficha'}.pdf`,
-    image: { type: 'jpeg', quality: 1 },
-    html2canvas: {
-      scale: 3,
-      backgroundColor: '#0f0e0c',
-      useCORS: true,
-      scrollX: 0,
-      scrollY: -window.scrollY,
-    },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-  };
+    inputs.forEach(input => {
+      valoresOriginais.push({ el: input, display: input.style.display, parent: input.parentNode });
+      const span = document.createElement('span');
+      span.textContent = input.value;
+      span.style.cssText = input.style.cssText;
+      span.style.display = 'block';
+      span.style.color = window.getComputedStyle(input).color;
+      span.style.fontFamily = window.getComputedStyle(input).fontFamily;
+      span.style.fontSize = window.getComputedStyle(input).fontSize;
+      span.dataset.pdfTemp = 'true';
+      input.parentNode.insertBefore(span, input);
+      input.style.display = 'none';
+    });
 
-  html2pdf().set(opt).from(element).save().then(() => {
-    document.querySelectorAll('[data-pdf-temp]').forEach(el => el.remove());
-    valoresOriginais.forEach(({ el }) => el.style.display = '');
-    esconder.forEach(el => el.style.display = '');
-  });
+    const esconder = [
+      document.querySelector('.flex.gap-3.flex-wrap'),
+      document.querySelector('nav'),
+      document.querySelector('[data-pdf-hide]'),
+    ].filter(Boolean);
+    esconder.forEach(el => el.style.display = 'none');
+
+    const element = document.getElementById('ficha-conteudo');
+    const opt = {
+      margin: [5, 5, 5, 5],
+      filename: `${ficha.name || 'ficha'}.pdf`,
+      image: { type: 'jpeg', quality: 1 },
+      html2canvas: {
+        scale: 3,
+        backgroundColor: '#0f0e0c',
+        useCORS: true,
+        scrollX: 0,
+        scrollY: -window.scrollY,
+      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    };
+
+    html2pdf().set(opt).from(element).save().then(() => {
+      document.querySelectorAll('[data-pdf-temp]').forEach(el => el.remove());
+      valoresOriginais.forEach(({ el }) => el.style.display = '');
+      esconder.forEach(el => el.style.display = '');
+      setExportandoPDF(false);
+      setAbaAtiva(abaAnterior);
+    });
+  }, 100); 
 }
 
 
@@ -1161,7 +1171,7 @@ function rolarAtaque(ataque) {
   ))}
 </div>
 
-{abaAtiva === 'principal' && (
+{(abaAtiva === 'principal' || exportandoPDF) && (
 <>
 
         {/* INFOS BÁSICAS */}
@@ -1460,7 +1470,7 @@ function rolarAtaque(ataque) {
 )}
 
         {/* SPELLCASTING */}
-        {abaAtiva === 'magias' && ficha.spellcasting && (
+        {(abaAtiva === 'magias' || exportandoPDF) && ficha.spellcasting && (
           <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
             <div className="px-6 py-4 border-b border-[#c8a84b15]">
               <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">LANÇAMENTO DE FEITIÇOS</p>
@@ -1816,7 +1826,7 @@ function rolarAtaque(ataque) {
 )}
 
         {/* ATRIBUTOS */}
-        {abaAtiva === 'atributos' && ficha.attributes && (
+        {(abaAtiva === 'atributos' || exportandoPDF) && ficha.attributes && (
           <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
             <div className="px-6 py-4 border-b border-[#c8a84b15]">
               <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">ATRIBUTOS</p>
@@ -1841,7 +1851,7 @@ function rolarAtaque(ataque) {
         )}
 
         {/* PERÍCIAS */}
-{abaAtiva === 'atributos' && ficha.attributes && (
+{(abaAtiva === 'atributos' || exportandoPDF) && ficha.attributes && (
   <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
     <div className="px-6 py-4 border-b border-[#c8a84b15]">
       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">PERÍCIAS</p>
@@ -1863,7 +1873,7 @@ function rolarAtaque(ataque) {
 )}
 
         {/* HABILIDADES DE CLASSE */}
-{abaAtiva === 'habilidades' && ficha.features && ficha.features.length > 0 && (
+{(abaAtiva === 'habilidades' || exportandoPDF) && ficha.features && (
   <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
     <div className="px-6 py-4 border-b border-[#c8a84b15]">
       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">HABILIDADES DE CLASSE</p>
@@ -1891,7 +1901,7 @@ function rolarAtaque(ataque) {
 )}
 
 {/* FEATURES RACIAIS & ANTECEDENTE */}
-{abaAtiva === 'habilidades' && ficha.features && ficha.features.some(f => typeof f === 'object' && (f.origem === 'racial' || f.origem === 'antecedente')) && (
+{(abaAtiva === 'habilidades' || exportandoPDF) && ficha.features && ficha.features.some(f => typeof f === 'object' && (f.origem === 'racial' || f.origem === 'antecedente')) && (
   <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
     <div className="px-6 py-4 border-b border-[#c8a84b15]">
       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">RAÇA & ANTECEDENTE</p>
@@ -1912,7 +1922,7 @@ function rolarAtaque(ataque) {
 )}
 
 {/* AÇÕES EM COMBATE */}
-{abaAtiva === 'habilidades' && (
+{(abaAtiva === 'habilidades' || exportandoPDF) && ficha.features && (
   <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
     <div className="px-6 py-4 border-b border-[#c8a84b15]">
       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">AÇÕES EM COMBATE</p>
@@ -1931,7 +1941,7 @@ function rolarAtaque(ataque) {
 )}
 
         {/* CONTADOR DE RECURSOS */}
-        {abaAtiva === 'inventario' && (
+        {(abaAtiva === 'inventario' || exportandoPDF) && (
 <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
   <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
     <div>
@@ -2004,7 +2014,7 @@ function rolarAtaque(ataque) {
 )}
 
 {/* DESCANSO */}
-{abaAtiva === 'inventario' && (
+{(abaAtiva === 'inventario' || exportandoPDF) && (
 <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
   <div className="px-6 py-4 border-b border-[#c8a84b15]">
     <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">DESCANSO</p>
@@ -2042,7 +2052,7 @@ function rolarAtaque(ataque) {
 )}
 
 {/* MOEDAS */}
-{abaAtiva === 'inventario' && (
+{(abaAtiva === 'inventario' || exportandoPDF) && (
 <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
   <div className="px-6 py-4 border-b border-[#c8a84b15]">
     <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">MOEDAS</p>
@@ -2114,7 +2124,7 @@ function rolarAtaque(ataque) {
 )}
 
         {/* INVENTÁRIO */}
-{abaAtiva === 'inventario' && ficha.inventory && ficha.inventory.length > 0 && (
+{(abaAtiva === 'inventario' || exportandoPDF) && ficha.inventory && ficha.inventory.length > 0 && (
   <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
     <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">INVENTÁRIO</p>
@@ -2305,7 +2315,7 @@ style={{
         )}
 
         {/* PERSONALIDADE & MOTIVAÇÕES */}
-{abaAtiva === 'personagem' && (
+{(abaAtiva === 'personagem' || exportandoPDF) && (
 <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
   <div className="px-6 py-4 border-b border-[#c8a84b15]">
     <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">PERSONALIDADE & MOTIVAÇÕES</p>
@@ -2335,7 +2345,7 @@ style={{
 )}
 
         {/* IDIOMAS */}
-        {abaAtiva === 'personagem' && (
+        {(abaAtiva === 'personagem' || exportandoPDF) && (
 <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
   <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
     <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">IDIOMAS</p>
@@ -2371,7 +2381,7 @@ style={{
 )}
         
         {/* NOTAS PRIVADAS */}
-{abaAtiva === 'notas' && (
+{(abaAtiva === 'notas' || exportandoPDF) && (
 <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
   <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
     <div>
