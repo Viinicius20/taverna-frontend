@@ -72,7 +72,7 @@ export default function Personagens() {
   }
 
   async function deletarPersonagem(id) {
-    if (!window.confirm('Tem certeza que deseja deletar este personagem?')) return;
+    if (!window.confirm('Tem certeza que deseja deletar este personagem? Essa ação não pode ser desfeita.')) return;
     setDeletando(id);
     try {
       await api.delete(`/characters/${id}`);

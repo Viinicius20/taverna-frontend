@@ -183,7 +183,7 @@ export default function Mestre() {
   }
 
   async function deletarNpc(id) {
-    if (!window.confirm('Deletar este NPC?')) return;
+    if (!window.confirm('Tem certeza que deseja deletar este NPC? Essa ação não pode ser desfeita.')) return;
     try {
       await api.delete(`/npcs/${id}`);
       setNpcs(prev => prev.filter(n => n.id !== id));
@@ -415,6 +415,31 @@ async function pararCountdown() {
 useEffect(() => {
   buscarSessoes();
 }, []);
+
+useEffect(() => {
+  function handleKeyDown(e) {
+    // Ignora se o foco estiver num input/textarea (não quer atrapalhar digitação)
+    const tag = document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+
+    if (e.key === 'Enter' && combateAtivo) {
+      e.preventDefault();
+      proximoTurno();
+    }
+
+    if (e.code === 'Space' && combatentes.length > 0) {
+      e.preventDefault();
+      if (combateAtivo) {
+        proximoTurno();
+      } else {
+        setCombateAtivo(true);
+      }
+    }
+  }
+
+  window.addEventListener('keydown', handleKeyDown);
+  return () => window.removeEventListener('keydown', handleKeyDown);
+}, [combateAtivo, combatentes, proximoTurno]);
 
 async function buscarSessoes() {
   try {
@@ -1016,23 +1041,23 @@ function gerarNome() {
                       )}
 
                       {d.features && d.features.length > 0 && (
-  <div>
-    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">HABILIDADES</p>
-    <div className="flex flex-wrap gap-2">
-      {d.features.map((f, i) => (
-        <button key={i}
-          onClick={e => {
-            e.stopPropagation();
-            abrirSkillNpc(f, d);
-          }}
-          className="border border-[#c8a84b20] text-[#6a6050] px-2 py-0.5 text-xs hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors"
-          style={{ borderRadius: '2px' }}>
-          {f} ↗
-        </button>
-      ))}
-    </div>
-  </div>
-)}
+                    <div>
+                      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">HABILIDADES</p>
+                      <div className="flex flex-wrap gap-2">
+                        {d.features.map((f, i) => (
+                        <button key={i}
+                        onClick={e => {
+                          e.stopPropagation();
+                          abrirSkillNpc(f, d);
+                        }}
+                        className="border border-[#c8a84b20] text-[#6a6050] px-2 py-0.5 text-xs hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors"
+                        style={{ borderRadius: '2px' }}>
+                        {f} ↗
+                      </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                       {d.background_story && (
                         <div>
@@ -1096,6 +1121,7 @@ function gerarNome() {
               className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors"
               style={{ ...cinzel, borderRadius: '2px' }}>
               PRÓXIMO TURNO →
+              <p className="text-[#3a3020] text-xs mt-2">Atalho: Espaço ou Enter para avançar turno</p>
             </button>
           ) : (
             <button onClick={() => setCombateAtivo(true)}
@@ -1235,6 +1261,7 @@ function gerarNome() {
               boxShadow: isAtivo ? '0 0 12px #c8a84b20' : 'none',
             }}>
             <div className="flex items-center gap-3">
+
               {/* Iniciativa */}
               <div className="flex flex-col items-center">
                 <span style={cinzel} className="text-[#c8a84b] text-xs opacity-50 mb-1">INIT</span>
@@ -1245,31 +1272,33 @@ function gerarNome() {
               </div>
 
               {/* Nome e tipo */}
-<div className="flex-1">
-  <div className="flex items-center gap-2 mb-2">
-    {isAtivo && <span className="text-[#c8a84b] text-xs">▶</span>}
-    {/* Avatar do jogador */}
-    {c.tipo === 'jogador' && c.avatar_url && (
-      <img src={c.avatar_url} alt={c.nome}
-        className="w-6 h-6 rounded object-cover border border-[#c8a84b20]"
-        style={{ borderRadius: '2px' }} />
-    )}
-    <span style={cinzel} className="text-[#e8e0d0] text-sm">{c.nome}</span>
-                  <span style={{ ...cinzel, borderRadius: '2px' }}
-                    className={[
-                      'text-xs px-2 py-0.5 border',
-                      c.tipo === 'monstro' ? 'border-red-900 text-red-900' :
-                      c.tipo === 'jogador' ? 'border-[#7ab8d430] text-[#7ab8d4]' :
-                      'border-[#c8a84b30] text-[#c8a84b60]'
-                    ].join(' ')}>
-                    {c.tipo === 'monstro' ? 'MONSTRO' : c.tipo === 'jogador' ? 'JOGADOR' : 'NPC'}
-                  </span>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    {isAtivo && <span className="text-[#c8a84b] text-xs">▶</span>}
+
+                    {/* Avatar do jogador */}
+                      {c.tipo === 'jogador' && c.avatar_url && (
+                        <img src={c.avatar_url} alt={c.nome}
+                        className="w-6 h-6 rounded object-cover border border-[#c8a84b20]"
+                        style={{ borderRadius: '2px' }} />
+                      )}
+                      <span style={cinzel} className="text-[#e8e0d0] text-sm">{c.nome}</span>
+                      <span style={{ ...cinzel, borderRadius: '2px' }}
+                        className={[
+                          'text-xs px-2 py-0.5 border',
+                          c.tipo === 'monstro' ? 'border-red-900 text-red-900' :
+                          c.tipo === 'jogador' ? 'border-[#7ab8d430] text-[#7ab8d4]' :
+                          'border-[#c8a84b30] text-[#c8a84b60]'
+                        ].join(' ')}>
+                        {c.tipo === 'monstro' ? 'MONSTRO' : c.tipo === 'jogador' ? 'JOGADOR' : 'NPC'}
+                      </span>
+                    </div>
+
+                      {/* Barra de HP */}
+                      <div className="h-1.5 bg-[#0f0e0c] rounded-full overflow-hidden">
+                    <div className="h-full transition-all" style={{ width: `${hpPct}%`, backgroundColor: hpCor }} />
+                  </div>
                 </div>
-                {/* Barra de HP */}
-                <div className="h-1.5 bg-[#0f0e0c] rounded-full overflow-hidden">
-                  <div className="h-full transition-all" style={{ width: `${hpPct}%`, backgroundColor: hpCor }} />
-                </div>
-              </div>
 
               {/* HP */}
               <div className="flex items-center gap-1">
@@ -1522,87 +1551,86 @@ function gerarNome() {
                   ))}
                 </select>
                 {!item.identificado && (
-  <button onClick={async e => {
-    e.stopPropagation();
-    await api.patch(`/magic-items/${item.id}/revelar`);
+                  <button onClick={async e => {
+                  e.stopPropagation();
+                  await api.patch(`/magic-items/${item.id}/revelar`);
     
-    // Atualiza todos os personagens que têm esse item no inventário
-    for (const p of personagens) {
-      const res = await api.get(`/characters/${p.id}`);
-      const char = res.data.data;
-      const inv = char.data?.inventory || [];
-      const temItem = inv.some(i => typeof i === 'object' && i.name === item.name);
-      if (temItem) {
-        const novoInv = inv.map(i => 
-          typeof i === 'object' && i.name === item.name
-            ? { ...i, identificado: true, description: item.description, mechanics: item.mechanics }
-            : i
-        );
-        await api.put(`/characters/${p.id}`, {
-          data: { ...char.data, inventory: novoInv }
-        });
-      }
-    }
+                  for (const p of personagens) {
+                    const res = await api.get(`/characters/${p.id}`);
+                    const char = res.data.data;
+                    const inv = char.data?.inventory || [];
+                    const temItem = inv.some(i => typeof i === 'object' && i.name === item.name);
+                  if (temItem) {
+                    const novoInv = inv.map(i => 
+                    typeof i === 'object' && i.name === item.name
+                      ? { ...i, identificado: true, description: item.description, mechanics: item.mechanics }
+                      : i
+                    );
+                  await api.put(`/characters/${p.id}`, {
+                    data: { ...char.data, inventory: novoInv }
+                  });
+                }
+              }
     
-    setMagicItems(prev => prev.map(i => i.id === item.id ? { ...i, identificado: true } : i));
-  }}
-    className="text-xs border border-[#8a5030] text-[#8a5030] px-2 py-0.5 hover:bg-[#8a503020] transition-colors"
-    style={{ ...cinzel, borderRadius: '2px' }}>
-    REVELAR
-  </button>
-)}
+                      setMagicItems(prev => prev.map(i => i.id === item.id ? { ...i, identificado: true } : i));
+                    }}
+                      className="text-xs border border-[#8a5030] text-[#8a5030] px-2 py-0.5 hover:bg-[#8a503020] transition-colors"
+                      style={{ ...cinzel, borderRadius: '2px' }}>
+                      REVELAR
+                    </button>
+                )}
               </div>
             </div>
 
               {/* Expandido */}
               {itemDetalhes?.id === item.id && (
-  <div className="mt-3 pt-3 border-t border-[#c8a84b10] space-y-2">
-    {item.art_url && (
-      <img src={item.art_url} alt={item.name} className="w-full max-h-48 object-cover" style={{ borderRadius: '2px' }} />
-    )}
-    {!item.identificado && (
-      <p style={cinzel} className="text-[#8a5030] text-xs tracking-[2px] mb-2">? NÃO IDENTIFICADO PELO JOGADOR</p>
-    )}
-    {item.description && (
-      <p className="text-[#6a6050] text-sm font-light leading-relaxed">{limparMarkdown(item.description)}</p>
-    )}
-    {item.mechanics && (
-      <div className="bg-[#0f0e0c] border border-[#c8a84b10] px-3 py-2">
-        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">MECÂNICA</p>
-        <p className="text-[#8a8070] text-sm leading-relaxed">{limparMarkdown(item.mechanics)}</p>
-      </div>
-    )}
-    <button onClick={async e => {
-  e.stopPropagation();
-  console.log("Deletando item:", item.id, item);
-  await api.delete(`/magic-items/${item.id}`);
-  setMagicItems(prev => prev.filter(i => i.id !== item.id));
-  setItemDetalhes(null);
-}}
-      className="text-xs border border-red-900 text-red-900 px-2 py-0.5 hover:bg-red-900 hover:text-white transition-colors mt-2"
-      style={{ ...cinzel, borderRadius: '2px' }}>
-      🗑 DELETAR ITEM
-    </button>
-    {item.art_url ? (
-  <button onClick={e => { e.stopPropagation(); setImagemVisualizando({ url: item.art_url, tipo: 'item', id: item.id }); }}
-    className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 hover:bg-[#c8a84b10] transition-colors mt-2"
-    style={{ ...cinzel, borderRadius: '2px' }}>
-    🖼 Ver Imagem
-  </button>
-) : (
-  <button onClick={e => { e.stopPropagation(); setModalGerarArte({ tipo: 'item', id: item.id }); }}
-    className="text-[10px] border border-[#c8a84b30] text-[#c8a84b] px-2 py-0.5 hover:bg-[#c8a84b10] transition-colors mt-2"
-    style={{ ...cinzel, borderRadius: '2px' }}>
-    🎨 Gerar Arte
-  </button>
-)}
+                <div className="mt-3 pt-3 border-t border-[#c8a84b10] space-y-2">
+              {item.art_url && (
+                <img src={item.art_url} alt={item.name} className="w-full max-h-48 object-cover" style={{ borderRadius: '2px' }} />
+              )}
+              {!item.identificado && (
+                <p style={cinzel} className="text-[#8a5030] text-xs tracking-[2px] mb-2">? NÃO IDENTIFICADO PELO JOGADOR</p>
+              )}
+                {item.description && (
+                <p className="text-[#6a6050] text-sm font-light leading-relaxed">{limparMarkdown(item.description)}</p>
+              )}
+              {item.mechanics && (
+                <div className="bg-[#0f0e0c] border border-[#c8a84b10] px-3 py-2">
+                <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">MECÂNICA</p>
+                <p className="text-[#8a8070] text-sm leading-relaxed">{limparMarkdown(item.mechanics)}</p>
+                </div>
+                )}
+            <button onClick={async e => {
+              e.stopPropagation();
+              if (!window.confirm('Tem certeza que deseja deletar este item?')) return;
+              await api.delete(`/magic-items/${item.id}`);
+              setMagicItems(prev => prev.filter(i => i.id !== item.id));
+              setItemDetalhes(null);
+            }}
+              className="text-xs border border-red-900 text-red-900 px-2 py-0.5 hover:bg-red-900 hover:text-white transition-colors mt-2"
+              style={{ ...cinzel, borderRadius: '2px' }}>
+              🗑 DELETAR ITEM
+            </button>
+              {item.art_url ? (
+              <button onClick={e => { e.stopPropagation(); setImagemVisualizando({ url: item.art_url, tipo: 'item', id: item.id }); }}
+                className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 hover:bg-[#c8a84b10] transition-colors mt-2"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                🖼 Ver Imagem
+              </button>
+            ) : (
+              <button onClick={e => { e.stopPropagation(); setModalGerarArte({ tipo: 'item', id: item.id }); }}
+              className="text-[10px] border border-[#c8a84b30] text-[#c8a84b] px-2 py-0.5 hover:bg-[#c8a84b10] transition-colors mt-2"
+              style={{ ...cinzel, borderRadius: '2px' }}>
+              🎨 Gerar Arte
+            </button>
+            )}
+          </div>
+          )}
+        </div>
+      );
+    })}
   </div>
 )}
-            </div>
-          );
-        })}
-    </div>
-  )}
 </div>
 
 {/* RESUMO DE REGRAS */}
