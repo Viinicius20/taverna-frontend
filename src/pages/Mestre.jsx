@@ -84,6 +84,7 @@ export default function Mestre() {
   const [imagemVisualizando, setImagemVisualizando] = useState(null);
   const [deletandoArte, setDeletandoArte] = useState(false);
   const [modalCondicoes, setModalCondicoes] = useState(null); 
+  const [modalRevelarSegredo, setModalRevelarSegredo] = useState(null);
 
   
 
@@ -1107,23 +1108,9 @@ const LISTA_CONDICOES = [
   )}
   {getNota(npc.id, 'secret') && (
   <button
-    onClick={async e => {
+    onClick={e => {
       e.stopPropagation();
-      if (!window.confirm('Revelar o segredo deste NPC para todos os jogadores via sussurro?')) return;
-      try {
-        const segredo = getNota(npc.id, 'secret');
-        // Envia pra todos os personagens
-        for (const p of personagens) {
-          await api.post('/secret-messages', {
-            campaign_id: '00000000-0000-0000-0000-000000000001',
-            character_id: p.id,
-            message: `🔓 Segredo revelado sobre ${npc.name}: ${segredo}`
-          });
-        }
-        alert('Segredo revelado para todos os jogadores!');
-      } catch {
-        alert('Erro ao revelar segredo.');
-      }
+      setModalRevelarSegredo({ npc });
     }}
     className="text-[#8a5030] hover:text-[#c8a84b] text-xs border border-[#8a5030] hover:border-[#c8a84b] px-4 py-1.5 transition-colors"
     style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
@@ -1143,6 +1130,75 @@ const LISTA_CONDICOES = [
             })}
           </div>
         )}
+
+        {modalRevelarSegredo && (
+  <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 px-4"
+    onClick={() => setModalRevelarSegredo(null)}>
+    <div className="bg-[#161410] border border-[#8a5030] max-w-md w-full p-6"
+      style={{ borderRadius: '2px' }}
+      onClick={e => e.stopPropagation()}>
+      <div className="flex justify-between items-start mb-4">
+        <p style={cinzel} className="text-[#8a5030] text-sm font-bold">
+          🔓 Revelar Segredo de {modalRevelarSegredo.npc.name}
+        </p>
+        <button onClick={() => setModalRevelarSegredo(null)}
+          className="text-[#4a4030] hover:text-[#c8a84b] text-xl">✕</button>
+      </div>
+
+      <p className="text-[#6a6050] text-sm italic mb-4 border border-[#8a5030] bg-[#0f0e0c] p-3"
+        style={{ borderRadius: '2px' }}>
+        "{getNota(modalRevelarSegredo.npc.id, 'secret')}"
+      </p>
+
+      <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-3">REVELAR PARA:</p>
+
+      <div className="flex flex-col gap-2 mb-4 max-h-48 overflow-y-auto">
+        {/* Todos */}
+        <button
+          onClick={async () => {
+            try {
+              const segredo = getNota(modalRevelarSegredo.npc.id, 'secret');
+              for (const p of personagens) {
+                await api.post('/secret-messages', {
+                  campaign_id: '00000000-0000-0000-0000-000000000001',
+                  character_id: p.id,
+                  message: `🔓 Segredo revelado sobre ${modalRevelarSegredo.npc.name}: ${segredo}`
+                });
+              }
+              setModalRevelarSegredo(null);
+              alert('Segredo revelado para todos!');
+            } catch { alert('Erro ao revelar.'); }
+          }}
+          className="border border-[#c8a84b30] text-[#c8a84b] px-4 py-2 text-sm text-left hover:bg-[#c8a84b10] transition-colors"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          👥 Todos os jogadores
+        </button>
+
+        {/* Individual */}
+        {personagens.map(p => (
+          <button key={p.id}
+            onClick={async () => {
+              try {
+                const segredo = getNota(modalRevelarSegredo.npc.id, 'secret');
+                await api.post('/secret-messages', {
+                  campaign_id: '00000000-0000-0000-0000-000000000001',
+                  character_id: p.id,
+                  message: `🔓 Segredo revelado sobre ${modalRevelarSegredo.npc.name}: ${segredo}`
+                });
+                setModalRevelarSegredo(null);
+                alert(`Segredo revelado para ${p.data?.name || p.name}!`);
+              } catch { alert('Erro ao revelar.'); }
+            }}
+            className="border border-[#c8a84b20] text-[#e8e0d0] px-4 py-2 text-sm text-left hover:bg-[#c8a84b08] transition-colors"
+            style={{ borderRadius: '2px' }}>
+            {p.data?.name || p.name}
+            <span className="text-[#4a4030] text-xs ml-2">{p.data?.race} · Nível {p.data?.level}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+)}
 
         {!carregando && npcs.length > 0 && (
           <p style={cinzel} className="text-[#3a3020] text-xs tracking-widest text-center mt-6">
