@@ -1105,6 +1105,31 @@ const LISTA_CONDICOES = [
       🎨 Gerar Arte
     </button>
   )}
+  {getNota(npc.id, 'secret') && (
+  <button
+    onClick={async e => {
+      e.stopPropagation();
+      if (!window.confirm('Revelar o segredo deste NPC para todos os jogadores via sussurro?')) return;
+      try {
+        const segredo = getNota(npc.id, 'secret');
+        // Envia pra todos os personagens
+        for (const p of personagens) {
+          await api.post('/secret-messages', {
+            campaign_id: '00000000-0000-0000-0000-000000000001',
+            character_id: p.id,
+            message: `🔓 Segredo revelado sobre ${npc.name}: ${segredo}`
+          });
+        }
+        alert('Segredo revelado para todos os jogadores!');
+      } catch {
+        alert('Erro ao revelar segredo.');
+      }
+    }}
+    className="text-[#8a5030] hover:text-[#c8a84b] text-xs border border-[#8a5030] hover:border-[#c8a84b] px-4 py-1.5 transition-colors"
+    style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
+    🔓 Revelar Segredo
+  </button>
+)}
   <button onClick={() => deletarNpc(npc.id)}
     className="text-red-900 hover:text-red-600 text-xs border border-red-900 hover:border-red-600 px-4 py-1.5 transition-colors"
     style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
