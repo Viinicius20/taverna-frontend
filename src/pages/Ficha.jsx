@@ -986,6 +986,19 @@ function rolarAtaque(ataque) {
     dano = rolls.reduce((a, b) => a + b, 0) + mod;
   }
 
+  setResultadoRolagem({
+    nome: ataque.nome,
+    d20,
+    bonus,
+    total,
+    dano,
+    tipoDano: ataque.tipo,
+    critico: d20 === 20,
+    falha: d20 === 1,
+  });
+  setTimeout(() => setResultadoRolagem(null), 5000);
+}
+
 function rolarPericia(nomeSkill, bonus) {
   const d20 = Math.floor(Math.random() * 20) + 1;
   const total = d20 + bonus;
