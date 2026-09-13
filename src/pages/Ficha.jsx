@@ -1337,28 +1337,6 @@ function rolarPericia(nomeSkill, bonus) {
   </div>
   <div className="p-6 flex flex-col gap-3">
 
-    {/* Resultado de rolagem */}
-    {resultadoRolagem && createPortal(
-  <div className="fixed bottom-6 right-6 z-50 modal-anim">
-    <div className={`border p-4 text-center shadow-lg ${resultadoRolagem.critico ? 'border-[#c8a84b] bg-[#161410]' : resultadoRolagem.falha ? 'border-red-900 bg-[#161410]' : 'border-[#c8a84b30] bg-[#161410]'}`}
-      style={{ borderRadius: '2px', minWidth: '200px' }}>
-      <p style={cinzel} className="text-[#4a4030] text-xs mb-1">{resultadoRolagem.nome}</p>
-      {resultadoRolagem.critico && <p style={cinzel} className="text-[#c8a84b] text-xs mb-1">⚔ CRÍTICO!</p>}
-      {resultadoRolagem.falha && <p style={cinzel} className="text-red-500 text-xs mb-1">✕ FALHA CRÍTICA</p>}
-      <p style={cinzel} className="text-[#f0e8d8] text-2xl">
-        {resultadoRolagem.total}
-        <span className="text-[#4a4030] text-sm ml-2">(d20:{resultadoRolagem.d20} {resultadoRolagem.bonus >= 0 ? '+' : ''}{resultadoRolagem.bonus})</span>
-      </p>
-      {resultadoRolagem.dano !== null && (
-        <p style={cinzel} className="text-[#c8a84b] text-sm mt-1">
-          Dano: {resultadoRolagem.dano} {resultadoRolagem.tipoDano}
-        </p>
-      )}
-    </div>
-  </div>,
-  document.body
-)}
-
     {/* Lista de ataques */}
     {ataques.length === 0 && !adicionandoAtaque && (
       <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest text-center py-4">
@@ -1423,6 +1401,28 @@ function rolarPericia(nomeSkill, bonus) {
     )}
   </div>
 </div>
+
+{/* Resultado de rolagem */}
+    {resultadoRolagem && createPortal(
+  <div className="fixed bottom-6 right-6 z-50 modal-anim">
+    <div className={`border p-4 text-center shadow-lg ${resultadoRolagem.critico ? 'border-[#c8a84b] bg-[#161410]' : resultadoRolagem.falha ? 'border-red-900 bg-[#161410]' : 'border-[#c8a84b30] bg-[#161410]'}`}
+      style={{ borderRadius: '2px', minWidth: '200px' }}>
+      <p style={cinzel} className="text-[#4a4030] text-xs mb-1">{resultadoRolagem.nome}</p>
+      {resultadoRolagem.critico && <p style={cinzel} className="text-[#c8a84b] text-xs mb-1">⚔ CRÍTICO!</p>}
+      {resultadoRolagem.falha && <p style={cinzel} className="text-red-500 text-xs mb-1">✕ FALHA CRÍTICA</p>}
+      <p style={cinzel} className="text-[#f0e8d8] text-2xl">
+        {resultadoRolagem.total}
+        <span className="text-[#4a4030] text-sm ml-2">(d20:{resultadoRolagem.d20} {resultadoRolagem.bonus >= 0 ? '+' : ''}{resultadoRolagem.bonus})</span>
+      </p>
+      {resultadoRolagem.dano !== null && (
+        <p style={cinzel} className="text-[#c8a84b] text-sm mt-1">
+          Dano: {resultadoRolagem.dano} {resultadoRolagem.tipoDano}
+        </p>
+      )}
+    </div>
+  </div>,
+  document.body
+)}
     
 
     {/* Outros campos de combate */}
