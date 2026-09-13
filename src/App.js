@@ -13,6 +13,7 @@ import Bestiario from './pages/Bestiario';
 import Galeria from './pages/Galeria';
 import FichaPublica from './pages/FichaPublica';
 import Campanhas from './pages/Campanhas';
+import Facoes from './pages/Facoes';
 
 
 function App() {
