@@ -83,6 +83,9 @@ export default function Mestre() {
   const [gerandoArte, setGerandoArte] = useState(false);
   const [imagemVisualizando, setImagemVisualizando] = useState(null);
   const [deletandoArte, setDeletandoArte] = useState(false);
+  const [modalCondicoes, setModalCondicoes] = useState(null); 
+
+  
 
   useEffect(() => {
     buscarNpcs();
@@ -637,6 +640,13 @@ function limparMarkdown(texto) {
   return texto.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
 }
 
+function toggleCondicao(combatenteId, condicao) {
+  const combatente = combatentes.find(c => c.id === combatenteId);
+  const atual = combatente?.condicoes || [];
+  const novo = atual.includes(condicao) ? atual.filter(x => x !== condicao) : [...atual, condicao];
+  atualizarCombatente(combatenteId, 'condicoes', novo);
+}
+
 function gerarNome() {
   const nomes = {
     'Humano': ['Aldric', 'Maren', 'Jovan', 'Sera', 'Edric', 'Lila', 'Torvin', 'Cass', 'Bran', 'Deva'],
@@ -652,6 +662,21 @@ function gerarNome() {
   const nome = lista[Math.floor(Math.random() * lista.length)];
   setNomeGerado(nome);
 }
+
+const LISTA_CONDICOES = [
+  { label: 'Caído', cor: '#8a2020' },
+  { label: 'Envenenado', cor: '#4a8a20' },
+  { label: 'Paralisado', cor: '#8a6020' },
+  { label: 'Enfeitiçado', cor: '#8a4a8a' },
+  { label: 'Amedrontado', cor: '#6a4020' },
+  { label: 'Atordoado', cor: '#4a6a8a' },
+  { label: 'Invisível', cor: '#6a6a6a' },
+  { label: 'Surdo', cor: '#4a4030' },
+  { label: 'Cego', cor: '#303030' },
+  { label: 'Incapacitado', cor: '#8a2050' },
+  { label: 'Petrificado', cor: '#607060' },
+  { label: 'Inconsciente', cor: '#202020' },
+];
 
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
@@ -1300,6 +1325,19 @@ function gerarNome() {
                   </div>
                 </div>
 
+                {/* Condições ativas */}
+{c.condicoes && c.condicoes.length > 0 && (
+  <div className="flex flex-wrap gap-1 mt-2">
+    {c.condicoes.map(cond => (
+      <span key={cond} style={cinzel}
+        className="text-xs px-2 py-0.5 border border-[#8a4a8a40] text-[#8a4a8a] bg-[#8a4a8a10]"
+        style2={{ borderRadius: '2px' }}>
+        {cond}
+      </span>
+    ))}
+  </div>
+)}
+
               {/* HP */}
               <div className="flex items-center gap-1">
                 <input type="number" value={c.hpAtual}
@@ -1309,6 +1347,13 @@ function gerarNome() {
                 <span className="text-[#3a3020] text-sm">/</span>
                 <span style={cinzel} className="text-[#3a3020] text-sm w-10 text-center">{c.hpMax}</span>
               </div>
+
+              {/* Condições */}
+<button onClick={() => setModalCondicoes(c.id)}
+  className="text-[#4a4030] hover:text-[#8a4a8a] text-xs transition-colors px-1"
+  title="Gerenciar condições">
+  ⚕
+</button>
 
               {/* Remover */}
               <button onClick={() => removerCombatente(c.id)}
@@ -2266,6 +2311,39 @@ function gerarNome() {
         style={{ ...cinzel, borderRadius: '2px' }}>
         Fechar
       </button>
+    </div>
+  </div>,
+  document.body
+)}
+
+{modalCondicoes && createPortal(
+  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
+    onClick={() => setModalCondicoes(null)}>
+    <div className="modal-anim bg-[#161410] border border-[#c8a84b30] max-w-sm w-full" style={{ borderRadius: '2px' }}
+      onClick={e => e.stopPropagation()}>
+      <div className="px-6 py-4 border-b border-[#c8a84b15]">
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">CONDIÇÕES</p>
+      </div>
+      <div className="p-6 flex flex-wrap gap-2">
+        {LISTA_CONDICOES.map(({ label, cor }) => {
+          const combatente = combatentes.find(c => c.id === modalCondicoes);
+          const ativo = (combatente?.condicoes || []).includes(label);
+          return (
+            <button key={label} onClick={() => toggleCondicao(modalCondicoes, label)}
+              className="px-3 py-1 text-xs border transition-all"
+              style={{ ...cinzel, borderRadius: '2px', borderColor: ativo ? cor : '#c8a84b15', backgroundColor: ativo ? `${cor}25` : 'transparent', color: ativo ? cor : '#4a4030' }}>
+              {label}
+            </button>
+          );
+        })}
+      </div>
+      <div className="px-6 pb-6">
+        <button onClick={() => setModalCondicoes(null)}
+          className="w-full border border-[#c8a84b20] text-[#4a4030] py-2 text-xs hover:border-[#c8a84b40] transition-colors"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          Fechar
+        </button>
+      </div>
     </div>
   </div>,
   document.body
