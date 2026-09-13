@@ -1468,6 +1468,9 @@ function rolarPericia(nomeSkill, bonus) {
   </div>
 </div>
 
+</>
+)}
+
 {/* Resultado de rolagem */}
     {resultadoRolagem && createPortal(
   <div className="fixed bottom-6 right-6 z-50 modal-anim">
@@ -1488,9 +1491,6 @@ function rolarPericia(nomeSkill, bonus) {
     </div>
   </div>,
   document.body
-)}
-
-</>
 )}
 
         {/* SPELLCASTING */}
