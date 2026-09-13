@@ -199,6 +199,9 @@ export default function Ficha() {
   const [nivelAlvo, setNivelAlvo] = useState(2);
   const [upando, setUpando] = useState(false);
 
+  const [historicoRolagens, setHistoricoRolagens] = useState([]);
+  const [modalHistoricoRolagens, setModalHistoricoRolagens] = useState(false);
+
   const [showClassLevelUpModal, setShowClassLevelUpModal] = useState(false);
 
   const [modal, setModal] = useState(null);
@@ -259,7 +262,6 @@ export default function Ficha() {
 
   const [exportandoPDF, setExportandoPDF] = useState(false);
 
-  const [historicoRolagens, setHistoricoRolagens] = useState([]);
 
   const ACOES_COMBATE = {
   'Attack': 'Faça um ataque corpo a corpo ou à distância.',
@@ -1497,6 +1499,54 @@ function rolarPericia(nomeSkill, bonus) {
           Dano: {resultadoRolagem.dano} {resultadoRolagem.tipoDano}
         </p>
       )}
+    </div>
+  </div>,
+  document.body
+)}
+
+{/* Botão de histórico de rolagens — sempre visível */}
+{historicoRolagens.length > 0 && createPortal(
+  <button onClick={() => setModalHistoricoRolagens(true)}
+    className="fixed bottom-6 left-6 z-40 bg-[#161410] border border-[#c8a84b30] text-[#c8a84b] w-10 h-10 flex items-center justify-center hover:bg-[#c8a84b10] transition-colors"
+    style={{ borderRadius: '2px' }}
+    title="Histórico de rolagens">
+    📜
+  </button>,
+  document.body
+)}
+
+{modalHistoricoRolagens && createPortal(
+  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
+    onClick={() => setModalHistoricoRolagens(false)}>
+    <div className="modal-anim bg-[#161410] border border-[#c8a84b30] max-w-md w-full max-h-[70vh] flex flex-col"
+      style={{ borderRadius: '2px' }}
+      onClick={e => e.stopPropagation()}>
+      <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">HISTÓRICO DE ROLAGENS</p>
+        <button onClick={() => setModalHistoricoRolagens(false)}
+          className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
+      </div>
+      <div className="px-6 py-4 overflow-y-auto flex-1 flex flex-col gap-2">
+        {historicoRolagens.length === 0 ? (
+          <p className="text-[#3a3020] text-sm text-center py-4">Nenhuma rolagem ainda.</p>
+        ) : (
+          historicoRolagens.map(r => (
+            <div key={r.id} className={`border p-3 flex items-center justify-between ${r.critico ? 'border-[#c8a84b40] bg-[#c8a84b08]' : r.falha ? 'border-red-900 bg-red-950 bg-opacity-10' : 'border-[#c8a84b15] bg-[#0f0e0c]'}`}
+              style={{ borderRadius: '2px' }}>
+              <div>
+                <p style={cinzel} className="text-[#e8e0d0] text-sm">{r.nome}</p>
+                <p className="text-[#4a4030] text-xs mt-0.5">
+                  d20:{r.d20} {r.bonus >= 0 ? '+' : ''}{r.bonus}
+                  {r.dano !== null && ` · dano: ${r.dano} ${r.tipoDano || ''}`}
+                </p>
+              </div>
+              <span style={cinzel} className={`text-lg ${r.critico ? 'text-[#c8a84b]' : r.falha ? 'text-red-500' : 'text-[#e8e0d0]'}`}>
+                {r.total}
+              </span>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   </div>,
   document.body
