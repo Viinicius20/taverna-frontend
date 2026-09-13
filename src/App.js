@@ -33,6 +33,7 @@ function App() {
           <Route path="/galeria" element={<Galeria />} />
           <Route path="/personagens/:id/publica" element={<FichaPublica />} />
           <Route path="/campanhas" element={<Campanhas />} />
+          <Route path="/faccoes" element={<Facoes />} />
         </Routes>
       </BrowserRouter>
     </UserProvider>
