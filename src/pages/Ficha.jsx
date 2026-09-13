@@ -259,6 +259,8 @@ export default function Ficha() {
 
   const [exportandoPDF, setExportandoPDF] = useState(false);
 
+  const [historicoRolagens, setHistoricoRolagens] = useState([]);
+
   const ACOES_COMBATE = {
   'Attack': 'Faça um ataque corpo a corpo ou à distância.',
   'Dash': 'Ganhe movimento extra igual à sua velocidade neste turno.',
@@ -975,7 +977,6 @@ function rolarAtaque(ataque) {
   const d20 = Math.floor(Math.random() * 20) + 1;
   const total = d20 + bonus;
   
-  // Rola o dano
   let dano = null;
   const danoMatch = ataque.dano.match(/(\d+)d(\d+)([+-]\d+)?/);
   if (danoMatch) {
@@ -986,7 +987,8 @@ function rolarAtaque(ataque) {
     dano = rolls.reduce((a, b) => a + b, 0) + mod;
   }
 
-  setResultadoRolagem({
+  const resultado = {
+    id: Date.now(),
     nome: ataque.nome,
     d20,
     bonus,
@@ -995,7 +997,10 @@ function rolarAtaque(ataque) {
     tipoDano: ataque.tipo,
     critico: d20 === 20,
     falha: d20 === 1,
-  });
+  };
+
+  setResultadoRolagem(resultado);
+  setHistoricoRolagens(prev => [resultado, ...prev].slice(0, 10));
   setTimeout(() => setResultadoRolagem(null), 5000);
 }
 
@@ -1003,7 +1008,8 @@ function rolarPericia(nomeSkill, bonus) {
   const d20 = Math.floor(Math.random() * 20) + 1;
   const total = d20 + bonus;
 
-  setResultadoRolagem({
+  const resultado = {
+    id: Date.now(),
     nome: nomeSkill.charAt(0).toUpperCase() + nomeSkill.slice(1),
     d20,
     bonus,
@@ -1012,7 +1018,10 @@ function rolarPericia(nomeSkill, bonus) {
     tipoDano: null,
     critico: d20 === 20,
     falha: d20 === 1,
-  });
+  };
+
+  setResultadoRolagem(resultado);
+  setHistoricoRolagens(prev => [resultado, ...prev].slice(0, 10));
   setTimeout(() => setResultadoRolagem(null), 5000);
 }
 
