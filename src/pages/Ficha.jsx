@@ -986,6 +986,23 @@ function rolarAtaque(ataque) {
     dano = rolls.reduce((a, b) => a + b, 0) + mod;
   }
 
+  function rolarPericia(nomeSkill, bonus) {
+  const d20 = Math.floor(Math.random() * 20) + 1;
+  const total = d20 + bonus;
+
+  setResultadoRolagem({
+    nome: nomeSkill.charAt(0).toUpperCase() + nomeSkill.slice(1),
+    d20,
+    bonus,
+    total,
+    dano: null,
+    tipoDano: null,
+    critico: d20 === 20,
+    falha: d20 === 1,
+  });
+  setTimeout(() => setResultadoRolagem(null), 5000);
+}
+
   setResultadoRolagem({
     nome: ataque.nome,
     d20,
@@ -1321,22 +1338,26 @@ function rolarAtaque(ataque) {
   <div className="p-6 flex flex-col gap-3">
 
     {/* Resultado de rolagem */}
-    {resultadoRolagem && (
-      <div className={`border p-3 text-center mb-2 ${resultadoRolagem.critico ? 'border-[#c8a84b] bg-[#c8a84b10]' : resultadoRolagem.falha ? 'border-red-900 bg-red-950 bg-opacity-20' : 'border-[#c8a84b20] bg-[#0f0e0c]'}`}>
-        <p style={cinzel} className="text-[#4a4030] text-xs mb-1">{resultadoRolagem.nome}</p>
-        {resultadoRolagem.critico && <p style={cinzel} className="text-[#c8a84b] text-xs mb-1">⚔ CRÍTICO!</p>}
-        {resultadoRolagem.falha && <p style={cinzel} className="text-red-500 text-xs mb-1">✕ FALHA CRÍTICA</p>}
-        <p style={cinzel} className="text-[#f0e8d8] text-2xl">
-          {resultadoRolagem.total}
-          <span className="text-[#4a4030] text-sm ml-2">(d20:{resultadoRolagem.d20} {resultadoRolagem.bonus >= 0 ? '+' : ''}{resultadoRolagem.bonus})</span>
+    {resultadoRolagem && createPortal(
+  <div className="fixed bottom-6 right-6 z-50 modal-anim">
+    <div className={`border p-4 text-center shadow-lg ${resultadoRolagem.critico ? 'border-[#c8a84b] bg-[#161410]' : resultadoRolagem.falha ? 'border-red-900 bg-[#161410]' : 'border-[#c8a84b30] bg-[#161410]'}`}
+      style={{ borderRadius: '2px', minWidth: '200px' }}>
+      <p style={cinzel} className="text-[#4a4030] text-xs mb-1">{resultadoRolagem.nome}</p>
+      {resultadoRolagem.critico && <p style={cinzel} className="text-[#c8a84b] text-xs mb-1">⚔ CRÍTICO!</p>}
+      {resultadoRolagem.falha && <p style={cinzel} className="text-red-500 text-xs mb-1">✕ FALHA CRÍTICA</p>}
+      <p style={cinzel} className="text-[#f0e8d8] text-2xl">
+        {resultadoRolagem.total}
+        <span className="text-[#4a4030] text-sm ml-2">(d20:{resultadoRolagem.d20} {resultadoRolagem.bonus >= 0 ? '+' : ''}{resultadoRolagem.bonus})</span>
+      </p>
+      {resultadoRolagem.dano !== null && (
+        <p style={cinzel} className="text-[#c8a84b] text-sm mt-1">
+          Dano: {resultadoRolagem.dano} {resultadoRolagem.tipoDano}
         </p>
-        {resultadoRolagem.dano !== null && (
-          <p style={cinzel} className="text-[#c8a84b] text-sm mt-1">
-            Dano: {resultadoRolagem.dano} {resultadoRolagem.tipoDano}
-          </p>
-        )}
-      </div>
-    )}
+      )}
+    </div>
+  </div>,
+  document.body
+)}
 
     {/* Lista de ataques */}
     {ataques.length === 0 && !adicionandoAtaque && (
@@ -1865,9 +1886,16 @@ function rolarAtaque(ataque) {
         return (
           <div key={skill} className="flex items-center justify-between py-1 border-b border-[#c8a84b08]">
             <span className={`text-sm capitalize ${temProficiencia ? 'text-[#c8a84b]' : 'text-[#8a8070]'}`}>{skill}</span>
-            <span style={cinzel} className={`text-sm ${temProficiencia ? 'text-[#c8a84b]' : 'text-[#6a6050]'}`}>
-              {val >= 0 ? '+' : ''}{val}
-            </span>
+            <div className="flex items-center gap-2">
+              <span style={cinzel} className={`text-sm ${temProficiencia ? 'text-[#c8a84b]' : 'text-[#6a6050]'}`}>
+                {val >= 0 ? '+' : ''}{val}
+              </span>
+              <button onClick={() => rolarPericia(skill, val)}
+                className="text-[#4a4030] hover:text-[#c8a84b] text-xs transition-colors px-1"
+                title="Rolar">
+                🎲
+              </button>
+            </div>
           </div>
         );
       })}
