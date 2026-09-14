@@ -698,6 +698,10 @@ const LISTA_CONDICOES = [
   className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
   ⚔ Campanhas
 </button>
+<button onClick={() => navigate('/faccoes')}
+  className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+  🏛 Facções
+</button>
     <button onClick={() => navigate('/')}
       className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
       ← Voltar
@@ -983,7 +987,7 @@ const LISTA_CONDICOES = [
                           </div>
 
                           {d.spellcasting.spells && d.spellcasting.spells.length > 0 ? (
-                            <div className="space-y-2">
+                            <div className="space-y-2">  
                               {d.spellcasting.spells.map((spell, idx) => (
                                 <div key={idx} className="bg-[#0f0e0c] border border-[#c8a84b10] p-2 flex items-center gap-2 text-xs">
                                   <span className="flex-1 text-[#6a6050]">{spell.name || 'Sem nome'}</span>
