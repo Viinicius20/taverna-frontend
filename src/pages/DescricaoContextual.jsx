@@ -16,6 +16,11 @@ export default function DescricaoContextual() {
   const [situacao, setSituacao] = useState('');
   const [consequencias, setConsequencias] = useState(null);
   const [gerandoConsequencia, setGerandoConsequencia] = useState(false);
+  const [personagens, setPersonagens] = useState([]);
+  const [personagemSelecionado, setPersonagemSelecionado] = useState('');
+  const [topico, setTopico] = useState('');
+  const [conhecimento, setConhecimento] = useState('');
+  const [gerandoConhecimento, setGerandoConhecimento] = useState(false);
 
   async function gerarDescricao() {
     if (!contexto.trim()) return;
@@ -43,6 +48,26 @@ export default function DescricaoContextual() {
     setErro('Erro ao gerar consequência.');
   }
   setGerandoConsequencia(false);
+}
+
+useEffect(() => {
+  api.get('/characters').then(res => setPersonagens(res.data.data || [])).catch(() => setPersonagens([]));
+}, []);
+
+async function verificarConhecimento() {
+  if (!personagemSelecionado || !topico.trim()) return;
+  setGerandoConhecimento(true);
+  setErro('');
+  try {
+    const res = await api.post('/personagem/conhecimento', {
+      character_id: personagemSelecionado,
+      topico
+    });
+    setConhecimento(res.data.data);
+  } catch {
+    setErro('Erro ao verificar conhecimento.');
+  }
+  setGerandoConhecimento(false);
 }
 
   return (
@@ -145,6 +170,49 @@ export default function DescricaoContextual() {
           <p style={cinzel} className="text-red-500 text-xs tracking-[2px] mb-2">✕ DESFAVORÁVEL</p>
           <p className="text-[#e8e0d0] text-sm leading-relaxed">{consequencias.desfavoravel}</p>
         </div>
+      </div>
+    )}
+  </>
+)}
+
+<button onClick={() => setTab('conhecimento')}
+  className={`px-4 py-2 text-xs tracking-widest transition-colors ${tab === 'conhecimento' ? 'bg-[#c8a84b] text-[#0f0e0c]' : 'border border-[#c8a84b30] text-[#c8a84b]'}`}
+  style={{ ...cinzel, borderRadius: '2px' }}>
+  CONHECIMENTO
+</button>
+
+{tab === 'conhecimento' && (
+  <>
+    <div className="border border-[#c8a84b30] bg-[#161410] mb-8 p-6">
+      <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] block mb-2">PERSONAGEM</label>
+      <select value={personagemSelecionado} onChange={e => setPersonagemSelecionado(e.target.value)}
+        className="bg-[#0f0e0c] border border-[#c8a84b30] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b60] mb-4"
+        style={{ borderRadius: '2px' }}>
+        <option value="">Selecione...</option>
+        {personagens.map(p => (
+          <option key={p.id} value={p.id}>{p.data?.name || p.name}</option>
+        ))}
+      </select>
+
+      <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] block mb-2">TÓPICO</label>
+      <textarea value={topico} onChange={e => setTopico(e.target.value)}
+        placeholder="Ex: a lenda do Duque Valerius, esse símbolo arcano gravado na parede..."
+        rows={2}
+        className="bg-[#0f0e0c] border border-[#c8a84b30] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b60] resize-none mb-4"
+        style={{ borderRadius: '2px' }} />
+
+      {erro && <p className="text-red-400 text-sm mb-3">{erro}</p>}
+      <button onClick={verificarConhecimento} disabled={!personagemSelecionado || !topico.trim() || gerandoConhecimento}
+        className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
+        style={{ ...cinzel, borderRadius: '2px' }}>
+        {gerandoConhecimento ? 'Consultando...' : 'Verificar Conhecimento →'}
+      </button>
+    </div>
+
+    {conhecimento && (
+      <div className="border border-[#c8a84b20] bg-[#161410] p-6">
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">O QUE O PERSONAGEM SABE</p>
+        <p className="text-[#e8e0d0] text-sm leading-relaxed italic">{conhecimento}</p>
       </div>
     )}
   </>
