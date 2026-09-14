@@ -57,22 +57,39 @@ export default function DescricaoContextual() {
       </nav>
 
       <div className="max-w-2xl mx-auto px-6 py-10">
-            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">NARRAÇÃO</p>
-            <h1 style={cinzel} className="text-2xl text-[#f0e8d8] font-semibold mb-8">Descrição de Cena</h1>
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">NARRAÇÃO</p>
+        <h1 style={cinzel} className="text-2xl text-[#f0e8d8] font-semibold mb-8">Descrição de Cena</h1>
 
-        {/* TOGGLE */}
-  <div className="flex gap-2 mb-8">
-    <button onClick={() => setTab('descricao')}
-      className={`px-4 py-2 text-xs tracking-widest transition-colors ${tab === 'descricao' ? 'bg-[#c8a84b] text-[#0f0e0c]' : 'border border-[#c8a84b30] text-[#c8a84b]'}`}
-      style={{ ...cinzel, borderRadius: '2px' }}>
-      DESCRIÇÃO DE CENA
-    </button>
-    <button onClick={() => setTab('consequencia')}
-      className={`px-4 py-2 text-xs tracking-widest transition-colors ${tab === 'consequencia' ? 'bg-[#c8a84b] text-[#0f0e0c]' : 'border border-[#c8a84b30] text-[#c8a84b]'}`}
-      style={{ ...cinzel, borderRadius: '2px' }}>
-      CONSEQUÊNCIAS
-    </button>
-  </div>
+        <div className="flex gap-2 mb-8">
+  <button onClick={() => setTab('descricao')}
+    className={`px-4 py-2 text-xs tracking-widest transition-colors ${tab === 'descricao' ? 'bg-[#c8a84b] text-[#0f0e0c]' : 'border border-[#c8a84b30] text-[#c8a84b]'}`}
+    style={{ ...cinzel, borderRadius: '2px' }}>
+    DESCRIÇÃO DE CENA
+  </button>
+  <button onClick={() => setTab('consequencia')}
+    className={`px-4 py-2 text-xs tracking-widest transition-colors ${tab === 'consequencia' ? 'bg-[#c8a84b] text-[#0f0e0c]' : 'border border-[#c8a84b30] text-[#c8a84b]'}`}
+    style={{ ...cinzel, borderRadius: '2px' }}>
+    CONSEQUÊNCIAS
+  </button>
+</div>
+
+
+        {tab === 'descricao' && (
+  <>
+        <div className="border border-[#c8a84b30] bg-[#161410] mb-8 p-6">
+          <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] block mb-2">CONTEXTO</label>
+          <textarea value={contexto} onChange={e => setContexto(e.target.value)}
+            placeholder="Ex: os jogadores entram numa taverna abandonada há anos, com um lobo faminto escondido nas sombras..."
+            rows={4}
+            className="bg-[#0f0e0c] border border-[#c8a84b30] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b60] resize-none mb-4"
+            style={{ borderRadius: '2px' }} />
+          {erro && <p className="text-red-400 text-sm mb-3">{erro}</p>}
+          <button onClick={gerarDescricao} disabled={!contexto.trim() || gerando}
+            className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
+            style={{ ...cinzel, borderRadius: '2px' }}>
+            {gerando ? 'Gerando...' : 'Gerar Descrição →'}
+          </button>
+        </div>
 
         {descricao && (
           <div className="border border-[#c8a84b20] bg-[#161410] mb-8 p-6">
@@ -81,6 +98,22 @@ export default function DescricaoContextual() {
           </div>
         )}
 
+        {historico.length > 1 && (
+          <div>
+            <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-3">HISTÓRICO DA SESSÃO</p>
+            <div className="space-y-2">
+              {historico.slice(1).map(h => (
+                <div key={h.id} className="border border-[#c8a84b10] bg-[#0f0e0c] p-4">
+                  <p className="text-[#4a4030] text-xs mb-1">{h.contexto}</p>
+                  <p className="text-[#6a6050] text-sm italic">{h.descricao}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+  </>
+)}
+        
         {tab === 'consequencia' && (
   <>
     <div className="border border-[#c8a84b30] bg-[#161410] mb-8 p-6">
@@ -116,20 +149,6 @@ export default function DescricaoContextual() {
     )}
   </>
 )}
-
-        {historico.length > 1 && (
-          <div>
-            <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-3">HISTÓRICO DA SESSÃO</p>
-            <div className="space-y-2">
-              {historico.slice(1).map(h => (
-                <div key={h.id} className="border border-[#c8a84b10] bg-[#0f0e0c] p-4">
-                  <p className="text-[#4a4030] text-xs mb-1">{h.contexto}</p>
-                  <p className="text-[#6a6050] text-sm italic">{h.descricao}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
