@@ -14,6 +14,7 @@ import Galeria from './pages/Galeria';
 import FichaPublica from './pages/FichaPublica';
 import Campanhas from './pages/Campanhas';
 import Facoes from './pages/Facoes';
+import DescricaoContextual from './pages/DescricaoContextual';
 
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
           <Route path="/personagens/:id/publica" element={<FichaPublica />} />
           <Route path="/campanhas" element={<Campanhas />} />
           <Route path="/faccoes" element={<Facoes />} />
+          <Route path="/mestre/descricao" element={<DescricaoContextual />} />
         </Routes>
       </BrowserRouter>
     </UserProvider>

@@ -702,6 +702,10 @@ const LISTA_CONDICOES = [
   className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
   🏛 Facções
 </button>
+<button onClick={() => navigate('/mestre/descricao')}
+  className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+  📜 Narração
+</button>
     <button onClick={() => navigate('/')}
       className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
       ← Voltar
