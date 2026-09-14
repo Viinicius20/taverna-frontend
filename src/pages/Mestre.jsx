@@ -690,6 +690,15 @@ async function pedirSugestao(npcId) {
   setGerandoSugestao(null);
 }
 
+async function removerMemoria(npcId, index) {
+  try {
+    const res = await api.post('/npcs/memoria/remover', { npc_id: npcId, index });
+    setNpcs(prev => prev.map(n => n.id === npcId ? { ...n, data: { ...n.data, memoria: res.data.data } } : n));
+  } catch {
+    alert('Erro ao remover memória.');
+  }
+}
+
 const LISTA_CONDICOES = [
   { label: 'Caído', cor: '#8a2020' },
   { label: 'Envenenado', cor: '#4a8a20' },
@@ -1093,14 +1102,16 @@ const LISTA_CONDICOES = [
                         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">🧠 MEMÓRIA</p>
                         <div className="flex flex-col gap-2 mb-3">
                           {(d.memoria || []).length === 0 ? (
-                            <p className="text-[#3a3020] text-xs">Nenhum evento registrado ainda.</p>
-                          ) : (
-                            d.memoria.map((m, i) => (
-                              <div key={i} className="border border-[#c8a84b10] bg-[#0f0e0c] px-3 py-2">
-                                <p className="text-[#6a6050] text-xs">{m.evento}</p>
-                              </div>
-                            ))
-                          )}
+  <p className="text-[#3a3020] text-xs">Nenhum evento registrado ainda.</p>
+) : (
+  d.memoria.map((m, i) => (
+    <div key={i} className="border border-[#c8a84b10] bg-[#0f0e0c] px-3 py-2 flex items-center justify-between gap-2">
+      <p className="text-[#6a6050] text-xs flex-1">{m.evento}</p>
+      <button onClick={e => { e.stopPropagation(); removerMemoria(npc.id, i); }}
+        className="text-red-900 hover:text-red-600 text-xs transition-colors flex-shrink-0">×</button>
+    </div>
+  ))
+)}
                         </div>
                         <div className="flex gap-2">
                           <input
