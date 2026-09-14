@@ -85,6 +85,9 @@ export default function Mestre() {
   const [deletandoArte, setDeletandoArte] = useState(false);
   const [modalCondicoes, setModalCondicoes] = useState(null); 
   const [modalRevelarSegredo, setModalRevelarSegredo] = useState(null);
+  const [novaMemoria, setNovaMemoria] = useState({});
+  const [sugestaoNpc, setSugestaoNpc] = useState({});
+  const [gerandoSugestao, setGerandoSugestao] = useState(null);
 
   
 
@@ -664,6 +667,29 @@ function gerarNome() {
   setNomeGerado(nome);
 }
 
+async function adicionarMemoria(npcId) {
+  const evento = novaMemoria[npcId];
+  if (!evento?.trim()) return;
+  try {
+    const res = await api.post('/npcs/memoria', { npc_id: npcId, evento });
+    setNpcs(prev => prev.map(n => n.id === npcId ? { ...n, data: { ...n.data, memoria: res.data.data } } : n));
+    setNovaMemoria(prev => ({ ...prev, [npcId]: '' }));
+  } catch {
+    alert('Erro ao adicionar memória.');
+  }
+}
+
+async function pedirSugestao(npcId) {
+  setGerandoSugestao(npcId);
+  try {
+    const res = await api.post('/npcs/sugerir-acao', { npc_id: npcId });
+    setSugestaoNpc(prev => ({ ...prev, [npcId]: res.data.data }));
+  } catch {
+    alert('Erro ao gerar sugestão.');
+  }
+  setGerandoSugestao(null);
+}
+
 const LISTA_CONDICOES = [
   { label: 'Caído', cor: '#8a2020' },
   { label: 'Envenenado', cor: '#4a8a20' },
@@ -1061,6 +1087,47 @@ const LISTA_CONDICOES = [
                             style={{ borderRadius: '2px', lineHeight: '1.7', border: 'none', borderLeft: '2px solid rgba(180,80,40,0.3)', resize: 'vertical' }} />
                         </div>
                       ))}
+
+                      {/* MEMÓRIA DO NPC */}
+                      <div>
+                        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">🧠 MEMÓRIA</p>
+                        <div className="flex flex-col gap-2 mb-3">
+                          {(d.memoria || []).length === 0 ? (
+                            <p className="text-[#3a3020] text-xs">Nenhum evento registrado ainda.</p>
+                          ) : (
+                            d.memoria.map((m, i) => (
+                              <div key={i} className="border border-[#c8a84b10] bg-[#0f0e0c] px-3 py-2">
+                                <p className="text-[#6a6050] text-xs">{m.evento}</p>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <input
+                            value={novaMemoria[npc.id] || ''}
+                            onChange={e => setNovaMemoria(prev => ({ ...prev, [npc.id]: e.target.value }))}
+                            onClick={e => e.stopPropagation()}
+                            placeholder="Ex: jogadores mentiram sobre o preço..."
+                            className="flex-1 bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+                            style={{ borderRadius: '2px' }} />
+                          <button onClick={e => { e.stopPropagation(); adicionarMemoria(npc.id); }}
+                            className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
+                            style={{ ...cinzel, borderRadius: '2px' }}>
+                            + Add
+                          </button>
+                        </div>
+                        <button onClick={e => { e.stopPropagation(); pedirSugestao(npc.id); }}
+                          disabled={gerandoSugestao === npc.id}
+                          className="mt-3 w-full border border-[#8a4a8a40] text-[#8a4a8a] py-2 text-xs tracking-widest hover:bg-[#8a4a8a10] transition-colors disabled:opacity-50"
+                          style={{ ...cinzel, borderRadius: '2px' }}>
+                          {gerandoSugestao === npc.id ? 'Pensando...' : '💭 Sugerir Reação'}
+                        </button>
+                        {sugestaoNpc[npc.id] && (
+                          <div className="mt-3 border border-[#8a4a8a30] bg-[#8a4a8a08] p-3">
+                            <p className="text-[#e8e0d0] text-sm italic">{sugestaoNpc[npc.id]}</p>
+                          </div>
+                        )}
+                      </div>
 
                       {d.inventory && d.inventory.length > 0 && (
                         <div>
