@@ -427,7 +427,7 @@ if (!isMestre) {
 
         {/* Abas */}
         <div className="flex gap-px mb-8 border-b border-[#c8a84b15]">
-          {[{ id: 'mapas', label: '🗺 MAPAS' }, { id: 'tokens', label: '⬡ TOKENS' }].map(({ id, label }) => (
+          {[{ id: 'mapas', label: '🗺 MAPAS' }, { id: 'tokens', label: '⬡ TOKENS' }, { id: 'handouts', label: '📜 HANDOUTS' }].map(({ id, label }) => (
             <button key={id} onClick={() => { setAba(id); setCategoriaAtiva(''); }}
               className="px-6 py-3 text-xs tracking-widest transition-colors"
               style={{
