@@ -343,29 +343,40 @@ if (!isMestre) {
         ) : imagemRevelada ? (
   <div className="w-full max-w-4xl mx-auto px-4">
     <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4 text-center">O MESTRE REVELOU</p>
-    <div className="relative w-full" id="mapa-container">
-  <img 
-    src={imagemRevelada.url} 
-    alt={imagemRevelada.name}
-    className="w-full h-auto block"
-    style={{ borderRadius: '2px' }}
-  />
-  {tokensNoMapa.map(token => (
-    <img key={token.id} src={token.token_url} alt="token"
-      style={{
-        position: 'absolute',
-        left: `${token.x}%`,
-        top: `${token.y}%`,
-        width: '40px',
-        height: '40px',
-        objectFit: 'cover',
-        borderRadius: '50%',
-        transform: `translate(-50%, -50%) scale(${token.scale || 1}) rotate(${token.rotation || 0}deg)`,
-        pointerEvents: 'none',
-      }} 
-    />
-  ))}
-</div>
+    {imagemRevelada.text_content ? (
+      <div className="border border-[#c8a84b20] bg-[#161410] p-8" style={{ borderRadius: '2px' }}>
+        <p className="text-[#4a4030] text-xs mb-3 text-center" style={cinzel}>
+          {imagemRevelada.category?.toUpperCase() || 'DOCUMENTO'}
+        </p>
+        <p className="text-[#e8e0d0] text-base leading-relaxed whitespace-pre-wrap text-center italic">
+          {imagemRevelada.text_content}
+        </p>
+      </div>
+    ) : (
+      <div className="relative w-full" id="mapa-container">
+        <img 
+          src={imagemRevelada.url} 
+          alt={imagemRevelada.name}
+          className="w-full h-auto block"
+          style={{ borderRadius: '2px' }}
+        />
+        {tokensNoMapa.map(token => (
+          <img key={token.id} src={token.token_url} alt="token"
+            style={{
+              position: 'absolute',
+              left: `${token.x}%`,
+              top: `${token.y}%`,
+              width: '40px',
+              height: '40px',
+              objectFit: 'cover',
+              borderRadius: '50%',
+              transform: `translate(-50%, -50%) scale(${token.scale || 1}) rotate(${token.rotation || 0}deg)`,
+              pointerEvents: 'none',
+            }} 
+          />
+        ))}
+      </div>
+    )}
   </div>
         ) : (
           <div className="flex flex-col items-center gap-4 text-center">
