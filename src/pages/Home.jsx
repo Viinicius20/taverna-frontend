@@ -224,10 +224,19 @@ export default function Home() {
         <div className="border border-[#c8a84b20] bg-[#161410] p-8" style={{ borderRadius: '2px' }}>
           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-4 opacity-70">CENA ATUAL</p>
           {imagemRevelada ? (
-            <img src={imagemRevelada.url} alt={imagemRevelada.name}
-              className="w-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
-              style={{ borderRadius: '2px', maxHeight: '220px' }}
-              onClick={() => navigate('/galeria')} />
+            imagemRevelada.text_content ? (
+              <div className="cursor-pointer hover:opacity-90 transition-opacity" onClick={() => navigate('/galeria')}>
+                <p className="text-[#4a4030] text-xs mb-2" style={cinzel}>{imagemRevelada.category?.toUpperCase() || 'DOCUMENTO'}</p>
+                <p className="text-[#a09880] text-sm leading-relaxed line-clamp-4 italic">
+                  {imagemRevelada.text_content}
+                </p>
+              </div>
+            ) : (
+              <img src={imagemRevelada.url} alt={imagemRevelada.name}
+                className="w-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                style={{ borderRadius: '2px', maxHeight: '220px' }}
+                onClick={() => navigate('/galeria')} />
+            )
           ) : (
             <div className="flex flex-col items-center justify-center h-40 gap-3">
               <span className="text-3xl opacity-10">🗺</span>
@@ -236,7 +245,6 @@ export default function Home() {
           )}
         </div>
       </div>
-
       {/* BOATOS */}
       <div className="max-w-5xl mx-auto px-8 mb-20">
         <div className="w-16 h-px bg-[#c8a84b60] mx-auto mb-16" />
