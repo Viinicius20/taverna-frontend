@@ -140,6 +140,16 @@ export default function Galeria() {
   setGerandoHandout(false);
 }
 
+async function deletarHandout(id) {
+  if (!window.confirm('Tem certeza que deseja deletar este handout?')) return;
+  try {
+    await api.delete(`/gallery/${id}`);
+    buscarImagens();
+  } catch {
+    alert('Erro ao deletar.');
+  }
+}
+
   const mapas = imagens.filter(i => i.type === 'map');
   const tokens = imagens.filter(i => i.type === 'token');
   const categorias = [...new Set(tokens.map(t => t.category).filter(Boolean))];
@@ -612,13 +622,20 @@ if (!isMestre) {
               <span className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-2 py-0.5" style={{ borderRadius: '2px', ...cinzel }}>
                 {h.category}
               </span>
-              {!h.revealed && (
-                <button onClick={() => revelarImagem(h.id)}
-                  className="text-xs border border-[#8a5030] text-[#8a5030] px-2 py-0.5 hover:bg-[#8a503020] transition-colors"
+              <div className="flex gap-2">
+                {!h.revealed && (
+                  <button onClick={() => revelarImagem(h.id)}
+                    className="text-xs border border-[#8a5030] text-[#8a5030] px-2 py-0.5 hover:bg-[#8a503020] transition-colors"
+                    style={{ borderRadius: '2px', ...cinzel }}>
+                    REVELAR
+                  </button>
+                )}
+                <button onClick={() => deletarHandout(h.id)}
+                  className="text-xs border border-red-900 text-red-900 px-2 py-0.5 hover:bg-red-900 hover:text-white transition-colors"
                   style={{ borderRadius: '2px', ...cinzel }}>
-                  REVELAR
+                  DELETAR
                 </button>
-              )}
+              </div>
             </div>
             {h.url ? (
               <img src={h.url} alt="handout" className="w-full rounded" />
