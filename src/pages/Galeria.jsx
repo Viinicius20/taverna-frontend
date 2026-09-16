@@ -38,6 +38,9 @@ export default function Galeria() {
   const initialScaleRef = useRef(1);
   const initialDistanceRef = useRef(0);
   const [buscaToken, setBuscaToken] = useState('');
+  const [tipoHandout, setTipoHandout] = useState('carta');
+  const [descricaoHandout, setDescricaoHandout] = useState('');
+  const [gerandoHandout, setGerandoHandout] = useState(false);
 
   useEffect(() => {
   buscarImagens();
@@ -121,10 +124,27 @@ export default function Galeria() {
     } catch {}
   }
 
+  async function gerarHandout() {
+  setGerandoHandout(true);
+  try {
+    await api.post('/gallery/gerar-handout', {
+      campaign_id: CAMPANHA_ID,
+      descricao: descricaoHandout,
+      tipo_documento: tipoHandout
+    });
+    setDescricaoHandout('');
+    buscarImagens();
+  } catch {
+    alert('Erro ao gerar handout.');
+  }
+  setGerandoHandout(false);
+}
+
   const mapas = imagens.filter(i => i.type === 'map');
   const tokens = imagens.filter(i => i.type === 'token');
   const categorias = [...new Set(tokens.map(t => t.category).filter(Boolean))];
   const tokensFiltrados = categoriaAtiva ? tokens.filter(t => t.category === categoriaAtiva) : tokens;
+  const handouts = imagens.filter(i => i.type === 'handout');
 
 // ======================== FUNÇÕES DE INTERAÇÃO COM TOKENS ========================
 
@@ -543,6 +563,63 @@ if (!isMestre) {
           </>
         )}
       </div>
+
+      {/* ABA HANDOUTS */}
+      {aba === 'handouts' && (
+  <div>
+    {/* Gerar com IA */}
+    <div className="border border-[#c8a84b30] bg-[#161410] mb-6 p-6">
+      <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] block mb-2">GERAR DOCUMENTO COM IA</label>
+      <select value={tipoHandout} onChange={e => setTipoHandout(e.target.value)}
+        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full mb-3 focus:outline-none focus:border-[#c8a84b50] text-sm"
+        style={{ borderRadius: '2px' }}>
+        <option value="carta">Carta</option>
+        <option value="bilhete">Bilhete</option>
+        <option value="pergaminho">Pergaminho antigo</option>
+        <option value="mapa de tesouro">Mapa de tesouro (descrição)</option>
+      </select>
+      <textarea value={descricaoHandout} onChange={e => setDescricaoHandout(e.target.value)}
+        placeholder="Ex: uma carta de amor nunca entregue, escondida há 20 anos..."
+        rows={2}
+        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full mb-3 focus:outline-none focus:border-[#c8a84b50] resize-none text-sm"
+        style={{ borderRadius: '2px' }} />
+      <button onClick={gerarHandout} disabled={!descricaoHandout.trim() || gerandoHandout}
+        className="bg-[#c8a84b] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
+        style={{ ...cinzel, borderRadius: '2px' }}>
+        {gerandoHandout ? 'Gerando...' : 'Gerar →'}
+      </button>
+    </div>
+
+    {/* Lista */}
+    <div className="space-y-2">
+      {handouts.length === 0 ? (
+        <p className="text-[#3a3020] text-sm text-center py-8">Nenhum handout ainda.</p>
+      ) : (
+        handouts.map(h => (
+          <div key={h.id} className="border border-[#c8a84b15] bg-[#161410] p-4" style={{ borderRadius: '2px' }}>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-2 py-0.5" style={{ borderRadius: '2px', ...cinzel }}>
+                {h.category}
+              </span>
+              {!h.revealed && (
+                <button onClick={() => revelarImagem(h.id)}
+                  className="text-xs border border-[#8a5030] text-[#8a5030] px-2 py-0.5 hover:bg-[#8a503020] transition-colors"
+                  style={{ borderRadius: '2px', ...cinzel }}>
+                  REVELAR
+                </button>
+              )}
+            </div>
+            {h.url ? (
+              <img src={h.url} alt="handout" className="w-full rounded" />
+            ) : (
+              <p className="text-[#a09880] text-sm whitespace-pre-wrap leading-relaxed">{h.text_content}</p>
+            )}
+          </div>
+        ))
+      )}
+    </div>
+  </div>
+)}
 
       {/* MODO MAPA */}
 {modoMapa && mapaAtivo && (
