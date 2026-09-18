@@ -745,6 +745,10 @@ const LISTA_CONDICOES = [
   className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
   🗺 Locais
 </button>
+<button onClick={() => navigate('/mundo-vivo')}
+  className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+  🌎 Mundo Vivo
+</button>
     <button onClick={() => navigate('/')}
       className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
       ← Voltar
