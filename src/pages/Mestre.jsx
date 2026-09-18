@@ -1091,7 +1091,6 @@ const LISTA_CONDICOES = [
                       {[
   { label: '🔒 SEGREDO', campo: 'secret', placeholder: 'O que este NPC esconde dos aventureiros...', cor: '#8a5030', rows: 3 },
   { label: '👁️ VERDADE OCULTA', campo: 'master_truth', placeholder: 'A verdade por trás da aparência pública deste NPC (ex: na verdade é um espião...)', cor: '#8a5030', rows: 3 },
-  { label: 'NOTAS DO MESTRE', campo: 'notes', placeholder: 'Anotações privadas sobre este NPC...', cor: '#8a5030', rows: 4 },
 ].map(({ label, campo, placeholder, cor, rows }) => (
   <div key={campo}>
     <label style={{ ...cinzel, color: cor }} className="text-xs tracking-[2px] block mb-2">{label}</label>
