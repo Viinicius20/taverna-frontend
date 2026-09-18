@@ -1089,21 +1089,22 @@ const LISTA_CONDICOES = [
 
                       {/* CAMPOS EDITÁVEIS DO MESTRE */}
                       {[
-                        { label: '🔒 SEGREDO', campo: 'secret', placeholder: 'O que este NPC esconde dos aventureiros...', cor: '#8a5030', rows: 3 },
-                        { label: 'NOTAS DO MESTRE', campo: 'notes', placeholder: 'Anotações privadas sobre este NPC...', cor: '#8a5030', rows: 4 },
-                      ].map(({ label, campo, placeholder, cor, rows }) => (
-                        <div key={campo}>
-                          <label style={{ ...cinzel, color: cor }} className="text-xs tracking-[2px] block mb-2">{label}</label>
-                          <textarea
-                            value={getNota(npc.id, campo)}
-                            onChange={e => editarNotaLocal(npc.id, campo, e.target.value)}
-                            onClick={e => e.stopPropagation()}
-                            placeholder={placeholder}
-                            rows={rows}
-                            className="bg-[#0f0e0c] text-[#a09880] px-4 py-3 w-full focus:outline-none placeholder-[#2a2520] text-sm"
-                            style={{ borderRadius: '2px', lineHeight: '1.7', border: 'none', borderLeft: '2px solid rgba(180,80,40,0.3)', resize: 'vertical' }} />
-                        </div>
-                      ))}
+  { label: '🔒 SEGREDO', campo: 'secret', placeholder: 'O que este NPC esconde dos aventureiros...', cor: '#8a5030', rows: 3 },
+  { label: '👁️ VERDADE OCULTA', campo: 'master_truth', placeholder: 'A verdade por trás da aparência pública deste NPC (ex: na verdade é um espião...)', cor: '#8a5030', rows: 3 },
+  { label: 'NOTAS DO MESTRE', campo: 'notes', placeholder: 'Anotações privadas sobre este NPC...', cor: '#8a5030', rows: 4 },
+].map(({ label, campo, placeholder, cor, rows }) => (
+  <div key={campo}>
+    <label style={{ ...cinzel, color: cor }} className="text-xs tracking-[2px] block mb-2">{label}</label>
+    <textarea
+      value={getNota(npc.id, campo)}
+      onChange={e => editarNotaLocal(npc.id, campo, e.target.value)}
+      onClick={e => e.stopPropagation()}
+      placeholder={placeholder}
+      rows={rows}
+      className="bg-[#0f0e0c] text-[#a09880] px-4 py-3 w-full focus:outline-none placeholder-[#2a2520] text-sm"
+      style={{ borderRadius: '2px', lineHeight: '1.7', border: 'none', borderLeft: '2px solid rgba(180,80,40,0.3)', resize: 'vertical' }} />
+  </div>
+))}
 
                       {/* MEMÓRIA DO NPC */}
                       <div>
