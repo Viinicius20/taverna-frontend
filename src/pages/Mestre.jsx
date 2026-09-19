@@ -2193,6 +2193,97 @@ const LISTA_CONDICOES = [
   </div>
 </div>
 
+{/* PRESSÁGIOS */}
+<div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+  <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
+    <div>
+      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">PRESSÁGIOS</p>
+      <p className="text-[#4a4030] text-xs mt-1">Sinais do destino — revelados quando o tempo chegar</p>
+    </div>
+    <button onClick={() => setAdicionandoPresagio(!adicionandoPresagio)}
+      className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      + Adicionar
+    </button>
+  </div>
+
+  {adicionandoPresagio && (
+    <div className="px-6 py-4 border-b border-[#c8a84b15]">
+      <textarea
+        value={novoPresagio}
+        onChange={e => setNovoPresagio(e.target.value)}
+        placeholder="Ex: Uma coruja branca pousou no ombro do ferreiro na noite anterior à batalha..."
+        rows={3}
+        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b50] resize-none mb-3 text-sm"
+        style={{ borderRadius: '2px' }} />
+      <div className="flex gap-2">
+        <button
+          onClick={async () => {
+            if (!novoPresagio.trim()) return;
+            try {
+              const res = await api.post('/presagios', { texto: novoPresagio.trim() });
+              setPresagios(prev => [res.data.data, ...prev]);
+              setNovoPresagio('');
+              setAdicionandoPresagio(false);
+            } catch { alert('Erro ao adicionar presságio.'); }
+          }}
+          className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors btn-shimmer"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          Salvar
+        </button>
+        <button onClick={() => { setAdicionandoPresagio(false); setNovoPresagio(''); }}
+          className="border border-[#c8a84b20] text-[#4a4030] px-4 py-2 text-xs hover:text-[#c8a84b] transition-colors"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          Cancelar
+        </button>
+      </div>
+    </div>
+  )}
+
+  <div className="divide-y divide-[#c8a84b10]">
+    {presagios.length === 0 ? (
+      <p className="px-6 py-6 text-[#3a3020] text-sm text-center" style={cinzel}>
+        Nenhum presságio registrado.
+      </p>
+    ) : (
+      presagios.map(p => (
+        <div key={p.id} className={`px-6 py-4 flex items-start gap-4 ${p.cumprido ? 'opacity-40' : ''}`}>
+          <span className="text-lg mt-0.5">{p.cumprido ? '✓' : '🔮'}</span>
+          <p className="flex-1 text-[#a09880] text-sm leading-relaxed italic">"{p.texto}"</p>
+          <div className="flex gap-2 flex-shrink-0">
+            {!p.cumprido && (
+              <button
+                onClick={async () => {
+                  try {
+                    await api.patch(`/presagios/${p.id}/cumprir`);
+                    setPresagios(prev => prev.map(x => x.id === p.id ? { ...x, cumprido: true } : x));
+                  } catch { alert('Erro ao cumprir presságio.'); }
+                }}
+                className="text-[#4a8a4a] border border-[#4a8a4a30] px-2 py-1 text-xs hover:border-[#4a8a4a] transition-colors"
+                style={{ ...cinzel, borderRadius: '2px' }}
+                title="Marcar como cumprido">
+                ✓
+              </button>
+            )}
+            <button
+              onClick={async () => {
+                if (!window.confirm('Deletar este presságio?')) return;
+                try {
+                  await api.delete(`/presagios/${p.id}`);
+                  setPresagios(prev => prev.filter(x => x.id !== p.id));
+                } catch { alert('Erro ao deletar.'); }
+              }}
+              className="text-red-900 border border-red-900 border-opacity-30 px-2 py-1 text-xs hover:border-red-600 hover:text-red-600 transition-colors"
+              style={{ borderRadius: '2px' }}>
+              ×
+            </button>
+          </div>
+        </div>
+      ))
+    )}
+  </div>
+</div>
+
         {/* DADOS SECRETOS */}
         <div className="mt-12">
           <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
@@ -2537,97 +2628,6 @@ const LISTA_CONDICOES = [
   </div>,
   document.body
 )}
-
-{/* PRESSÁGIOS */}
-<div className="border border-[#c8a84b20] bg-[#161410] mb-6">
-  <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
-    <div>
-      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">PRESSÁGIOS</p>
-      <p className="text-[#4a4030] text-xs mt-1">Sinais do destino — revelados quando o tempo chegar</p>
-    </div>
-    <button onClick={() => setAdicionandoPresagio(!adicionandoPresagio)}
-      className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
-      style={{ ...cinzel, borderRadius: '2px' }}>
-      + Adicionar
-    </button>
-  </div>
-
-  {adicionandoPresagio && (
-    <div className="px-6 py-4 border-b border-[#c8a84b15]">
-      <textarea
-        value={novoPresagio}
-        onChange={e => setNovoPresagio(e.target.value)}
-        placeholder="Ex: Uma coruja branca pousou no ombro do ferreiro na noite anterior à batalha..."
-        rows={3}
-        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b50] resize-none mb-3 text-sm"
-        style={{ borderRadius: '2px' }} />
-      <div className="flex gap-2">
-        <button
-          onClick={async () => {
-            if (!novoPresagio.trim()) return;
-            try {
-              const res = await api.post('/presagios', { texto: novoPresagio.trim() });
-              setPresagios(prev => [res.data.data, ...prev]);
-              setNovoPresagio('');
-              setAdicionandoPresagio(false);
-            } catch { alert('Erro ao adicionar presságio.'); }
-          }}
-          className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors btn-shimmer"
-          style={{ ...cinzel, borderRadius: '2px' }}>
-          Salvar
-        </button>
-        <button onClick={() => { setAdicionandoPresagio(false); setNovoPresagio(''); }}
-          className="border border-[#c8a84b20] text-[#4a4030] px-4 py-2 text-xs hover:text-[#c8a84b] transition-colors"
-          style={{ ...cinzel, borderRadius: '2px' }}>
-          Cancelar
-        </button>
-      </div>
-    </div>
-  )}
-
-  <div className="divide-y divide-[#c8a84b10]">
-    {presagios.length === 0 ? (
-      <p className="px-6 py-6 text-[#3a3020] text-sm text-center" style={cinzel}>
-        Nenhum presságio registrado.
-      </p>
-    ) : (
-      presagios.map(p => (
-        <div key={p.id} className={`px-6 py-4 flex items-start gap-4 ${p.cumprido ? 'opacity-40' : ''}`}>
-          <span className="text-lg mt-0.5">{p.cumprido ? '✓' : '🔮'}</span>
-          <p className="flex-1 text-[#a09880] text-sm leading-relaxed italic">"{p.texto}"</p>
-          <div className="flex gap-2 flex-shrink-0">
-            {!p.cumprido && (
-              <button
-                onClick={async () => {
-                  try {
-                    await api.patch(`/presagios/${p.id}/cumprir`);
-                    setPresagios(prev => prev.map(x => x.id === p.id ? { ...x, cumprido: true } : x));
-                  } catch { alert('Erro ao cumprir presságio.'); }
-                }}
-                className="text-[#4a8a4a] border border-[#4a8a4a30] px-2 py-1 text-xs hover:border-[#4a8a4a] transition-colors"
-                style={{ ...cinzel, borderRadius: '2px' }}
-                title="Marcar como cumprido">
-                ✓
-              </button>
-            )}
-            <button
-              onClick={async () => {
-                if (!window.confirm('Deletar este presságio?')) return;
-                try {
-                  await api.delete(`/presagios/${p.id}`);
-                  setPresagios(prev => prev.filter(x => x.id !== p.id));
-                } catch { alert('Erro ao deletar.'); }
-              }}
-              className="text-red-900 border border-red-900 border-opacity-30 px-2 py-1 text-xs hover:border-red-600 hover:text-red-600 transition-colors"
-              style={{ borderRadius: '2px' }}>
-              ×
-            </button>
-          </div>
-        </div>
-      ))
-    )}
-  </div>
-</div>
 
 
       </div>
