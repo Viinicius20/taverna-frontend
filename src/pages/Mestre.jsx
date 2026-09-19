@@ -216,6 +216,10 @@ async function buscarPersonagens() {
   }
 }
 
+useEffect(() => {
+  buscarPresagios();
+}, []);
+
 async function buscarPresagios() {
   try {
     const res = await api.get('/presagios');
