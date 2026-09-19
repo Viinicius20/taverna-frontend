@@ -72,6 +72,16 @@ export default function Bestiario() {
     setMonstroDetalhes(null);
   }
 
+async function toggleDescoberto(id, atual) {
+  const novoValor = atual === false ? true : false;
+  try {
+    await api.patch(`/bestiary/${id}/descoberto`, { discovered: novoValor });
+    setMonstros(prev => prev.map(m => m.id === id ? { ...m, discovered: novoValor } : m));
+  } catch {
+    alert('Erro ao atualizar.');
+  }
+}
+
   const attrLabel = { str: 'FOR', dex: 'DES', con: 'CON', int: 'INT', wis: 'SAB', cha: 'CAR' };
 
   return (
@@ -171,13 +181,18 @@ export default function Bestiario() {
                   onClick={() => setMonstroDetalhes(monstroDetalhes?.id === m.id ? null : m)}>
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-3">
-                      <span style={cinzel} className="text-[#c8a84b] text-xs w-12">CR {m.cr}</span>
-                      <span style={cinzel} className="text-[#e8e0d0] text-sm font-bold">{m.name}</span>
-                      <span className="text-[#4a4030] text-xs">{m.size} {m.type}</span>
-                      {m.is_homebrew && (
-                        <span style={cinzel} className="text-xs border border-[#8a5030] text-[#8a5030] px-1.5 py-0.5">HOMEBREW</span>
-                      )}
-                    </div>
+  <span style={cinzel} className="text-[#c8a84b] text-xs w-12">CR {m.cr}</span>
+  <span style={cinzel} className="text-[#e8e0d0] text-sm font-bold">
+    {m.discovered === false ? '??? Criatura Desconhecida' : m.name}
+  </span>
+  <span className="text-[#4a4030] text-xs">{m.size} {m.type}</span>
+  {m.is_homebrew && (
+    <span style={cinzel} className="text-xs border border-[#8a5030] text-[#8a5030] px-1.5 py-0.5">HOMEBREW</span>
+  )}
+  {m.discovered === false && (
+    <span style={cinzel} className="text-xs border border-[#4a6a8a] text-[#4a6a8a] px-1.5 py-0.5">NÃO DESCOBERTO</span>
+  )}
+</div>
                     <div className="flex items-center gap-4 text-xs" style={cinzel}>
                       <span className="text-[#6a6050]">HP <span className="text-[#e8e0d0]">{m.hp}</span></span>
                       <span className="text-[#6a6050]">CA <span className="text-[#e8e0d0]">{m.ac}</span></span>
@@ -187,10 +202,23 @@ export default function Bestiario() {
                 </div>
 
                 {/* Detalhes expandidos */}
-                {monstroDetalhes?.id === m.id && (
-                  <div className="border border-[#c8a84b15] border-t-0 bg-[#0f0e0c] p-6 space-y-4">
-                    {/* Atributos */}
-                    {m.attributes && (
+{monstroDetalhes?.id === m.id && (
+  <div className="border border-[#c8a84b15] border-t-0 bg-[#0f0e0c] p-6 space-y-4">
+
+    {/* Toggle de descoberto */}
+    <div className="flex items-center justify-between border border-[#c8a84b15] bg-[#161410] px-4 py-3">
+      <span style={cinzel} className="text-[#4a4030] text-xs tracking-[2px]">
+        {m.discovered === false ? '👁️ OS JOGADORES AINDA NÃO CONHECEM ESTA CRIATURA' : '✓ JOGADORES JÁ CONHECEM ESTA CRIATURA'}
+      </span>
+      <button onClick={e => { e.stopPropagation(); toggleDescoberto(m.id, m.discovered); }}
+        className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
+        style={{ ...cinzel, borderRadius: '2px' }}>
+        {m.discovered === false ? 'Marcar como Descoberto' : 'Ocultar Novamente'}
+      </button>
+    </div>
+
+    {/* Atributos */}
+    {m.attributes && (
                       <div className="grid grid-cols-6 gap-2 text-center">
                         {Object.entries(m.attributes).map(([attr, val]) => (
                           <div key={attr} className="border border-[#c8a84b15] py-2">
