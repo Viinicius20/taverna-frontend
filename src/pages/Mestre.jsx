@@ -152,6 +152,18 @@ export default function Mestre() {
     setGerando(false);
   }
 
+  const [modalEnviarPresagio, setModalEnviarPresagio] = useState(null);
+
+async function enviarPresagio(presagioId, characterId) {
+  try {
+    await api.post(`/presagios/${presagioId}/enviar`, { character_id: characterId });
+    setModalEnviarPresagio(null);
+    alert('Presságio enviado!');
+  } catch {
+    alert('Erro ao enviar presságio.');
+  }
+}
+
   async function importarPdfNpc() {
     if (!pdfFile) return;
     setGerando(true);
@@ -2277,12 +2289,42 @@ const LISTA_CONDICOES = [
               style={{ borderRadius: '2px' }}>
               ×
             </button>
+            <button onClick={() => setModalEnviarPresagio(p.id)}
+              className="text-[#4a6a8a] border border-[#4a6a8a30] px-2 py-1 text-xs hover:border-[#4a6a8a] transition-colors"
+              style={{ ...cinzel, borderRadius: '2px' }}
+              title="Enviar aos jogadores">
+              📨
+            </button>
           </div>
         </div>
       ))
     )}
   </div>
 </div>
+
+{/* MODAL ENVIAR PRESSÁGIO */}
+{modalEnviarPresagio && createPortal(
+  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
+    onClick={() => setModalEnviarPresagio(null)}>
+    <div className="modal-anim bg-[#161410] border border-[#c8a84b30] max-w-sm w-full p-6" style={{ borderRadius: '2px' }}
+      onClick={e => e.stopPropagation()}>
+      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">ENVIAR PRESSÁGIO</p>
+      <button onClick={() => enviarPresagio(modalEnviarPresagio, null)}
+        className="w-full border border-[#c8a84b30] text-[#c8a84b] py-2 text-xs mb-2 hover:bg-[#c8a84b10] transition-colors"
+        style={{ ...cinzel, borderRadius: '2px' }}>
+        Enviar a Todos
+      </button>
+      {personagens.map(p => (
+        <button key={p.id} onClick={() => enviarPresagio(modalEnviarPresagio, p.id)}
+          className="w-full border border-[#c8a84b15] text-[#6a6050] py-2 text-xs mb-2 hover:border-[#c8a84b40] hover:text-[#c8a84b] transition-colors"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          {p.name}
+        </button>
+      ))}
+    </div>
+  </div>,
+  document.body
+)}
 
         {/* DADOS SECRETOS */}
         <div className="mt-12">
