@@ -107,33 +107,44 @@ export default function MundoVivo() {
         </div>
 
         {mostrarForm && (
-          <div className="border border-[#c8a84b30] bg-[#161410] mb-8 p-6 flex flex-col gap-3">
-            <input value={novoEvento.next_event_name} onChange={e => setNovoEvento(prev => ({ ...prev, next_event_name: e.target.value }))}
-  placeholder="(Opcional) Nome do evento que nasce quando este terminar"
-  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
-  style={{ borderRadius: '2px' }} />
-<textarea value={novoEvento.next_event_description} onChange={e => setNovoEvento(prev => ({ ...prev, next_event_description: e.target.value }))}
-  placeholder="(Opcional) Descrição desse próximo evento"
-  rows={2}
-  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50] resize-none"
-  style={{ borderRadius: '2px' }} />
-            <input value={novoEvento.deadline} onChange={e => setNovoEvento(prev => ({ ...prev, deadline: e.target.value }))}
-              placeholder="Prazo (opcional, ex: próxima lua cheia, 4 dias)"
-              className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
-              style={{ borderRadius: '2px' }} />
-            <textarea value={novoEvento.consequences} onChange={e => setNovoEvento(prev => ({ ...prev, consequences: e.target.value }))}
-              placeholder="O que acontece quando chegar a 100%..."
-              rows={2}
-              className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50] resize-none"
-              style={{ borderRadius: '2px' }} />
-            <button onClick={criarEvento} disabled={!novoEvento.name.trim() || criando}
-              className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
-              style={{ ...cinzel, borderRadius: '2px' }}>
-              {criando ? 'Criando...' : 'Criar Evento →'}
-            </button>
-          </div>
-        )}
+  <div className="border border-[#c8a84b30] bg-[#161410] mb-8 p-6 flex flex-col gap-3">
+    <input value={novoEvento.name} onChange={e => setNovoEvento(prev => ({ ...prev, name: e.target.value }))}
+      placeholder="Nome do evento (ex: Golpe em Valdris)"
+      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+      style={{ borderRadius: '2px' }} />
+    <textarea value={novoEvento.description} onChange={e => setNovoEvento(prev => ({ ...prev, description: e.target.value }))}
+      placeholder="Descrição do que está acontecendo..."
+      rows={2}
+      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50] resize-none"
+      style={{ borderRadius: '2px' }} />
 
+    <input value={novoEvento.next_event_name} onChange={e => setNovoEvento(prev => ({ ...prev, next_event_name: e.target.value }))}
+      placeholder="(Opcional) Nome do evento que nasce quando este terminar"
+      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+      style={{ borderRadius: '2px' }} />
+    <textarea value={novoEvento.next_event_description} onChange={e => setNovoEvento(prev => ({ ...prev, next_event_description: e.target.value }))}
+      placeholder="(Opcional) Descrição desse próximo evento"
+      rows={2}
+      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50] resize-none"
+      style={{ borderRadius: '2px' }} />
+
+    <input value={novoEvento.deadline} onChange={e => setNovoEvento(prev => ({ ...prev, deadline: e.target.value }))}
+      placeholder="Prazo (opcional, ex: próxima lua cheia, 4 dias)"
+      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+      style={{ borderRadius: '2px' }} />
+    <textarea value={novoEvento.consequences} onChange={e => setNovoEvento(prev => ({ ...prev, consequences: e.target.value }))}
+      placeholder="O que acontece quando chegar a 100%..."
+      rows={2}
+      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50] resize-none"
+      style={{ borderRadius: '2px' }} />
+
+    <button onClick={criarEvento} disabled={!novoEvento.name.trim() || criando}
+      className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-30"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      {criando ? 'Criando...' : 'Criar Evento →'}
+    </button>
+  </div>
+)}
         {carregando ? (
           <div className="flex items-center gap-3 justify-center py-16">
             <div className="w-6 h-6 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
