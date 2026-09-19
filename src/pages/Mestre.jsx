@@ -91,6 +91,7 @@ export default function Mestre() {
   const [presagios, setPresagios] = useState([]);
   const [novoPresagio, setNovoPresagio] = useState('');
   const [adicionandoPresagio, setAdicionandoPresagio] = useState(false);
+  const [drawerAberto, setDrawerAberto] = useState(false);
 
   
 
@@ -740,41 +741,23 @@ const LISTA_CONDICOES = [
   { label: 'Inconsciente', cor: '#202020' },
 ];
 
+const menuItemsMestre = [
+  { label: '🐉 Bestiário', rota: '/mestre/bestiario' },
+  { label: '🗺 Galeria', rota: '/galeria' },
+  { label: '⚔ Campanhas', rota: '/campanhas' },
+  { label: '🏛 Facções', rota: '/faccoes' },
+  { label: '📜 Narração', rota: '/mestre/descricao' },
+  { label: '🗺 Locais', rota: '/locais' },
+  { label: '🌎 Mundo Vivo', rota: '/mundo-vivo' },
+];
+
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
 
       <nav className="flex items-center justify-between px-8 py-4 border-b border-[#c8a84b20]">
   <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
     onClick={() => navigate('/')}>⚔ TAVERNA</span>
-  <div className="flex gap-6 items-center">
-    <button onClick={() => navigate('/mestre/bestiario')}
-      className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
-      🐉 Bestiário
-    </button>
-    <button onClick={() => navigate('/galeria')}
-  className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
-  🗺 Galeria
-</button>
-<button onClick={() => navigate('/campanhas')}
-  className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
-  ⚔ Campanhas
-</button>
-<button onClick={() => navigate('/faccoes')}
-  className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
-  🏛 Facções
-</button>
-<button onClick={() => navigate('/mestre/descricao')}
-  className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
-  📜 Narração
-</button>
-<button onClick={() => navigate('/locais')}
-  className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
-  🗺 Locais
-</button>
-<button onClick={() => navigate('/mundo-vivo')}
-  className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
-  🌎 Mundo Vivo
-</button>
+  <div className="flex gap-4 items-center">
     <button onClick={() => navigate('/')}
       className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
       ← Voltar
@@ -783,6 +766,14 @@ const LISTA_CONDICOES = [
       className="bg-[#c8a84b] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors"
       style={{ ...cinzel, borderRadius: '2px' }}>
       + Novo NPC
+    </button>
+    <button onClick={() => setDrawerAberto(true)}
+      className="text-[#a09880] hover:text-[#c8a84b] transition-colors p-2">
+      <div className="flex flex-col gap-1.5">
+        <span className="block w-5 h-px bg-current" />
+        <span className="block w-5 h-px bg-current" />
+        <span className="block w-5 h-px bg-current" />
+      </div>
     </button>
   </div>
 </nav>
@@ -802,6 +793,36 @@ const LISTA_CONDICOES = [
         </div>
 
         <div className="w-16 h-px bg-[#c8a84b30] mb-10" />
+
+        {/* DRAWER */}
+{drawerAberto && (
+  <div className="fixed inset-0 z-50 flex justify-end">
+    <div className="absolute inset-0 bg-black bg-opacity-60"
+      onClick={() => setDrawerAberto(false)} />
+    <div className="relative w-72 bg-[#0f0e0c] border-l border-[#c8a84b20] h-full flex flex-col"
+      style={{ animation: 'slideIn 0.2s ease' }}>
+      <div className="flex items-center justify-between px-6 py-4 border-b border-[#c8a84b20]">
+        <span style={cinzel} className="text-[#c8a84b] text-sm tracking-widest">⚔ FERRAMENTAS</span>
+        <button onClick={() => setDrawerAberto(false)}
+          className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">✕</button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto py-4">
+        {menuItemsMestre.map(({ label, rota }) => (
+          <button key={label}
+            onClick={() => { navigate(rota); setDrawerAberto(false); }}
+            className="w-full text-left px-6 py-3 text-sm hover:bg-[#161410] transition-colors flex items-center justify-between group"
+            style={cinzel}>
+            <span className="text-[#a09880] group-hover:text-[#c8a84b] transition-colors">
+              {label}
+            </span>
+            <span className="text-[#4a4030] group-hover:text-[#c8a84b] transition-colors text-xs">→</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+)}
 
         {/* FORM NOVO NPC */}
         {mostrarForm && (
