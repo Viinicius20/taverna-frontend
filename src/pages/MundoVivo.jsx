@@ -18,7 +18,7 @@ export default function MundoVivo() {
   const [eventos, setEventos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [mostrarForm, setMostrarForm] = useState(false);
-  const [novoEvento, setNovoEvento] = useState({ name: '', description: '', deadline: '', consequences: '' });
+  const [novoEvento, setNovoEvento] = useState({ name: '', description: '', deadline: '', consequences: '', next_event_name: '', next_event_description: '' });
   const [criando, setCriando] = useState(false);
   const [expandido, setExpandido] = useState(null);
 
@@ -108,15 +108,15 @@ export default function MundoVivo() {
 
         {mostrarForm && (
           <div className="border border-[#c8a84b30] bg-[#161410] mb-8 p-6 flex flex-col gap-3">
-            <input value={novoEvento.name} onChange={e => setNovoEvento(prev => ({ ...prev, name: e.target.value }))}
-              placeholder="Nome do evento (ex: Golpe em Valdris)"
-              className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
-              style={{ borderRadius: '2px' }} />
-            <textarea value={novoEvento.description} onChange={e => setNovoEvento(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="Descrição do que está acontecendo..."
-              rows={2}
-              className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50] resize-none"
-              style={{ borderRadius: '2px' }} />
+            <input value={novoEvento.next_event_name} onChange={e => setNovoEvento(prev => ({ ...prev, next_event_name: e.target.value }))}
+  placeholder="(Opcional) Nome do evento que nasce quando este terminar"
+  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+  style={{ borderRadius: '2px' }} />
+<textarea value={novoEvento.next_event_description} onChange={e => setNovoEvento(prev => ({ ...prev, next_event_description: e.target.value }))}
+  placeholder="(Opcional) Descrição desse próximo evento"
+  rows={2}
+  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50] resize-none"
+  style={{ borderRadius: '2px' }} />
             <input value={novoEvento.deadline} onChange={e => setNovoEvento(prev => ({ ...prev, deadline: e.target.value }))}
               placeholder="Prazo (opcional, ex: próxima lua cheia, 4 dias)"
               className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
@@ -158,9 +158,17 @@ export default function MundoVivo() {
                     </span>
                   </div>
                   <div className="h-1.5 bg-[#0f0e0c] rounded-full overflow-hidden">
-                    <div className="h-full transition-all" style={{ width: `${ev.progress}%`, backgroundColor: STATUS_COR[ev.status] || '#c8a84b' }} />
-                  </div>
-                  <p className="text-[#4a4030] text-xs mt-1">{ev.progress}%</p>
+  <div className="h-full transition-all" style={{ width: `${ev.progress}%`, backgroundColor: STATUS_COR[ev.status] || '#c8a84b' }} />
+</div>
+<p className="text-[#4a4030] text-xs mt-1">
+  {ev.progress}%
+  {ev.next_event_name && (
+    <span className="ml-3">
+      → {ev.triggered_event_id ? '✓ ' : ''}
+      <span style={cinzel} className="text-[#8a4a8a]">{ev.next_event_name}</span>
+    </span>
+  )}
+</p>
                 </div>
 
                 {expandido === ev.id && (
