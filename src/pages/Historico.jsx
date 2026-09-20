@@ -53,6 +53,16 @@ async function encerrarSessao() {
   setEncerrando(false);
 }
 
+async function deletarSessao(id) {
+  if (!window.confirm('Deletar esta sessão?')) return;
+  try {
+    await api.delete(`/sessions/${id}`);
+    setSessoes(prev => prev.filter(s => s.id !== id));
+  } catch {
+    alert('Erro ao deletar sessão.');
+  }
+}
+
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
       <nav className="flex items-center justify-between px-4 py-4 border-b border-[#c8a84b20]">
@@ -93,11 +103,16 @@ async function encerrarSessao() {
                     <span style={cinzel} className="text-[#e8e0d0] text-sm">{s.title}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-[#4a4030] text-xs">
-                      {new Date(s.created_at).toLocaleDateString('pt-BR')}
-                    </span>
-                    <span className="text-[#4a4030] text-xs">{expandida === s.id ? '▲' : '▼'}</span>
-                  </div>
+  <span className="text-[#4a4030] text-xs">
+    {new Date(s.created_at).toLocaleDateString('pt-BR')}
+  </span>
+  <span className="text-[#4a4030] text-xs">{expandida === s.id ? '▲' : '▼'}</span>
+  <button
+    onClick={e => { e.stopPropagation(); deletarSessao(s.id); }}
+    className="text-red-900 hover:text-red-600 text-sm transition-colors px-1">
+    ×
+  </button>
+</div>
                 </div>
                 {expandida === s.id && s.summary && (
                   <div className="px-4 pb-4 border-t border-[#c8a84b10] pt-3">
