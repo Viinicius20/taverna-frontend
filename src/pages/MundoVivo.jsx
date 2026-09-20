@@ -23,10 +23,12 @@ export default function MundoVivo() {
   const [expandido, setExpandido] = useState(null);
   const [sugestoes, setSugestoes] = useState({});
   const [gerandoSugestao, setGerandoSugestao] = useState(null);
+  const [worldLog, setWorldLog] = useState([]);
 
   useEffect(() => {
-    buscarEventos();
-  }, []);
+  buscarEventos();
+  api.get(`/world-log/${CAMPANHA_ID}`).then(res => setWorldLog(res.data.data || [])).catch(() => setWorldLog([]));
+}, []);
 
   async function buscarEventos() {
     try {
@@ -180,6 +182,27 @@ async function aprovarSugestao(evento, sugestao) {
     </button>
   </div>
 )}
+
+{worldLog.length > 0 && (
+  <div className="mt-12">
+    <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+    <p style={cinzel} className="text-[#8a4a8a] text-xs tracking-[4px] mb-2 opacity-70">CRÔNICAS OCULTAS</p>
+    <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">O Mundo Que Vocês Não Viram</h2>
+
+    <div className="space-y-2">
+      {worldLog.map(log => (
+        <div key={log.id} className="border border-[#8a4a8a15] bg-[#161410] px-4 py-3" style={{ borderRadius: '2px' }}>
+          <div className="flex items-center justify-between mb-1">
+            <span style={cinzel} className="text-[#8a4a8a] text-xs">{log.event_name}</span>
+            <span className="text-[#3a3020] text-xs">Sessão #{log.session_number}</span>
+          </div>
+          <p className="text-[#6a6050] text-sm">{log.description}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
         {carregando ? (
           <div className="flex items-center gap-3 justify-center py-16">
             <div className="w-6 h-6 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
