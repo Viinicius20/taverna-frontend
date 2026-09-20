@@ -47,6 +47,32 @@ export default function Historico() {
   setEncerrando(false);
 }
 
+async function encerrarSessao() {
+  setEncerrando(true);
+  try {
+    const res = await fetch('https://taverna-backend-eq3b.onrender.com/sessions/encerrar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ campaign_id: CAMPANHA_ID })
+    });
+    const json = await res.json();
+    if (json.success) {
+      buscarSessoes();
+      if (json.eventos_avancados?.length > 0) {
+        const resumo = json.eventos_avancados.map(e => 
+          `• ${e.name}: ${e.progress_antes}% → ${e.progress_depois}%`
+        ).join('\n');
+        alert(`🌎 O mundo avançou enquanto vocês estavam ocupados:\n\n${resumo}`);
+      }
+    } else {
+      alert(json.detail || 'Erro ao encerrar sessão');
+    }
+  } catch {
+    alert('Erro ao encerrar sessão.');
+  }
+  setEncerrando(false);
+}
+
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
       <nav className="flex items-center justify-between px-4 py-4 border-b border-[#c8a84b20]">
