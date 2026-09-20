@@ -27,26 +27,6 @@ export default function Historico() {
     setCarregando(false);
   }
 
-  async function encerrarSessao() {
-  setEncerrando(true);
-  try {
-    const res = await fetch('https://taverna-backend-eq3b.onrender.com/sessions/encerrar', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ campaign_id: CAMPANHA_ID })
-    });
-    const json = await res.json();
-    if (json.success) {
-      buscarSessoes(); // recarrega a lista com a nova sessão
-    } else {
-      alert(json.detail || 'Erro ao encerrar sessão');
-    }
-  } catch {
-    alert('Erro ao encerrar sessão.');
-  }
-  setEncerrando(false);
-}
-
 async function encerrarSessao() {
   setEncerrando(true);
   try {
