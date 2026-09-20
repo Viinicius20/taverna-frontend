@@ -21,6 +21,8 @@ export default function MundoVivo() {
   const [novoEvento, setNovoEvento] = useState({ name: '', description: '', deadline: '', consequences: '', next_event_name: '', next_event_description: '' });
   const [criando, setCriando] = useState(false);
   const [expandido, setExpandido] = useState(null);
+  const [sugestoes, setSugestoes] = useState({});
+  const [gerandoSugestao, setGerandoSugestao] = useState(null);
 
   useEffect(() => {
     buscarEventos();
@@ -81,6 +83,39 @@ export default function MundoVivo() {
       alert('Erro ao deletar.');
     }
   }
+
+async function pedirSugestaoEvento(id) {
+  setGerandoSugestao(id);
+  try {
+    const res = await api.post(`/world-events/${id}/sugerir`);
+    setSugestoes(prev => ({ ...prev, [id]: res.data.data }));
+  } catch {
+    alert('Erro ao gerar sugestão.');
+  }
+  setGerandoSugestao(null);
+}
+
+function ignorarSugestao(id) {
+  setSugestoes(prev => {
+    const novo = { ...prev };
+    delete novo[id];
+    return novo;
+  });
+}
+
+async function aprovarSugestao(evento, sugestao) {
+  try {
+    await api.post('/world-events', {
+      campaign_id: CAMPANHA_ID,
+      name: `Desdobramento: ${evento.name}`,
+      description: sugestao,
+    });
+    ignorarSugestao(evento.id);
+    buscarEventos();
+  } catch {
+    alert('Erro ao criar evento a partir da sugestão.');
+  }
+}
 
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
@@ -205,6 +240,33 @@ export default function MundoVivo() {
                         ))}
                       </div>
                     </div>
+
+                    <div>
+  <button onClick={() => pedirSugestaoEvento(ev.id)}
+    disabled={gerandoSugestao === ev.id}
+    className="w-full border border-[#8a4a8a40] text-[#8a4a8a] py-2 text-xs tracking-widest hover:bg-[#8a4a8a10] transition-colors disabled:opacity-50"
+    style={{ ...cinzel, borderRadius: '2px' }}>
+    {gerandoSugestao === ev.id ? 'Pensando...' : '💭 Sugerir Desdobramento'}
+  </button>
+
+  {sugestoes[ev.id] && (
+    <div className="mt-3 border border-[#8a4a8a30] bg-[#8a4a8a08] p-4">
+      <p className="text-[#e8e0d0] text-sm italic mb-3">{sugestoes[ev.id]}</p>
+      <div className="flex gap-2">
+        <button onClick={() => aprovarSugestao(ev, sugestoes[ev.id])}
+          className="flex-1 bg-[#8a4a8a] text-[#0f0e0c] py-1.5 text-xs font-bold hover:bg-[#a05aa0] transition-colors"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          ✓ Aprovar
+        </button>
+        <button onClick={() => ignorarSugestao(ev.id)}
+          className="flex-1 border border-[#c8a84b20] text-[#4a4030] py-1.5 text-xs hover:border-[#c8a84b40] transition-colors"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          ✕ Ignorar
+        </button>
+      </div>
+    </div>
+  )}
+</div>
 
                     <div className="flex gap-2 justify-end pt-2">
                       <button onClick={() => toggleTrava(ev.id, ev.locked_by_master)}
