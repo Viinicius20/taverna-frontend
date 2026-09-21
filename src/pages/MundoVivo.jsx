@@ -24,6 +24,10 @@ export default function MundoVivo() {
   const [sugestoes, setSugestoes] = useState({});
   const [gerandoSugestao, setGerandoSugestao] = useState(null);
   const [worldLog, setWorldLog] = useState([]);
+  const [flags, setFlags] = useState([]);
+  const [novaFlagKey, setNovaFlagKey] = useState('');
+  const [novaFlagDesc, setNovaFlagDesc] = useState('');
+  const [criandoFlag, setCriandoFlag] = useState(false);
 
   useEffect(() => {
   buscarEventos();
@@ -116,6 +120,50 @@ async function aprovarSugestao(evento, sugestao) {
     buscarEventos();
   } catch {
     alert('Erro ao criar evento a partir da sugestão.');
+  }
+}
+
+useEffect(() => {
+  buscarEventos();
+  api.get(`/world-log/${CAMPANHA_ID}`).then(res => setWorldLog(res.data.data || [])).catch(() => setWorldLog([]));
+  api.get(`/flags/${CAMPANHA_ID}`).then(res => setFlags(res.data.data || [])).catch(() => setFlags([]));
+}, []);
+
+async function criarFlag() {
+  if (!novaFlagKey.trim()) return;
+  setCriandoFlag(true);
+  try {
+    const res = await api.post('/flags', {
+      campaign_id: CAMPANHA_ID,
+      key: novaFlagKey.trim().toLowerCase().replace(/\s+/g, '_'),
+      value: false,
+      description: novaFlagDesc
+    });
+    setFlags(prev => [...prev, res.data.data]);
+    setNovaFlagKey('');
+    setNovaFlagDesc('');
+  } catch {
+    alert('Erro ao criar flag.');
+  }
+  setCriandoFlag(false);
+}
+
+async function toggleFlag(id, valorAtual) {
+  try {
+    await api.patch(`/flags/${id}`, { value: !valorAtual });
+    setFlags(prev => prev.map(f => f.id === id ? { ...f, value: !valorAtual } : f));
+  } catch {
+    alert('Erro ao atualizar flag.');
+  }
+}
+
+async function deletarFlag(id) {
+  if (!window.confirm('Deletar esta flag?')) return;
+  try {
+    await api.delete(`/flags/${id}`);
+    setFlags(prev => prev.filter(f => f.id !== id));
+  } catch {
+    alert('Erro ao deletar.');
   }
 }
 
@@ -309,6 +357,54 @@ async function aprovarSugestao(evento, sugestao) {
             ))}
           </div>
         )}
+
+        {/* FLAGS DA CAMPANHA */}
+<div className="mt-12">
+  <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+  <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
+  <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Flags</h2>
+
+  <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6 flex flex-col gap-3">
+    <input value={novaFlagKey} onChange={e => setNovaFlagKey(e.target.value)}
+      placeholder="Nome da flag (ex: rei_morto, portal_aberto)"
+      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+      style={{ borderRadius: '2px' }} />
+    <input value={novaFlagDesc} onChange={e => setNovaFlagDesc(e.target.value)}
+      placeholder="Descrição (opcional)"
+      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+      style={{ borderRadius: '2px' }} />
+    <button onClick={criarFlag} disabled={!novaFlagKey.trim() || criandoFlag}
+      className="bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] transition-colors disabled:opacity-30"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      {criandoFlag ? 'Criando...' : '+ Nova Flag'}
+    </button>
+  </div>
+
+  {flags.length === 0 ? (
+    <p className="text-[#3a3020] text-sm text-center py-6">Nenhuma flag registrada.</p>
+  ) : (
+    <div className="grid grid-cols-2 gap-2">
+      {flags.map(f => (
+        <div key={f.id} className={`border p-3 flex items-center justify-between ${f.value ? 'border-[#4a8a4a30] bg-[#4a8a4a08]' : 'border-[#c8a84b15] bg-[#161410]'}`}
+          style={{ borderRadius: '2px' }}>
+          <div>
+            <p style={cinzel} className={`text-sm ${f.value ? 'text-[#4a8a4a]' : 'text-[#6a6050]'}`}>{f.key}</p>
+            {f.description && <p className="text-[#3a3020] text-xs mt-0.5">{f.description}</p>}
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => toggleFlag(f.id, f.value)}
+              className="text-xs px-2 py-1 border transition-colors"
+              style={{ borderRadius: '2px', ...cinzel, borderColor: f.value ? '#4a8a4a' : '#c8a84b30', color: f.value ? '#4a8a4a' : '#4a4030' }}>
+              {f.value ? 'TRUE' : 'FALSE'}
+            </button>
+            <button onClick={() => deletarFlag(f.id)}
+              className="text-red-900 hover:text-red-600 text-xs transition-colors">×</button>
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
       </div>
     </div>
   );
