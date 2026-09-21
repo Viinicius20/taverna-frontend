@@ -18,7 +18,11 @@ export default function MundoVivo() {
   const [eventos, setEventos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [mostrarForm, setMostrarForm] = useState(false);
-  const [novoEvento, setNovoEvento] = useState({ name: '', description: '', deadline: '', consequences: '', next_event_name: '', next_event_description: '' });
+  const [novoEvento, setNovoEvento] = useState({ 
+  name: '', description: '', deadline: '', consequences: '', 
+  next_event_name: '', next_event_description: '',
+  affects_faction_id: '', faction_reputation_change: '', sets_flag_key: ''
+});
   const [criando, setCriando] = useState(false);
   const [expandido, setExpandido] = useState(null);
   const [sugestoes, setSugestoes] = useState({});
@@ -28,6 +32,7 @@ export default function MundoVivo() {
   const [novaFlagKey, setNovaFlagKey] = useState('');
   const [novaFlagDesc, setNovaFlagDesc] = useState('');
   const [criandoFlag, setCriandoFlag] = useState(false);
+  const [faccoes, setFaccoes] = useState([]);
 
   useEffect(() => {
   buscarEventos();
@@ -167,6 +172,13 @@ async function deletarFlag(id) {
   }
 }
 
+useEffect(() => {
+  buscarEventos();
+  api.get(`/world-log/${CAMPANHA_ID}`).then(res => setWorldLog(res.data.data || [])).catch(() => setWorldLog([]));
+  api.get(`/flags/${CAMPANHA_ID}`).then(res => setFlags(res.data.data || [])).catch(() => setFlags([]));
+  api.get(`/factions/${CAMPANHA_ID}`).then(res => setFaccoes(res.data.data || [])).catch(() => setFaccoes([]));
+}, []);
+
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
       <nav className="flex items-center justify-between px-6 py-4 border-b border-[#c8a84b20]">
@@ -212,6 +224,29 @@ async function deletarFlag(id) {
       rows={2}
       className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50] resize-none"
       style={{ borderRadius: '2px' }} />
+
+      <select value={novoEvento.affects_faction_id} onChange={e => setNovoEvento(prev => ({ ...prev, affects_faction_id: e.target.value }))}
+       className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+        style={{ borderRadius: '2px' }}>
+        <option value="">(Opcional) Afeta qual facção?</option>
+        {faccoes.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
+      </select>
+
+{novoEvento.affects_faction_id && (
+  <select value={novoEvento.faction_reputation_change} onChange={e => setNovoEvento(prev => ({ ...prev, faction_reputation_change: e.target.value }))}
+    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+    style={{ borderRadius: '2px' }}>
+    <option value="">Nova reputação ao concluir</option>
+    <option value="aliada">Aliada</option>
+    <option value="neutra">Neutra</option>
+    <option value="hostil">Hostil</option>
+  </select>
+)}
+
+<input value={novoEvento.sets_flag_key} onChange={e => setNovoEvento(prev => ({ ...prev, sets_flag_key: e.target.value }))}
+  placeholder="(Opcional) Ativa qual flag ao concluir (ex: rei_morto)"
+  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+  style={{ borderRadius: '2px' }} />
 
     <input value={novoEvento.deadline} onChange={e => setNovoEvento(prev => ({ ...prev, deadline: e.target.value }))}
       placeholder="Prazo (opcional, ex: próxima lua cheia, 4 dias)"
