@@ -243,7 +243,8 @@ useEffect(() => {
   </select>
 )}
 
-<input value={novoEvento.sets_flag_key} onChange={e => setNovoEvento(prev => ({ ...prev, sets_flag_key: e.target.value }))}
+<input value={novoEvento.sets_flag_key} 
+  onChange={e => setNovoEvento(prev => ({ ...prev, sets_flag_key: e.target.value.toLowerCase().replace(/\s+/g, '_') }))}
   placeholder="(Opcional) Ativa qual flag ao concluir (ex: rei_morto)"
   className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
   style={{ borderRadius: '2px' }} />
