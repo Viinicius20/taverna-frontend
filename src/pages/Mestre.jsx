@@ -92,6 +92,10 @@ export default function Mestre() {
   const [novoPresagio, setNovoPresagio] = useState('');
   const [adicionandoPresagio, setAdicionandoPresagio] = useState(false);
   const [drawerAberto, setDrawerAberto] = useState(false);
+  const [profecias, setProfecias] = useState([]);
+  const [novaProfeciaTexto, setNovaProfeciaTexto] = useState('');
+  const [novaProfeciaCondicao, setNovaProfeciaCondicao] = useState('');
+  const [adicionandoProfecia, setAdicionandoProfecia] = useState(false);
 
   
 
@@ -751,6 +755,17 @@ const menuItemsMestre = [
   { label: '🌎 Mundo Vivo', rota: '/mundo-vivo' },
   { label: '📂 Arquivo Secreto', rota: '/arquivo-mestre' }
 ];
+
+useEffect(() => {
+  buscarProfecias();
+}, []);
+
+async function buscarProfecias() {
+  try {
+    const res = await api.get(`/prophecies/${CAMPANHA_ID}`);
+    setProfecias(res.data.data || []);
+  } catch {}
+}
 
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
@@ -2332,6 +2347,113 @@ const menuItemsMestre = [
           </div>
         </div>
       ))
+    )}
+  </div>
+</div>
+
+{/* PROFECIAS */}
+<div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+  <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
+    <div>
+      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">PROFECIAS</p>
+      <p className="text-[#4a4030] text-xs mt-1">Condições que, uma vez cumpridas, revelam seu significado</p>
+    </div>
+    <button onClick={() => setAdicionandoProfecia(!adicionandoProfecia)}
+      className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      + Adicionar
+    </button>
+  </div>
+
+  {adicionandoProfecia && (
+    <div className="px-6 py-4 border-b border-[#c8a84b15] flex flex-col gap-3">
+      <textarea value={novaProfeciaTexto} onChange={e => setNovaProfeciaTexto(e.target.value)}
+        placeholder='Ex: "Quando o portador do Ápice derramar sangue no templo..."'
+        rows={2}
+        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b50] resize-none text-sm"
+        style={{ borderRadius: '2px' }} />
+      <input value={novaProfeciaCondicao} onChange={e => setNovaProfeciaCondicao(e.target.value)}
+        placeholder="Condição de cumprimento (só você vê, ex: Grypsi sangra no altar de Kemet-Shur)"
+        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-4 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
+        style={{ borderRadius: '2px' }} />
+      <div className="flex gap-2">
+        <button
+          onClick={async () => {
+            if (!novaProfeciaTexto.trim() || !novaProfeciaCondicao.trim()) return;
+            try {
+              const res = await api.post('/prophecies', {
+                campaign_id: CAMPANHA_ID,
+                texto: novaProfeciaTexto.trim(),
+                condicao: novaProfeciaCondicao.trim()
+              });
+              setProfecias(prev => [res.data.data, ...prev]);
+              setNovaProfeciaTexto('');
+              setNovaProfeciaCondicao('');
+              setAdicionandoProfecia(false);
+            } catch { alert('Erro ao adicionar profecia.'); }
+          }}
+          className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          Salvar
+        </button>
+        <button onClick={() => { setAdicionandoProfecia(false); setNovaProfeciaTexto(''); setNovaProfeciaCondicao(''); }}
+          className="border border-[#c8a84b20] text-[#4a4030] px-4 py-2 text-xs hover:text-[#c8a84b] transition-colors"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          Cancelar
+        </button>
+      </div>
+    </div>
+  )}
+
+  <div className="divide-y divide-[#c8a84b10]">
+    {profecias.length === 0 ? (
+      <p className="px-6 py-6 text-[#3a3020] text-sm text-center" style={cinzel}>
+        Nenhuma profecia registrada.
+      </p>
+    ) : (
+      profecias.map(p => {
+        const STATUS_COR = { pendente: '#8a4a8a', parcial: '#8a7020', cumprida: '#4a8a4a' };
+        return (
+          <div key={p.id} className="px-6 py-4">
+            <div className="flex items-start justify-between gap-4">
+              <p className="flex-1 text-[#a09880] text-sm leading-relaxed italic">"{p.texto}"</p>
+              <button
+                onClick={async () => {
+                  if (!window.confirm('Deletar esta profecia?')) return;
+                  try {
+                    await api.delete(`/prophecies/${p.id}`);
+                    setProfecias(prev => prev.filter(x => x.id !== p.id));
+                  } catch { alert('Erro ao deletar.'); }
+                }}
+                className="text-red-900 border border-red-900 border-opacity-30 px-2 py-1 text-xs hover:border-red-600 hover:text-red-600 transition-colors flex-shrink-0"
+                style={{ borderRadius: '2px' }}>
+                ×
+              </button>
+            </div>
+            <div className="flex items-center gap-2 mt-3">
+              {['pendente', 'parcial', 'cumprida'].map(status => (
+                <button key={status}
+                  onClick={async () => {
+                    try {
+                      await api.patch(`/prophecies/${p.id}`, { status });
+                      setProfecias(prev => prev.map(x => x.id === p.id ? { ...x, status } : x));
+                    } catch { alert('Erro ao atualizar.'); }
+                  }}
+                  className="px-2 py-1 text-xs border transition-all"
+                  style={{
+                    borderRadius: '2px', ...cinzel,
+                    borderColor: p.status === status ? STATUS_COR[status] : '#c8a84b15',
+                    backgroundColor: p.status === status ? `${STATUS_COR[status]}20` : 'transparent',
+                    color: p.status === status ? STATUS_COR[status] : '#4a4030',
+                  }}>
+                  {status.toUpperCase()}
+                </button>
+              ))}
+              <span className="text-[#3a3020] text-xs ml-2" title="Só você vê">🔒 {p.condicao}</span>
+            </div>
+          </div>
+        );
+      })
     )}
   </div>
 </div>
