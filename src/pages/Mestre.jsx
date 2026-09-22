@@ -1136,9 +1136,9 @@ const menuItemsMestre = [
                       ) : null)}
 
                       {/* CAMPOS EDITÁVEIS DO MESTRE */}
-                      {[
+{[
   { label: '🔒 SEGREDO', campo: 'secret', placeholder: 'O que este NPC esconde dos aventureiros...', cor: '#8a5030', rows: 3 },
-  { label: '👁️ VERDADE OCULTA', campo: 'master_truth', placeholder: 'A verdade por trás da aparência pública deste NPC (ex: na verdade é um espião...)', cor: '#8a5030', rows: 3 },
+  { label: 'NOTAS DO MESTRE', campo: 'notes', placeholder: 'Anotações privadas sobre este NPC...', cor: '#8a5030', rows: 4 },
 ].map(({ label, campo, placeholder, cor, rows }) => (
   <div key={campo}>
     <label style={{ ...cinzel, color: cor }} className="text-xs tracking-[2px] block mb-2">{label}</label>
@@ -1152,6 +1152,18 @@ const menuItemsMestre = [
       style={{ borderRadius: '2px', lineHeight: '1.7', border: 'none', borderLeft: '2px solid rgba(180,80,40,0.3)', resize: 'vertical' }} />
   </div>
 ))}
+
+{/* LOCAL ATUAL */}
+<div>
+  <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">📍 LOCAL ATUAL</label>
+  <input
+    value={getNota(npc.id, 'location')}
+    onChange={e => editarNotaLocal(npc.id, 'location', e.target.value)}
+    onClick={e => e.stopPropagation()}
+    placeholder="Ex: Porto de Valdris"
+    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
+    style={{ borderRadius: '2px' }} />
+</div>
 
                       {/* MEMÓRIA DO NPC */}
                       <div>
