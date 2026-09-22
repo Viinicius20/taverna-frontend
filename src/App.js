@@ -17,6 +17,7 @@ import Facoes from './pages/Facoes';
 import DescricaoContextual from './pages/DescricaoContextual';
 import Locais from './pages/Locais';
 import MundoVivo from './pages/MundoVivo';
+import ArquivoMestre from './pages/ArquivoMestre';
 
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
           <Route path="/mestre/descricao" element={<DescricaoContextual />} />
           <Route path="/locais" element={<Locais />} />
           <Route path="/mundo-vivo" element={<MundoVivo />} />
+          <Route path="/arquivo-mestre" element={<ArquivoMestre />} />
         </Routes>
       </BrowserRouter>
     </UserProvider>
