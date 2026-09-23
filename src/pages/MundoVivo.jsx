@@ -39,6 +39,8 @@ export default function MundoVivo() {
   modificadores: { comida: 1, armas: 1, viagem: 1, comercio: 1 },
   });
   const [criandoEventoRegional, setCriandoEventoRegional] = useState(false);
+  const [precos, setPrecos] = useState([]);
+  const [eventoExpandido, setEventoExpandido] = useState(null);
  
   const [locais, setLocais] = useState([]);
   const [viagens, setViagens] = useState([]);
@@ -253,6 +255,7 @@ useEffect(() => {
   api.get(`/economia/eventos-campanha/${CAMPANHA_ID}`).then(res => setEventosRegionais(res.data.data || [])).catch(() => setEventosRegionais([]));
   api.get(`/viagem/locais/${CAMPANHA_ID}`).then(res => setLocais(res.data.data || [])).catch(() => setLocais([]));
   api.get(`/viagem/campanha/${CAMPANHA_ID}`).then(res => setViagens(res.data.data || [])).catch(() => setViagens([]));
+  api.get(`/economia/precos/${CAMPANHA_ID}`).then(res => setPrecos(res.data.data || [])).catch(() => setPrecos([]));
 }, []);
 
   return (
@@ -567,21 +570,43 @@ useEffect(() => {
   ) : (
     <div className="grid grid-cols-2 gap-2">
       {eventosRegionais.map(ev => (
-        <div key={ev.id} className={`border p-3 flex items-center justify-between ${ev.ativo ? 'border-[#c8a84b30] bg-[#c8a84b08]' : 'border-[#c8a84b15] bg-[#161410]'}`}
-          style={{ borderRadius: '2px' }}>
-          <div>
-            <p style={cinzel} className={`text-sm ${ev.ativo ? 'text-[#c8a84b]' : 'text-[#6a6050]'}`}>{ev.regiao} — {ev.tipo_evento}</p>
-            <p className="text-[#3a3020] text-xs mt-0.5">{ev.motivo}</p>
-            <p className="text-[#4a4030] text-xs mt-0.5">
-              {Object.entries(ev.modificadores).map(([k, v]) => `${k}: x${v}`).join(' · ')}
-            </p>
-          </div>
-          {ev.ativo && (
-            <button onClick={() => encerrarEventoRegional(ev.id)}
-              className="text-red-900 hover:text-red-600 text-xs transition-colors">×</button>
-          )}
-        </div>
-      ))}
+  <div key={ev.id}
+    onClick={() => setEventoExpandido(prev => prev === ev.id ? null : ev.id)}
+    className={`border p-3 cursor-pointer ${ev.ativo ? 'border-[#c8a84b30] bg-[#c8a84b08]' : 'border-[#c8a84b15] bg-[#161410]'}`}
+    style={{ borderRadius: '2px' }}>
+    <div className="flex items-center justify-between">
+      <div>
+        <p style={cinzel} className={`text-sm ${ev.ativo ? 'text-[#c8a84b]' : 'text-[#6a6050]'}`}>{ev.regiao} — {ev.tipo_evento}</p>
+        <p className="text-[#3a3020] text-xs mt-0.5">{ev.motivo}</p>
+      </div>
+      {ev.ativo && (
+        <button onClick={(e) => { e.stopPropagation(); encerrarEventoRegional(ev.id); }}
+          className="text-red-900 hover:text-red-600 text-xs transition-colors">×</button>
+      )}
+    </div>
+
+    {eventoExpandido === ev.id && (
+      <div className="mt-3 border-t border-[#c8a84b15] pt-3 flex flex-col gap-1">
+        {precos.filter(p => ev.modificadores[p.categoria]).map(p => {
+          const mod = ev.modificadores[p.categoria];
+          const precoNovo = (p.preco_base * mod).toFixed(2);
+          return (
+            <div key={p.id} className="flex items-center justify-between text-xs">
+              <span className="text-[#6a6050]">{p.nome_item}</span>
+              <span>
+                <span className="text-[#3a3020] line-through mr-2">{p.preco_base} {p.moeda}</span>
+                <span className={mod > 1 ? 'text-red-600' : 'text-green-600'}>{precoNovo} {p.moeda}</span>
+              </span>
+            </div>
+          );
+        })}
+        {precos.filter(p => ev.modificadores[p.categoria]).length === 0 && (
+          <p className="text-[#3a3020] text-xs">Nenhum preço cadastrado nessa categoria.</p>
+        )}
+      </div>
+    )}
+  </div>
+))}
     </div>
   )}
 </div>
