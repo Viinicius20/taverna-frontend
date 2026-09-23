@@ -33,6 +33,19 @@ export default function MundoVivo() {
   const [novaFlagDesc, setNovaFlagDesc] = useState('');
   const [criandoFlag, setCriandoFlag] = useState(false);
   const [faccoes, setFaccoes] = useState([]);
+  const [eventosRegionais, setEventosRegionais] = useState([]);
+  const [novoEventoRegional, setNovoEventoRegional] = useState({
+  regiao: '', tipo_evento: '', motivo: '',
+  modificadores: { comida: 1, armas: 1, viagem: 1, comercio: 1 },
+  });
+  const [mostrarFormEconomia, setMostrarFormEconomia] = useState(false);
+  const [criandoEventoRegional, setCriandoEventoRegional] = useState(false);
+ 
+  const [cidades, setCidades] = useState([]);
+  const [viagens, setViagens] = useState([]);
+  const [novaViagem, setNovaViagem] = useState({ cidade_origem_id: '', cidade_destino_id: '' });
+  const [iniciandoViagem, setIniciandoViagem] = useState(false);
+  const [avancandoDia, setAvancandoDia] = useState(null);
 
   useEffect(() => {
   buscarEventos();
@@ -172,11 +185,62 @@ async function deletarFlag(id) {
   }
 }
 
+async function criarEventoRegional() {
+  if (!novoEventoRegional.regiao.trim() || !novoEventoRegional.motivo.trim()) return;
+  setCriandoEventoRegional(true);
+  try {
+    const res = await api.post('/economia/eventos', { campaign_id: CAMPANHA_ID, ...novoEventoRegional });
+    setEventosRegionais(prev => [res.data, ...prev]);
+    setNovoEventoRegional({ regiao: '', tipo_evento: '', motivo: '', modificadores: { comida: 1, armas: 1, viagem: 1, comercio: 1 } });
+    setMostrarFormEconomia(false);
+  } catch {
+    alert('Erro ao criar evento regional.');
+  }
+  setCriandoEventoRegional(false);
+}
+ 
+async function encerrarEventoRegional(id) {
+  try {
+    await api.patch(`/economia/eventos/${id}/encerrar`);
+    setEventosRegionais(prev => prev.map(e => e.id === id ? { ...e, ativo: false } : e));
+  } catch {
+    alert('Erro ao encerrar evento.');
+  }
+}
+ 
+async function iniciarViagem() {
+  if (!novaViagem.cidade_origem_id || !novaViagem.cidade_destino_id) return;
+  setIniciandoViagem(true);
+  try {
+    const res = await api.post('/viagem/iniciar', { campaign_id: CAMPANHA_ID, ...novaViagem });
+    setViagens(prev => [res.data, ...prev]);
+    setNovaViagem({ cidade_origem_id: '', cidade_destino_id: '' });
+  } catch {
+    alert('Erro ao iniciar viagem.');
+  }
+  setIniciandoViagem(false);
+}
+ 
+async function avancarDiaViagem(id) {
+  setAvancandoDia(id);
+  try {
+    const res = await api.post(`/viagem/${id}/avancar`);
+    setViagens(prev => prev.map(v => v.id === id ? res.data : v));
+  } catch {
+    alert('Erro ao avançar viagem.');
+  }
+  setAvancandoDia(null);
+}
+ 
+
 useEffect(() => {
   buscarEventos();
   api.get(`/world-log/${CAMPANHA_ID}`).then(res => setWorldLog(res.data.data || [])).catch(() => setWorldLog([]));
   api.get(`/flags/${CAMPANHA_ID}`).then(res => setFlags(res.data.data || [])).catch(() => setFlags([]));
   api.get(`/factions/${CAMPANHA_ID}`).then(res => setFaccoes(res.data.data || [])).catch(() => setFaccoes([]));
+  api.get(`/economia/eventos-campanha/${CAMPANHA_ID}`).then(res => setEventosRegionais(res.data.data || [])).catch(() => setEventosRegionais([]));
+  api.get(`/viagem/cidades/${CAMPANHA_ID}`).then(res => setCidades(res.data.data || [])).catch(() => setCidades([]));
+  api.get(`/viagem/campanha/${CAMPANHA_ID}`).then(res => setViagens(res.data.data || [])).catch(() => setViagens([]));
 }, []);
 
   return (
@@ -440,6 +504,107 @@ useEffect(() => {
       ))}
     </div>
   )}
+</div>
+
+{/* --- SEÇÃO: ECONOMIA VIVA --- */}
+<div style={{ marginTop: 32 }}>
+  <h2 style={{ ...cinzel, color: '#c8a84b', fontSize: 22 }}>💰 Economia Viva</h2>
+ 
+  {eventosRegionais.map(ev => (
+    <div key={ev.id} style={{
+      border: `1px solid ${ev.ativo ? '#c8a84b' : '#6a6050'}`,
+      borderRadius: 8, padding: 12, marginBottom: 8, opacity: ev.ativo ? 1 : 0.5,
+    }}>
+      <div style={{ ...crimson, fontWeight: 'bold' }}>{ev.regiao} — {ev.tipo_evento}</div>
+      <div style={crimson}>{ev.motivo}</div>
+      <div style={{ ...crimson, fontSize: 13, color: '#999' }}>
+        {Object.entries(ev.modificadores).map(([k, v]) => `${k}: x${v}`).join(' · ')}
+      </div>
+      {ev.ativo && (
+        <button onClick={() => encerrarEventoRegional(ev.id)} style={{ marginTop: 6 }}>
+          Encerrar evento
+        </button>
+      )}
+    </div>
+  ))}
+ 
+  {mostrarFormEconomia ? (
+    <div style={{ border: '1px solid #c8a84b', borderRadius: 8, padding: 12 }}>
+      <input placeholder="Região" value={novoEventoRegional.regiao}
+        onChange={e => setNovoEventoRegional(prev => ({ ...prev, regiao: e.target.value }))} />
+      <input placeholder="Tipo (guerra, peste...)" value={novoEventoRegional.tipo_evento}
+        onChange={e => setNovoEventoRegional(prev => ({ ...prev, tipo_evento: e.target.value }))} />
+      <input placeholder="Motivo (ex: Guerra regional)" value={novoEventoRegional.motivo}
+        onChange={e => setNovoEventoRegional(prev => ({ ...prev, motivo: e.target.value }))} />
+      {/* modificadores: simplificado com 4 inputs numéricos */}
+      {['comida', 'armas', 'viagem', 'comercio'].map(campo => (
+        <label key={campo} style={{ display: 'block', marginTop: 4 }}>
+          {campo}:
+          <input type="number" step="0.1" value={novoEventoRegional.modificadores[campo]}
+            onChange={e => setNovoEventoRegional(prev => ({
+              ...prev, modificadores: { ...prev.modificadores, [campo]: parseFloat(e.target.value) }
+            }))} />
+        </label>
+      ))}
+      <button disabled={criandoEventoRegional} onClick={criarEventoRegional} style={{ marginTop: 8 }}>
+        {criandoEventoRegional ? 'Criando...' : 'Criar evento'}
+      </button>
+      <button onClick={() => setMostrarFormEconomia(false)}>Cancelar</button>
+    </div>
+  ) : (
+    <button onClick={() => setMostrarFormEconomia(true)}>+ Novo evento regional</button>
+  )}
+</div>
+ 
+{/* --- SEÇÃO: VIAGEM COMO SISTEMA --- */}
+<div style={{ marginTop: 32 }}>
+  <h2 style={{ ...cinzel, color: '#c8a84b', fontSize: 22 }}>🧭 Viagem</h2>
+ 
+  <div style={{ marginBottom: 16 }}>
+    <select value={novaViagem.cidade_origem_id}
+      onChange={e => setNovaViagem(prev => ({ ...prev, cidade_origem_id: e.target.value }))}>
+      <option value="">Origem</option>
+      {cidades.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+    </select>
+    <select value={novaViagem.cidade_destino_id}
+      onChange={e => setNovaViagem(prev => ({ ...prev, cidade_destino_id: e.target.value }))}>
+      <option value="">Destino</option>
+      {cidades.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+    </select>
+    <button disabled={iniciandoViagem} onClick={iniciarViagem}>
+      {iniciandoViagem ? 'Calculando...' : 'Iniciar viagem'}
+    </button>
+  </div>
+ 
+  {viagens.map(v => (
+    <div key={v.id} style={{
+      border: `1px solid ${STATUS_COR[v.status] || '#6a6050'}`,
+      borderRadius: 8, padding: 12, marginBottom: 8,
+    }}>
+      <div style={{ ...crimson, fontWeight: 'bold' }}>
+        {v.cidade_origem_id?.nome || '?'} → {v.cidade_destino_id?.nome || '?'}
+      </div>
+      <div style={crimson}>
+        Dia {v.dia_atual}/{v.tempo_estimado_dias} · Clima: {v.clima} · Status: {v.status}
+      </div>
+ 
+      {v.eventos?.length > 0 && (
+        <div style={{ marginTop: 6 }}>
+          {v.eventos.map((ev, i) => (
+            <div key={i} style={{ ...crimson, fontSize: 13, color: '#c8a84b' }}>
+              ⚠️ Dia {ev.dia}: {ev.descricao}
+            </div>
+          ))}
+        </div>
+      )}
+ 
+      {v.status === 'em_andamento' && (
+        <button disabled={avancandoDia === v.id} onClick={() => avancarDiaViagem(v.id)} style={{ marginTop: 6 }}>
+          {avancandoDia === v.id ? 'Avançando...' : 'Avançar 1 dia'}
+        </button>
+      )}
+    </div>
+  ))}
 </div>
       </div>
     </div>
