@@ -128,6 +128,16 @@ function ignorarSugestao(id) {
   });
 }
 
+async function deletarEventoRegional(id) {
+  if (!window.confirm('Deletar este evento?')) return;
+  try {
+    await api.delete(`/economia/eventos/${id}`);
+    setEventosRegionais(prev => prev.filter(e => e.id !== id));
+  } catch {
+    alert('Erro ao deletar evento.');
+  }
+}
+
 async function aprovarSugestao(evento, sugestao) {
   try {
     await api.post('/world-events', {
@@ -579,10 +589,14 @@ useEffect(() => {
         <p style={cinzel} className={`text-sm ${ev.ativo ? 'text-[#c8a84b]' : 'text-[#6a6050]'}`}>{ev.regiao} — {ev.tipo_evento}</p>
         <p className="text-[#3a3020] text-xs mt-0.5">{ev.motivo}</p>
       </div>
-      {ev.ativo && (
-        <button onClick={(e) => { e.stopPropagation(); encerrarEventoRegional(ev.id); }}
-          className="text-red-900 hover:text-red-600 text-xs transition-colors">×</button>
-      )}
+      <div className="flex items-center gap-2">
+  {ev.ativo && (
+    <button onClick={(e) => { e.stopPropagation(); encerrarEventoRegional(ev.id); }}
+      className="text-xs text-[#c8a84b] hover:text-[#e8c76a] transition-colors">Encerrar</button>
+  )}
+  <button onClick={(e) => { e.stopPropagation(); deletarEventoRegional(ev.id); }}
+    className="text-red-900 hover:text-red-600 text-xs transition-colors">×</button>
+</div>
     </div>
 
     {eventoExpandido === ev.id && (
