@@ -233,6 +233,16 @@ async function avancarDiaViagem(id) {
   }
   setAvancandoDia(null);
 }
+
+async function deletarViagem(id) {
+  if (!window.confirm('Deletar esta viagem?')) return;
+  try {
+    await api.delete(`/viagem/${id}`);
+    setViagens(prev => prev.filter(v => v.id !== id));
+  } catch {
+    alert('Erro ao deletar viagem.');
+  }
+}
  
 
 useEffect(() => {
@@ -616,6 +626,18 @@ useEffect(() => {
       style={{ ...cinzel, borderRadius: '2px' }}>
       {iniciandoViagem ? 'Calculando...' : 'Iniciar Viagem'}
     </button>
+    <div className="flex items-center justify-between">
+  <p style={cinzel} className="text-[#e8e0d0] text-sm">
+    {v.origem?.name || '?'} → {v.destino?.name || '?'}
+  </p>
+  <div className="flex items-center gap-2">
+    <p style={{ color: STATUS_COR[v.status] || '#6a6050' }} className="text-xs uppercase tracking-wider">
+      {v.status}
+    </p>
+    <button onClick={() => deletarViagem(v.id)}
+      className="text-red-900 hover:text-red-600 text-xs transition-colors">×</button>
+  </div>
+</div>
   </div>
   {viagens.length === 0 ? (
     <p className="text-[#3a3020] text-sm text-center py-6">Nenhuma viagem registrada.</p>
@@ -626,7 +648,7 @@ useEffect(() => {
           style={{ borderRadius: '2px' }}>
           <div className="flex items-center justify-between">
             <p style={cinzel} className="text-[#e8e0d0] text-sm">
-              {v.cidade_origem_id?.nome || '?'} → {v.cidade_destino_id?.nome || '?'}
+              {v.origem?.name || '?'} → {v.destino?.name || '?'}
             </p>
             <p style={{ color: STATUS_COR[v.status] || '#6a6050' }} className="text-xs uppercase tracking-wider">
               {v.status}
