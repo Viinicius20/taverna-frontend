@@ -191,7 +191,6 @@ async function criarEventoRegional() {
     const res = await api.post('/economia/eventos', { campaign_id: CAMPANHA_ID, ...novoEventoRegional });
     setEventosRegionais(prev => [res.data, ...prev]);
     setNovoEventoRegional({ regiao: '', tipo_evento: '', motivo: '', modificadores: { comida: 1, armas: 1, viagem: 1, comercio: 1 } });
-    setMostrarFormEconomia(false);
   } catch {
     alert('Erro ao criar evento regional.');
   }
