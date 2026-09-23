@@ -506,105 +506,142 @@ useEffect(() => {
   )}
 </div>
 
-{/* --- SEÇÃO: ECONOMIA VIVA --- */}
-<div style={{ marginTop: 32 }}>
-  <h2 style={{ ...cinzel, color: '#c8a84b', fontSize: 22 }}>💰 Economia Viva</h2>
+{/* ECONOMIA VIVA */}
+<div className="mt-12">
+  <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+  <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
+  <h2 style={cinzel} className="text-xl text-[#c8a84b] font-semibold mb-6">💰 Economia Viva</h2>
  
-  {eventosRegionais.map(ev => (
-    <div key={ev.id} style={{
-      border: `1px solid ${ev.ativo ? '#c8a84b' : '#6a6050'}`,
-      borderRadius: 8, padding: 12, marginBottom: 8, opacity: ev.ativo ? 1 : 0.5,
-    }}>
-      <div style={{ ...crimson, fontWeight: 'bold' }}>{ev.regiao} — {ev.tipo_evento}</div>
-      <div style={crimson}>{ev.motivo}</div>
-      <div style={{ ...crimson, fontSize: 13, color: '#999' }}>
-        {Object.entries(ev.modificadores).map(([k, v]) => `${k}: x${v}`).join(' · ')}
-      </div>
-      {ev.ativo && (
-        <button onClick={() => encerrarEventoRegional(ev.id)} style={{ marginTop: 6 }}>
-          Encerrar evento
-        </button>
-      )}
-    </div>
-  ))}
+  <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6 flex flex-col gap-3">
+    <input value={novoEventoRegional.regiao}
+      onChange={e => setNovoEventoRegional(prev => ({ ...prev, regiao: e.target.value }))}
+      placeholder="Região"
+      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+      style={{ borderRadius: '2px' }} />
+    <input value={novoEventoRegional.tipo_evento}
+      onChange={e => setNovoEventoRegional(prev => ({ ...prev, tipo_evento: e.target.value }))}
+      placeholder="Tipo (guerra, peste...)"
+      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+      style={{ borderRadius: '2px' }} />
+    <input value={novoEventoRegional.motivo}
+      onChange={e => setNovoEventoRegional(prev => ({ ...prev, motivo: e.target.value }))}
+      placeholder="Motivo (ex: Guerra regional)"
+      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+      style={{ borderRadius: '2px' }} />
  
-  {mostrarFormEconomia ? (
-    <div style={{ border: '1px solid #c8a84b', borderRadius: 8, padding: 12 }}>
-      <input placeholder="Região" value={novoEventoRegional.regiao}
-        onChange={e => setNovoEventoRegional(prev => ({ ...prev, regiao: e.target.value }))} />
-      <input placeholder="Tipo (guerra, peste...)" value={novoEventoRegional.tipo_evento}
-        onChange={e => setNovoEventoRegional(prev => ({ ...prev, tipo_evento: e.target.value }))} />
-      <input placeholder="Motivo (ex: Guerra regional)" value={novoEventoRegional.motivo}
-        onChange={e => setNovoEventoRegional(prev => ({ ...prev, motivo: e.target.value }))} />
-      {/* modificadores: simplificado com 4 inputs numéricos */}
+    <div className="grid grid-cols-2 gap-3">
       {['comida', 'armas', 'viagem', 'comercio'].map(campo => (
-        <label key={campo} style={{ display: 'block', marginTop: 4 }}>
-          {campo}:
+        <label key={campo} className="flex items-center gap-2 text-[#6a6050] text-xs">
+          {campo}
           <input type="number" step="0.1" value={novoEventoRegional.modificadores[campo]}
             onChange={e => setNovoEventoRegional(prev => ({
               ...prev, modificadores: { ...prev.modificadores, [campo]: parseFloat(e.target.value) }
-            }))} />
+            }))}
+            className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-2 py-1 text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
+            style={{ borderRadius: '2px' }} />
         </label>
       ))}
-      <button disabled={criandoEventoRegional} onClick={criarEventoRegional} style={{ marginTop: 8 }}>
-        {criandoEventoRegional ? 'Criando...' : 'Criar evento'}
-      </button>
-      <button onClick={() => setMostrarFormEconomia(false)}>Cancelar</button>
     </div>
-  ) : (
-    <button onClick={() => setMostrarFormEconomia(true)}>+ Novo evento regional</button>
-  )}
-</div>
  
-{/* --- SEÇÃO: VIAGEM COMO SISTEMA --- */}
-<div style={{ marginTop: 32 }}>
-  <h2 style={{ ...cinzel, color: '#c8a84b', fontSize: 22 }}>🧭 Viagem</h2>
- 
-  <div style={{ marginBottom: 16 }}>
-    <select value={novaViagem.cidade_origem_id}
-      onChange={e => setNovaViagem(prev => ({ ...prev, cidade_origem_id: e.target.value }))}>
-      <option value="">Origem</option>
-      {cidades.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
-    </select>
-    <select value={novaViagem.cidade_destino_id}
-      onChange={e => setNovaViagem(prev => ({ ...prev, cidade_destino_id: e.target.value }))}>
-      <option value="">Destino</option>
-      {cidades.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
-    </select>
-    <button disabled={iniciandoViagem} onClick={iniciarViagem}>
-      {iniciandoViagem ? 'Calculando...' : 'Iniciar viagem'}
+    <button onClick={criarEventoRegional} disabled={!novoEventoRegional.regiao.trim() || !novoEventoRegional.motivo.trim() || criandoEventoRegional}
+      className="bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] transition-colors disabled:opacity-30"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      {criandoEventoRegional ? 'Criando...' : '+ Criar Evento'}
     </button>
   </div>
  
-  {viagens.map(v => (
-    <div key={v.id} style={{
-      border: `1px solid ${STATUS_COR[v.status] || '#6a6050'}`,
-      borderRadius: 8, padding: 12, marginBottom: 8,
-    }}>
-      <div style={{ ...crimson, fontWeight: 'bold' }}>
-        {v.cidade_origem_id?.nome || '?'} → {v.cidade_destino_id?.nome || '?'}
-      </div>
-      <div style={crimson}>
-        Dia {v.dia_atual}/{v.tempo_estimado_dias} · Clima: {v.clima} · Status: {v.status}
-      </div>
- 
-      {v.eventos?.length > 0 && (
-        <div style={{ marginTop: 6 }}>
-          {v.eventos.map((ev, i) => (
-            <div key={i} style={{ ...crimson, fontSize: 13, color: '#c8a84b' }}>
-              ⚠️ Dia {ev.dia}: {ev.descricao}
-            </div>
-          ))}
+  {eventosRegionais.length === 0 ? (
+    <p className="text-[#3a3020] text-sm text-center py-6">Nenhum evento regional registrado.</p>
+  ) : (
+    <div className="grid grid-cols-2 gap-2">
+      {eventosRegionais.map(ev => (
+        <div key={ev.id} className={`border p-3 flex items-center justify-between ${ev.ativo ? 'border-[#c8a84b30] bg-[#c8a84b08]' : 'border-[#c8a84b15] bg-[#161410]'}`}
+          style={{ borderRadius: '2px' }}>
+          <div>
+            <p style={cinzel} className={`text-sm ${ev.ativo ? 'text-[#c8a84b]' : 'text-[#6a6050]'}`}>{ev.regiao} — {ev.tipo_evento}</p>
+            <p className="text-[#3a3020] text-xs mt-0.5">{ev.motivo}</p>
+            <p className="text-[#4a4030] text-xs mt-0.5">
+              {Object.entries(ev.modificadores).map(([k, v]) => `${k}: x${v}`).join(' · ')}
+            </p>
+          </div>
+          {ev.ativo && (
+            <button onClick={() => encerrarEventoRegional(ev.id)}
+              className="text-red-900 hover:text-red-600 text-xs transition-colors">×</button>
+          )}
         </div>
-      )}
- 
-      {v.status === 'em_andamento' && (
-        <button disabled={avancandoDia === v.id} onClick={() => avancarDiaViagem(v.id)} style={{ marginTop: 6 }}>
-          {avancandoDia === v.id ? 'Avançando...' : 'Avançar 1 dia'}
-        </button>
-      )}
+      ))}
     </div>
-  ))}
+  )}
+</div>
+ 
+{/* VIAGEM COMO SISTEMA */}
+<div className="mt-12">
+  <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+  <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
+  <h2 style={cinzel} className="text-xl text-[#c8a84b] font-semibold mb-6">🧭 Viagem</h2>
+ 
+  <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6 flex flex-col gap-3">
+    <div className="flex gap-3">
+      <select value={novaViagem.cidade_origem_id}
+        onChange={e => setNovaViagem(prev => ({ ...prev, cidade_origem_id: e.target.value }))}
+        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 focus:outline-none focus:border-[#c8a84b50]"
+        style={{ borderRadius: '2px' }}>
+        <option value="">Origem</option>
+        {cidades.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+      </select>
+      <select value={novaViagem.cidade_destino_id}
+        onChange={e => setNovaViagem(prev => ({ ...prev, cidade_destino_id: e.target.value }))}
+        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 focus:outline-none focus:border-[#c8a84b50]"
+        style={{ borderRadius: '2px' }}>
+        <option value="">Destino</option>
+        {cidades.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+      </select>
+    </div>
+    <button onClick={iniciarViagem} disabled={!novaViagem.cidade_origem_id || !novaViagem.cidade_destino_id || iniciandoViagem}
+      className="bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] transition-colors disabled:opacity-30"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      {iniciandoViagem ? 'Calculando...' : 'Iniciar Viagem'}
+    </button>
+  </div>
+ 
+  {viagens.length === 0 ? (
+    <p className="text-[#3a3020] text-sm text-center py-6">Nenhuma viagem registrada.</p>
+  ) : (
+    <div className="flex flex-col gap-2">
+      {viagens.map(v => (
+        <div key={v.id} className="border border-[#c8a84b20] bg-[#161410] p-4"
+          style={{ borderRadius: '2px' }}>
+          <div className="flex items-center justify-between">
+            <p style={cinzel} className="text-[#e8e0d0] text-sm">
+              {v.cidade_origem_id?.nome || '?'} → {v.cidade_destino_id?.nome || '?'}
+            </p>
+            <p style={{ color: STATUS_COR[v.status] || '#6a6050' }} className="text-xs uppercase tracking-wider">
+              {v.status}
+            </p>
+          </div>
+          <p className="text-[#6a6050] text-xs mt-1">
+            Dia {v.dia_atual}/{v.tempo_estimado_dias} · Clima: {v.clima}
+          </p>
+ 
+          {v.eventos?.length > 0 && (
+            <div className="mt-2 flex flex-col gap-1">
+              {v.eventos.map((ev, i) => (
+                <p key={i} className="text-[#c8a84b] text-xs">⚠️ Dia {ev.dia}: {ev.descricao}</p>
+              ))}
+            </div>
+          )}
+ 
+          {v.status === 'em_andamento' && (
+            <button onClick={() => avancarDiaViagem(v.id)} disabled={avancandoDia === v.id}
+              className="mt-3 text-xs px-3 py-1 border border-[#c8a84b30] text-[#c8a84b] hover:bg-[#c8a84b10] transition-colors disabled:opacity-30"
+              style={{ ...cinzel, borderRadius: '2px' }}>
+              {avancandoDia === v.id ? 'Avançando...' : 'Avançar 1 Dia'}
+            </button>
+          )}
+        </div>
+      ))}
+    </div>
+  )}
 </div>
       </div>
     </div>
