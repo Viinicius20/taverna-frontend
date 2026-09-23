@@ -227,7 +227,7 @@ async function avancarDiaViagem(id) {
   setAvancandoDia(id);
   try {
     const res = await api.post(`/viagem/${id}/avancar`);
-    setViagens(prev => prev.map(v => v.id === id ? res.data : v));
+    setViagens(prev => prev.map(v => v.id === id ? { ...v, ...res.data } : v));
   } catch {
     alert('Erro ao avançar viagem.');
   }
