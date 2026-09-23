@@ -40,7 +40,7 @@ export default function MundoVivo() {
   });
   const [criandoEventoRegional, setCriandoEventoRegional] = useState(false);
  
-  const [cidades, setCidades] = useState([]);
+  const [locais, setLocais] = useState([]);
   const [viagens, setViagens] = useState([]);
   const [novaViagem, setNovaViagem] = useState({ cidade_origem_id: '', cidade_destino_id: '' });
   const [iniciandoViagem, setIniciandoViagem] = useState(false);
