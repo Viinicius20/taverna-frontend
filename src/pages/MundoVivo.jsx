@@ -38,7 +38,6 @@ export default function MundoVivo() {
   regiao: '', tipo_evento: '', motivo: '',
   modificadores: { comida: 1, armas: 1, viagem: 1, comercio: 1 },
   });
-  const [mostrarFormEconomia, setMostrarFormEconomia] = useState(false);
   const [criandoEventoRegional, setCriandoEventoRegional] = useState(false);
  
   const [cidades, setCidades] = useState([]);
