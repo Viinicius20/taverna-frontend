@@ -191,6 +191,7 @@ async function criarEventoRegional() {
     const res = await api.post('/economia/eventos', { campaign_id: CAMPANHA_ID, ...novoEventoRegional });
     setEventosRegionais(prev => [res.data, ...prev]);
     setNovoEventoRegional({ regiao: '', tipo_evento: '', motivo: '', modificadores: { comida: 1, armas: 1, viagem: 1, comercio: 1 } });
+    setMostrarFormEconomia(false);
   } catch {
     alert('Erro ao criar evento regional.');
   }
@@ -207,12 +208,16 @@ async function encerrarEventoRegional(id) {
 }
  
 async function iniciarViagem() {
-  if (!novaViagem.cidade_origem_id || !novaViagem.cidade_destino_id) return;
+  if (!novaViagem.origem_id || !novaViagem.destino_id || !novaViagem.tempo_estimado_dias) return;
   setIniciandoViagem(true);
   try {
-    const res = await api.post('/viagem/iniciar', { campaign_id: CAMPANHA_ID, ...novaViagem });
+    const res = await api.post('/viagem/iniciar', {
+      campaign_id: CAMPANHA_ID,
+      ...novaViagem,
+      tempo_estimado_dias: parseFloat(novaViagem.tempo_estimado_dias),
+    });
     setViagens(prev => [res.data, ...prev]);
-    setNovaViagem({ cidade_origem_id: '', cidade_destino_id: '' });
+    setNovaViagem({ origem_id: '', destino_id: '', tempo_estimado_dias: '', clima: '' });
   } catch {
     alert('Erro ao iniciar viagem.');
   }
