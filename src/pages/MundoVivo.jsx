@@ -581,31 +581,42 @@ useEffect(() => {
   <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
   <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
   <h2 style={cinzel} className="text-xl text-[#c8a84b] font-semibold mb-6">🧭 Viagem</h2>
- 
+
   <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6 flex flex-col gap-3">
     <div className="flex gap-3">
-      <select value={novaViagem.cidade_origem_id}
-        onChange={e => setNovaViagem(prev => ({ ...prev, cidade_origem_id: e.target.value }))}
+      <select value={novaViagem.origem_id}
+        onChange={e => setNovaViagem(prev => ({ ...prev, origem_id: e.target.value }))}
         className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 focus:outline-none focus:border-[#c8a84b50]"
         style={{ borderRadius: '2px' }}>
         <option value="">Origem</option>
-        {cidades.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+        {locais.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
       </select>
-      <select value={novaViagem.cidade_destino_id}
-        onChange={e => setNovaViagem(prev => ({ ...prev, cidade_destino_id: e.target.value }))}
+      <select value={novaViagem.destino_id}
+        onChange={e => setNovaViagem(prev => ({ ...prev, destino_id: e.target.value }))}
         className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 focus:outline-none focus:border-[#c8a84b50]"
         style={{ borderRadius: '2px' }}>
         <option value="">Destino</option>
-        {cidades.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+        {locais.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
       </select>
     </div>
-    <button onClick={iniciarViagem} disabled={!novaViagem.cidade_origem_id || !novaViagem.cidade_destino_id || iniciandoViagem}
+    <div className="flex gap-3">
+      <input type="number" min="1" value={novaViagem.tempo_estimado_dias}
+        onChange={e => setNovaViagem(prev => ({ ...prev, tempo_estimado_dias: e.target.value }))}
+        placeholder="Tempo estimado (dias)"
+        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 focus:outline-none focus:border-[#c8a84b50]"
+        style={{ borderRadius: '2px' }} />
+      <input value={novaViagem.clima}
+        onChange={e => setNovaViagem(prev => ({ ...prev, clima: e.target.value }))}
+        placeholder="Clima (opcional)"
+        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 focus:outline-none focus:border-[#c8a84b50]"
+        style={{ borderRadius: '2px' }} />
+    </div>
+    <button onClick={iniciarViagem} disabled={!novaViagem.origem_id || !novaViagem.destino_id || !novaViagem.tempo_estimado_dias || iniciandoViagem}
       className="bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] transition-colors disabled:opacity-30"
       style={{ ...cinzel, borderRadius: '2px' }}>
       {iniciandoViagem ? 'Calculando...' : 'Iniciar Viagem'}
     </button>
   </div>
- 
   {viagens.length === 0 ? (
     <p className="text-[#3a3020] text-sm text-center py-6">Nenhuma viagem registrada.</p>
   ) : (
