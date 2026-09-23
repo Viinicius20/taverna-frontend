@@ -241,7 +241,7 @@ useEffect(() => {
   api.get(`/flags/${CAMPANHA_ID}`).then(res => setFlags(res.data.data || [])).catch(() => setFlags([]));
   api.get(`/factions/${CAMPANHA_ID}`).then(res => setFaccoes(res.data.data || [])).catch(() => setFaccoes([]));
   api.get(`/economia/eventos-campanha/${CAMPANHA_ID}`).then(res => setEventosRegionais(res.data.data || [])).catch(() => setEventosRegionais([]));
-  api.get(`/viagem/cidades/${CAMPANHA_ID}`).then(res => setCidades(res.data.data || [])).catch(() => setCidades([]));
+  api.get(`/viagem/locais/${CAMPANHA_ID}`).then(res => setLocais(res.data.data || [])).catch(() => setLocais([]));
   api.get(`/viagem/campanha/${CAMPANHA_ID}`).then(res => setViagens(res.data.data || [])).catch(() => setViagens([]));
 }, []);
 
