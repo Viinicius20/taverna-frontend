@@ -626,7 +626,15 @@ useEffect(() => {
       style={{ ...cinzel, borderRadius: '2px' }}>
       {iniciandoViagem ? 'Calculando...' : 'Iniciar Viagem'}
     </button>
-    <div className="flex items-center justify-between">
+  </div>
+  {viagens.length === 0 ? (
+    <p className="text-[#3a3020] text-sm text-center py-6">Nenhuma viagem registrada.</p>
+  ) : (
+    <div className="flex flex-col gap-2">
+      {viagens.map(v => (
+        <div key={v.id} className="border border-[#c8a84b20] bg-[#161410] p-4"
+          style={{ borderRadius: '2px' }}>
+          <div className="flex items-center justify-between">
   <p style={cinzel} className="text-[#e8e0d0] text-sm">
     {v.origem?.name || '?'} → {v.destino?.name || '?'}
   </p>
@@ -638,22 +646,6 @@ useEffect(() => {
       className="text-red-900 hover:text-red-600 text-xs transition-colors">×</button>
   </div>
 </div>
-  </div>
-  {viagens.length === 0 ? (
-    <p className="text-[#3a3020] text-sm text-center py-6">Nenhuma viagem registrada.</p>
-  ) : (
-    <div className="flex flex-col gap-2">
-      {viagens.map(v => (
-        <div key={v.id} className="border border-[#c8a84b20] bg-[#161410] p-4"
-          style={{ borderRadius: '2px' }}>
-          <div className="flex items-center justify-between">
-            <p style={cinzel} className="text-[#e8e0d0] text-sm">
-              {v.origem?.name || '?'} → {v.destino?.name || '?'}
-            </p>
-            <p style={{ color: STATUS_COR[v.status] || '#6a6050' }} className="text-xs uppercase tracking-wider">
-              {v.status}
-            </p>
-          </div>
           <p className="text-[#6a6050] text-xs mt-1">
             Dia {v.dia_atual}/{v.tempo_estimado_dias} · Clima: {v.clima}
           </p>
