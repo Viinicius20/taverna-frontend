@@ -632,7 +632,7 @@ useEffect(() => {
   <h2 style={cinzel} className="text-xl text-[#c8a84b] font-semibold mb-6">🧭 Viagem</h2>
 
   <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6 flex flex-col gap-3">
-    <div className="flex gap-3">
+    <div className="flex flex-col sm:flex-row gap-3">
       <select value={novaViagem.origem_id}
         onChange={e => setNovaViagem(prev => ({ ...prev, origem_id: e.target.value }))}
         className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 focus:outline-none focus:border-[#c8a84b50]"
@@ -648,7 +648,7 @@ useEffect(() => {
         {locais.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
       </select>
     </div>
-    <div className="flex gap-3">
+    <div className="flex flex-col sm:flex-row gap-3">
       <input type="number" min="1" value={novaViagem.tempo_estimado_dias}
         onChange={e => setNovaViagem(prev => ({ ...prev, tempo_estimado_dias: e.target.value }))}
         placeholder="Tempo estimado (dias)"
