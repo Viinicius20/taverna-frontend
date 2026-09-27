@@ -268,6 +268,16 @@ useEffect(() => {
   api.get(`/economia/precos/${CAMPANHA_ID}`).then(res => setPrecos(res.data.data || [])).catch(() => setPrecos([]));
 }, []);
 
+function iconeRelogio(nome) {
+  const n = nome.toLowerCase();
+  if (n.includes('guerra') || n.includes('batalha') || n.includes('invas')) return '⚔️';
+  if (n.includes('ritual') || n.includes('culto') || n.includes('cerimô')) return '🔥';
+  if (n.includes('golpe') || n.includes('política') || n.includes('trono') || n.includes('coroa')) return '👑';
+  if (n.includes('peste') || n.includes('praga') || n.includes('doença')) return '☠️';
+  if (n.includes('cerco') || n.includes('fortaleza')) return '🏰';
+  return '⏳';
+}
+
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
       <nav className="flex items-center justify-between px-6 py-4 border-b border-[#c8a84b20]">
@@ -372,6 +382,42 @@ useEffect(() => {
           <p className="text-[#6a6050] text-sm">{log.description}</p>
         </div>
       ))}
+    </div>
+  </div>
+)}
+
+{!carregando && eventos.filter(e => e.status === 'ativo').length > 0 && (
+  <div className="mb-8">
+    <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-3 opacity-70">RELÓGIOS ATIVOS</p>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {eventos.filter(e => e.status === 'ativo').map(ev => {
+        const segmentos = 10;
+        const preenchidos = Math.round((ev.progress / 100) * segmentos);
+        return (
+          <div key={ev.id} className="border border-[#c8a84b15] bg-[#161410] p-4" style={{ borderRadius: '2px' }}>
+            <div className="flex items-center justify-between mb-2">
+              <span style={cinzel} className="text-[#e8e0d0] text-sm">
+                {iconeRelogio(ev.name)} {ev.name}
+              </span>
+              <span style={cinzel} className="text-[#c8a84b] text-xs">{ev.progress}%</span>
+            </div>
+            <div className="flex gap-1">
+              {Array.from({ length: segmentos }).map((_, i) => (
+                <div key={i} className="flex-1 h-3" style={{
+                  borderRadius: '1px',
+                  backgroundColor: i < preenchidos ? (STATUS_COR[ev.status] || '#c8a84b') : '#0f0e0c',
+                  border: '1px solid #c8a84b20',
+                }} />
+              ))}
+            </div>
+            {ev.next_event_name && (
+              <p className="text-[#4a4030] text-xs mt-2">
+                Ao completar → <span style={cinzel} className="text-[#8a4a8a]">{ev.next_event_name}</span>
+              </p>
+            )}
+          </div>
+        );
+      })}
     </div>
   </div>
 )}
