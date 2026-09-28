@@ -1032,11 +1032,11 @@ function rolarPericia(nomeSkill, bonus) {
 }
 
 useEffect(() => {
-  if (!personagens[0]) return;
+  if (!id) return;
 
-  const checarChangeLog = async () => {
+  const checarChangelog = async () => {
     try {
-      const res = await api.get('/world-changelog/%{CAMPANHA_ID}/nao-lido/%{personagens[0].id}');
+      const res = await api.get(`/world-changelog/${CAMPANHA_ID}/nao-lido/${id}`);
       const naoLidos = res.data.data || [];
       setChangelogNaoLido(naoLidos);
       const temNovo = naoLidos.some(c => !changelogsJaMostrados.current.has(c.id));
@@ -1047,15 +1047,15 @@ useEffect(() => {
     } catch {}
   };
 
-  checarChangeLog();
-  const interval = setInterval(checarChangeLog, 10000);
+  checarChangelog();
+  const interval = setInterval(checarChangelog, 10000);
   return () => clearInterval(interval);
-}, [personagens]);
+}, [id]);
 
-async function marcarChangelogLido(id) {
+async function marcarChangelogLido(changelogId) {
   try {
-    await api.post(`/world-changelog/${id}/marcar-lido`,  { personagem_id: personagens[0].id });
-    setChangelogNaoLido(prev => prev.filter(c => c.id !== id));
+    await api.post(`/world-changelog/${changelogId}/marcar-lido`, { personagem_id: id });
+    setChangelogNaoLido(prev => prev.filter(c => c.id !== changelogId));
   } catch {}
 }
 
