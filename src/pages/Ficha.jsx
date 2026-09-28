@@ -270,6 +270,13 @@ export default function Ficha() {
   const [gazetaAtual, setGazetaAtual] = useState(null);
   const [modalGazeta, setModalGazeta] = useState(false);
 
+  const [modalDowntime, setModalDowntime] = useState(false);
+  const [atividadeDowntime, setAtividadeDowntime] = useState('');
+  const [focoDowntime, setFocoDowntime] = useState('');
+  const [enviandoDowntime, setEnviandoDowntime] = useState(false);
+  const [downtimeResolvidos, setDowntimeResolvidos] = useState([]);
+  const [modalDowntimeResultado, setModalDowntimeResultado] = useState(false);
+
 
   const ACOES_COMBATE = {
   'Attack': 'Faça um ataque corpo a corpo ou à distância.',
@@ -312,6 +319,20 @@ function temArquetipoValido(valor) {
   return true;
 }
 
+useEffect(() => {
+  if (!id) return;
+  const checarDowntime = async () => {
+    try {
+      const res = await api.get(`/downtime/resolvidos-nao-vistos/${id}`);
+      const novos = res.data.data || [];
+      setDowntimeResolvidos(novos);
+      if (novos.length > 0) setModalDowntimeResultado(true);
+    } catch {}
+  };
+  checarDowntime();
+  const interval = setInterval(checarDowntime, 10000);
+  return () => clearInterval(interval);
+}, [id]);
 
 useEffect(() => {
   async function init() {
@@ -657,8 +678,33 @@ function exportarPDF() {
   }, 300); 
 }
 
+async function enviarDowntime() {
+  if (!atividadeDowntime) return;
+  setEnviandoDowntime(true);
+  try {
+    await api.post('/downtime/solicitar', {
+      campaign_id: CAMPANHA_ID,
+      character_id: id,
+      character_name: ficha?.name || personagem?.name || 'Personagem',
+      atividade: atividadeDowntime,
+      foco: focoDowntime.trim() || null,
+    });
+    setModalDowntime(false);
+    setAtividadeDowntime('');
+    setFocoDowntime('');
+    alert('Enviado! O mestre vai revisar o resultado.');
+  } catch {
+    alert('Erro ao enviar downtime.');
+  }
+  setEnviandoDowntime(false);
+}
 
-
+async function marcarDowntimeVisto(reqId) {
+  try {
+    await api.post(`/downtime/${reqId}/marcar-visto`);
+    setDowntimeResolvidos(prev => prev.filter(d => d.id !== reqId));
+  } catch {}
+}
 
   // ===== FUNÇÕES DE LEVEL UP COM MULTICLASSING =====
   async function handleLevelUp() {
@@ -1233,6 +1279,7 @@ async function abrirGazeta() {
     { id: 'inventario', label: 'INVENTÁRIO' },
     { id: 'personagem', label: 'PERSONAGEM' },
     { id: 'notas', label: 'NOTAS' },
+    { id: 'downtime', label: '🌙 DOWNTIME' },
   ].map(({ id, label }) => (
     <button key={id} onClick={() => setAbaAtiva(id)}
       className="px-4 py-3 text-xs tracking-widest whitespace-nowrap transition-colors border-b-2"
@@ -2927,6 +2974,33 @@ style={{
           </div>
         )}
       </div>
+
+      {abaAtiva === 'downtime' && (
+  <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6">
+    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">O QUE SEU PERSONAGEM FEZ?</p>
+    <div className="grid grid-cols-2 gap-2 mb-4">
+      {ATIVIDADES_DOWNTIME.map(a => (
+        <button key={a} onClick={() => setAtividadeDowntime(a)}
+          className={`border px-3 py-2 text-xs capitalize transition-colors ${
+            atividadeDowntime === a ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]' : 'border-[#c8a84b20] text-[#6a6050]'
+          }`}
+          style={{ borderRadius: '2px' }}>
+          {a}
+        </button>
+      ))}
+    </div>
+    <textarea value={focoDowntime} onChange={e => setFocoDowntime(e.target.value)}
+      placeholder="Algum detalhe? (opcional — ex: 'treinando com espadas', 'investigando o Vazio')"
+      rows={3}
+      className="w-full bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm mb-4 focus:outline-none focus:border-[#c8a84b50]"
+      style={{ borderRadius: '2px' }} />
+    <button onClick={enviarDowntime} disabled={!atividadeDowntime || enviandoDowntime}
+      className="w-full bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] transition-colors disabled:opacity-30"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      {enviandoDowntime ? 'Enviando...' : 'Enviar para o Mestre'}
+    </button>
+  </div>
+)}
 
       {caixaMensagens && (
   <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 px-4"
