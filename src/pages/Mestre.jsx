@@ -2712,15 +2712,6 @@ async function revelarConsequenciaIndividual(id, personagemId) {
   document.body
 )}
 
-        {/* DADOS SECRETOS */}
-        <div className="mt-12">
-          <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
-          <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">EXCLUSIVO DO MESTRE</p>
-          <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-2">Rolagens Secretas</h2>
-          <p className="text-[#7a7060] mb-6 font-light text-sm">Resultados visíveis apenas para você.</p>
-          <Dados secreto={true} />
-        </div>
-
         {/* GERADOR DE NOMES — fixo */}
 <div className="fixed bottom-6 right-6 z-50">
   <div className="bg-[#161410] border border-[#c8a84b30] shadow-lg" style={{ borderRadius: '2px' }}>
@@ -3312,6 +3303,15 @@ async function revelarConsequenciaIndividual(id, personagemId) {
     )}
   </div>
 </div>
+
+{/* DADOS SECRETOS */}
+        <div className="mt-12">
+          <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+          <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">EXCLUSIVO DO MESTRE</p>
+          <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-2">Rolagens Secretas</h2>
+          <p className="text-[#7a7060] mb-6 font-light text-sm">Resultados visíveis apenas para você.</p>
+          <Dados secreto={true} />
+        </div>
 
       </div>
     </div>
