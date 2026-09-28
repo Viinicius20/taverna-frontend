@@ -270,7 +270,6 @@ export default function Ficha() {
   const [gazetaAtual, setGazetaAtual] = useState(null);
   const [modalGazeta, setModalGazeta] = useState(false);
 
-  const [modalDowntime, setModalDowntime] = useState(false);
   const [atividadeDowntime, setAtividadeDowntime] = useState('');
   const [focoDowntime, setFocoDowntime] = useState('');
   const [enviandoDowntime, setEnviandoDowntime] = useState(false);
@@ -3029,6 +3028,36 @@ style={{
           ))}
         </div>
       )}
+    </div>
+  </div>
+)}
+
+{modalDowntimeResultado && (
+  <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 px-4"
+    onClick={() => setModalDowntimeResultado(false)}>
+    <div className="bg-[#0f0e0c] border border-[#8a4a8a50] max-w-md w-full p-6 mb-4 sm:mb-0"
+      style={{ borderRadius: '2px', boxShadow: '0 0 30px #8a4a8a20' }}
+      onClick={e => e.stopPropagation()}>
+      <div className="flex items-center justify-between mb-4">
+        <p style={cinzel} className="text-[#8a4a8a] text-xs tracking-[4px]">🌙 RESULTADO DO DOWNTIME</p>
+        <button onClick={() => setModalDowntimeResultado(false)}
+          className="text-[#4a4030] hover:text-[#c8a84b] transition-colors">✕</button>
+      </div>
+      <div className="flex flex-col gap-3">
+        {downtimeResolvidos.map(d => (
+          <div key={d.id} className="border border-[#8a4a8a30] bg-[#161410] p-4">
+            <p style={cinzel} className="text-[#c8a84b] text-xs capitalize mb-1">
+              {d.atividade} {d.status === 'rejeitado' && '(não aconteceu)'}
+            </p>
+            <p className="text-[#e8e0d0] text-sm leading-relaxed italic mb-3">"{d.consequencia_final}"</p>
+            <button onClick={() => marcarDowntimeVisto(d.id)}
+              className="border border-[#8a4a8a50] text-[#8a4a8a] px-3 py-1 text-xs hover:bg-[#8a4a8a10] transition-colors w-full"
+              style={{ ...cinzel, borderRadius: '2px' }}>
+              ENTENDIDO
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   </div>
 )}
