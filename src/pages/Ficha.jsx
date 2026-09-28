@@ -6,6 +6,7 @@ import { createPortal } from 'react-dom';
 import { normalizarClasseParaEN } from '../utils/classTranslation';
 
 
+const ATIVIDADES_DOWNTIME = ['treinar', 'trabalhar', 'pesquisar', 'viajar', 'fabricar item', 'investigar', 'socializar', 'descansar'];
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
 const CAMPANHA_ID = '00000000-0000-0000-0000-000000000001';
@@ -2977,7 +2978,7 @@ style={{
   <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6">
     <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">O QUE SEU PERSONAGEM FEZ?</p>
     <div className="grid grid-cols-2 gap-2 mb-4">
-      {atividadeDowntime.map(a => (
+      {ATIVIDADES_DOWNTIME.map(a => (
         <button key={a} onClick={() => setAtividadeDowntime(a)}
           className={`border px-3 py-2 text-xs capitalize transition-colors ${
             atividadeDowntime === a ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]' : 'border-[#c8a84b20] text-[#6a6050]'
