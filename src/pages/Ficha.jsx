@@ -688,7 +688,6 @@ async function enviarDowntime() {
       atividade: atividadeDowntime,
       foco: focoDowntime.trim() || null,
     });
-    setModalDowntime(false);
     setAtividadeDowntime('');
     setFocoDowntime('');
     alert('Enviado! O mestre vai revisar o resultado.');
