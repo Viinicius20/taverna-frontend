@@ -107,8 +107,16 @@ export default function Mestre() {
   const [gerandoConsequencia, setGerandoConsequencia] = useState(false);
   const [criandoConsequencia, setCriandoConsequencia] = useState(false);
   const [flagsDisponiveis, setFlagsDisponiveis] = useState([]);
+  const [fatosMundo, setFatosMundo] = useState([]);
+  const [novoFato, setNovoFato] = useState({ texto: '', todos_jogadores: false, personagens_que_sabem: [], npcs_que_sabem: [] });
+  const [criandoFato, setCriandoFato] = useState(false);
+  const [perspectivaFiltro, setPerspectivaFiltro] = useState('todos'); // 'todos' | `char:<id>` | `npc:<id>`
 
   
+
+useEffect(() => {
+  api.get(`/fatos-mundo/${CAMPANHA_ID}`).then(res => setFatosMundo(res.data.data || [])).catch(() => setFatosMundo([]));
+}, []);
 
 useEffect(() => {
   api.get(`/consequencias/${CAMPANHA_ID}`).then(res => setConsequencias(res.data.data || [])).catch(() => setConsequencias([]));
@@ -878,6 +886,42 @@ async function deletarConsequencia(id) {
     setConsequencias(prev => prev.filter(c => c.id !== id));
     setConsequenciasProntas(prev => prev.filter(c => c.id !== id));
   } catch { alert('Erro ao apagar.'); }
+}
+
+async function criarFatoMundo() {
+  if (!novoFato.texto.trim()) return;
+  setCriandoFato(true);
+  try {
+    const res = await api.post('/fatos-mundo', { campaign_id: CAMPANHA_ID, ...novoFato });
+    setFatosMundo(prev => [res.data.data, ...prev]);
+    setNovoFato({ texto: '', todos_jogadores: false, personagens_que_sabem: [], npcs_que_sabem: [] });
+  } catch { alert('Erro ao criar fato.'); }
+  setCriandoFato(false);
+}
+
+function toggleSabedor(lista, id) {
+  return lista.includes(id) ? lista.filter(x => x !== id) : [...lista, id];
+}
+
+async function deletarFatoMundo(id) {
+  if (!window.confirm('Apagar este fato?')) return;
+  try {
+    await api.delete(`/fatos-mundo/${id}`);
+    setFatosMundo(prev => prev.filter(f => f.id !== id));
+  } catch { alert('Erro ao apagar.'); }
+}
+
+function fatoVisivelNaPerspectiva(f) {
+  if (perspectivaFiltro === 'todos') return true;
+  if (perspectivaFiltro.startsWith('char:')) {
+    const cid = perspectivaFiltro.slice(5);
+    return f.todos_jogadores || (f.personagens_que_sabem || []).includes(cid);
+  }
+  if (perspectivaFiltro.startsWith('npc:')) {
+    const nid = perspectivaFiltro.slice(4);
+    return (f.npcs_que_sabem || []).includes(nid);
+  }
+  return true;
 }
 
 async function revelarConsequenciaIndividual(id, personagemId) {
@@ -3165,6 +3209,107 @@ async function revelarConsequenciaIndividual(id, personagemId) {
         </div>
       </div>
     ))}
+  </div>
+</div>
+
+<div className="mt-12">
+  <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-2 opacity-70">PERSPECTIVAS DO MUNDO</p>
+  <h2 style={cinzel} className="text-xl text-[#c8a84b] font-semibold mb-6">🧠 Memória Individual</h2>
+
+  <div className="border border-[#c8a84b20] bg-[#161410] p-6 mb-6 flex flex-col gap-3">
+    <textarea value={novoFato.texto}
+      onChange={e => setNovoFato(p => ({ ...p, texto: e.target.value }))}
+      placeholder="Qual é o fato? (ex: O Sábio possui ligação com a Estigma)"
+      rows={2}
+      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+      style={{ borderRadius: '2px' }} />
+
+    <label className="flex items-center gap-2 text-[#6a6050] text-xs cursor-pointer">
+      <input type="checkbox" checked={novoFato.todos_jogadores}
+        onChange={e => setNovoFato(p => ({ ...p, todos_jogadores: e.target.checked }))} />
+      <span style={cinzel} className="tracking-widest">TODOS OS JOGADORES SABEM</span>
+    </label>
+
+    {!novoFato.todos_jogadores && (
+      <div>
+        <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-2">PERSONAGENS QUE SABEM</p>
+        <div className="flex flex-wrap gap-2">
+          {personagens.map(p => (
+            <button key={p.id} type="button"
+              onClick={() => setNovoFato(prev => ({ ...prev, personagens_que_sabem: toggleSabedor(prev.personagens_que_sabem, p.id) }))}
+              className={`border px-3 py-1 text-xs transition-colors ${
+                novoFato.personagens_que_sabem.includes(p.id) ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]' : 'border-[#c8a84b20] text-[#6a6050]'
+              }`}
+              style={{ borderRadius: '2px' }}>
+              {p.data?.name || p.name}
+            </button>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <div>
+      <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-2">NPCS QUE SABEM</p>
+      <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+        {npcs.map(n => (
+          <button key={n.id} type="button"
+            onClick={() => setNovoFato(prev => ({ ...prev, npcs_que_sabem: toggleSabedor(prev.npcs_que_sabem, n.id) }))}
+            className={`border px-3 py-1 text-xs transition-colors ${
+              novoFato.npcs_que_sabem.includes(n.id) ? 'border-[#8a4a8a] text-[#8a4a8a] bg-[#8a4a8a10]' : 'border-[#c8a84b20] text-[#6a6050]'
+            }`}
+            style={{ borderRadius: '2px' }}>
+            {n.name}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <button onClick={criarFatoMundo} disabled={!novoFato.texto.trim() || criandoFato}
+      className="bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] transition-colors disabled:opacity-30"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      {criandoFato ? 'Salvando...' : '+ Registrar Fato'}
+    </button>
+  </div>
+
+  <div className="flex items-center gap-2 mb-4">
+    <span style={cinzel} className="text-[#4a4030] text-xs tracking-[2px]">VER PELA PERSPECTIVA DE:</span>
+    <select value={perspectivaFiltro} onChange={e => setPerspectivaFiltro(e.target.value)}
+      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-1 text-xs focus:outline-none"
+      style={{ borderRadius: '2px' }}>
+      <option value="todos">Todos os fatos (visão do mestre)</option>
+      <optgroup label="Personagens">
+        {personagens.map(p => <option key={p.id} value={`char:${p.id}`}>{p.data?.name || p.name}</option>)}
+      </optgroup>
+      <optgroup label="NPCs">
+        {npcs.map(n => <option key={n.id} value={`npc:${n.id}`}>{n.name}</option>)}
+      </optgroup>
+    </select>
+  </div>
+
+  <div className="flex flex-col gap-2">
+    {fatosMundo.filter(fatoVisivelNaPerspectiva).length === 0 ? (
+      <p className="text-[#3a3020] text-sm text-center py-6">
+        {perspectivaFiltro === 'todos' ? 'Nenhum fato registrado.' : 'Ninguém aqui sabe de nada ainda.'}
+      </p>
+    ) : (
+      fatosMundo.filter(fatoVisivelNaPerspectiva).map(f => (
+        <div key={f.id} className="border border-[#c8a84b15] bg-[#161410] p-4 flex items-start justify-between" style={{ borderRadius: '2px' }}>
+          <div>
+            <p className="text-[#e8e0d0] text-sm mb-1">{f.texto}</p>
+            <p className="text-[#4a4030] text-xs">
+              {f.todos_jogadores && 'Todos os jogadores'}
+              {!f.todos_jogadores && f.personagens_que_sabem?.length > 0 &&
+                `Personagens: ${f.personagens_que_sabem.map(id => personagens.find(p => p.id === id)?.data?.name || personagens.find(p => p.id === id)?.name || '?').join(', ')}`}
+              {f.npcs_que_sabem?.length > 0 &&
+                `${f.personagens_que_sabem?.length > 0 || f.todos_jogadores ? ' · ' : ''}NPCs: ${f.npcs_que_sabem.map(id => npcs.find(n => n.id === id)?.name || '?').join(', ')}`}
+              {!f.todos_jogadores && f.personagens_que_sabem?.length === 0 && f.npcs_que_sabem?.length === 0 && 'Só o Mestre sabe'}
+            </p>
+          </div>
+          <button onClick={() => deletarFatoMundo(f.id)}
+            className="text-red-900 hover:text-red-600 text-xs">×</button>
+        </div>
+      ))
+    )}
   </div>
 </div>
 
