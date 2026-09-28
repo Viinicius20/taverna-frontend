@@ -68,14 +68,14 @@ export default function MundoVivo() {
   }
 
   async function deletarWorldLog(id) {
-    if (!window.confirm('Apagar essa cronica?')) return;
-    try {
-      await api.delete('/world-log/${id}');
-      setWorldLog(prev => prev.filter(l => l.id !== id));
-    } catch {
-      alert('Erro ao apagar.');
-    }
+  if (!window.confirm('Apagar essa cronica?')) return;
+  try {
+    await api.delete(`/world-log/${id}`);
+    setWorldLog(prev => prev.filter(l => l.id !== id));
+  } catch {
+    alert('Erro ao apagar.');
   }
+}
 
   async function criarEvento() {
     if (!novoEvento.name.trim()) return;
