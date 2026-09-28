@@ -63,7 +63,6 @@ export default function Mestre() {
   const [novoItemNomeMisterioso, setNovoItemNomeMisterioso] = useState('');
   const [encounter, setEncounter] = useState(null);
   const [gerandoEncounter, setGerandoEncounter] = useState(false);
-  const [encounterConfig, setEncounterConfig] = useState({ bioma: 'Floresta', nivel: 5, contexto: '' });
   const [mensagemSecreta, setMensagemSecreta] = useState('');
   const [personagemDestino, setPersonagemDestino] = useState('');
   const [enviandoMensagem, setEnviandoMensagem] = useState(false);
@@ -101,6 +100,7 @@ export default function Mestre() {
   const [caixaMundoMudou, setCaixaMundoMudou] = useState(false);
   const [stagesSegredo, setStagesSegredo] = useState(null);
   const [gerandoStages, setGerandoStages] = useState(false);
+  const [encounterConfig, setEncounterConfig] = useState({ bioma: 'Floresta', nivel: 5, contexto: '', usar_mundo: true });
 
   
 
@@ -2294,6 +2294,12 @@ async function buscarProfecias() {
     </button>
   </div>
 
+  <label className="flex items-center gap-2 mb-4 text-[#6a6050] text-xs cursor-pointer">
+      <input type="checkbox" checked={encounterConfig.usar_mundo}
+        onChange={e => setEncounterConfig(p => ({ ...p, usar_mundo: e.target.checked }))} />
+      <span style={cinzel} className="tracking-widest">USAR ESTADO DO MUNDO</span>
+    </label>
+
   {encounter && (
     <div className="border border-[#c8a84b20] bg-[#161410] p-6 space-y-4">
       <div>
@@ -2321,6 +2327,13 @@ async function buscarProfecias() {
           <p className="text-[#8a8070] text-sm leading-relaxed font-light">{encounter.diferencial}</p>
         </div>
       )}
+
+      {encounter.ligacao_mundo && (
+  <div className="border-t border-[#c8a84b10] pt-4">
+    <p style={cinzel} className="text-[#8a4a8a] text-xs tracking-[2px] mb-1">🌎 LIGAÇÃO COM O MUNDO</p>
+    <p className="text-[#8a8070] text-sm leading-relaxed font-light">{encounter.ligacao_mundo}</p>
+  </div>
+)}
 
       {encounter.recompensa && (
         <div className="border-t border-[#c8a84b10] pt-4">
