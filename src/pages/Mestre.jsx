@@ -747,10 +747,10 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, []);
 
-  async function marcarChangeLogLido(Id) {
+  async function marcarChangelogLido(id) {
     try {
       await api.post(`/world-changelog/${id}/marcar-lido-mestre`);
-      setChangelogNaoLido(prev => prev.filter(c => c.id !== Id));
+      setChangelogNaoLido(prev => prev.filter(c => c.id !== id));
     } catch {}
   }
 
