@@ -880,6 +880,17 @@ async function deletarConsequencia(id) {
   } catch { alert('Erro ao apagar.'); }
 }
 
+async function revelarConsequenciaIndividual(id, personagemId) {
+  try {
+    await api.post(`/consequencias/${id}/revelar`, {
+      enviar_sussurro: true,
+      personagem_ids: [personagemId],
+    });
+    setConsequencias(prev => prev.map(c => c.id === id ? { ...c, status: 'revelada' } : c));
+    setConsequenciasProntas(prev => prev.filter(c => c.id !== id));
+  } catch { alert('Erro ao revelar.'); }
+}
+
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
 
@@ -3141,6 +3152,26 @@ async function deletarConsequencia(id) {
   </div>
 </div>
 
+{c.status === 'oculta' && (
+  <div className="flex items-center gap-2">
+    <select onChange={e => {
+      const v = e.target.value;
+      if (v === 'todos') revelarConsequencia(c.id, true);
+      else if (v === 'log') revelarConsequencia(c.id, false);
+      else if (v) revelarConsequenciaIndividual(c.id, v);
+      e.target.value = '';
+    }} defaultValue=""
+      className="bg-[#0f0e0c] border border-[#c8a84b30] text-[#c8a84b] text-xs px-2 py-1 focus:outline-none"
+      style={{ borderRadius: '2px' }}>
+      <option value="" disabled>Revelar...</option>
+      <option value="todos">Para todos</option>
+      <option value="log">Só no log</option>
+      {personagens.map(p => (
+        <option key={p.id} value={p.id}>Para {p.data?.name || p.name}</option>
+      ))}
+    </select>
+  </div>
+)}
 
       </div>
     </div>
