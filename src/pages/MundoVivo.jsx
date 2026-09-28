@@ -67,6 +67,16 @@ export default function MundoVivo() {
     setCarregando(false);
   }
 
+  async function deletarWorldLog(id) {
+    if (!window.confirm('Apagar essa cronica?')) return;
+    try {
+      await api.delete('/world-log/${id}');
+      setWorldLog(prev => prev.filter(l => l.id !== id));
+    } catch {
+      alert('Erro ao apagar.');
+    }
+  }
+
   async function criarEvento() {
     if (!novoEvento.name.trim()) return;
     setCriando(true);
@@ -420,14 +430,18 @@ function iconeRelogio(nome) {
 
     <div className="space-y-2">
       {worldLog.map(log => (
-        <div key={log.id} className="border border-[#8a4a8a15] bg-[#161410] px-4 py-3" style={{ borderRadius: '2px' }}>
-          <div className="flex items-center justify-between mb-1">
-            <span style={cinzel} className="text-[#8a4a8a] text-xs">{log.event_name}</span>
-            <span className="text-[#3a3020] text-xs">Sessão #{log.session_number}</span>
-          </div>
-          <p className="text-[#6a6050] text-sm">{log.description}</p>
-        </div>
-      ))}
+  <div key={log.id} className="border border-[#8a4a8a15] bg-[#161410] px-4 py-3" style={{ borderRadius: '2px' }}>
+    <div className="flex items-center justify-between mb-1">
+      <span style={cinzel} className="text-[#8a4a8a] text-xs">{log.event_name}</span>
+      <div className="flex items-center gap-2">
+        <span className="text-[#3a3020] text-xs">Sessão #{log.session_number}</span>
+        <button onClick={() => deletarWorldLog(log.id)}
+          className="text-red-900 hover:text-red-600 text-xs transition-colors">×</button>
+      </div>
+    </div>
+    <p className="text-[#6a6050] text-sm">{log.description}</p>
+  </div>
+))}
     </div>
   </div>
 )}
