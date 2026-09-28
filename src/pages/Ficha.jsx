@@ -4,6 +4,7 @@ import api from '../services/api';
 import html2pdf from 'html2pdf.js';
 import { createPortal } from 'react-dom';
 import { normalizarClasseParaEN } from '../utils/classTranslation';
+import { useState, useEffect, useRef } from 'react';
 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
@@ -261,6 +262,10 @@ export default function Ficha() {
   const [criandoManual, setCriandoManual] = useState(false);
 
   const [exportandoPDF, setExportandoPDF] = useState(false);
+
+  const [changelogNaoLido, setChangelogNaoLido] = useState([]);
+  const [caixaMundoMudou, setCaixaMundoMudou] = useState(false);
+  const changelogsJaMostrados = useRef(new Set());
 
 
   const ACOES_COMBATE = {
@@ -1025,6 +1030,34 @@ function rolarPericia(nomeSkill, bonus) {
   setResultadoRolagem(resultado);
   setHistoricoRolagens(prev => [resultado, ...prev].slice(0, 10));
   setTimeout(() => setResultadoRolagem(null), 5000);
+}
+
+useEffect(() => {
+  if (!personagens[0]) return;
+
+  const checarChangeLog = async () => {
+    try {
+      const res = await api.get('/world-changelog/%{CAMPANHA_ID}/nao-lido/%{personagens[0].id}');
+      const naoLidos = res.data.data || [];
+      setChangelogNaoLido(naoLidos);
+      const temNovo = naoLidos.some(c => !changelogsJaMostrados.current.has(c.id));
+      if (temNovo) {
+        naoLidos.forEach(c => changelogsJaMostrados.current.add(c.id));
+        setCaixaMundoMudou(true);
+      }
+    } catch {}
+  };
+
+  checarChangeLog();
+  const interval = setInterval(checarChangeLog, 10000);
+  return () => clearInterval(interval);
+}, [personagens]);
+
+async function marcarChangelogLido(id) {
+  try {
+    await api.post(`/world-changelog/${id}/marcar-lido`,  { personagem_id: personagens[0].id });
+    setChangelogNaoLido(prev => prev.filter(c => c.id !== id));
+  } catch {}
 }
 
 
@@ -2881,6 +2914,7 @@ style={{
           </div>
         )}
       </div>
+
       {caixaMensagens && (
   <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 px-4"
     onClick={() => setCaixaMensagens(false)}>
@@ -2911,6 +2945,39 @@ style={{
     </div>
   </div>
 )}
+
+{caixaMundoMudou && (
+  <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 px-4"
+    onClick={() => setCaixaMundoMudou(false)}>
+    <div className="bg-[#0f0e0c] border border-[#c8a84b50] max-w-md w-full p-6 mb-4 sm:mb-0"
+      style={{ borderRadius: '2px', boxShadow: '0 0 30px #c8a84b20' }}
+      onClick={e => e.stopPropagation()}>
+      <div className="flex items-center justify-between mb-4">
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px]">🌎 O MUNDO MUDOU</p>
+        <button onClick={() => setCaixaMundoMudou(false)}
+          className="text-[#4a4030] hover:text-[#c8a84b] transition-colors">✕</button>
+      </div>
+      {changelogNaoLido.length === 0 ? (
+        <p className="text-[#4a4030] text-sm text-center py-4">Nada novo.</p>
+      ) : (
+        <div className="flex flex-col gap-3">
+          {changelogNaoLido.map(item => (
+            <div key={item.id} className="border border-[#c8a84b30] bg-[#161410] p-4">
+              <p className="text-[#e8e0d0] text-sm leading-relaxed whitespace-pre-line mb-3">{item.content}</p>
+              <button onClick={() => marcarChangelogLido(item.id)}
+                className="border border-[#c8a84b50] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors w-full"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                ENTENDIDO
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
+
     </div>
   );
 }

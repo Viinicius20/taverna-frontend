@@ -96,6 +96,8 @@ export default function Mestre() {
   const [novaProfeciaTexto, setNovaProfeciaTexto] = useState('');
   const [novaProfeciaCondicao, setNovaProfeciaCondicao] = useState('');
   const [adicionandoProfecia, setAdicionandoProfecia] = useState(false);
+  const [changelogNaoLido, setChangelogNaoLido] = useState([]);
+  const [caixaMundoMudou, setCaixaMundoMudou] = useState(false);
 
   
 
@@ -729,6 +731,28 @@ async function removerMemoria(npcId, index) {
     alert('Erro ao remover memória.');
   }
 }
+
+useEffect(() => {
+  const checarChangeLog = async () => {
+    try {
+      const res = await api.get(`/world-changelog/${CAMPANHA_ID}`);
+      const naoLidos = (res.data.data || []).filter(c => !c.visto_mestre);
+      setChangelogNaoLido(naoLidos);
+      if (naoLidos.length > 0) setCaixaMundoMudou(true);
+    } catch {}
+  };
+
+  checarChangeLog();
+  const interval = setInterval(checarChangeLog, 10000);
+  return () => clearInterval(interval);
+}, []);
+
+  async function marcarChangeLogLido(Id) {
+    try {
+      await api.post(`/world-changelog/${id}/marcar-lido-mestre`);
+      setChangelogNaoLido(prev => prev.filter(c => c.id !== Id));
+    } catch {}
+  }
 
 const LISTA_CONDICOES = [
   { label: 'Caído', cor: '#8a2020' },
@@ -2825,6 +2849,37 @@ async function buscarProfecias() {
     </div>
   </div>,
   document.body
+)}
+
+{caixaMundoMudou && (
+  <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 px-4"
+    onClick={() => setCaixaMundoMudou(false)}>
+    <div className="bg-[#0f0e0c] border border-[#c8a84b50] max-w-md w-full p-6 mb-4 sm:mb-0"
+      style={{ borderRadius: '2px', boxShadow: '0 0 30px #c8a84b20' }}
+      onClick={e => e.stopPropagation()}>
+      <div className="flex items-center justify-between mb-4">
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px]">🌎 O MUNDO MUDOU</p>
+        <button onClick={() => setCaixaMundoMudou(false)}
+          className="text-[#4a4030] hover:text-[#c8a84b] transition-colors">✕</button>
+      </div>
+      {changelogNaoLido.length === 0 ? (
+        <p className="text-[#4a4030] text-sm text-center py-4">Nada novo.</p>
+      ) : (
+        <div className="flex flex-col gap-3">
+          {changelogNaoLido.map(item => (
+            <div key={item.id} className="border border-[#c8a84b30] bg-[#161410] p-4">
+              <p className="text-[#e8e0d0] text-sm leading-relaxed whitespace-pre-line mb-3">{item.content}</p>
+              <button onClick={() => marcarChangelogLido(item.id)}
+                className="border border-[#c8a84b50] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors w-full"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                ENTENDIDO
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
 )}
 
 

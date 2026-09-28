@@ -17,7 +17,6 @@ export default function Personagens() {
   const [escolhendo, setEscolhendo] = useState(false);
   const [temMensagem, setTemMensagem] = useState(false);
 
-  // Modal de habilidade
   const [modal, setModal] = useState(null); // { skill, system, context }
   const [descricaoSkill, setDescricaoSkill] = useState(null);
   const [carregandoSkill, setCarregandoSkill] = useState(false);
@@ -37,6 +36,7 @@ export default function Personagens() {
   if (user) buscarPersonagens();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+  
   useEffect(() => {
   if (!personagens[0]?.id) return;
   
@@ -59,7 +59,6 @@ export default function Personagens() {
     const meus = res.data.data || [];
     setPersonagens(meus);
 
-    // Se não tem nenhum vinculado, busca todos disponíveis
     if (meus.length === 0) {
       const todos = await api.get('/characters', { params: { sem_dono: true } });
       setTodosPersonagens(todos.data.data || []);
