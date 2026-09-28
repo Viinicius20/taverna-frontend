@@ -101,8 +101,18 @@ export default function Mestre() {
   const [stagesSegredo, setStagesSegredo] = useState(null);
   const [gerandoStages, setGerandoStages] = useState(false);
   const [encounterConfig, setEncounterConfig] = useState({ bioma: 'Floresta', nivel: 5, contexto: '', usar_mundo: true });
+  const [consequencias, setConsequencias] = useState([]);
+  const [consequenciasProntas, setConsequenciasProntas] = useState([]);
+  const [novaConsequencia, setNovaConsequencia] = useState({ gatilho: '', consequencia: '', condicao_tipo: 'manual', condicao_valor: '' });
+  const [gerandoConsequencia, setGerandoConsequencia] = useState(false);
+  const [criandoConsequencia, setCriandoConsequencia] = useState(false);
 
   
+
+useEffect(() => {
+  api.get(`/consequencias/${CAMPANHA_ID}`).then(res => setConsequencias(res.data.data || [])).catch(() => setConsequencias([]));
+  api.get(`/consequencias/prontas/${CAMPANHA_ID}`).then(res => setConsequenciasProntas(res.data.data || [])).catch(() => setConsequenciasProntas([]));
+}, []);
 
   useEffect(() => {
     buscarNpcs();
@@ -825,6 +835,47 @@ async function buscarProfecias() {
     const res = await api.get(`/prophecies/${CAMPANHA_ID}`);
     setProfecias(res.data.data || []);
   } catch {}
+}
+
+async function gerarConsequenciaIA() {
+  if (!novaConsequencia.gatilho.trim()) return;
+  setGerandoConsequencia(true);
+  try {
+    const res = await api.post('/consequencias/gerar', { gatilho: novaConsequencia.gatilho });
+    setNovaConsequencia(prev => ({ ...prev, consequencia: res.data.data }));
+  } catch { alert('Erro ao gerar consequência.'); }
+  setGerandoConsequencia(false);
+}
+
+async function criarConsequencia() {
+  if (!novaConsequencia.gatilho.trim() || !novaConsequencia.consequencia.trim()) return;
+  setCriandoConsequencia(true);
+  try {
+    const res = await api.post('/consequencias', { campaign_id: CAMPANHA_ID, ...novaConsequencia });
+    setConsequencias(prev => [res.data.data, ...prev]);
+    setNovaConsequencia({ gatilho: '', consequencia: '', condicao_tipo: 'manual', condicao_valor: '' });
+  } catch { alert('Erro ao criar.'); }
+  setCriandoConsequencia(false);
+}
+
+async function revelarConsequencia(id, paraTodos) {
+  try {
+    await api.post(`/consequencias/${id}/revelar`, {
+      enviar_sussurro: paraTodos,
+      personagem_ids: paraTodos ? personagens.map(p => p.id) : [],
+    });
+    setConsequencias(prev => prev.map(c => c.id === id ? { ...c, status: 'revelada' } : c));
+    setConsequenciasProntas(prev => prev.filter(c => c.id !== id));
+  } catch { alert('Erro ao revelar.'); }
+}
+
+async function deletarConsequencia(id) {
+  if (!window.confirm('Apagar esta consequência?')) return;
+  try {
+    await api.delete(`/consequencias/${id}`);
+    setConsequencias(prev => prev.filter(c => c.id !== id));
+    setConsequenciasProntas(prev => prev.filter(c => c.id !== id));
+  } catch { alert('Erro ao apagar.'); }
 }
 
   return (
@@ -2979,6 +3030,114 @@ async function buscarProfecias() {
     </div>
   </div>
 )}
+
+<div className="mt-12">
+  <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-2 opacity-70">GANCHOS DE LONGO PRAZO</p>
+  <h2 style={cinzel} className="text-xl text-[#c8a84b] font-semibold mb-6">🧩 Consequências Ocultas</h2>
+
+  {consequenciasProntas.length > 0 && (
+    <div className="mb-6">
+      <p style={cinzel} className="text-[#8a5030] text-xs tracking-[2px] mb-2">⚡ PRONTAS PARA REVELAR</p>
+      <div className="flex flex-col gap-2">
+        {consequenciasProntas.map(c => (
+          <div key={c.id} className="border border-[#8a5030] bg-[#8a503010] p-4" style={{ borderRadius: '2px' }}>
+            <p className="text-[#4a4030] text-xs italic mb-1">Gatilho: {c.gatilho}</p>
+            <p className="text-[#e8e0d0] text-sm mb-3">{c.consequencia}</p>
+            <div className="flex gap-2">
+              <button onClick={() => revelarConsequencia(c.id, true)}
+                className="flex-1 border border-[#4a8a4a50] text-[#4a8a4a] px-3 py-1 text-xs hover:bg-[#4a8a4a10]"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                REVELAR PARA TODOS
+              </button>
+              <button onClick={() => revelarConsequencia(c.id, false)}
+                className="flex-1 border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10]"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                SÓ REGISTRAR NO LOG
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  <div className="border border-[#c8a84b20] bg-[#161410] p-6 mb-6 flex flex-col gap-3">
+    <input value={novaConsequencia.gatilho}
+      onChange={e => setNovaConsequencia(p => ({ ...p, gatilho: e.target.value }))}
+      placeholder="O que os jogadores fizeram? (ex: mataram o Capitão)"
+      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+      style={{ borderRadius: '2px' }} />
+
+    <div className="flex gap-2">
+      <textarea value={novaConsequencia.consequencia}
+        onChange={e => setNovaConsequencia(p => ({ ...p, consequencia: e.target.value }))}
+        placeholder="Qual a consequência oculta?"
+        rows={2}
+        className="flex-1 bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+        style={{ borderRadius: '2px' }} />
+      <button onClick={gerarConsequenciaIA} disabled={!novaConsequencia.gatilho.trim() || gerandoConsequencia}
+        className="border border-[#8a4a8a50] text-[#8a4a8a] px-3 text-xs hover:bg-[#8a4a8a10] disabled:opacity-30"
+        style={{ ...cinzel, borderRadius: '2px' }}>
+        {gerandoConsequencia ? '...' : '✨ IA'}
+      </button>
+    </div>
+
+    <div className="flex gap-2">
+      <select value={novaConsequencia.condicao_tipo}
+        onChange={e => setNovaConsequencia(p => ({ ...p, condicao_tipo: e.target.value, condicao_valor: '' }))}
+        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none"
+        style={{ borderRadius: '2px' }}>
+        <option value="manual">Revelar manualmente</option>
+        <option value="sessao">Revelar a partir da sessão nº</option>
+        <option value="flag">Revelar quando flag ativar</option>
+      </select>
+      {novaConsequencia.condicao_tipo === 'sessao' && (
+        <input type="number" min="1" value={novaConsequencia.condicao_valor}
+          onChange={e => setNovaConsequencia(p => ({ ...p, condicao_valor: e.target.value }))}
+          placeholder="Nº da sessão"
+          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm w-32 focus:outline-none"
+          style={{ borderRadius: '2px' }} />
+      )}
+      {novaConsequencia.condicao_tipo === 'flag' && (
+        <select value={novaConsequencia.condicao_valor}
+          onChange={e => setNovaConsequencia(p => ({ ...p, condicao_valor: e.target.value }))}
+          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 focus:outline-none"
+          style={{ borderRadius: '2px' }}>
+          <option value="">Selecione a flag</option>
+          {flags.map(f => <option key={f.id} value={f.key}>{f.key}</option>)}
+        </select>
+      )}
+    </div>
+
+    <button onClick={criarConsequencia} disabled={criandoConsequencia}
+      className="bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] disabled:opacity-30"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      {criandoConsequencia ? 'Salvando...' : '+ Registrar Consequência'}
+    </button>
+  </div>
+
+  <div className="flex flex-col gap-2">
+    {consequencias.map(c => (
+      <div key={c.id} className={`border p-4 flex items-start justify-between ${c.status === 'oculta' ? 'border-[#c8a84b15] bg-[#161410]' : 'border-[#4a8a4a20] bg-[#161410]'}`}
+        style={{ borderRadius: '2px' }}>
+        <div>
+          <p className="text-[#4a4030] text-xs italic mb-1">{c.gatilho}</p>
+          <p className="text-sm" style={{ color: c.status === 'oculta' ? '#6a6050' : '#e8e0d0' }}>
+            {c.status === 'oculta' ? '🔒 Oculta' : `🔓 ${c.consequencia}`}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          {c.status === 'oculta' && (
+            <button onClick={() => revelarConsequencia(c.id, false)}
+              className="text-[#c8a84b] hover:text-[#e0c060] text-xs">Revelar</button>
+          )}
+          <button onClick={() => deletarConsequencia(c.id)}
+            className="text-red-900 hover:text-red-600 text-xs">×</button>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
 
 
       </div>
