@@ -3141,18 +3141,6 @@ async function revelarConsequenciaIndividual(id, personagemId) {
         </div>
         <div className="flex items-center gap-2">
           {c.status === 'oculta' && (
-            <button onClick={() => revelarConsequencia(c.id, false)}
-              className="text-[#c8a84b] hover:text-[#e0c060] text-xs">Revelar</button>
-          )}
-          <button onClick={() => deletarConsequencia(c.id)}
-            className="text-red-900 hover:text-red-600 text-xs">×</button>
-        </div>
-      </div>
-    ))}
-  </div>
-</div>
-
-{c.status === 'oculta' && (
   <div className="flex items-center gap-2">
     <select onChange={e => {
       const v = e.target.value;
@@ -3172,6 +3160,13 @@ async function revelarConsequenciaIndividual(id, personagemId) {
     </select>
   </div>
 )}
+          <button onClick={() => deletarConsequencia(c.id)}
+            className="text-red-900 hover:text-red-600 text-xs">×</button>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
 
       </div>
     </div>
