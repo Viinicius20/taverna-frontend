@@ -2979,7 +2979,7 @@ style={{
   <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6">
     <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">O QUE SEU PERSONAGEM FEZ?</p>
     <div className="grid grid-cols-2 gap-2 mb-4">
-      {ATIVIDADES_DOWNTIME.map(a => (
+      {atividadeDowntime.map(a => (
         <button key={a} onClick={() => setAtividadeDowntime(a)}
           className={`border px-3 py-2 text-xs capitalize transition-colors ${
             atividadeDowntime === a ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]' : 'border-[#c8a84b20] text-[#6a6050]'
