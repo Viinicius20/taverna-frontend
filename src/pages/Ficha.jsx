@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../services/api';
 import html2pdf from 'html2pdf.js';
 import { createPortal } from 'react-dom';
 import { normalizarClasseParaEN } from '../utils/classTranslation';
-import { useState, useEffect, useRef } from 'react';
 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
