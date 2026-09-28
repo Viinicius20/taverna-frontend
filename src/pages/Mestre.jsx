@@ -106,12 +106,14 @@ export default function Mestre() {
   const [novaConsequencia, setNovaConsequencia] = useState({ gatilho: '', consequencia: '', condicao_tipo: 'manual', condicao_valor: '' });
   const [gerandoConsequencia, setGerandoConsequencia] = useState(false);
   const [criandoConsequencia, setCriandoConsequencia] = useState(false);
+  const [flagsDisponiveis, setFlagsDisponiveis] = useState([]);
 
   
 
 useEffect(() => {
   api.get(`/consequencias/${CAMPANHA_ID}`).then(res => setConsequencias(res.data.data || [])).catch(() => setConsequencias([]));
   api.get(`/consequencias/prontas/${CAMPANHA_ID}`).then(res => setConsequenciasProntas(res.data.data || [])).catch(() => setConsequenciasProntas([]));
+  api.get(`/flags/${CAMPANHA_ID}`).then(res => setFlagsDisponiveis(res.data.data || [])).catch(() => setFlagsDisponiveis([]));
 }, []);
 
   useEffect(() => {
@@ -3104,7 +3106,7 @@ async function deletarConsequencia(id) {
           className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 focus:outline-none"
           style={{ borderRadius: '2px' }}>
           <option value="">Selecione a flag</option>
-          {flags.map(f => <option key={f.id} value={f.key}>{f.key}</option>)}
+          {flagsDisponiveis.map(f => <option key={f.id} value={f.key}>{f.key}</option>)}
         </select>
       )}
     </div>
