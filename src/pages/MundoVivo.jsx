@@ -48,6 +48,10 @@ export default function MundoVivo() {
   const [iniciandoViagem, setIniciandoViagem] = useState(false);
   const [avancandoDia, setAvancandoDia] = useState(null);
 
+  const [gazetas, setGazetas] = useState([]);
+  const [gerandoGazeta, setGerandoGazeta] = useState(false);
+  const [nomeJornal, setNomeJornal] = useState('');
+
   useEffect(() => {
   buscarEventos();
   api.get(`/world-log/${CAMPANHA_ID}`).then(res => setWorldLog(res.data.data || [])).catch(() => setWorldLog([]));
@@ -255,6 +259,47 @@ async function deletarViagem(id) {
     alert('Erro ao deletar viagem.');
   }
 }
+
+async function gerarGazeta() {
+  setGerandoGazeta(true);
+  try {
+    const res = await api.post('/gazeta/gerar', { campaign_id: CAMPANHA_ID, nome_jornal: nomeJornal.trim() || null });
+    setGazetas(prev => [res.data.data, ...prev]);
+  } catch (e) {
+    alert(e.response?.data?.detail || 'Erro ao gerar gazeta.');
+  }
+  setGerandoGazeta(false);
+}
+
+function editarNoticia(gazetaId, idx, texto) {
+  setGazetas(prev => prev.map(g => g.id === gazetaId
+    ? { ...g, noticias: g.noticias.map((n, i) => i === idx ? { ...n, texto } : n) } : g));
+}
+
+function removerNoticia(gazetaId, idx) {
+  setGazetas(prev => prev.map(g => g.id === gazetaId
+    ? { ...g, noticias: g.noticias.filter((_, i) => i !== idx) } : g));
+}
+
+async function publicarGazeta(g) {
+  try {
+    await api.patch(`/gazeta/${g.id}`, { titulo: g.titulo, noticias: g.noticias });
+    const res = await api.post(`/gazeta/${g.id}/publicar`);
+    setGazetas(prev => prev.map(x => x.id === g.id ? res.data.data : x));
+  } catch {
+    alert('Erro ao publicar.');
+  }
+}
+
+async function deletarGazeta(id) {
+  if (!window.confirm('Deletar esta edição?')) return;
+  try {
+    await api.delete(`/gazeta/${id}`);
+    setGazetas(prev => prev.filter(g => g.id !== id));
+  } catch {
+    alert('Erro ao deletar.');
+  }
+}
  
 
 useEffect(() => {
@@ -266,6 +311,7 @@ useEffect(() => {
   api.get(`/viagem/locais/${CAMPANHA_ID}`).then(res => setLocais(res.data.data || [])).catch(() => setLocais([]));
   api.get(`/viagem/campanha/${CAMPANHA_ID}`).then(res => setViagens(res.data.data || [])).catch(() => setViagens([]));
   api.get(`/economia/precos/${CAMPANHA_ID}`).then(res => setPrecos(res.data.data || [])).catch(() => setPrecos([]));
+  api.get(`/gazeta/${CAMPANHA_ID}`).then(res => setGazetas(res.data.data || [])).catch(() => setGazetas([]));
 }, []);
 
 function iconeRelogio(nome) {
@@ -755,6 +801,90 @@ function iconeRelogio(nome) {
     </div>
   )}
 </div>
+
+{/* GAZETA DO MUNDO */}
+<div className="mt-12">
+  <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+  <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
+  <h2 style={cinzel} className="text-xl text-[#c8a84b] font-semibold mb-6">📰 Gazeta</h2>
+
+  <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6 flex flex-col sm:flex-row gap-3">
+    <input value={nomeJornal} onChange={e => setNomeJornal(e.target.value)}
+      placeholder="Nome do jornal (ex: Gazeta de Valdris)"
+      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 focus:outline-none focus:border-[#c8a84b50]"
+      style={{ borderRadius: '2px' }} />
+    <button onClick={gerarGazeta} disabled={gerandoGazeta}
+      className="bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] transition-colors disabled:opacity-30"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      {gerandoGazeta ? 'Escrevendo...' : '+ Nova Edição'}
+    </button>
+  </div>
+
+  {gazetas.length === 0 ? (
+    <p className="text-[#3a3020] text-sm text-center py-6">Nenhuma edição ainda.</p>
+  ) : (
+    <div className="flex flex-col gap-3">
+      {gazetas.map(g => {
+        const rascunho = g.status === 'rascunho';
+        return (
+          <div key={g.id} className={`border p-4 ${rascunho ? 'border-[#c8a84b30] bg-[#c8a84b08]' : 'border-[#4a8a4a30] bg-[#161410]'}`}
+            style={{ borderRadius: '2px' }}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex-1 mr-3">
+                <p style={cinzel} className="text-[#6a6050] text-xs tracking-[2px]">EDIÇÃO Nº {g.edicao}</p>
+                {rascunho ? (
+                  <input value={g.titulo}
+                    onChange={e => setGazetas(prev => prev.map(x => x.id === g.id ? { ...x, titulo: e.target.value } : x))}
+                    className="bg-transparent border-b border-[#c8a84b30] text-[#e8e0d0] text-lg w-full focus:outline-none focus:border-[#c8a84b]"
+                    style={cinzel} />
+                ) : (
+                  <p style={cinzel} className="text-[#e8e0d0] text-lg">{g.titulo}</p>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <span style={{ ...cinzel, color: rascunho ? '#c8a84b' : '#4a8a4a' }} className="text-xs uppercase">
+                  {rascunho ? 'Rascunho' : 'Publicada'}
+                </span>
+                <button onClick={() => deletarGazeta(g.id)}
+                  className="text-red-900 hover:text-red-600 text-xs transition-colors">×</button>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              {(g.noticias || []).map((n, i) => (
+                <div key={i} className="flex items-start gap-2">
+                  <span className="mt-1">{n.icone}</span>
+                  {rascunho ? (
+                    <>
+                      <textarea value={n.texto} rows={2}
+                        onChange={e => editarNoticia(g.id, i, e.target.value)}
+                        className="flex-1 bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-2 py-1 text-sm focus:outline-none focus:border-[#c8a84b50]"
+                        style={{ borderRadius: '2px' }} />
+                      <button onClick={() => removerNoticia(g.id, i)}
+                        className="text-red-900 hover:text-red-600 text-xs mt-1">×</button>
+                    </>
+                  ) : (
+                    <p className="text-[#8a8070] text-sm leading-relaxed">{n.texto}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {rascunho && (
+              <button onClick={() => publicarGazeta(g)}
+                className="mt-4 w-full border border-[#4a8a4a50] text-[#4a8a4a] px-4 py-2 text-xs hover:bg-[#4a8a4a10] transition-colors"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                PUBLICAR PARA OS JOGADORES
+              </button>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  )}
+</div>
+
+
       </div>
     </div>
   );

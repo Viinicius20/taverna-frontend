@@ -267,6 +267,9 @@ export default function Ficha() {
   const [caixaMundoMudou, setCaixaMundoMudou] = useState(false);
   const changelogsJaMostrados = useRef(new Set());
 
+  const [gazetaAtual, setGazetaAtual] = useState(null);
+  const [modalGazeta, setModalGazeta] = useState(false);
+
 
   const ACOES_COMBATE = {
   'Attack': 'Faça um ataque corpo a corpo ou à distância.',
@@ -1058,6 +1061,16 @@ async function marcarChangelogLido(changelogId) {
     await api.post(`/world-changelog/${changelogId}/marcar-lido`, { personagem_id: id });
     setChangelogNaoLido(prev => prev.filter(c => c.id !== changelogId));
   } catch {}
+}
+
+async function abrirGazeta() {
+  try {
+    const res = await api.get(`/gazeta/${CAMPANHA_ID}/publicada`);
+    setGazetaAtual(res.data.data);
+  } catch {
+    setGazetaAtual(null);
+  }
+  setModalGazeta(true);
 }
 
 
@@ -2972,6 +2985,43 @@ style={{
             </div>
           ))}
         </div>
+      )}
+    </div>
+  </div>
+)}
+
+<button onClick={abrirGazeta}
+  className="fixed bottom-4 left-4 z-40 border border-[#c8a84b50] bg-[#0f0e0c] text-[#c8a84b] px-3 py-2 text-xs hover:bg-[#c8a84b10] transition-colors"
+  style={{ ...cinzel, borderRadius: '2px' }}>
+  📰 GAZETA
+</button>
+
+{modalGazeta && (
+  <div className="fixed inset-0 bg-black bg-opacity-70 flex items-end sm:items-center justify-center z-50 px-4"
+    onClick={() => setModalGazeta(false)}>
+    <div className="bg-[#0f0e0c] border border-[#c8a84b50] max-w-md w-full max-h-[80vh] overflow-y-auto p-6 mb-4 sm:mb-0"
+      style={{ borderRadius: '2px', boxShadow: '0 0 30px #c8a84b20' }}
+      onClick={e => e.stopPropagation()}>
+      <div className="flex items-center justify-between mb-4">
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px]">📰 GAZETA</p>
+        <button onClick={() => setModalGazeta(false)}
+          className="text-[#4a4030] hover:text-[#c8a84b] transition-colors">✕</button>
+      </div>
+      {!gazetaAtual ? (
+        <p className="text-[#4a4030] text-sm text-center py-4">Nenhuma edição publicada ainda.</p>
+      ) : (
+        <>
+          <p style={cinzel} className="text-[#6a6050] text-xs tracking-[2px]">EDIÇÃO Nº {gazetaAtual.edicao}</p>
+          <h3 style={cinzel} className="text-[#e8e0d0] text-lg mb-4">{gazetaAtual.titulo}</h3>
+          <div className="flex flex-col gap-3">
+            {(gazetaAtual.noticias || []).map((n, i) => (
+              <div key={i} className="flex items-start gap-2 border-t border-[#c8a84b15] pt-3">
+                <span>{n.icone}</span>
+                <p className="text-[#8a8070] text-sm leading-relaxed">{n.texto}</p>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   </div>
