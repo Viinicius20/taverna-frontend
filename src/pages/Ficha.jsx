@@ -1269,7 +1269,7 @@ async function abrirGazeta() {
         )}
 
         {/* NAVEGAÇÃO DE ABAS */}
-<div className="flex gap-1 border-b border-[#c8a84b20] mb-6 overflow-x-auto">
+<div className="flex gap-1 border-b border-[#c8a84b20] mb-6 overflow-x-auto scroll-tema">
   {[
     { id: 'principal', label: 'PRINCIPAL' },
     ...(ficha.spellcasting ? [{ id: 'magias', label: 'MAGIAS' }] : []),

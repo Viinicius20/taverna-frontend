@@ -117,3 +117,8 @@ html, body {
   animation: float-particle linear infinite;
   box-shadow: 0 0 6px 1px #c8a84b80;
 }
+
+.scroll-tema {
+  scrollbar-width: thin;
+  scrollbar-color: var(--cor-classe, #c8a84b) #161410;
+}
