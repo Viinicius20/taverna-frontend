@@ -13,6 +13,7 @@ Plataforma web fullstack para mesas de RPG presencial com IA generativa, fichas 
 ![Home](./screenshots/home.png)
 ![Ficha](./screenshots/ficha.png)
 ![Mestre](./screenshots/mestre.png)
+![Mundo Vivo](./screenshots/mundo-vivo.png)
 ![Galeria](./screenshots/galeria.png)
 
 
