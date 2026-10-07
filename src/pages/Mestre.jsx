@@ -113,6 +113,7 @@ export default function Mestre() {
   const [perspectivaFiltro, setPerspectivaFiltro] = useState('todos'); // 'todos' | `char:<id>` | `npc:<id>`
   const [params, setParams] = useSearchParams();
   const processado = useRef(false);
+  const [aba, setAba] = useState('painel');
 
   
 
@@ -986,6 +987,21 @@ useEffect(() => {
           </div>
         </div>
 
+        <div className="flex gap-1 border-b border-[#c8a84b20] mb-6 overflow-x-auto scroll-tema">
+  {[
+    { id: 'painel', label: 'Painel' },
+    { id: 'npcs', label: `NPCs (${npcs.length})` },
+  ].map(a => (
+    <button key={a.id} onClick={() => setAba(a.id)}
+      style={cinzel}
+      className={`px-4 py-3 text-xs tracking-[2px] uppercase whitespace-nowrap border-b-2 transition-colors ${
+        aba === a.id ? 'border-[#c8a84b] text-[#c8a84b]' : 'border-transparent text-[#4a4030] hover:text-[#6a6050]'
+      }`}>
+      {a.label}
+    </button>
+  ))}
+</div>
+
         <div className="w-16 h-px bg-[#c8a84b30] mb-10" />
 
         {/* DRAWER */}
@@ -1019,6 +1035,8 @@ useEffect(() => {
 )}
 
         {/* FORM NOVO NPC */}
+        {aba === 'npcs' && (
+          <>
         {mostrarForm && (
           <div className="border border-[#c8a84b30] bg-[#161410] mb-8">
             <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
@@ -1182,6 +1200,7 @@ useEffect(() => {
                       {d.art_url && (
                         <img src={d.art_url} alt={d.name} className="w-full max-h-64 object-cover mb-2" style={{ borderRadius: '2px' }} />
                       )}
+                
 
                     {/* STATS DE COMBATE */}
                       {d.combat && (
@@ -1601,8 +1620,12 @@ useEffect(() => {
     </div>
   </div>
 )}
+</>
+)}
 
         {/* PAINEL DE COMBATE */}
+        {aba === 'painel' && (
+          <>
 <div className="mt-12">
   <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
   <div className="flex items-center justify-between mb-2">
@@ -1848,6 +1871,8 @@ useEffect(() => {
     </p>
   )}
 </div>
+</>
+)}
 
 {/* GERADOR DE LOOT */}
 <div className="mt-12">
