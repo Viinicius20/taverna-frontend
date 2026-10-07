@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import Dados from '../components/Dados';
@@ -940,21 +940,27 @@ async function revelarConsequenciaIndividual(id, personagemId) {
 useEffect(() => {
   const nome = params.get("addMonster");
   if (!nome) { processado.current = false; return; }   
+  if (processado.current) return;
   processado.current = true;
 
   const num = (k, padrao, min, max) => Math.min(max, Math.max(min, Number(params.get(k)) || padrao));
-  const hp = num("hp", 1, 1, 9999), ac = num("ac", 10, 0, 40);
-  const dex = num("dex", 10, 1, 30), qtd = num("qtd", 1, 1, 20);
+  const hp = num("hp", 1, 1, 9999);
+  const dex = num("dex", 10, 1, 30);
+  const qtd = num("qtd", 1, 1, 20);
 
-  for (let i = 1; i <= qtd; i++) {
-    adicionarMonstro({
-      nome: qtd > 1 ? `${nome} ${i}` : nome,
-      hp, hpMax: hp, ca: ac,
-      iniciativa: Math.floor(Math.random() * 20) + 1 + Math.floor((dex - 10) / 2),
-    });
-  }
+  const base = Date.now();
+  const novos = Array.from({ length: qtd }, (_, i) => ({
+    id: base + i,
+    nome: qtd > 1 ? `${nome} ${i + 1}` : nome,
+    tipo: 'monstro',
+    hpMax: hp,
+    hpAtual: hp,
+    iniciativa: Math.floor(Math.random() * 20) + 1 + Math.floor((dex - 10) / 2),
+  }));
+
+  setCombatentes(prev => [...prev, ...novos]);
   setParams({}, { replace: true });
-}, [params, setParams, adicionarMonstro]);
+}, [params, setParams]);
 
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
