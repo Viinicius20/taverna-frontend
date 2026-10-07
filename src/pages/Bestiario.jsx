@@ -23,6 +23,7 @@ export default function Bestiario() {
   const [novoTipo, setNovoTipo] = useState('');
   const [novaDescricao, setNovaDescricao] = useState('');
   const [erro, setErro] = useState('');
+  const [qtd, setQtd] = useState({});
 
   useEffect(() => {
     buscarMonstros();
@@ -288,17 +289,35 @@ async function toggleDescoberto(id, atual) {
                       <p className="text-[#4a4030] text-sm italic border-t border-[#c8a84b10] pt-3">{m.description}</p>
                     )}
 
-                    <div className="flex gap-2 pt-2 border-t border-[#c8a84b10]">
-  <button onClick={() => navigate(`/mestre?addMonster=${encodeURIComponent(m.name)}&hp=${m.hp}`)}
+                    <div className="flex items-center gap-2 pt-2 border-t border-[#c8a84b10]">
+  <input type="number" min="1" max="20" title="Quantidade"
+    value={qtd[m.id] ?? 1}
+    onChange={e => setQtd(q => ({ ...q, [m.id]: Math.max(1, Math.min(20, Number(e.target.value) || 1)) }))}
+    className="w-14 bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-2 py-1 text-xs text-center focus:outline-none"
+    style={{ borderRadius: '2px' }} />
+
+  <button onClick={() => {
+      const q = new URLSearchParams({
+        addMonster: m.name,
+        hp: String(m.hp ?? 1),
+        ac: String(m.ac ?? 10),
+        dex: String(m.attributes?.dex ?? 10),
+        qtd: String(qtd[m.id] ?? 1),
+      });
+      navigate(`/mestre?${q}`);
+    }}
     className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 hover:bg-[#c8a84b10] transition-colors"
     style={{ ...cinzel, borderRadius: '2px' }}>
     ⚔ + COMBATE
   </button>
-  <button onClick={() => deletarMonstro(m.id)}
-    className="text-xs border border-red-900 text-red-900 px-3 py-1 hover:bg-red-900 hover:text-white transition-colors"
-    style={{ ...cinzel, borderRadius: '2px' }}>
-    🗑 DELETAR
-  </button>
+
+  {m.is_homebrew && (
+    <button onClick={() => { if (window.confirm(`Deletar "${m.name}"?`)) deletarMonstro(m.id); }}
+      className="text-xs border border-red-900 text-red-900 px-3 py-1 hover:bg-red-900 hover:text-white transition-colors"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      🗑 DELETAR
+    </button>
+  )}
 </div>
                   </div>
                 )}

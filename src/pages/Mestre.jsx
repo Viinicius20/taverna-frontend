@@ -111,6 +111,8 @@ export default function Mestre() {
   const [novoFato, setNovoFato] = useState({ texto: '', todos_jogadores: false, personagens_que_sabem: [], npcs_que_sabem: [] });
   const [criandoFato, setCriandoFato] = useState(false);
   const [perspectivaFiltro, setPerspectivaFiltro] = useState('todos'); // 'todos' | `char:<id>` | `npc:<id>`
+  const [params, setParams] = useSearchParams();
+  const processado = useRef(false);
 
   
 
@@ -934,6 +936,25 @@ async function revelarConsequenciaIndividual(id, personagemId) {
     setConsequenciasProntas(prev => prev.filter(c => c.id !== id));
   } catch { alert('Erro ao revelar.'); }
 }
+
+useEffect(() => {
+  const nome = params.get("addMonster");
+  if (!nome || processado.current) return;   
+  processado.current = true;
+
+  const num = (k, padrao, min, max) => Math.min(max, Math.max(min, Number(params.get(k)) || padrao));
+  const hp = num("hp", 1, 1, 9999), ac = num("ac", 10, 0, 40);
+  const dex = num("dex", 10, 1, 30), qtd = num("qtd", 1, 1, 20);
+
+  for (let i = 1; i <= qtd; i++) {
+    adicionarMonstro({   
+      nome: qtd > 1 ? `${nome} ${i}` : nome,
+      hp, hpMax: hp, ca: ac,
+      iniciativa: Math.floor(Math.random() * 20) + 1 + Math.floor((dex - 10) / 2),
+    });
+  }
+  setParams({}, { replace: true });   
+}, []);
 
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
