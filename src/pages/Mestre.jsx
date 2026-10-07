@@ -1002,8 +1002,6 @@ useEffect(() => {
   ))}
 </div>
 
-        <div className="w-16 h-px bg-[#c8a84b30] mb-10" />
-
         {/* DRAWER */}
 {drawerAberto && (
   <div className="fixed inset-0 z-50 flex justify-end">
@@ -1625,9 +1623,8 @@ useEffect(() => {
 
         {/* PAINEL DE COMBATE */}
         {aba === 'painel' && (
-          <>
-<div className="mt-12">
-  <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+        <>
+<div>
   <div className="flex items-center justify-between mb-2">
     <div>
       <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">ENCONTRO ATUAL</p>
@@ -1871,8 +1868,6 @@ useEffect(() => {
     </p>
   )}
 </div>
-</>
-)}
 
 {/* GERADOR DE LOOT */}
 <div className="mt-12">
@@ -3347,7 +3342,8 @@ useEffect(() => {
           <p className="text-[#7a7060] mb-6 font-light text-sm">Resultados visíveis apenas para você.</p>
           <Dados secreto={true} />
         </div>
-
+        </>
+)}
       </div>
     </div>
   );
