@@ -939,7 +939,7 @@ async function revelarConsequenciaIndividual(id, personagemId) {
 
 useEffect(() => {
   const nome = params.get("addMonster");
-  if (!nome || processado.current) return;   
+  if (!nome) { processado.current = false; return; }   
   processado.current = true;
 
   const num = (k, padrao, min, max) => Math.min(max, Math.max(min, Number(params.get(k)) || padrao));
@@ -947,14 +947,14 @@ useEffect(() => {
   const dex = num("dex", 10, 1, 30), qtd = num("qtd", 1, 1, 20);
 
   for (let i = 1; i <= qtd; i++) {
-    adicionarMonstro({   
+    adicionarMonstro({
       nome: qtd > 1 ? `${nome} ${i}` : nome,
       hp, hpMax: hp, ca: ac,
       iniciativa: Math.floor(Math.random() * 20) + 1 + Math.floor((dex - 10) / 2),
     });
   }
-  setParams({}, { replace: true });   
-}, []);
+  setParams({}, { replace: true });
+}, [params, setParams, adicionarMonstro]);
 
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
