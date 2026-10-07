@@ -134,23 +134,6 @@ useEffect(() => {
     if (attrs) setAttrsLocais(JSON.parse(attrs));
   }, []);
 
-  useEffect(() => {
-  const params = new URLSearchParams(window.location.search);
-  const monsterName = params.get('addMonster');
-  const monsterHp = params.get('hp');
-  if (monsterName) {
-    setCombatentes(prev => [...prev, {
-      id: Date.now(),
-      nome: decodeURIComponent(monsterName),
-      tipo: 'monstro',
-      hpMax: Number(monsterHp) || 10,
-      hpAtual: Number(monsterHp) || 10,
-      iniciativa: 0,
-    }]);
-    window.history.replaceState({}, '', '/mestre');
-  }
-}, []);
-
   async function buscarNpcs() {
     setCarregando(true);
     try {
