@@ -822,6 +822,14 @@ const menuItemsMestre = [
   { label: '📂 Arquivo Secreto', rota: '/arquivo-mestre' }
 ];
 
+const HUMORES = [
+  { id: 'neutro', emoji: '😐', label: 'Neutro' },
+  { id: 'hostil', emoji: '😡', label: 'Hostil' },
+  { id: 'assustado', emoji: '😨', label: 'Assustado' },
+  { id: 'amigavel', emoji: '😊', label: 'Amigável' },
+  { id: 'manipulador', emoji: '😈', label: 'Manipulador' },
+];
+
 useEffect(() => {
   buscarProfecias();
 }, []);
@@ -1179,6 +1187,9 @@ useEffect(() => {
                       <div className="flex items-center gap-3 mb-1 flex-wrap">
                         <h2 style={cinzel} className="text-[#f0e8d8] text-lg font-semibold">{d.name || npc.name}</h2>
                         {d.race && <span className="text-[#4a4030] text-xs" style={cinzel}>{d.race}</span>}
+                        {getNota(npc.id, 'mood') && getNota(npc.id, 'mood') !== 'neutro' && (
+                          <span title="Estado emocional">{HUMORES.find(h => h.id === getNota(npc.id, 'mood'))?.emoji}</span>
+                        )}
                         {d.level && <span className="text-[#4a4030] text-xs" style={cinzel}>Nível {d.level}</span>}
                       </div>
                       <p className="text-[#6a6050] text-sm">
@@ -1373,6 +1384,26 @@ useEffect(() => {
     placeholder="Ex: Porto de Valdris"
     className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
     style={{ borderRadius: '2px' }} />
+</div>
+
+{/* HUMOR */}
+<div>
+  <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">ESTADO EMOCIONAL</p>
+  <div className="flex flex-wrap gap-2">
+    {HUMORES.map(h => {
+      const ativo = (getNota(npc.id, 'mood') || 'neutro') === h.id;
+      return (
+        <button key={h.id}
+          onClick={e => { e.stopPropagation(); editarNotaLocal(npc.id, 'mood', h.id); }}
+          className={`px-3 py-1 text-xs border transition-colors ${
+            ativo ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]' : 'border-[#c8a84b20] text-[#6a6050] hover:border-[#c8a84b50]'
+          }`}
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          {h.emoji} {h.label}
+        </button>
+      );
+    })}
+  </div>
 </div>
 
                       {/* MEMÓRIA DO NPC */}

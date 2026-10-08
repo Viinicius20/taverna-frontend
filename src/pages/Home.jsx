@@ -245,6 +245,7 @@ export default function Home() {
           )}
         </div>
       </div>
+      
       {/* BOATOS */}
       <div className="max-w-5xl mx-auto px-8 mb-20">
         <div className="w-16 h-px bg-[#c8a84b60] mx-auto mb-16" />
