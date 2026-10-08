@@ -724,7 +724,10 @@ async function adicionarMemoria(npcId) {
 async function pedirSugestao(npcId) {
   setGerandoSugestao(npcId);
   try {
-    const res = await api.post('/npcs/sugerir-acao', { npc_id: npcId });
+    const res = await api.post('/npcs/sugerir-acao', {
+      npc_id: npcId,
+      mood: getNota(npcId, 'mood') || 'neutro',
+    });
     setSugestaoNpc(prev => ({ ...prev, [npcId]: res.data.data }));
   } catch {
     alert('Erro ao gerar sugestão.');
