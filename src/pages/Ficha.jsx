@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom';
 import { normalizarClasseParaEN } from '../utils/classTranslation';
 
 
-const ATIVIDADES_DOWNTIME = ['treinar', 'trabalhar', 'pesquisar', 'viajar', 'fabricar item', 'investigar', 'socializar', 'descansar'];
+
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
 const CAMPANHA_ID = '00000000-0000-0000-0000-000000000001';
@@ -17,6 +17,8 @@ const tipoColor = {
   'feature de classe': '#c8a84b',
   'perícia': '#c87ab8',
 };
+const ATIVIDADES_DOWNTIME = ['treinar', 'trabalhar', 'pesquisar', 'viajar', 'fabricar item', 'investigar', 'socializar', 'descansar'];
+ const TIPOS_MOMENTO = ['😂', '💀', '🩸', '❤️', '🍺', '⚠️'];
 
 const combatFields = [
   { label: 'HP ATUAL', campo: 'hp', tipo: 'number' },
@@ -185,6 +187,87 @@ function getIconeClasse(classe) {
   );
 }
 
+function CartaoMomento({ m, onRemover }) {
+  return (
+    <div className={`flex items-start gap-3 bg-[#161410] px-4 py-3 border-l-2 ${m.permanente ? 'border-[#8a5030]' : 'border-[#c8a84b50]'}`}>
+      <span className="text-xl">{m.emoji}</span>
+      <div className="flex-1">
+        <p className="text-[#e8e0d0] text-sm italic leading-relaxed">{m.texto}</p>
+        <p style={cinzel} className="text-[#4a4030] text-xs mt-1">
+          {m.permanente ? '📌 MARCA PERMANENTE · ' : ''}{m.data}
+        </p>
+      </div>
+      <button onClick={() => onRemover(m.id)} className="text-red-900 hover:text-red-600 text-lg" title="Apagar">×</button>
+    </div>
+  );
+}
+
+function Momentos({ momentos = [], onChange }) {
+  const [texto, setTexto] = useState('');
+  const [emoji, setEmoji] = useState('😂');
+  const [permanente, setPermanente] = useState(false);
+
+  function adicionar() {
+    const t = texto.trim();
+    if (!t) return;
+    onChange([{ id: Date.now(), emoji, texto: t, permanente, data: new Date().toLocaleDateString('pt-BR') }, ...momentos]);
+    setTexto('');
+    setPermanente(false);
+  }
+  const remover = id => onChange(momentos.filter(m => m.id !== id));
+
+  const fixos = momentos.filter(m => m.permanente);
+  const historia = momentos.filter(m => !m.permanente);
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-1">CRÔNICAS</p>
+        <p className="text-[#6a6050] text-sm italic">O que aconteceu, ficou. A mesa nunca esquece.</p>
+      </div>
+
+      <div className="border border-[#c8a84b20] bg-[#0f0e0c] p-4 flex flex-col gap-3">
+        <textarea value={texto} onChange={e => setTexto(e.target.value)} rows={2}
+          placeholder="Ex: Perdeu 20 kg em três dias e descobriu que está diabético..."
+          className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm w-full focus:outline-none focus:border-[#c8a84b50] resize-none"
+          style={{ borderRadius: '2px' }} />
+        <div className="flex flex-wrap items-center gap-2">
+          {TIPOS_MOMENTO.map(e => (
+            <button key={e} onClick={() => setEmoji(e)}
+              className={`text-lg px-2 py-1 border ${emoji === e ? 'border-[#c8a84b]' : 'border-transparent opacity-50 hover:opacity-100'}`}
+              style={{ borderRadius: '2px' }}>{e}</button>
+          ))}
+          <label className="flex items-center gap-2 text-xs text-[#6a6050] ml-2 cursor-pointer" style={cinzel}>
+            <input type="checkbox" checked={permanente} onChange={e => setPermanente(e.target.checked)} />
+            📌 Marca permanente
+          </label>
+          <button onClick={adicionar} disabled={!texto.trim()}
+            className="ml-auto bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] disabled:opacity-30"
+            style={{ ...cinzel, borderRadius: '2px' }}>
+            ✒ Escrever na crônica
+          </button>
+        </div>
+      </div>
+
+      {fixos.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <p style={cinzel} className="text-[#8a5030] text-xs tracking-[3px]">MARCAS PERMANENTES</p>
+          {fixos.map(m => <CartaoMomento key={m.id} m={m} onRemover={remover} />)}
+        </div>
+      )}
+
+      {historia.length > 0 ? (
+        <div className="flex flex-col gap-2">
+          <p style={cinzel} className="text-[#4a4030] text-xs tracking-[3px]">HISTÓRICO</p>
+          {historia.map(m => <CartaoMomento key={m.id} m={m} onRemover={remover} />)}
+        </div>
+      ) : fixos.length === 0 && (
+        <p className="text-[#3a3020] text-sm text-center py-6 italic">Nenhuma façanha (ou desgraça) registrada ainda.</p>
+      )}
+    </div>
+  );
+}
+
 export default function Ficha() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -276,6 +359,8 @@ export default function Ficha() {
   const [enviandoDowntime, setEnviandoDowntime] = useState(false);
   const [downtimeResolvidos, setDowntimeResolvidos] = useState([]);
   const [modalDowntimeResultado, setModalDowntimeResultado] = useState(false);
+
+
 
 
   const ACOES_COMBATE = {
@@ -1279,6 +1364,7 @@ async function abrirGazeta() {
     { id: 'personagem', label: 'PERSONAGEM' },
     { id: 'notas', label: 'NOTAS' },
     { id: 'downtime', label: '🌙 DOWNTIME' },
+    { id: 'momentos', label: '📜 CRÔNICA' },
   ].map(({ id, label }) => (
     <button key={id} onClick={() => setAbaAtiva(id)}
       className="px-4 py-3 text-xs tracking-widest whitespace-nowrap transition-colors border-b-2"
@@ -3060,6 +3146,13 @@ style={{
       </div>
     </div>
   </div>
+)}
+
+{abaAtiva === 'momentos' && (
+  <Momentos
+    momentos={ficha.momentos || []}
+    onChange={lista => setFicha(f => ({ ...f, momentos: lista }))}
+  />
 )}
 
 {caixaMundoMudou && (
