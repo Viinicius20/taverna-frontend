@@ -12,6 +12,11 @@ export default function Misterios() {
   const [descricao, setDescricao] = useState('');
   const [total, setTotal] = useState(5);
   const [erro, setErro] = useState('');
+  const [npcs, setNpcs] = useState([]);
+  const [locais, setLocais] = useState([]);
+  const [npcId, setNpcId] = useState('');
+  const [localId, setLocalId] = useState('');
+  const [filtro, setFiltro] = useState('todos');
 
   const carregar = useCallback(async () => {
     try {
@@ -25,14 +30,19 @@ export default function Misterios() {
 
   useEffect(() => { carregar(); }, [carregar]);
 
-  async function criar() {
-    if (!titulo.trim()) return;
-    try {
-      await api.post('/misterios', { title: titulo, description: descricao, clues_total: Number(total) || 1 });
-      setTitulo(''); setDescricao(''); setTotal(5); setErro('');
-      carregar();
-    } catch { setErro('Erro ao criar o mistério.'); }
-  }
+async function criar() {
+  if (!titulo.trim()) return;
+  try {
+    await api.post('/misterios', {
+      title: titulo, description: descricao, clues_total: Number(total) || 1,
+      npc_id: npcId || null, location_id: localId || null,
+    });
+    setTitulo(''); setDescricao(''); setTotal(5);
+    setNpcId(''); setLocalId('');
+    setErro('');
+    carregar();
+  } catch { setErro('Erro ao criar o mistério.'); }
+}
 
   async function mudarPistas(m, delta) {
     const novo = Math.max(0, Math.min(m.clues_total, m.clues_found + delta));
@@ -49,6 +59,15 @@ export default function Misterios() {
     catch { setErro('Erro ao apagar.'); }
   }
 
+useEffect(() => {
+  api.get('/npcs').then(r => setNpcs(r.data.data || [])).catch(() => {});
+  api.get('/locations').then(r => setLocais(r.data.data || [])).catch(() => {});
+}, []);
+
+const visiveis = lista.filter(m =>
+  filtro === 'npc' ? m.npc_id : filtro === 'local' ? m.location_id : true);
+
+
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade">
       <nav className="flex items-center justify-between px-8 py-4 border-b border-[#c8a84b20]">
@@ -60,6 +79,11 @@ export default function Misterios() {
       <div className="max-w-3xl mx-auto px-8 py-12">
         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">MUNDO</p>
         <h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold mb-8">Mistérios Abertos</h1>
+
+        <div className="flex flex-wrap gap-2 mt-2">
+            {m.npcs?.name && <span style={cinzel} className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-2 py-0.5">👤 {m.npcs.name}</span>}
+            {m.locations?.name && <span style={cinzel} className="text-xs border border-[#7ab8d430] text-[#7ab8d4] px-2 py-0.5">📍 {m.locations.name}</span>}
+        </div>
 
         <div className="border border-[#c8a84b20] bg-[#161410] p-4 flex flex-col gap-3 mb-8">
           <input value={titulo} onChange={e => setTitulo(e.target.value)} maxLength={200}
@@ -75,6 +99,20 @@ export default function Misterios() {
             <input type="number" min={1} max={50} value={total} onChange={e => setTotal(e.target.value)}
               className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] w-16 px-2 py-1 text-center text-sm focus:outline-none"
               style={{ borderRadius: '2px' }} />
+            <div className="flex flex-wrap gap-2">
+                <select value={npcId} onChange={e => setNpcId(e.target.value)}
+                    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 min-w-40"
+                    style={{ borderRadius: '2px' }}>
+                    <option value="">👤 Sem NPC ligado</option>
+                    {npcs.map(n => <option key={n.id} value={n.id}>{n.name}</option>)}
+                </select>
+                <select value={localId} onChange={e => setLocalId(e.target.value)}
+                    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 min-w-40"
+                    style={{ borderRadius: '2px' }}>
+                    <option value="">📍 Sem local ligado</option>
+                    {locais.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                </select>
+            </div>
             <button onClick={criar} disabled={!titulo.trim()} style={{ ...cinzel, borderRadius: '2px' }}
               className="ml-auto bg-[#c8a84b] text-[#0f0e0c] px-5 py-2 text-xs font-bold hover:bg-[#e0c060] disabled:opacity-30">
               + Novo mistério
@@ -83,13 +121,32 @@ export default function Misterios() {
           {erro && <p className="text-red-400 text-sm">{erro}</p>}
         </div>
 
+        <div className="flex gap-2 mb-4">
+          {[
+            { id: 'todos', label: 'Todos' },
+            { id: 'npc', label: '👤 Com NPC' },
+            { id: 'local', label: '📍 Com local' },
+          ].map(f => (
+            <button key={f.id} onClick={() => setFiltro(f.id)} style={{ ...cinzel, borderRadius: '2px' }}
+                className={`px-3 py-1 text-xs border transition-colors ${
+                  filtro === f.id ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]' : 'border-[#c8a84b20] text-[#6a6050] hover:border-[#c8a84b50]'
+                }`}>
+                {f.label}
+            </button>
+          ))}
+        </div>
+
+        {!carregando && lista.length > 0 && visiveis.length === 0 && (
+            <p className="text-[#3a3020] text-sm text-center py-10 italic">Nenhum mistério com esse filtro.</p>
+        )}
+
         {carregando ? (
           <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest text-center py-10">CARREGANDO...</p>
         ) : lista.length === 0 ? (
           <p className="text-[#3a3020] text-sm text-center py-10 italic">Nenhum mistério. O mundo é suspeitosamente tranquilo.</p>
         ) : (
           <div className="flex flex-col gap-3">
-            {lista.map(m => {
+            {visiveis.map(m => {
               const pct = Math.round((m.clues_found / m.clues_total) * 100);
               const resolvido = m.status === 'resolvido';
               return (
