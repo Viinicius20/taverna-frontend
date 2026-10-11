@@ -60,8 +60,13 @@ async function criar() {
   }
 
 useEffect(() => {
-  api.get('/npcs').then(r => setNpcs(r.data.data || [])).catch(() => {});
-  api.get('/locations').then(r => setLocais(r.data.data || [])).catch(() => {});
+  api.get(`/npcs/${CAMPANHA_ID}`)
+    .then(res => { console.log('NPCs:', res.data); setNpcs(res.data.data || []); })
+    .catch(err => { console.error('Erro NPCs:', err); setNpcs([]); });
+
+  api.get(`/locations/${CAMPANHA_ID}`)
+    .then(res => { console.log('Locais:', res.data); setLocais(res.data.data || []); })
+    .catch(err => { console.error('Erro locais:', err); setLocais([]); });
 }, []);
 
 const visiveis = lista.filter(m =>
