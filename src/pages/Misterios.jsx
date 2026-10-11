@@ -80,11 +80,6 @@ const visiveis = lista.filter(m =>
         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">MUNDO</p>
         <h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold mb-8">Mistérios Abertos</h1>
 
-        <div className="flex flex-wrap gap-2 mt-2">
-            {m.npcs?.name && <span style={cinzel} className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-2 py-0.5">👤 {m.npcs.name}</span>}
-            {m.locations?.name && <span style={cinzel} className="text-xs border border-[#7ab8d430] text-[#7ab8d4] px-2 py-0.5">📍 {m.locations.name}</span>}
-        </div>
-
         <div className="border border-[#c8a84b20] bg-[#161410] p-4 flex flex-col gap-3 mb-8">
           <input value={titulo} onChange={e => setTitulo(e.target.value)} maxLength={200}
             placeholder="Ex: Quem matou o rei?"
@@ -157,6 +152,11 @@ const visiveis = lista.filter(m =>
                       <p style={cinzel} className={`text-lg ${resolvido ? 'text-[#4a8a4a] line-through' : 'text-[#f0e8d8]'}`}>
                         {resolvido ? '✓' : '❓'} {m.title}
                       </p>
+
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {m.npcs?.name && <span style={cinzel} className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-2 py-0.5">👤 {m.npcs.name}</span>}
+                        {m.locations?.name && <span style={cinzel} className="text-xs border border-[#7ab8d430] text-[#7ab8d4] px-2 py-0.5">📍 {m.locations.name}</span>}
+                      </div>
                       {m.description && <p className="text-[#6a6050] text-sm mt-1 italic">{m.description}</p>}
                     </div>
                     <button onClick={() => apagar(m)} className="text-red-900 hover:text-red-600 text-lg" title="Apagar">×</button>
