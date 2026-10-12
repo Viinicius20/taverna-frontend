@@ -33,6 +33,14 @@ export default function PainelReputacao({ tipo, id, pontos = 0, onMudou }) {
     } catch { setErro('Erro ao ajustar a reputação.'); }
   }
 
+async function apagarLog(logId) {
+  if (!window.confirm('Apagar este registro do histórico?')) return;
+  try {
+    await api.delete(`/reputation/log/${logId}`);
+    setLog(prev => prev.filter(h => h.id !== logId));
+  } catch { setErro('Erro ao apagar o registro.'); }
+}
+
   const estado = estadoPorPontos(pontos);
   const pos = ((Math.max(-MAXIMO, Math.min(MAXIMO, pontos)) + MAXIMO) / (2 * MAXIMO)) * 100;
 
@@ -66,16 +74,20 @@ export default function PainelReputacao({ tipo, id, pontos = 0, onMudou }) {
       {erro && <p className="text-red-400 text-xs">{erro}</p>}
 
       {log.length > 0 && (
-        <div className="flex flex-col gap-1">
-          {log.map(h => (
-            <p key={h.id} className="text-xs text-[#6a6050]">
-              <span style={{ color: h.delta > 0 ? COR.aliada : COR.hostil }}>{h.delta > 0 ? '+' : ''}{h.delta}</span>
-              {' · '}{h.reason}
-              <span className="text-[#3a3020]"> · {new Date(h.created_at).toLocaleDateString('pt-BR')}{h.source === 'evento' ? ' · evento' : ''}</span>
-            </p>
-          ))}
-        </div>
-      )}
+  <div className="flex flex-col gap-1">
+    {log.map(h => (
+      <div key={h.id} className="flex items-start justify-between gap-2">
+        <p className="text-xs text-[#6a6050]">
+          <span style={{ color: h.delta > 0 ? COR.aliada : COR.hostil }}>{h.delta > 0 ? '+' : ''}{h.delta}</span>
+          {' · '}{h.reason}
+          <span className="text-[#3a3020]"> · {new Date(h.created_at).toLocaleDateString('pt-BR')}{h.source === 'evento' ? ' · evento' : ''}</span>
+        </p>
+        <button onClick={() => apagarLog(h.id)}
+          className="text-red-900 hover:text-red-600 text-xs transition-colors flex-shrink-0">×</button>
+      </div>
+    ))}
+  </div>
+)}
     </div>
   );
 }
