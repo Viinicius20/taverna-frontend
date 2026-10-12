@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import PainelReputacao from "../components/PainelReputacao";
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -36,6 +37,13 @@ export default function Facoes() {
     setCarregando(false);
   }
 
+async function recarregarFaccoesSilencioso() {
+  try {
+    const res = await api.get(`/factions/${CAMPANHA_ID}`);
+    setFaccoes(res.data.data || []);
+  } catch { /* mantém a lista atual */ }
+}
+
   async function gerarFaccao() {
     if (!descricaoFaccao.trim()) return;
     setGerando(true);
@@ -52,15 +60,6 @@ export default function Facoes() {
       setErro('Erro ao gerar facção.');
     }
     setGerando(false);
-  }
-
-  async function atualizarReputacao(id, novaReputacao) {
-    try {
-      await api.patch(`/factions/${id}`, { reputation: novaReputacao });
-      setFaccoes(prev => prev.map(f => f.id === id ? { ...f, reputation: novaReputacao } : f));
-    } catch {
-      alert('Erro ao atualizar reputação.');
-    }
   }
 
   async function deletarFaccao(id) {
@@ -134,6 +133,7 @@ export default function Facoes() {
                   </div>
                   <span className="text-[#4a4030] text-xs">{faccaoExpandida === f.id ? '▲' : '▼'}</span>
                 </div>
+
                 {faccaoExpandida === f.id && (
                   <div className="px-6 pb-5 border-t border-[#c8a84b10] pt-4 flex flex-col gap-3">
                     {f.description && <p className="text-[#8a8070] text-sm leading-relaxed">{f.description}</p>}
@@ -145,20 +145,7 @@ export default function Facoes() {
                     )}
                     <div>
                       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">REPUTAÇÃO</p>
-                      <div className="flex gap-2">
-                        {['aliada', 'neutra', 'hostil'].map(rep => (
-                          <button key={rep} onClick={() => atualizarReputacao(f.id, rep)}
-                            className="px-3 py-1 text-xs border transition-all"
-                            style={{
-                              borderRadius: '2px', ...cinzel,
-                              borderColor: f.reputation === rep ? REPUTACAO_COR[rep] : '#c8a84b15',
-                              backgroundColor: f.reputation === rep ? `${REPUTACAO_COR[rep]}25` : 'transparent',
-                              color: f.reputation === rep ? REPUTACAO_COR[rep] : '#4a4030',
-                            }}>
-                            {rep.toUpperCase()}
-                          </button>
-                        ))}
-                      </div>
+                      <PainelReputacao tipo="faction" id={f.id} pontos={f.reputation_score || 0} onMudou={recarregarFaccoesSilencioso} />
                     </div>
                     <button onClick={() => deletarFaccao(f.id)}
                       className="text-red-900 hover:text-red-600 text-xs border border-red-900 hover:border-red-600 px-3 py-1.5 transition-colors self-end"

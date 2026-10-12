@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import Dados from '../components/Dados';
 import { createPortal } from 'react-dom';
+import PainelReputacao from "../components/PainelReputacao";
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -145,6 +146,13 @@ useEffect(() => {
     }
     setCarregando(false);
   }
+
+async function recarregarNpcsSilencioso() {
+  try {
+    const res = await api.get(`/npcs/${CAMPANHA_ID}`);
+    setNpcs(res.data.data || []);
+  } catch {}
+}
 
   async function gerarNpc() {
     if (!descNpc.trim()) return;
@@ -1408,6 +1416,11 @@ useEffect(() => {
       );
     })}
   </div>
+</div>
+
+<div>
+  <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">RELAÇÃO COM OS JOGADORES</p>
+  <PainelReputacao tipo="npc" id={npc.id} pontos={npc.relation_score || 0} onMudou={recarregarNpcsSilencioso} />
 </div>
 
                       {/* MEMÓRIA DO NPC */}
