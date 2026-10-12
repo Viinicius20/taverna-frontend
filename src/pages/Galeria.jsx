@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useUser } from '../context/UserContext';
 import { TIPOS_DOC } from "../constants/tiposDoc";
+import EnviarHandout from "../components/EnviarHandout";
+
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const CAMPANHA_ID = '00000000-0000-0000-0000-000000000001';
@@ -61,6 +63,14 @@ export default function Galeria() {
     return () => clearInterval(interval);
   }
 }, [isMestre]);
+
+const [personagens, setPersonagens] = useState([]);
+
+useEffect(() => {
+  api.get('/characters')
+    .then(res => setPersonagens(res.data.data || []))
+    .catch(() => setPersonagens([]));
+}, []);
 
   async function buscarImagens() {
     try {
@@ -640,13 +650,10 @@ if (!isMestre) {
              {tipoDoc(h.category).label}
             </span>
               <div className="flex gap-2">
-                {!h.revealed && (
-                  <button onClick={() => revelarImagem(h.id)}
-                    className="text-xs border border-[#8a5030] text-[#8a5030] px-2 py-0.5 hover:bg-[#8a503020] transition-colors"
-                    style={{ borderRadius: '2px', ...cinzel }}>
-                    REVELAR
-                  </button>
+                {h.revealed && (
+                  <p style={cinzel} className="text-[#4a8a4a] text-xs tracking-[2px] mb-2">VISÍVEL PARA TODOS</p>
                 )}
+                <EnviarHandout handoutId={h.id} personagens={personagens} onEnviado={buscarImagens} />
                 <button onClick={() => deletarHandout(h.id)}
                   className="text-xs border border-red-900 text-red-900 px-2 py-0.5 hover:bg-red-900 hover:text-white transition-colors"
                   style={{ borderRadius: '2px', ...cinzel }}>
