@@ -2,9 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useUser } from '../context/UserContext';
+import { TIPOS_DOC } from "../constants/tiposDoc";
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const CAMPANHA_ID = '00000000-0000-0000-0000-000000000001';
+const tipoDoc = cat => TIPOS_DOC[cat] || { label: cat, cor: '#c8a84b' };
 
 const CATEGORIAS_TOKEN = ['Nobre', 'Cultista', 'Aberração', 'Bandido', 'Goblin', 'Humanoide', 'Undead', 'Gigante', 'Besta', 'Dragão', 'Demônio', 'Construto', 'Outro'];
 
@@ -41,6 +43,7 @@ export default function Galeria() {
   const [tipoHandout, setTipoHandout] = useState('carta');
   const [descricaoHandout, setDescricaoHandout] = useState('');
   const [gerandoHandout, setGerandoHandout] = useState(false);
+  const [remetente, setRemetente] = useState('');
 
   useEffect(() => {
   buscarImagens();
@@ -124,15 +127,17 @@ export default function Galeria() {
     } catch {}
   }
 
-  async function gerarHandout() {
+async function gerarHandout() {
   setGerandoHandout(true);
   try {
     await api.post('/gallery/gerar-handout', {
       campaign_id: CAMPANHA_ID,
       descricao: descricaoHandout,
-      tipo_documento: tipoHandout
+      tipo_documento: tipoHandout,
+      remetente,
     });
     setDescricaoHandout('');
+    setRemetente('');
     buscarImagens();
   } catch {
     alert('Erro ao gerar handout.');
@@ -591,14 +596,24 @@ if (!isMestre) {
     {/* Gerar com IA */}
     <div className="border border-[#c8a84b30] bg-[#161410] mb-6 p-6">
       <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] block mb-2">GERAR DOCUMENTO COM IA</label>
-      <select value={tipoHandout} onChange={e => setTipoHandout(e.target.value)}
+      <div className="flex flex-wrap gap-2 mb-3">
+  {Object.entries(TIPOS_DOC).map(([id, t]) => (
+    <button key={id} type="button" onClick={() => setTipoHandout(id)}
+      className="px-3 py-1 text-xs border transition-colors"
+      style={{
+        ...cinzel, borderRadius: '2px',
+        borderColor: tipoHandout === id ? t.cor : '#c8a84b20',
+        color: tipoHandout === id ? t.cor : '#6a6050',
+        backgroundColor: tipoHandout === id ? `${t.cor}18` : 'transparent',
+        }}>
+        {t.label}
+        </button>
+      ))}
+      </div>
+      <input value={remetente} onChange={e => setRemetente(e.target.value)} maxLength={80}
+       placeholder="Remetente (opcional): ex: Capitão da Guarda, Culto da Estigma"
         className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full mb-3 focus:outline-none focus:border-[#c8a84b50] text-sm"
-        style={{ borderRadius: '2px' }}>
-        <option value="carta">Carta</option>
-        <option value="bilhete">Bilhete</option>
-        <option value="pergaminho">Pergaminho antigo</option>
-        <option value="mapa de tesouro">Mapa de tesouro (descrição)</option>
-      </select>
+        style={{ borderRadius: '2px' }} />
       <textarea value={descricaoHandout} onChange={e => setDescricaoHandout(e.target.value)}
         placeholder="Ex: uma carta de amor nunca entregue, escondida há 20 anos..."
         rows={2}
@@ -617,11 +632,13 @@ if (!isMestre) {
         <p className="text-[#3a3020] text-sm text-center py-8">Nenhum handout ainda.</p>
       ) : (
         handouts.map(h => (
-          <div key={h.id} className="border border-[#c8a84b15] bg-[#161410] p-4" style={{ borderRadius: '2px' }}>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-2 py-0.5" style={{ borderRadius: '2px', ...cinzel }}>
-                {h.category}
-              </span>
+          <div key={h.id} className="border border-[#c8a84b15] bg-[#161410] p-4"
+            style={{ borderRadius: '2px', borderLeft: `4px solid ${tipoDoc(h.category).cor}` }}>
+             <div className="flex items-center justify-between mb-2">
+            <span className="text-xs border px-2 py-0.5"
+             style={{ borderRadius: '2px', ...cinzel, borderColor: `${tipoDoc(h.category).cor}60`, color: tipoDoc(h.category).cor }}>
+             {tipoDoc(h.category).label}
+            </span>
               <div className="flex gap-2">
                 {!h.revealed && (
                   <button onClick={() => revelarImagem(h.id)}

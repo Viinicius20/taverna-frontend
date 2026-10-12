@@ -6,7 +6,6 @@ import { createPortal } from 'react-dom';
 import { normalizarClasseParaEN } from '../utils/classTranslation';
 
 
-
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
 const CAMPANHA_ID = '00000000-0000-0000-0000-000000000001';
