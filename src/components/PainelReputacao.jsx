@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import api from "../services/api";
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
+const MAXIMO = 100;
 const FAIXAS = {
   faction: [
     { min: 50, nome: 'Aliada', emoji: '', cor: '#4a8a4a' },
@@ -20,7 +21,6 @@ const FAIXAS = {
 };
 const faixaPorPontos = (tipo, p) => (FAIXAS[tipo] || FAIXAS.faction).find(f => p >= f.min);
 const COR = { aliada: '#4a8a4a', neutra: '#8a8070', hostil: '#c84b4b' };
-const estadoPorPontos = p => (p >= LIMIAR ? 'aliada' : p <= -LIMIAR ? 'hostil' : 'neutra');
 
 export default function PainelReputacao({ tipo, id, pontos = 0, onMudou }) {
   const [delta, setDelta] = useState(10);
