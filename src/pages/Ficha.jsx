@@ -32,6 +32,8 @@ const combatFields = [
 
 const saveLabel = { str: 'FOR', dex: 'DES', con: 'CON', int: 'INT', wis: 'SAB', cha: 'CAR' };
 
+const limparTexto = t => (t || '').replace(/\\n/g, '\n').replace(/^"|"$/g, '').trim();
+
 function getTemaClasse(classe) {
   if (!classe) return '';
   const c = classe.toLowerCase();
@@ -3245,7 +3247,7 @@ style={{
             {h.url ? (
               <img src={h.url} alt={h.name} className="w-full rounded" />
             ) : (
-              <p className="text-[#a09880] text-sm whitespace-pre-wrap leading-relaxed">{h.text_content}</p>
+              <p className="text-[#a09880] text-sm whitespace-pre-wrap leading-relaxed">{limparTexto(h.text_content)}</p>
             )}
           </div>
         ))}
