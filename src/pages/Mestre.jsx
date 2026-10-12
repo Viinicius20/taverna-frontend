@@ -836,10 +836,12 @@ const menuItemsMestre = [
 
 const HUMORES = [
   { id: 'neutro', emoji: '😐', label: 'Neutro' },
-  { id: 'hostil', emoji: '😡', label: 'Hostil' },
+  { id: 'hostil', emoji: '😠', label: 'Irritado' },
   { id: 'assustado', emoji: '😨', label: 'Assustado' },
-  { id: 'amigavel', emoji: '😊', label: 'Amigável' },
+  { id: 'amigavel', emoji: '😄', label: 'Animado' },
   { id: 'manipulador', emoji: '😈', label: 'Manipulador' },
+  { id: 'triste', emoji: '😢', label: 'Triste' },
+  { id: 'curioso', emoji: '🧐', label: 'Curioso' },
 ];
 
 useEffect(() => {

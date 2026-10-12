@@ -2,8 +2,23 @@ import { useState, useEffect, useCallback } from "react";
 import api from "../services/api";
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
-const LIMIAR = 50;
-const MAXIMO = 100;
+const FAIXAS = {
+  faction: [
+    { min: 50, nome: 'Aliada', emoji: '', cor: '#4a8a4a' },
+    { min: -49, nome: 'Neutra', emoji: '', cor: '#8a8070' },
+    { min: -Infinity, nome: 'Hostil', emoji: '', cor: '#c84b4b' },
+  ],
+  npc: [
+    { min: 75, nome: 'Leal', emoji: '🤝', cor: '#c8a84b' },
+    { min: 50, nome: 'Amigável', emoji: '😊', cor: '#4a8a4a' },
+    { min: 21, nome: 'Cordial', emoji: '🙂', cor: '#7aaa5a' },
+    { min: -20, nome: 'Neutro', emoji: '😐', cor: '#8a8070' },
+    { min: -49, nome: 'Desconfiado', emoji: '😒', cor: '#d08a30' },
+    { min: -75, nome: 'Hostil', emoji: '😡', cor: '#c84b4b' },
+    { min: -Infinity, nome: 'Inimigo jurado', emoji: '💀', cor: '#8a2020' },
+  ],
+};
+const faixaPorPontos = (tipo, p) => (FAIXAS[tipo] || FAIXAS.faction).find(f => p >= f.min);
 const COR = { aliada: '#4a8a4a', neutra: '#8a8070', hostil: '#c84b4b' };
 const estadoPorPontos = p => (p >= LIMIAR ? 'aliada' : p <= -LIMIAR ? 'hostil' : 'neutra');
 
@@ -41,13 +56,13 @@ async function apagarLog(logId) {
   } catch { setErro('Erro ao apagar o registro.'); }
 }
 
-  const estado = estadoPorPontos(pontos);
+  const faixa = faixaPorPontos(tipo, pontos);
   const pos = ((Math.max(-MAXIMO, Math.min(MAXIMO, pontos)) + MAXIMO) / (2 * MAXIMO)) * 100;
 
   return (
     <div className="flex flex-col gap-3" onClick={e => e.stopPropagation()}>
-      <p style={{ ...cinzel, color: COR[estado] }} className="text-xs tracking-[2px]">
-        {estado.toUpperCase()} · {pontos > 0 ? '+' : ''}{pontos}
+      <p style={{ ...cinzel, color: faixa.cor }} className="text-xs tracking-[2px]">
+        {faixa.emoji ? `${faixa.emoji} ` : ''}{faixa.nome.toUpperCase()} · {pontos > 0 ? '+' : ''}{pontos}
       </p>
 
       <div className="relative h-2 bg-[#0f0e0c] rounded-full">
@@ -55,7 +70,7 @@ async function apagarLog(logId) {
         <div className="absolute inset-y-0 w-px bg-[#c8a84b60]" style={{ left: '50%' }} />
         <div className="absolute inset-y-0 w-px bg-[#c8a84b40]" style={{ left: '75%' }} />
         <div className="absolute -top-0.5 w-3 h-3 rounded-full"
-          style={{ left: `calc(${pos}% - 6px)`, backgroundColor: COR[estado] }} />
+          style={{ left: `calc(${pos}% - 6px)`, backgroundColor: faixa.cor }} />
       </div>
 
       <div className="flex gap-2">
