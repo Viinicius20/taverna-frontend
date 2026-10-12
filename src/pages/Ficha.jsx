@@ -359,6 +359,8 @@ export default function Ficha() {
   const [downtimeResolvidos, setDowntimeResolvidos] = useState([]);
   const [modalDowntimeResultado, setModalDowntimeResultado] = useState(false);
 
+  const [handoutsRecebidos, setHandoutsRecebidos] = useState([]);
+
 
 
 
@@ -417,6 +419,13 @@ useEffect(() => {
   const interval = setInterval(checarDowntime, 10000);
   return () => clearInterval(interval);
 }, [id]);
+
+useEffect(() => {
+  if (abaAtiva !== 'documentos' || !id) return;
+  api.get(`/handouts/personagem/${id}`)
+    .then(res => setHandoutsRecebidos(res.data.data || []))
+    .catch(() => setHandoutsRecebidos([]));
+}, [abaAtiva, id]);
 
 useEffect(() => {
   async function init() {
@@ -1364,6 +1373,7 @@ async function abrirGazeta() {
     { id: 'notas', label: 'NOTAS' },
     { id: 'downtime', label: '🌙 DOWNTIME' },
     { id: 'momentos', label: '📜 CRÔNICA' },
+    { id: 'documentos', label: '🎫 DOCUMENTOS' },
   ].map(({ id, label }) => (
     <button key={id} onClick={() => setAbaAtiva(id)}
       className="px-4 py-3 text-xs tracking-widest whitespace-nowrap transition-colors border-b-2"
@@ -3219,6 +3229,28 @@ style={{
         </>
       )}
     </div>
+  </div>
+)}
+
+{abaAtiva === 'documentos' && (
+  <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6">
+    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">DOCUMENTOS RECEBIDOS</p>
+    {handoutsRecebidos.length === 0 ? (
+      <p className="text-[#3a3020] text-sm text-center py-6">Nenhum documento recebido ainda.</p>
+    ) : (
+      <div className="flex flex-col gap-3">
+        {handoutsRecebidos.map(h => (
+          <div key={h.id} className="border border-[#c8a84b15] bg-[#0f0e0c] p-4" style={{ borderRadius: '2px' }}>
+            <p style={cinzel} className="text-[#e8e0d0] text-sm mb-2">{h.name}</p>
+            {h.url ? (
+              <img src={h.url} alt={h.name} className="w-full rounded" />
+            ) : (
+              <p className="text-[#a09880] text-sm whitespace-pre-wrap leading-relaxed">{h.text_content}</p>
+            )}
+          </div>
+        ))}
+      </div>
+    )}
   </div>
 )}
 
