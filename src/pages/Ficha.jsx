@@ -423,12 +423,11 @@ useEffect(() => {
 }, [id]);
 
 useEffect(() => {
-  if (abaAtiva !== 'documentos' || !id) return;
-  api.get(`/handouts/personagem/${id}`)
+  if (!id) return;
+  api.get(`/gallery/handouts-para/${id}`)
     .then(res => setHandoutsRecebidos(res.data.data || []))
     .catch(() => setHandoutsRecebidos([]));
-}, [abaAtiva, id]);
-
+}, [id, abaAtiva]);
 useEffect(() => {
   async function init() {
     buscarPersonagem();
