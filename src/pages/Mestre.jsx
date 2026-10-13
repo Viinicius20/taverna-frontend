@@ -4,6 +4,9 @@ import api from '../services/api';
 import Dados from '../components/Dados';
 import { createPortal } from 'react-dom';
 import PainelReputacao from "../components/PainelReputacao";
+import RolagemRapida from "../components/RolagemRapida";
+
+
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
 
@@ -1670,6 +1673,10 @@ useEffect(() => {
 </>
 )}
 
+{aba === 'painel' && (
+  <>
+  <RolagemRapida />
+
         {/* PAINEL DE COMBATE */}
         {aba === 'painel' && (
         <>
@@ -1917,6 +1924,8 @@ useEffect(() => {
     </p>
   )}
 </div>
+</>
+)}
 
 {/* GERADOR DE LOOT */}
 <div className="mt-12">
