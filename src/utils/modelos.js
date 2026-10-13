@@ -5,9 +5,9 @@ export const MODELOS = {
     { id: 'vilao', emoji: '😈', label: 'Vilão',
       descricao: 'Vilão com motivação compreensível (evite "dominar o mundo"), método de operação, uma fraqueza ou ponto cego, um capanga leal e uma forma de o grupo achar pistas dele antes do confronto.' },
   ],
-  encontro: [
+    encontro: [
     { id: 'emboscada', emoji: '🗡️', label: 'Emboscada', bioma: 'Floresta',
-      contexto: 'Emboscada em terreno que favorece os inimigos (cobertura, altura), com inimigos escondidos detectáveis por teste de Percepção, um gatilho que revela a armadilha e uma saída tática para o grupo.' },
+      contexto: 'Emboscada em terreno que favorece os inimigos (cobertura, altura). Informe a CD de Percepção para notar os inimigos escondidos antes do ataque, o gatilho que revela a armadilha e uma saída tática para o grupo.' },
   ],
   local: [
     { id: 'taverna', emoji: '🍺', label: 'Taverna', tipo: 'taverna',
@@ -15,8 +15,9 @@ export const MODELOS = {
     { id: 'masmorra', emoji: '🏚️', label: 'Masmorra', tipo: 'masmorra',
       descricao: 'Masmorra de 5 a 7 salas com um tema, um desafio de cada tipo (combate, armadilha, enigma), um chefe, tesouro e uma pista de lore sobre quem a construiu.' },
   ],
-  quest: [
+    quest: [
     { id: 'investigacao', emoji: '🔍', label: 'Quest de investigação',
-      descricao: 'Mistério com um crime ou desaparecimento, 3 suspeitos com motivo e álibi, 4 pistas em locais diferentes, uma pista falsa e a verdade por trás de tudo, com o que acontece se o grupo errar a conclusão.' },
+      nome: 'Mistério: [nome do caso]',
+      descricao: 'O que aconteceu: [crime ou desaparecimento]\nSuspeitos: [A], [B], [C] (motivo e álibi de cada um)\nPistas: 1) [local] 2) [local] 3) [local] 4) [local]\nPista falsa: [qual]\nA verdade: [quem fez e por quê]\nSe o grupo errar: [consequência]\nProgresso: cada pista encontrada vale +25%.' },
   ],
 };

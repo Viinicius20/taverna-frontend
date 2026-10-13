@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { MODELOS } from '../utils/modelos';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -66,6 +67,11 @@ export default function MundoVivo() {
     }
     setCarregando(false);
   }
+
+  function aplicarModeloQuest(m) {
+  setNovoEvento(prev => ({ ...prev, name: m.nome, description: m.descricao }));
+  setMostrarForm(true);
+}
 
   async function deletarWorldLog(id) {
   if (!window.confirm('Apagar essa cronica?')) return;
@@ -351,6 +357,13 @@ function iconeRelogio(nome) {
             <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">MUNDO</p>
             <h1 style={cinzel} className="text-2xl text-[#f0e8d8] font-semibold">Mundo Vivo</h1>
           </div>
+          {MODELOS.quest.map(m => (
+            <button key={m.id} onClick={() => aplicarModeloQuest(m)}
+              className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
+              style={{ ...cinzel, borderRadius: '2px' }}>
+              {m.emoji} {m.label}
+            </button>
+          ))}
           <button onClick={() => setMostrarForm(!mostrarForm)}
             className="bg-[#c8a84b] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors"
             style={{ ...cinzel, borderRadius: '2px' }}>

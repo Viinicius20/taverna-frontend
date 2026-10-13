@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { MODELOS } from '../utils/modelos';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -31,6 +32,11 @@ export default function Locais() {
     }
     setCarregando(false);
   }
+
+  function aplicarModeloLocal(m) {
+  setDescricao(m.descricao);
+  setMostrarForm(true);
+}
 
   async function gerarLocal() {
     if (!descricao.trim()) return;
@@ -88,6 +94,16 @@ export default function Locais() {
             style={{ ...cinzel, borderRadius: '2px' }}>
             + Novo Local
           </button>
+          <div className="flex flex-wrap items-center gap-2 mb-6">
+            <span style={cinzel} className="text-[#4a4030] text-xs tracking-[2px]">MODELOS:</span>
+            {MODELOS.local.map(m => (
+              <button key={m.id} onClick={() => aplicarModeloLocal(m)}
+                className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                {m.emoji} {m.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {mostrarForm && (
