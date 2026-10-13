@@ -5,6 +5,7 @@ import Dados from '../components/Dados';
 import { createPortal } from 'react-dom';
 import PainelReputacao from "../components/PainelReputacao";
 import RolagemRapida from "../components/RolagemRapida";
+import { MODELOS } from '../utils/modelos';
 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
@@ -878,6 +879,16 @@ async function criarConsequencia() {
   setCriandoConsequencia(false);
 }
 
+function aplicarModeloNpc(m) {
+  setDescNpc(m.descricao);
+  setAbaForm('ia');
+  setMostrarForm(true);
+}
+
+function aplicarModeloEncontro(m) {
+  setEncounterConfig(p => ({ ...p, bioma: m.bioma, contexto: m.contexto }));
+}
+
 async function revelarConsequencia(id, paraTodos) {
   try {
     await api.post(`/consequencias/${id}/revelar`, {
@@ -1089,6 +1100,15 @@ useEffect(() => {
 
               {abaForm === 'ia' && (
                 <>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {MODELOS.npc.map(m => (
+                      <button key={m.id} onClick={() => aplicarModeloNpc(m)}
+                        className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
+                        style={{ ...cinzel, borderRadius: '2px' }}>
+                        {m.emoji} {m.label}
+                      </button>
+                    ))}
+                  </div>
                   <div>
                     <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] block mb-2">DESCRIÇÃO DO NPC</label>
                     <textarea value={descNpc} onChange={e => setDescNpc(e.target.value)}
@@ -2468,6 +2488,15 @@ useEffect(() => {
   <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Encontro Aleatório</h2>
 
   <div className="flex flex-col sm:flex-row gap-2 mb-4">
+    <div className="flex flex-wrap gap-2 mb-3">
+      {MODELOS.encontro.map(m => (
+        <button key={m.id} onClick={() => aplicarModeloEncontro(m)}
+          className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          {m.emoji} {m.label}
+        </button>
+      ))}
+    </div>
     <select value={encounterConfig.bioma} onChange={e => setEncounterConfig(p => ({ ...p, bioma: e.target.value }))}
       className="bg-[#161410] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-xs focus:outline-none focus:border-[#c8a84b50]"
       style={{ borderRadius: '2px' }}>
