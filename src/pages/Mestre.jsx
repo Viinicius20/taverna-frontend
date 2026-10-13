@@ -4,7 +4,6 @@ import api from '../services/api';
 import Dados from '../components/Dados';
 import { createPortal } from 'react-dom';
 import PainelReputacao from "../components/PainelReputacao";
-
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
 
@@ -111,7 +110,7 @@ export default function Mestre() {
   const [fatosMundo, setFatosMundo] = useState([]);
   const [novoFato, setNovoFato] = useState({ texto: '', todos_jogadores: false, personagens_que_sabem: [], npcs_que_sabem: [] });
   const [criandoFato, setCriandoFato] = useState(false);
-  const [perspectivaFiltro, setPerspectivaFiltro] = useState('todos'); // 'todos' | `char:<id>` | `npc:<id>`
+  const [perspectivaFiltro, setPerspectivaFiltro] = useState('todos'); 
   const [params, setParams] = useSearchParams();
   const processado = useRef(false);
   const [aba, setAba] = useState('painel');

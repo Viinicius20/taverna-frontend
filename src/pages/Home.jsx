@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useUser } from '../context/UserContext';
+import NotasSessao from "../components/NotasSessao";
+import api from "../services/api";
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -24,6 +26,7 @@ export default function Home() {
   const [monstro, setMonstro] = useState(null);
   const [imagemRevelada, setImagemRevelada] = useState(null);
   const isMestre = user?.role === 'mestre';
+  const [proximos, setProximos] = useState([]);
   
 
   useEffect(() => {
@@ -40,6 +43,13 @@ export default function Home() {
       setMonstro(null);
     }
   }
+
+  useEffect(() => {
+  if (!isMestre) return;
+  api.get('/mundo/eventos-proximos')
+    .then(res => setProximos(res.data.data || []))
+    .catch(() => setProximos([]));
+}, [isMestre]);
 
   async function buscarImagemRevelada() {
     try {
@@ -161,6 +171,33 @@ export default function Home() {
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ANOTAÇÕES DO MESTRE */}
+      {isMestre && (
+        <div className="max-w-5xl mx-auto px-8 pt-8">
+          <NotasSessao />
+          {proximos.length > 0 && (
+            <div className="border border-[#8a5030] bg-[#8a503010] p-4 mb-8" style={{ borderRadius: '2px' }}>
+              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">⚠ O MUNDO ESTÁ PRESTES A MUDAR</p>
+              <div className="flex flex-col gap-3">
+                {proximos.map(ev => {
+                  const pct = Math.max(0, Math.min(100, Number(ev.progress) || 0));
+                  const cor = pct >= 85 ? '#c84b4b' : pct >= 65 ? '#d98a3a' : '#c8a84b';
+                  return (
+                    <div key={ev.id} className="flex items-center gap-3">
+                      <span className="text-[#e8e0d0] text-sm w-48 truncate">{ev.name}</span>
+                      <div className="flex-1 h-1.5 bg-[#0f0e0c] rounded-full overflow-hidden">
+                        <div className="h-full" style={{ width: `${pct}%`, backgroundColor: cor }} />
+                      </div>
+                      <span style={{ ...cinzel, color: cor }} className="text-xs w-10 text-right">{pct}%</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
