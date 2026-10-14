@@ -118,6 +118,8 @@ export default function Mestre() {
   const [params, setParams] = useSearchParams();
   const processado = useRef(false);
   const [aba, setAba] = useState('painel');
+  const [opcoesEse, setOpcoesEse] = useState([]);
+  const [gerandoEse, setGerandoEse] = useState(false);
 
   
 
@@ -866,6 +868,21 @@ async function gerarConsequenciaIA() {
     setNovaConsequencia(prev => ({ ...prev, consequencia: res.data.data }));
   } catch { alert('Erro ao gerar consequência.'); }
   setGerandoConsequencia(false);
+}
+
+async function sugerirEse() {
+  if (!novaConsequencia.gatilho.trim()) return;
+  setGerandoEse(true);
+  try {
+    const res = await api.post('/consequencias/sugerir', { gatilho: novaConsequencia.gatilho });
+    setOpcoesEse(res.data.data || []);
+  } catch { alert('Erro ao gerar opções.'); }
+  setGerandoEse(false);
+}
+
+function escolherEse(texto) {
+  setNovaConsequencia(prev => ({ ...prev, consequencia: texto }));
+  setOpcoesEse([]);
 }
 
 async function criarConsequencia() {
@@ -3234,18 +3251,42 @@ useEffect(() => {
       style={{ borderRadius: '2px' }} />
 
     <div className="flex gap-2">
-      <textarea value={novaConsequencia.consequencia}
-        onChange={e => setNovaConsequencia(p => ({ ...p, consequencia: e.target.value }))}
-        placeholder="Qual a consequência oculta?"
-        rows={2}
-        className="flex-1 bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
-        style={{ borderRadius: '2px' }} />
-      <button onClick={gerarConsequenciaIA} disabled={!novaConsequencia.gatilho.trim() || gerandoConsequencia}
-        className="border border-[#8a4a8a50] text-[#8a4a8a] px-3 text-xs hover:bg-[#8a4a8a10] disabled:opacity-30"
-        style={{ ...cinzel, borderRadius: '2px' }}>
-        {gerandoConsequencia ? '...' : '✨ IA'}
+  <textarea value={novaConsequencia.consequencia}
+    onChange={e => setNovaConsequencia(p => ({ ...p, consequencia: e.target.value }))}
+    placeholder="Qual a consequência oculta?"
+    rows={2}
+    className="flex-1 bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+    style={{ borderRadius: '2px' }} />
+  <div className="flex flex-col gap-2">
+    <button onClick={gerarConsequenciaIA} disabled={!novaConsequencia.gatilho.trim() || gerandoConsequencia}
+      className="border border-[#8a4a8a50] text-[#8a4a8a] px-3 py-1 text-xs hover:bg-[#8a4a8a10] disabled:opacity-30"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      {gerandoConsequencia ? '...' : '✨ IA'}
+    </button>
+    <button onClick={sugerirEse} disabled={!novaConsequencia.gatilho.trim() || gerandoEse}
+      className="border border-[#c8a84b50] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] disabled:opacity-30"
+      style={{ ...cinzel, borderRadius: '2px' }}>
+      {gerandoEse ? '...' : '🔮 E se?'}
+    </button>
+  </div>
+</div>
+
+{opcoesEse.length > 0 && (
+  <div className="flex flex-col gap-2">
+    <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px]">ESCOLHA UMA CONSEQUÊNCIA</p>
+    {opcoesEse.map((o, i) => (
+      <button key={i} onClick={() => escolherEse(o)}
+        className="text-left border border-[#c8a84b20] bg-[#0f0e0c] text-[#a09880] px-3 py-2 text-sm hover:border-[#c8a84b60] hover:text-[#e8e0d0] transition-colors"
+        style={{ borderRadius: '2px' }}>
+        <span className="mr-2">{['👥', '🔮', '🎒'][i]}</span>{o}
       </button>
-    </div>
+    ))}
+    <button onClick={() => setOpcoesEse([])}
+      className="text-[#4a4030] hover:text-[#c8a84b] text-xs self-end transition-colors">
+      Descartar opções
+    </button>
+  </div>
+)}
 
     <div className="flex gap-2">
       <select value={novaConsequencia.condicao_tipo}
