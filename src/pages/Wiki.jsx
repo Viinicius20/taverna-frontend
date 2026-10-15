@@ -70,7 +70,7 @@ export default function Wiki() {
       <nav className="flex items-center justify-between px-6 py-4 border-b border-[#c8a84b20]">
         <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
           onClick={() => navigate('/')}>⚔ TAVERNA</span>
-        <button onClick={() => navigate('/mestre')} className="text-[#6a6050] text-sm hover:text-[#c8a84b]" style={cinzel}>
+        <button onClick={() => navigate('/mestre')} className="text-[#9a8e78] text-sm hover:text-[#c8a84b]" style={cinzel}>
           ← Voltar
         </button>
       </nav>
@@ -89,10 +89,10 @@ export default function Wiki() {
             if (lista.length === 0) return null;
             return (
               <div key={cat} className="mb-4">
-                <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-1">{cat.toUpperCase()}</p>
+                <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-1">{cat.toUpperCase()}</p>
                 {lista.map(p => (
                   <button key={p.id} onClick={() => abrir(p.id)}
-                    className={`block w-full text-left px-2 py-1 text-sm ${p.id === atualId ? 'text-[#c8a84b]' : 'text-[#a09880] hover:text-[#e8e0d0]'}`}>
+                    className={`block w-full text-left px-2 py-1 text-sm ${p.id === atualId ? 'text-[#c8a84b]' : 'text-[#8a7e68] hover:text-[#e8e0d0]'}`}>
                     {p.revelada ? '👁 ' : '🔒 '}{p.titulo}
                   </button>
                 ))}
@@ -113,9 +113,9 @@ export default function Wiki() {
 
           <div className="flex items-center justify-between">
             <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px]">
-              CONTEÚDO <span className="text-[#4a4030]">· use [[Nome]] para criar links</span>
+              CONTEÚDO <span className="text-[#8a7e68]">· use [[Nome]] para criar links</span>
             </p>
-            <button onClick={() => setPrevia(!previa)} className="text-xs text-[#6a6050] hover:text-[#c8a84b]">
+            <button onClick={() => setPrevia(!previa)} className="text-xs text-[#9a8e78] hover:text-[#c8a84b]">
               {previa ? 'Editar' : 'Prévia'}
             </button>
           </div>
@@ -135,7 +135,7 @@ export default function Wiki() {
             onChange={e => setForm(f => ({ ...f, notas_mestre: e.target.value }))}
             className={campo} style={{ borderRadius: '2px' }} />
 
-          <label className="flex items-center gap-2 text-[#6a6050] text-xs cursor-pointer">
+          <label className="flex items-center gap-2 text-[#9a8e78] text-xs cursor-pointer">
             <input type="checkbox" checked={form.revelada}
               onChange={e => setForm(f => ({ ...f, revelada: e.target.checked }))} />
             <span style={cinzel} className="tracking-widest">REVELADA PARA OS JOGADORES</span>

@@ -92,10 +92,10 @@ async function apagarLog(logId) {
   <div className="flex flex-col gap-1">
     {log.map(h => (
       <div key={h.id} className="flex items-start justify-between gap-2">
-        <p className="text-xs text-[#6a6050]">
+        <p className="text-xs text-[#8a7e68]">
           <span style={{ color: h.delta > 0 ? COR.aliada : COR.hostil }}>{h.delta > 0 ? '+' : ''}{h.delta}</span>
           {' · '}{h.reason}
-          <span className="text-[#3a3020]"> · {new Date(h.created_at).toLocaleDateString('pt-BR')}{h.source === 'evento' ? ' · evento' : ''}</span>
+          <span className="text-[#7a6e58]"> · {new Date(h.created_at).toLocaleDateString('pt-BR')}{h.source === 'evento' ? ' · evento' : ''}</span>
         </p>
         <button onClick={() => apagarLog(h.id)}
           className="text-red-900 hover:text-red-600 text-xs transition-colors flex-shrink-0">×</button>

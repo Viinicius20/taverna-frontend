@@ -125,7 +125,7 @@ function getIconeClasse(classe) {
         {modo === "atributos" ? (
           <>
             <div className="px-6 py-4 flex flex-col gap-3">
-              <p className="text-[#6a6050] text-xs mb-1">Distribua 2 pontos (máx +2 num só, ou +1 em dois)</p>
+              <p className="text-[#9a8e78] text-xs mb-1">Distribua 2 pontos (máx +2 num só, ou +1 em dois)</p>
               {Object.entries(atributos).map(([attr, valor]) => (
                 <div key={attr} className="flex items-center justify-between">
                   <span className="text-[#e8e0d0] text-sm">
@@ -146,7 +146,7 @@ function getIconeClasse(classe) {
             </div>
             <div className="px-6 py-4 border-t border-[#c8a84b15] flex gap-3">
               <button onClick={onFechar}
-                className="flex-1 border border-[#c8a84b20] text-[#4a4030] text-xs tracking-widest py-2 hover:border-[#c8a84b40] transition-colors"
+                className="flex-1 border border-[#c8a84b20] text-[#8a7e68] text-xs tracking-widest py-2 hover:border-[#c8a84b40] transition-colors"
                 style={{ ...cinzel, borderRadius: '2px' }}>
                 Cancelar
               </button>
@@ -171,7 +171,7 @@ function getIconeClasse(classe) {
             </div>
             <div className="px-6 py-4 border-t border-[#c8a84b15] flex gap-3">
               <button onClick={onFechar}
-                className="flex-1 border border-[#c8a84b20] text-[#4a4030] text-xs tracking-widest py-2 hover:border-[#c8a84b40] transition-colors"
+                className="flex-1 border border-[#c8a84b20] text-[#8a7e68] text-xs tracking-widest py-2 hover:border-[#c8a84b40] transition-colors"
                 style={{ ...cinzel, borderRadius: '2px' }}>
                 Cancelar
               </button>
@@ -195,7 +195,7 @@ function CartaoMomento({ m, onRemover }) {
       <span className="text-xl">{m.emoji}</span>
       <div className="flex-1">
         <p className="text-[#e8e0d0] text-sm italic leading-relaxed">{m.texto}</p>
-        <p style={cinzel} className="text-[#4a4030] text-xs mt-1">
+        <p style={cinzel} className="text-[#8a7e68] text-xs mt-1">
           {m.permanente ? '📌 MARCA PERMANENTE · ' : ''}{m.data}
         </p>
       </div>
@@ -225,7 +225,7 @@ function Momentos({ momentos = [], onChange }) {
     <div className="flex flex-col gap-6">
       <div>
         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-1">CRÔNICAS</p>
-        <p className="text-[#6a6050] text-sm italic">O que aconteceu, ficou. A mesa nunca esquece.</p>
+        <p className="text-[#9a8e78] text-sm italic">O que aconteceu, ficou. A mesa nunca esquece.</p>
       </div>
 
       <div className="border border-[#c8a84b20] bg-[#0f0e0c] p-4 flex flex-col gap-3">
@@ -239,7 +239,7 @@ function Momentos({ momentos = [], onChange }) {
               className={`text-lg px-2 py-1 border ${emoji === e ? 'border-[#c8a84b]' : 'border-transparent opacity-50 hover:opacity-100'}`}
               style={{ borderRadius: '2px' }}>{e}</button>
           ))}
-          <label className="flex items-center gap-2 text-xs text-[#6a6050] ml-2 cursor-pointer" style={cinzel}>
+          <label className="flex items-center gap-2 text-xs text-[#9a8e78] ml-2 cursor-pointer" style={cinzel}>
             <input type="checkbox" checked={permanente} onChange={e => setPermanente(e.target.checked)} />
             📌 Marca permanente
           </label>
@@ -260,11 +260,11 @@ function Momentos({ momentos = [], onChange }) {
 
       {historia.length > 0 ? (
         <div className="flex flex-col gap-2">
-          <p style={cinzel} className="text-[#4a4030] text-xs tracking-[3px]">HISTÓRICO</p>
+          <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[3px]">HISTÓRICO</p>
           {historia.map(m => <CartaoMomento key={m.id} m={m} onRemover={remover} />)}
         </div>
       ) : fixos.length === 0 && (
-        <p className="text-[#3a3020] text-sm text-center py-6 italic">Nenhuma façanha (ou desgraça) registrada ainda.</p>
+        <p className="text-[#7a6e58] text-sm text-center py-6 italic">Nenhuma façanha (ou desgraça) registrada ainda.</p>
       )}
     </div>
   );
@@ -1299,7 +1299,7 @@ async function abrirGazeta() {
           </div>
 
           <button onClick={() => navigate('/personagens')}
-            className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+            className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
             ← Meus Personagens
           </button>
         </div>
@@ -1341,7 +1341,7 @@ async function abrirGazeta() {
         <span style={{ color: 'var(--cor-classe, #c8a84b)' }} className="mr-2">{getIconeClasse(classeParaTema)}</span>
         {ficha.name}
       </h1>
-      <p className="text-[#6a6050] mt-1">{[
+      <p className="text-[#9a8e78] mt-1">{[
   ficha.race,
   ficha.classes?.length
     ? ficha.classes.map(c => `${c.name} ${c.level}`).join(' / ')
@@ -1366,12 +1366,12 @@ async function abrirGazeta() {
     navigator.clipboard.writeText(`${window.location.origin}/personagens/${id}/publica`);
     alert('Link copiado!');
   }}
-  className="border border-[#c8a84b20] text-[#4a4030] px-4 py-2 text-xs tracking-widest hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors"
+  className="border border-[#c8a84b20] text-[#8a7e68] px-4 py-2 text-xs tracking-widest hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors"
   style={{ ...cinzel, borderRadius: '2px' }}>
   🔗 Compartilhar
 </button>
 <button onClick={exportarPDF}
-  className="border border-[#c8a84b20] text-[#4a4030] px-4 py-2 text-xs tracking-widest hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors"
+  className="border border-[#c8a84b20] text-[#8a7e68] px-4 py-2 text-xs tracking-widest hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors"
   style={{ ...cinzel, borderRadius: '2px' }}>
   ↓ PDF
 </button>
@@ -1498,7 +1498,7 @@ async function abrirGazeta() {
       <div className="h-0.5 bg-[#c8a84b15] w-full">
         <div className="h-full bg-[#c8a84b40] transition-all" style={{ width: `${pct}%` }} />
       </div>
-      <p style={cinzel} className="text-[#3a3020] text-xs mt-1">{xpAtual} / {xpProxNivel} XP</p>
+      <p style={cinzel} className="text-[#7a6e58] text-xs mt-1">{xpAtual} / {xpProxNivel} XP</p>
     </div>
   ) : null;
 })()}
@@ -1525,7 +1525,7 @@ async function abrirGazeta() {
           className="flex-1 bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-2 py-1 text-sm focus:outline-none focus:border-[#c8a84b50]"
           style={{ borderRadius: '2px' }}
         />
-        <label className="text-[#6a6050] text-xs">Lvl:</label>
+        <label className="text-[#9a8e78] text-xs">Lvl:</label>
         <input
           type="number" min={1} max={20}
           value={cls.level || 1}
@@ -1556,7 +1556,7 @@ async function abrirGazeta() {
           className="bg-transparent border-b border-[#c8a84b30] text-[#f0e8d8] text-3xl font-light w-full focus:outline-none focus:border-[#c8a84b60] text-center pb-1"
           style={cinzel} />
       </div>
-      <span className="text-[#4a4030] text-2xl">/</span>
+      <span className="text-[#8a7e68] text-2xl">/</span>
       <div className="flex-1">
         <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">HP MÁXIMO</label>
         <input type="number" value={combat.hp_max ?? 0} onChange={e => editarCombat('hp_max', e.target.value)}
@@ -1571,7 +1571,7 @@ async function abrirGazeta() {
   <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
     <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">ATAQUES</p>
     <button onClick={() => setAdicionandoAtaque(true)}
-      className="text-[#4a4030] text-xs tracking-widest hover:text-[#c8a84b] transition-colors"
+      className="text-[#8a7e68] text-xs tracking-widest hover:text-[#c8a84b] transition-colors"
       style={cinzel}>
       + Adicionar
     </button>
@@ -1580,7 +1580,7 @@ async function abrirGazeta() {
 
     {/* Lista de ataques */}
     {ataques.length === 0 && !adicionandoAtaque && (
-      <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest text-center py-4">
+      <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest text-center py-4">
         Nenhum ataque cadastrado
       </p>
     )}
@@ -1589,7 +1589,7 @@ async function abrirGazeta() {
       <div key={idx} className="flex items-center gap-3 border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3">
         <div className="flex-1">
           <p style={cinzel} className="text-[#e8e0d0] text-sm">{ataque.nome}</p>
-          <p style={cinzel} className="text-[#4a4030] text-xs mt-0.5">
+          <p style={cinzel} className="text-[#8a7e68] text-xs mt-0.5">
             {ataque.bonus && `+${ataque.bonus} para acertar`} {ataque.dano && `· ${ataque.dano}`} {ataque.tipo && `· ${ataque.tipo}`}
           </p>
         </div>
@@ -1599,7 +1599,7 @@ async function abrirGazeta() {
           ⚄ Rolar
         </button>
         <button onClick={() => removerAtaque(idx)}
-          className="text-[#4a4030] hover:text-red-500 transition-colors text-lg leading-none">
+          className="text-[#8a7e68] hover:text-red-500 transition-colors text-lg leading-none">
           ×
         </button>
       </div>
@@ -1633,7 +1633,7 @@ async function abrirGazeta() {
             Salvar Ataque
           </button>
           <button onClick={() => setAdicionandoAtaque(false)}
-            className="flex-1 border border-[#c8a84b20] text-[#4a4030] py-2 text-xs hover:border-[#c8a84b40] transition-colors"
+            className="flex-1 border border-[#c8a84b20] text-[#8a7e68] py-2 text-xs hover:border-[#c8a84b40] transition-colors"
             style={{ ...cinzel, borderRadius: '2px' }}>
             Cancelar
           </button>
@@ -1648,7 +1648,7 @@ async function abrirGazeta() {
     <div className="grid grid-cols-3 gap-4 mb-6">
       {combatFields.filter(f => !['hp', 'hp_max'].includes(f.campo)).map(({ label, campo, tipo }) => (
         <div key={campo} className="flex flex-col items-center border border-[#c8a84b15] bg-[#0f0e0c] p-3 rounded">
-          <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest mb-2 text-center">{label}</label>
+          <label style={cinzel} className="text-[#8a7e68] text-xs tracking-widest mb-2 text-center">{label}</label>
           <input type={tipo} value={combat[campo] ?? (tipo === 'number' ? 0 : '')}
             onChange={e => editarCombat(campo, e.target.value)}
             className="bg-transparent text-[#c8a84b] text-xl font-light w-full focus:outline-none text-center"
@@ -1663,7 +1663,7 @@ async function abrirGazeta() {
       <div className="grid grid-cols-6 gap-2">
         {Object.entries(combat.saving_throws || {}).map(([attr, val]) => (
           <div key={attr} className="flex flex-col items-center gap-1">
-            <label style={cinzel} className="text-[#4a4030] text-xs">{saveLabel[attr] || attr.toUpperCase()}</label>
+            <label style={cinzel} className="text-[#8a7e68] text-xs">{saveLabel[attr] || attr.toUpperCase()}</label>
             <input type="number" value={val ?? 0} onChange={e => editarSavingThrow(attr, e.target.value)}
               className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-sm w-full py-1.5 focus:outline-none focus:border-[#c8a84b50]"
               style={{ borderRadius: '2px', ...cinzel }} />
@@ -1717,12 +1717,12 @@ async function abrirGazeta() {
   <div className="fixed bottom-6 right-6 z-50 modal-anim">
     <div className={`border p-4 text-center shadow-lg ${resultadoRolagem.critico ? 'border-[#c8a84b] bg-[#161410]' : resultadoRolagem.falha ? 'border-red-900 bg-[#161410]' : 'border-[#c8a84b30] bg-[#161410]'}`}
       style={{ borderRadius: '2px', minWidth: '200px' }}>
-      <p style={cinzel} className="text-[#4a4030] text-xs mb-1">{resultadoRolagem.nome}</p>
+      <p style={cinzel} className="text-[#8a7e68] text-xs mb-1">{resultadoRolagem.nome}</p>
       {resultadoRolagem.critico && <p style={cinzel} className="text-[#c8a84b] text-xs mb-1">⚔ CRÍTICO!</p>}
       {resultadoRolagem.falha && <p style={cinzel} className="text-red-500 text-xs mb-1">✕ FALHA CRÍTICA</p>}
       <p style={cinzel} className="text-[#f0e8d8] text-2xl">
         {resultadoRolagem.total}
-        <span className="text-[#4a4030] text-sm ml-2">(d20:{resultadoRolagem.d20} {resultadoRolagem.bonus >= 0 ? '+' : ''}{resultadoRolagem.bonus})</span>
+        <span className="text-[#8a7e68] text-sm ml-2">(d20:{resultadoRolagem.d20} {resultadoRolagem.bonus >= 0 ? '+' : ''}{resultadoRolagem.bonus})</span>
       </p>
       {resultadoRolagem.dano !== null && (
         <p style={cinzel} className="text-[#c8a84b] text-sm mt-1">
@@ -1754,18 +1754,18 @@ async function abrirGazeta() {
       <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">HISTÓRICO DE ROLAGENS</p>
         <button onClick={() => setModalHistoricoRolagens(false)}
-          className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
+          className="text-[#8a7e68] hover:text-[#c8a84b] text-xl transition-colors">×</button>
       </div>
       <div className="px-6 py-4 overflow-y-auto flex-1 flex flex-col gap-2">
         {historicoRolagens.length === 0 ? (
-          <p className="text-[#3a3020] text-sm text-center py-4">Nenhuma rolagem ainda.</p>
+          <p className="text-[#7a6e58] text-sm text-center py-4">Nenhuma rolagem ainda.</p>
         ) : (
           historicoRolagens.map(r => (
             <div key={r.id} className={`border p-3 flex items-center justify-between ${r.critico ? 'border-[#c8a84b40] bg-[#c8a84b08]' : r.falha ? 'border-red-900 bg-red-950 bg-opacity-10' : 'border-[#c8a84b15] bg-[#0f0e0c]'}`}
               style={{ borderRadius: '2px' }}>
               <div>
                 <p style={cinzel} className="text-[#e8e0d0] text-sm">{r.nome}</p>
-                <p className="text-[#4a4030] text-xs mt-0.5">
+                <p className="text-[#8a7e68] text-xs mt-0.5">
                   d20:{r.d20} {r.bonus >= 0 ? '+' : ''}{r.bonus}
                   {r.dano !== null && ` · dano: ${r.dano} ${r.tipoDano || ''}`}
                 </p>
@@ -1823,7 +1823,7 @@ async function abrirGazeta() {
                     {ficha.spellcasting.spells.map((spell, idx) => (
                       <div key={idx} className="border border-[#c8a84b15] bg-[#0f0e0c] p-3 flex items-end gap-3">
                       <div className="flex-1">
-                    <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest block mb-1">NOME</label>
+                    <label style={cinzel} className="text-[#8a7e68] text-xs tracking-widest block mb-1">NOME</label>
                     <button
                       onClick={() => setSpellDetalhes(spell)}
                       className="text-left text-[#e8e0d0] hover:text-[#c8a84b] text-sm transition-colors w-full"
@@ -1832,7 +1832,7 @@ async function abrirGazeta() {
                     </button>
                   </div>
                   <div className="w-16">
-                    <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest block mb-1">NÍVEL</label>
+                    <label style={cinzel} className="text-[#8a7e68] text-xs tracking-widest block mb-1">NÍVEL</label>
                     <input type="number" min={0} max={9} value={spell.level || 0}
                       onChange={e => {
                         const novoSpell = [...ficha.spellcasting.spells];
@@ -1843,7 +1843,7 @@ async function abrirGazeta() {
                       style={{ borderRadius: '2px' }} />
                   </div>
                   <div className="w-16">
-                    <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest block mb-1">SLOTS</label>
+                    <label style={cinzel} className="text-[#8a7e68] text-xs tracking-widest block mb-1">SLOTS</label>
                     <input type="number" min={0} value={spell.slots || 0}
                       onChange={e => {
                         const novoSpell = [...ficha.spellcasting.spells];
@@ -1854,7 +1854,7 @@ async function abrirGazeta() {
                       style={{ borderRadius: '2px' }} />
                   </div>
                   <div className="w-16">
-                    <label style={cinzel} className="text-[#4a4030] text-xs tracking-widest block mb-1">USADOS</label>
+                    <label style={cinzel} className="text-[#8a7e68] text-xs tracking-widest block mb-1">USADOS</label>
                     <input type="number" min={0} value={spell.slots_used || 0}
                       onChange={e => {
                         const novoSpell = [...ficha.spellcasting.spells];
@@ -1883,7 +1883,7 @@ async function abrirGazeta() {
                 </div>
               ) : (
                 <div className="border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3 text-center">
-                  <p className="text-[#4a4030] text-sm font-light">Nenhum feitiço registrado</p>
+                  <p className="text-[#8a7e68] text-sm font-light">Nenhum feitiço registrado</p>
                   <button onClick={abrirModalAddSpell}
                     className="mt-2 border border-[#c8a84b30] text-[#c8a84b] px-4 py-1 text-xs tracking-widest hover:bg-[#c8a84b10] transition-colors"
                     style={{ ...cinzel, borderRadius: '2px' }}>
@@ -1900,12 +1900,12 @@ async function abrirGazeta() {
       <div className="flex justify-between items-start mb-4">
         <div>
           <p style={cinzel} className="text-[#c8a84b] text-lg font-bold">{spellDetalhes.name}</p>
-          <p className="text-[#4a4030] text-xs mt-1" style={cinzel}>
+          <p className="text-[#8a7e68] text-xs mt-1" style={cinzel}>
             Nível {spellDetalhes.level} · {spellDetalhes.school || ''}
           </p>
         </div>
         <button onClick={() => setSpellDetalhes(null)}
-          className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">✕</button>
+          className="text-[#8a7e68] hover:text-[#c8a84b] text-xl transition-colors">✕</button>
       </div>
       {spellDetalhes.description && (
         <div className="mb-3">
@@ -1922,19 +1922,19 @@ async function abrirGazeta() {
       <div className="grid grid-cols-3 gap-2 mt-4 text-xs text-center">
         {spellDetalhes.range && (
           <div className="border border-[#c8a84b15] p-2">
-            <p style={cinzel} className="text-[#4a4030] tracking-widest mb-1">ALCANCE</p>
+            <p style={cinzel} className="text-[#8a7e68] tracking-widest mb-1">ALCANCE</p>
             <p className="text-[#e8e0d0]">{spellDetalhes.range}</p>
           </div>
         )}
         {spellDetalhes.duration && (
           <div className="border border-[#c8a84b15] p-2">
-            <p style={cinzel} className="text-[#4a4030] tracking-widest mb-1">DURAÇÃO</p>
+            <p style={cinzel} className="text-[#8a7e68] tracking-widest mb-1">DURAÇÃO</p>
             <p className="text-[#e8e0d0]">{spellDetalhes.duration}</p>
           </div>
         )}
         {spellDetalhes.components && (
           <div className="border border-[#c8a84b15] p-2">
-            <p style={cinzel} className="text-[#4a4030] tracking-widest mb-1">COMPONENTES</p>
+            <p style={cinzel} className="text-[#8a7e68] tracking-widest mb-1">COMPONENTES</p>
             <p className="text-[#e8e0d0]">{spellDetalhes.components}</p>
           </div>
         )}
@@ -1957,7 +1957,7 @@ async function abrirGazeta() {
       <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">ADICIONAR FEITIÇO</p>
         <button onClick={() => setModalAddSpell(false)}
-          className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
+          className="text-[#8a7e68] hover:text-[#c8a84b] text-xl transition-colors">×</button>
       </div>
       
       <div className="px-6 py-6 flex flex-col gap-4">
@@ -1995,14 +1995,14 @@ async function abrirGazeta() {
             {loadingSpells ? (
               <div className="flex items-center gap-3 justify-center py-4">
                 <div className="w-5 h-5 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-                <p style={cinzel} className="text-[#4a4030] text-xs">CARREGANDO...</p>
+                <p style={cinzel} className="text-[#8a7e68] text-xs">CARREGANDO...</p>
               </div>
             ) : (
               availableSpells.map((spell, i) => (
                 <button key={i} onClick={() => adicionarFeiticoDoDropdown(spell)}
                   className="w-full text-left border border-[#c8a84b25] bg-[#c8a84b08] text-[#c8a84b] px-3 py-2 text-xs hover:bg-[#c8a84b18] transition-colors"
                   style={{ borderRadius: '2px', letterSpacing: '0.5px' }}>
-                  <span className="font-bold">{spell.name}</span> <span className="text-[#4a4030]">(Nível {spell.level})</span>
+                  <span className="font-bold">{spell.name}</span> <span className="text-[#8a7e68]">(Nível {spell.level})</span>
                 </button>
               ))
             )}
@@ -2111,7 +2111,7 @@ async function abrirGazeta() {
             </div>
 
             <div className="border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3">
-              <p className="text-[#6a6050] text-xs font-light">
+              <p className="text-[#9a8e78] text-xs font-light">
                 ✦ A IA vai criar uma magia completa baseada no nome e sua classe. 
                 A magia fica salva no banco pra próxima vez!
               </p>
@@ -2154,7 +2154,7 @@ async function abrirGazeta() {
                     onChange={e => editarAtributo(attr, e.target.value)}
                     className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] text-center text-xl font-light w-full py-3 focus:outline-none focus:border-[#c8a84b50]"
                     style={{ borderRadius: '2px' }} />
-                  <span className="text-[#4a4030] text-xs" style={cinzel}>
+                  <span className="text-[#8a7e68] text-xs" style={cinzel}>
                     {Math.floor((val - 10) / 2) >= 0 ? '+' : ''}{Math.floor((val - 10) / 2)}
                   </span>
                 </div>
@@ -2176,11 +2176,11 @@ async function abrirGazeta() {
           <div key={skill} className="flex items-center justify-between py-1 border-b border-[#c8a84b08]">
             <span className={`text-sm capitalize ${temProficiencia ? 'text-[#c8a84b]' : 'text-[#8a8070]'}`}>{skill}</span>
             <div className="flex items-center gap-2">
-              <span style={cinzel} className={`text-sm ${temProficiencia ? 'text-[#c8a84b]' : 'text-[#6a6050]'}`}>
+              <span style={cinzel} className={`text-sm ${temProficiencia ? 'text-[#c8a84b]' : 'text-[#9a8e78]'}`}>
                 {val >= 0 ? '+' : ''}{val}
               </span>
               <button onClick={() => rolarPericia(skill, val)}
-                className="text-[#4a4030] hover:text-[#c8a84b] text-xs transition-colors px-1"
+                className="text-[#8a7e68] hover:text-[#c8a84b] text-xs transition-colors px-1"
                 title="Rolar">
                 🎲
               </button>
@@ -2197,7 +2197,7 @@ async function abrirGazeta() {
   <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
     <div className="px-6 py-4 border-b border-[#c8a84b15]">
       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">HABILIDADES DE CLASSE</p>
-      <p className="text-[#4a4030] text-xs mt-1">Clique para ver descrição</p>
+      <p className="text-[#8a7e68] text-xs mt-1">Clique para ver descrição</p>
     </div>
     <div className="p-6 flex flex-wrap gap-2">
       {ficha.features
@@ -2225,7 +2225,7 @@ async function abrirGazeta() {
   <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
     <div className="px-6 py-4 border-b border-[#c8a84b15]">
       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">RAÇA & ANTECEDENTE</p>
-      <p className="text-[#4a4030] text-xs mt-1">Clique para ver descrição</p>
+      <p className="text-[#8a7e68] text-xs mt-1">Clique para ver descrição</p>
     </div>
     <div className="p-6 flex flex-wrap gap-2">
       {ficha.features
@@ -2246,12 +2246,12 @@ async function abrirGazeta() {
   <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
     <div className="px-6 py-4 border-b border-[#c8a84b15]">
       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">AÇÕES EM COMBATE</p>
-      <p className="text-[#4a4030] text-xs mt-1">Clique para ver descrição</p>
+      <p className="text-[#8a7e68] text-xs mt-1">Clique para ver descrição</p>
     </div>
     <div className="p-6 flex flex-wrap gap-2">
       {Object.keys(ACOES_COMBATE).map((acao, i) => (
         <button key={i} onClick={() => abrirAcaoFixa(acao, ACOES_COMBATE[acao])}
-          className="border border-[#c8a84b15] text-[#6a6050] px-3 py-1 text-xs hover:bg-[#c8a84b10] hover:border-[#c8a84b40] hover:text-[#c8a84b] transition-all"
+          className="border border-[#c8a84b15] text-[#9a8e78] px-3 py-1 text-xs hover:bg-[#c8a84b10] hover:border-[#c8a84b40] hover:text-[#c8a84b] transition-all"
           style={{ borderRadius: '2px', ...cinzel, letterSpacing: '0.5px' }}>
           {acao}
         </button>
@@ -2266,7 +2266,7 @@ async function abrirGazeta() {
   <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
     <div>
       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">RECURSOS</p>
-      <p className="text-[#4a4030] text-xs mt-1">Features e habilidades com usos limitados</p>
+      <p className="text-[#8a7e68] text-xs mt-1">Features e habilidades com usos limitados</p>
     </div>
     <button onClick={() => {
       const nome = prompt('Nome do recurso (ex: Imposição de Mãos, Metamagia):');
@@ -2285,7 +2285,7 @@ async function abrirGazeta() {
 
   <div className="p-6">
     {!ficha.recursos || ficha.recursos.length === 0 ? (
-      <p className="text-[#3a3020] text-sm text-center py-4">Nenhum recurso adicionado.</p>
+      <p className="text-[#7a6e58] text-sm text-center py-4">Nenhum recurso adicionado.</p>
     ) : (
       <div className="space-y-3">
         {ficha.recursos.map((recurso, idx) => (
@@ -2299,7 +2299,7 @@ async function abrirGazeta() {
                 </span>
               )}
               <div className="flex items-center gap-2">
-                <span style={cinzel} className="text-[#4a4030] text-xs">{recurso.atual}/{recurso.max}</span>
+                <span style={cinzel} className="text-[#8a7e68] text-xs">{recurso.atual}/{recurso.max}</span>
                 <button onClick={() => {
                   const novos = ficha.recursos.filter((_, i) => i !== idx);
                   setFicha(prev => ({ ...prev, recursos: novos }));
@@ -2411,7 +2411,7 @@ async function abrirGazeta() {
       setFicha(prev => ({ ...prev, moedas: novo }));
     }}
     disabled={moedas.pc < 100}
-    className="text-xs border border-[#c8a84b20] text-[#4a4030] px-3 py-1 hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors disabled:opacity-30"
+    className="text-xs border border-[#c8a84b20] text-[#8a7e68] px-3 py-1 hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors disabled:opacity-30"
     style={{ ...cinzel, borderRadius: '2px' }}>
     100 PC → 1 PP
   </button>
@@ -2423,7 +2423,7 @@ async function abrirGazeta() {
       setFicha(prev => ({ ...prev, moedas: novo }));
     }}
     disabled={moedas.pp < 100}
-    className="text-xs border border-[#c8a84b20] text-[#4a4030] px-3 py-1 hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors disabled:opacity-30"
+    className="text-xs border border-[#c8a84b20] text-[#8a7e68] px-3 py-1 hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors disabled:opacity-30"
     style={{ ...cinzel, borderRadius: '2px' }}>
     100 PP → 1 PE
   </button>
@@ -2435,7 +2435,7 @@ async function abrirGazeta() {
       setFicha(prev => ({ ...prev, moedas: novo }));
     }}
     disabled={moedas.pe < 100}
-    className="text-xs border border-[#c8a84b20] text-[#4a4030] px-3 py-1 hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors disabled:opacity-30"
+    className="text-xs border border-[#c8a84b20] text-[#8a7e68] px-3 py-1 hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors disabled:opacity-30"
     style={{ ...cinzel, borderRadius: '2px' }}>
     100 PE → 1 PO
   </button>
@@ -2519,10 +2519,10 @@ style={{
       <div className="flex justify-between items-start mb-4">
         <div>
           <p style={cinzel} className="text-[#c8a84b] text-lg font-bold">{itemInventarioDetalhes.name}</p>
-          <p className="text-[#4a4030] text-xs mt-1" style={cinzel}>{itemInventarioDetalhes.rarity}</p>
+          <p className="text-[#8a7e68] text-xs mt-1" style={cinzel}>{itemInventarioDetalhes.rarity}</p>
         </div>
         <button onClick={() => setItemInventarioDetalhes(null)}
-          className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">✕</button>
+          className="text-[#8a7e68] hover:text-[#c8a84b] text-xl transition-colors">✕</button>
       </div>
       {itemInventarioDetalhes.identificado ? (
         <>
@@ -2539,7 +2539,7 @@ style={{
       ) : (
         <div className="text-center py-4">
           <p style={cinzel} className="text-[#8a5030] text-xs tracking-[2px] mb-2">? NÃO IDENTIFICADO</p>
-          <p className="text-[#4a4030] text-sm">As propriedades deste item são desconhecidas.</p>
+          <p className="text-[#8a7e68] text-sm">As propriedades deste item são desconhecidas.</p>
         </div>
       )}
       
@@ -2575,7 +2575,7 @@ style={{
       <div className="flex justify-between items-start mb-4">
         <p style={cinzel} className="text-[#c8a84b] text-sm font-bold">📦 Enviar Item</p>
         <button onClick={() => setModalEnviarItem(null)}
-          className="text-[#4a4030] hover:text-[#c8a84b] text-xl">✕</button>
+          className="text-[#8a7e68] hover:text-[#c8a84b] text-xl">✕</button>
       </div>
 
       <p className="text-[#e8e0d0] text-sm mb-4">
@@ -2586,18 +2586,18 @@ style={{
 
       <div className="flex gap-2 mb-4">
         <button onClick={() => setEnviarCopia(false)}
-          className={`flex-1 px-3 py-2 text-xs transition-colors ${!enviarCopia ? 'bg-[#c8a84b] text-[#0f0e0c]' : 'border border-[#c8a84b30] text-[#4a4030]'}`}
+          className={`flex-1 px-3 py-2 text-xs transition-colors ${!enviarCopia ? 'bg-[#c8a84b] text-[#0f0e0c]' : 'border border-[#c8a84b30] text-[#8a7e68]'}`}
           style={{ ...cinzel, borderRadius: '2px' }}>
           Enviar e Remover
         </button>
         <button onClick={() => setEnviarCopia(true)}
-          className={`flex-1 px-3 py-2 text-xs transition-colors ${enviarCopia ? 'bg-[#c8a84b] text-[#0f0e0c]' : 'border border-[#c8a84b30] text-[#4a4030]'}`}
+          className={`flex-1 px-3 py-2 text-xs transition-colors ${enviarCopia ? 'bg-[#c8a84b] text-[#0f0e0c]' : 'border border-[#c8a84b30] text-[#8a7e68]'}`}
           style={{ ...cinzel, borderRadius: '2px' }}>
           Enviar Cópia
         </button>
       </div>
 
-      <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-2">ENVIAR PARA:</p>
+      <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-2">ENVIAR PARA:</p>
       <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
         {personagens
           .filter(p => p.id !== id)
@@ -2608,7 +2608,7 @@ style={{
               className="border border-[#c8a84b20] text-[#e8e0d0] px-4 py-2 text-sm text-left hover:border-[#c8a84b50] hover:bg-[#c8a84b08] transition-colors disabled:opacity-50"
               style={{ borderRadius: '2px' }}>
               {p.data?.name || p.name}
-              <span className="text-[#4a4030] text-xs ml-2">
+              <span className="text-[#8a7e68] text-xs ml-2">
                 {p.data?.race} · Nível {p.data?.level}
               </span>
             </button>
@@ -2675,17 +2675,17 @@ style={{
       const atuais = ficha.languages || [];
       editarCampo('languages', [...atuais, novo.trim()]);
     }}
-      className="text-[#4a4030] text-xs tracking-widest hover:text-[#c8a84b] transition-colors"
+      className="text-[#8a7e68] text-xs tracking-widest hover:text-[#c8a84b] transition-colors"
       style={cinzel}>
       + Adicionar
     </button>
   </div>
   <div className="p-6 flex flex-wrap gap-2">
     {(ficha.languages || []).length === 0 ? (
-      <p className="text-[#3a3020] text-sm">Nenhum idioma registrado.</p>
+      <p className="text-[#7a6e58] text-sm">Nenhum idioma registrado.</p>
     ) : (
       ficha.languages.map((idioma, i) => (
-        <span key={i} className="border border-[#c8a84b15] text-[#6a6050] px-3 py-1 text-sm flex items-center gap-2"
+        <span key={i} className="border border-[#c8a84b15] text-[#9a8e78] px-3 py-1 text-sm flex items-center gap-2"
           style={{ borderRadius: '2px' }}>
           {idioma}
           <button onClick={() => {
@@ -2706,9 +2706,9 @@ style={{
   <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
     <div>
       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">NOTAS PRIVADAS</p>
-      <p style={cinzel} className="text-[#4a4030] text-xs mt-1">Só você vê isso</p>
+      <p style={cinzel} className="text-[#8a7e68]text-xs mt-1">Só você vê isso</p>
     </div>
-    <span className="text-[#4a4030] text-xs">🔒</span>
+    <span className="text-[#8a7e68] text-xs">🔒</span>
     <div className="border border-[#c8a84b20] bg-[#161410] mb-6" data-pdf-hide></div>
   </div>
   <div className="p-6">
@@ -2751,18 +2751,18 @@ style={{
                 <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">SUBIR DE NÍVEL</p>
                 {!upando && (
                   <button onClick={() => setModalLevelUp(false)}
-                    className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
+                    className="text-[#8a7e68] hover:text-[#c8a84b] text-xl transition-colors">×</button>
                 )}
               </div>
               <div className="px-6 py-6 flex flex-col gap-5">
                 <div className="flex items-center gap-4">
                   <div className="text-center">
-                    <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest mb-1">ATUAL</p>
+                    <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest mb-1">ATUAL</p>
                     <p style={cinzel} className="text-[#c8a84b] text-3xl font-bold">{ficha.level}</p>
                   </div>
-                  <div className="text-[#4a4030] text-2xl flex-1 text-center">→</div>
+                  <div className="text-[#8a7e68] text-2xl flex-1 text-center">→</div>
                   <div className="text-center">
-                    <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest mb-1">NOVO NÍVEL</p>
+                    <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest mb-1">NOVO NÍVEL</p>
                     <input type="number" min={ficha.level + 1} max={20} value={nivelAlvo}
                       onChange={e => setNivelAlvo(Number(e.target.value))}
                       className="bg-[#0f0e0c] border border-[#c8a84b30] text-[#c8a84b] text-center text-3xl font-bold w-20 py-2 focus:outline-none focus:border-[#c8a84b60]"
@@ -2770,7 +2770,7 @@ style={{
                   </div>
                 </div>
                 <div className="border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3">
-                  <p className="text-[#6a6050] text-sm font-light">
+                  <p className="text-[#9a8e78] text-sm font-light">
                     ✦ A IA vai adicionar automaticamente todas as features, melhorias de atributos e recalcular os stats de combate.
                   </p>
                 </div>
@@ -2786,7 +2786,7 @@ style={{
                   {upando ? 'Aguarde...' : `Subir para Nível ${nivelAlvo} com IA →`}
                 </button>
                 <button onClick={() => !upando && setModalLevelUp(false)}
-                  className="text-[#4a4030] text-xs tracking-widest hover:text-[#6a6050] transition-colors text-center"
+                  className="text-[#8a7e68] text-xs tracking-widest hover:text-[#9a8e78] transition-colors text-center"
                   style={cinzel}>
                   Cancelar
                 </button>
@@ -2804,19 +2804,19 @@ style={{
       <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between flex-shrink-0">
         <div>
           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">REVISÃO DE LEVEL UP</p>
-          <p style={cinzel} className="text-[#4a4030] text-xs mt-1">
+          <p style={cinzel} className="text-[#8a7e68] text-xs mt-1">
             Nível {ficha.level} → {fichaPreview.level}
           </p>
         </div>
         <button onClick={() => setModalRevisao(false)}
-          className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
+          className="text-[#8a7e68] hover:text-[#c8a84b] text-xl transition-colors">×</button>
       </div>
         
 
       {/* Lista de mudanças */}
       <div className="px-6 py-4 overflow-y-auto flex-1 flex flex-col gap-4">
         {levelUpDiff.length === 0 && (
-          <p style={cinzel} className="text-[#4a4030] text-xs text-center py-4">
+          <p style={cinzel} className="text-[#8a7e68] text-xs text-center py-4">
             Nenhuma mudança detectada.
           </p>
         )}
@@ -2828,10 +2828,10 @@ style={{
             <div className="flex flex-col gap-2">
               {levelUpDiff.filter(m => m.tipo === 'numero').map((m, i) => (
                 <div key={i} className="flex items-center justify-between border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3">
-                  <span style={cinzel} className="text-[#6a6050] text-xs tracking-widest">{m.label}</span>
+                  <span style={cinzel} className="text-[#9a8e78] text-xs tracking-widest">{m.label}</span>
                   <div className="flex items-center gap-3">
-                    <span style={cinzel} className="text-[#4a4030] text-sm line-through">{m.de ?? '—'}</span>
-                    <span className="text-[#4a4030]">→</span>
+                    <span style={cinzel} className="text-[#8a7e68] text-sm line-through">{m.de ?? '—'}</span>
+                    <span className="text-[#8a7e68]">→</span>
                     <input
                       type="number"
                       defaultValue={m.para}
@@ -2866,7 +2866,7 @@ style={{
                 <div key={i} className="border border-[#c8a84b20] bg-[#0f0e0c] px-4 py-3">
                   <p style={cinzel} className="text-[#c8a84b] text-xs mb-1">{m.label}</p>
                   {m.descricao && (
-                    <p className="text-[#6a6050] text-xs leading-relaxed font-light">{m.descricao}</p>
+                    <p className="text-[#9a8e78] text-xs leading-relaxed font-light">{m.descricao}</p>
                   )}
                 </div>
               ))}
@@ -2882,7 +2882,7 @@ style={{
               {levelUpDiff.filter(m => m.tipo === 'recurso').map((m, i) => (
                 <div key={i} className="flex items-center justify-between border border-[#c8a84b20] bg-[#0f0e0c] px-4 py-3">
                   <span style={cinzel} className="text-[#c8a84b] text-xs">{m.label}</span>
-                  <span style={cinzel} className="text-[#4a4030] text-xs">
+                  <span style={cinzel} className="text-[#8a7e68] text-xs">
                     {m.max && `${m.max}×`} {m.recarga && `· ${m.recarga}`}
                   </span>
                 </div>
@@ -2896,7 +2896,7 @@ style={{
       <div className="px-6 py-4 border-t border-[#c8a84b15] flex gap-3 flex-shrink-0">
         <button
           onClick={() => setModalRevisao(false)}
-          className="flex-1 border border-[#c8a84b20] text-[#4a4030] text-xs tracking-widest py-2 hover:border-[#c8a84b40] hover:text-[#6a6050] transition-colors"
+          className="flex-1 border border-[#c8a84b20] text-[#8a7e68] text-xs tracking-widest py-2 hover:border-[#c8a84b40] hover:text-[#9a8e78] transition-colors"
           style={{ ...cinzel, borderRadius: '2px' }}>
           Descartar
         </button>
@@ -2923,7 +2923,7 @@ style={{
     <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full" style={{ borderRadius: '2px' }}>
       <div className="modal-anim bg-[#161410] border border-[#c8a84b30] max-w-md w-full" style={{ borderRadius: '2px' }}>
         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">ESCOLHA SEU ARQUÉTIPO</p>
-        <p style={cinzel} className="text-[#4a4030] text-xs mt-1">
+        <p style={cinzel} className="text-[#8a7e68] text-xs mt-1">
           Nível {pendingLevelUp?.novoNivel} — esta escolha é permanente
         </p>
       </div>
@@ -2945,7 +2945,7 @@ style={{
       </div>
       <div className="px-6 py-4 border-t border-[#c8a84b15] flex gap-3">
         <button onClick={() => { setModalArquetipo(false); setPendingLevelUp(null); }}
-          className="flex-1 border border-[#c8a84b20] text-[#4a4030] text-xs tracking-widest py-2 hover:border-[#c8a84b40] transition-colors"
+          className="flex-1 border border-[#c8a84b20] text-[#8a7e68] text-xs tracking-widest py-2 hover:border-[#c8a84b40] transition-colors"
           style={{ ...cinzel, borderRadius: '2px' }}>
           Cancelar
         </button>
@@ -3024,13 +3024,13 @@ style={{
                     className="w-full bg-[#0f0e0c] hover:bg-[#1a1814] border border-[#c8a84b30] text-[#e8e0d0] p-4 rounded text-left transition disabled:opacity-50"
                     style={{ borderRadius: '2px' }}>
                     <span style={cinzel} className="font-bold text-[#c8a84b]">{cls.name}</span>
-                    <span className="text-[#4a4030] text-sm float-right">{cls.level} → {cls.level + 1}</span>
+                    <span className="text-[#8a7e68] text-sm float-right">{cls.level} → {cls.level + 1}</span>
                   </button>
                 ))}
                 <button
                   onClick={() => setShowClassLevelUpModal(false)}
                   disabled={upando}
-                  className="w-full border border-[#4a4030] text-[#4a4030] hover:text-[#6a6050] p-2 rounded transition disabled:opacity-50"
+                  className="w-full border border-[#4a4030] text-[#8a7e68] hover:text-[#9a8e78] p-2 rounded transition disabled:opacity-50"
                   style={{ borderRadius: '2px', ...cinzel }}>
                   Cancelar
                 </button>
@@ -3049,13 +3049,13 @@ style={{
               <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
                 <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">HABILIDADE</p>
                 <button onClick={() => { setModal(null); setDescricaoSkill(null); }}
-                  className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
+                  className="text-[#8a7e68] hover:text-[#c8a84b] text-xl transition-colors">×</button>
               </div>
               <div className="px-6 py-6">
                 {carregandoSkill && (
                   <div className="flex flex-col items-center py-10 gap-4">
                     <div className="w-8 h-8 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-                    <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">CONSULTANDO A IA...</p>
+                    <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">CONSULTANDO A IA...</p>
                   </div>
                 )}
                 {!carregandoSkill && descricaoSkill && !descricaoSkill.error && (
@@ -3078,8 +3078,8 @@ style={{
                     </div>
                     {descricaoSkill.source && (
                       <div>
-                        <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-1">ORIGEM</p>
-                        <p className="text-[#6a6050] text-sm font-light">{descricaoSkill.source}</p>
+                        <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-1">ORIGEM</p>
+                        <p className="text-[#9a8e78] text-sm font-light">{descricaoSkill.source}</p>
                       </div>
                     )}
                     {descricaoSkill.description && (
@@ -3102,7 +3102,7 @@ style={{
               </div>
               <div className="px-6 pb-6">
                 <button onClick={() => { setModal(null); setDescricaoSkill(null); }}
-                  className="border border-[#c8a84b30] text-[#6a6050] px-6 py-2 text-xs tracking-widest hover:border-[#c8a84b60] hover:text-[#c8a84b] transition-colors w-full"
+                  className="border border-[#c8a84b30] text-[#9a8e78] px-6 py-2 text-xs tracking-widest hover:border-[#c8a84b60] hover:text-[#c8a84b] transition-colors w-full"
                   style={{ ...cinzel, borderRadius: '2px' }}>
                   Fechar
                 </button>
@@ -3119,7 +3119,7 @@ style={{
       {ATIVIDADES_DOWNTIME.map(a => (
         <button key={a} onClick={() => setAtividadeDowntime(a)}
           className={`border px-3 py-2 text-xs capitalize transition-colors ${
-            atividadeDowntime === a ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]' : 'border-[#c8a84b20] text-[#6a6050]'
+            atividadeDowntime === a ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]' : 'border-[#c8a84b20] text-[#9a8e78]'
           }`}
           style={{ borderRadius: '2px' }}>
           {a}
@@ -3148,10 +3148,10 @@ style={{
       <div className="flex items-center justify-between mb-4">
         <p style={cinzel} className="text-[#8a4a8a] text-xs tracking-[4px]">🔮 SUSSURROS DO MESTRE</p>
         <button onClick={() => setCaixaMensagens(false)}
-          className="text-[#4a4030] hover:text-[#c8a84b] transition-colors">✕</button>
+          className="text-[#8a7e68] hover:text-[#c8a84b] transition-colors">✕</button>
       </div>
       {mensagensSecretas.length === 0 ? (
-        <p className="text-[#4a4030] text-sm text-center py-4">Nenhum sussurro novo.</p>
+        <p className="text-[#8a7e68] text-sm text-center py-4">Nenhum sussurro novo.</p>
       ) : (
         <div className="flex flex-col gap-3">
           {mensagensSecretas.map(msg => (
@@ -3179,7 +3179,7 @@ style={{
       <div className="flex items-center justify-between mb-4">
         <p style={cinzel} className="text-[#8a4a8a] text-xs tracking-[4px]">🌙 RESULTADO DO DOWNTIME</p>
         <button onClick={() => setModalDowntimeResultado(false)}
-          className="text-[#4a4030] hover:text-[#c8a84b] transition-colors">✕</button>
+          className="text-[#8a7e68] hover:text-[#c8a84b] transition-colors">✕</button>
       </div>
       <div className="flex flex-col gap-3">
         {downtimeResolvidos.map(d => (
@@ -3216,10 +3216,10 @@ style={{
       <div className="flex items-center justify-between mb-4">
         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px]">🌎 O MUNDO MUDOU</p>
         <button onClick={() => setCaixaMundoMudou(false)}
-          className="text-[#4a4030] hover:text-[#c8a84b] transition-colors">✕</button>
+          className="text-[#8a7e68] hover:text-[#c8a84b] transition-colors">✕</button>
       </div>
       {changelogNaoLido.length === 0 ? (
-        <p className="text-[#4a4030] text-sm text-center py-4">Nada novo.</p>
+        <p className="text-[#8a7e68] text-sm text-center py-4">Nada novo.</p>
       ) : (
         <div className="flex flex-col gap-3">
           {changelogNaoLido.map(item => (
@@ -3253,13 +3253,13 @@ style={{
       <div className="flex items-center justify-between mb-4">
         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px]">📰 GAZETA</p>
         <button onClick={() => setModalGazeta(false)}
-          className="text-[#4a4030] hover:text-[#c8a84b] transition-colors">✕</button>
+          className="text-[#8a7e68] hover:text-[#c8a84b] transition-colors">✕</button>
       </div>
       {!gazetaAtual ? (
-        <p className="text-[#4a4030] text-sm text-center py-4">Nenhuma edição publicada ainda.</p>
+        <p className="text-[#8a7e68] text-sm text-center py-4">Nenhuma edição publicada ainda.</p>
       ) : (
         <>
-          <p style={cinzel} className="text-[#6a6050] text-xs tracking-[2px]">EDIÇÃO Nº {gazetaAtual.edicao}</p>
+          <p style={cinzel} className="text-[#9a8e78] text-xs tracking-[2px]">EDIÇÃO Nº {gazetaAtual.edicao}</p>
           <h3 style={cinzel} className="text-[#e8e0d0] text-lg mb-4">{gazetaAtual.titulo}</h3>
           <div className="flex flex-col gap-3">
             {(gazetaAtual.noticias || []).map((n, i) => (
@@ -3279,7 +3279,7 @@ style={{
   <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6">
     <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">DOCUMENTOS RECEBIDOS</p>
     {handoutsRecebidos.length === 0 ? (
-      <p className="text-[#3a3020] text-sm text-center py-6">Nenhum documento recebido ainda.</p>
+      <p className="text-[#7a6e58] text-sm text-center py-6">Nenhum documento recebido ainda.</p>
     ) : (
       <div className="flex flex-col gap-3">
         {handoutsRecebidos.map(h => (
@@ -3300,13 +3300,13 @@ style={{
 {abaAtiva === 'diario' && (
   <div className="flex flex-col gap-6 mb-6">
     {!diario ? (
-      <p className="text-[#3a3020] text-sm text-center py-6">Carregando...</p>
+      <p className="text-[#7a6e58] text-sm text-center py-6">Carregando...</p>
     ) : (
       <>
         <div className="border border-[#c8a84b20] bg-[#161410] p-6">
           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">O QUE EU SEI</p>
           {diario.fatos.length === 0 ? (
-            <p className="text-[#3a3020] text-sm">Nada descoberto ainda.</p>
+            <p className="text-[#7a6e58] text-sm">Nada descoberto ainda.</p>
           ) : (
             <div className="flex flex-col gap-2">
               {diario.fatos.map(f => (
@@ -3321,7 +3321,7 @@ style={{
         <div className="border border-[#c8a84b20] bg-[#161410] p-6">
           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">QUEM EU CONHEÇO</p>
           {diario.npcs.length === 0 ? (
-            <p className="text-[#3a3020] text-sm">Ninguém ainda.</p>
+            <p className="text-[#7a6e58] text-sm">Ninguém ainda.</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {diario.npcs.map(n => (
@@ -3332,7 +3332,7 @@ style={{
                   )}
                   <div>
                     <p style={cinzel} className="text-[#e8e0d0] text-sm">{n.name}</p>
-                    <p className="text-[#6a6050] text-xs">{[n.race, n.occupation].filter(Boolean).join(' · ')}</p>
+                    <p className="text-[#9a8e78] text-xs">{[n.race, n.occupation].filter(Boolean).join(' · ')}</p>
                   </div>
                 </div>
               ))}
@@ -3344,17 +3344,17 @@ style={{
           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">MINHAS ANOTAÇÕES</p>
           <div className="flex flex-col gap-2">
             {diario.sessoes.length === 0 && (
-              <p className="text-[#3a3020] text-sm">As sessões aparecem aqui depois que o mestre as encerra.</p>
+              <p className="text-[#7a6e58] text-sm">As sessões aparecem aqui depois que o mestre as encerra.</p>
             )}
             {diario.sessoes.map(s => ({ session_number: s.session_number, title: s.title || `Sessão ${s.session_number}` })).map(s => (
               <div key={s.session_number} className="border border-[#c8a84b15] bg-[#0f0e0c]" style={{ borderRadius: '2px' }}>
                 <button onClick={() => setNotaAberta(notaAberta === s.session_number ? null : s.session_number)}
                   className="w-full flex items-center justify-between px-4 py-3 text-left">
                   <span style={cinzel} className="text-[#e8e0d0] text-sm">
-                    {s.session_number > 0 && <span className="text-[#6a6050] mr-2">#{s.session_number}</span>}
+                    {s.session_number > 0 && <span className="text-[#9a8e78] mr-2">#{s.session_number}</span>}
                     {s.title}
                   </span>
-                  <span className="text-[#4a4030] text-xs">
+                  <span className="text-[#8a7e68] text-xs">
                     {notasDiario[s.session_number] ? '✎ ' : ''}{notaAberta === s.session_number ? '▲' : '▼'}
                   </span>
                 </button>
@@ -3389,8 +3389,8 @@ style={{
       if (!p) return null;
       return (
         <>
-          <button onClick={() => setWikiAberta(null)} className="text-[#6a6050] hover:text-[#c8a84b] text-xs mb-4">← Voltar</button>
-          <p style={cinzel} className="text-[#6a6050] text-xs tracking-[2px]">{p.categoria.toUpperCase()}</p>
+          <button onClick={() => setWikiAberta(null)} className="text-[#9a8e78] hover:text-[#c8a84b] text-xs mb-4">← Voltar</button>
+          <p style={cinzel} className="text-[#9a8e78] text-xs tracking-[2px]">{p.categoria.toUpperCase()}</p>
           <h3 style={cinzel} className="text-[#e8e0d0] text-lg mb-3">{p.titulo}</h3>
           <TextoWiki texto={p.conteudo} paginas={wikiPaginas} onAbrir={setWikiAberta} />
         </>
@@ -3399,7 +3399,7 @@ style={{
       <>
         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">WIKI DA CAMPANHA</p>
         {wikiPaginas.length === 0 ? (
-          <p className="text-[#3a3020] text-sm text-center py-6">Nenhuma página revelada ainda.</p>
+          <p className="text-[#9a8e78] text-sm text-center py-6">Nenhuma página revelada ainda.</p>
         ) : (
           <div className="flex flex-col gap-1">
             {wikiPaginas.map(p => (
@@ -3407,7 +3407,7 @@ style={{
                 className="text-left border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3 hover:border-[#c8a84b50] transition-colors"
                 style={{ borderRadius: '2px' }}>
                 <span style={cinzel} className="text-[#e8e0d0] text-sm">{p.titulo}</span>
-                <span className="text-[#4a4030] text-xs ml-2">{p.categoria}</span>
+                <span className="text-[#8a7e68] text-xs ml-2">{p.categoria}</span>
               </button>
             ))}
           </div>

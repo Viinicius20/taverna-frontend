@@ -92,7 +92,7 @@ useEffect(() => {
             {modoMestre ? '⚔ MESTRE' : '👁 JOGADOR'}
           </button>
           <button onClick={() => navigate('/')}
-            className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+            className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
             ← Voltar
           </button>
         </div>
@@ -106,7 +106,7 @@ useEffect(() => {
         {modoMestre && (
           <div className="flex flex-col sm:flex-row gap-2 mb-8">
             <select value={novaCategoria} onChange={e => setNovaCategoria(e.target.value)}
-              className="bg-[#161410] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-xs focus:outline-none"
+              className="bg-[#161410] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 text-xs focus:outline-none"
               style={{ borderRadius: '2px' }}>
               {CATEGORIAS.map(c => (
                 <option key={c.label} value={c.label}>{c.label}</option>
@@ -136,7 +136,7 @@ useEffect(() => {
         {/* Post-its por categoria */}
         {postits.length === 0 ? (
           <div className="text-center py-20">
-            <p style={cinzel} className="text-[#3a3020] text-sm tracking-widest">NENHUMA INFORMAÇÃO REGISTRADA</p>
+            <p style={cinzel} className="text-[#7a6e58] text-sm tracking-widest">NENHUMA INFORMAÇÃO REGISTRADA</p>
             {!modoMestre && (
               <p className="text-[#2a2018] text-xs mt-2">Aguarde o mestre adicionar informações da sessão.</p>
             )}

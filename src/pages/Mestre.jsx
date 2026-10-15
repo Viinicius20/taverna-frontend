@@ -254,7 +254,7 @@ async function enviarPresagio(presagioId, characterId) {
   }
 
   async function deletarNpc(id) {
-    if (!window.confirm('Tem certeza que deseja deletar este NPC? Essa ação não pode ser desfeita.')) return;
+    if (!(await confirmar('Tem certeza que deseja deletar este NPC? Essa ação não pode ser desfeita.'))) return;
     try {
       await api.delete(`/npcs/${id}`);
       setNpcs(prev => prev.filter(n => n.id !== id));
@@ -546,7 +546,7 @@ async function criarSessao() {
 }
 
 async function deletarSessao(id) {
-  if (!window.confirm('Deletar esta sessão?')) return;
+  if (!(await confirmar('Deletar esta sessão?'))) return;
   try {
     await api.delete(`/sessions/${id}`);
     setSessoes(prev => prev.filter(s => s.id !== id));
@@ -659,7 +659,7 @@ async function confirmarGerarArte() {
 }
 
 async function deletarArte(tipo, id) {
-  if (!window.confirm('Deletar esta imagem?')) return;
+  if (!(await confirmar('Deletar esta imagem?'))) return;
   setDeletandoArte(true);
   try {
     await api.post('/deletar-arte', { tipo, id });
@@ -939,7 +939,7 @@ async function revelarConsequencia(id, paraTodos) {
 }
 
 async function deletarConsequencia(id) {
-  if (!window.confirm('Apagar esta consequência?')) return;
+  if (!(await confirmar('Apagar esta consequência?'))) return;
   try {
     await api.delete(`/consequencias/${id}`);
     setConsequencias(prev => prev.filter(c => c.id !== id));
@@ -963,7 +963,7 @@ function toggleSabedor(lista, id) {
 }
 
 async function deletarFatoMundo(id) {
-  if (!window.confirm('Apagar este fato?')) return;
+  if (!(await confirmar('Apagar este fato?'))) return;
   try {
     await api.delete(`/fatos-mundo/${id}`);
     setFatosMundo(prev => prev.filter(f => f.id !== id));
@@ -1027,7 +1027,7 @@ useEffect(() => {
     onClick={() => navigate('/')}>⚔ TAVERNA</span>
   <div className="flex gap-4 items-center">
     <button onClick={() => navigate('/')}
-      className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+      className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
       ← Voltar
     </button>
     <button onClick={() => { setMostrarForm(f => !f); setErro(''); }}
@@ -1056,7 +1056,7 @@ useEffect(() => {
           </div>
           <div className="border border-[#c8a84b20] bg-[#c8a84b08] px-4 py-2 text-right">
             <p style={cinzel} className="text-[#c8a84b] text-xs tracking-widest">🔒 PRIVADO</p>
-            <p className="text-[#4a4030] text-xs mt-0.5 font-light">Jogadores não veem esta área</p>
+            <p className="text-[#8a7e68] text-xs mt-0.5 font-light">Jogadores não veem esta área</p>
           </div>
         </div>
 
@@ -1068,7 +1068,7 @@ useEffect(() => {
     <button key={a.id} onClick={() => setAba(a.id)}
       style={cinzel}
       className={`px-4 py-3 text-xs tracking-[2px] uppercase whitespace-nowrap border-b-2 transition-colors ${
-        aba === a.id ? 'border-[#c8a84b] text-[#c8a84b]' : 'border-transparent text-[#4a4030] hover:text-[#6a6050]'
+        aba === a.id ? 'border-[#c8a84b] text-[#c8a84b]' : 'border-transparent text-[#8a7e68] hover:text-[#a09880]'
       }`}>
       {a.label}
     </button>
@@ -1085,7 +1085,7 @@ useEffect(() => {
       <div className="flex items-center justify-between px-6 py-4 border-b border-[#c8a84b20]">
         <span style={cinzel} className="text-[#c8a84b] text-sm tracking-widest">⚔ FERRAMENTAS</span>
         <button onClick={() => setDrawerAberto(false)}
-          className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">✕</button>
+          className="text-[#8a7e68] hover:text-[#c8a84b] text-xl transition-colors">✕</button>
       </div>
 
       <div className="flex-1 overflow-y-auto py-4">
@@ -1097,7 +1097,7 @@ useEffect(() => {
             <span className="text-[#a09880] group-hover:text-[#c8a84b] transition-colors">
               {label}
             </span>
-            <span className="text-[#4a4030] group-hover:text-[#c8a84b] transition-colors text-xs">→</span>
+            <span className="text-[#8a7e68] group-hover:text-[#c8a84b] transition-colors text-xs">→</span>
           </button>
         ))}
       </div>
@@ -1113,14 +1113,14 @@ useEffect(() => {
             <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
               <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">NOVO NPC</p>
               <button onClick={() => setMostrarForm(false)}
-                className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
+                className="text-[#8a7e68] hover:text-[#c8a84b] text-xl transition-colors">×</button>
             </div>
 
             <div className="flex gap-px border-b border-[#c8a84b15]">
               {[{ id: 'ia', label: '✦ Gerar com IA' }, { id: 'pdf', label: '◈ Importar PDF' }].map(({ id, label }) => (
                 <button key={id} onClick={() => { setAbaForm(id); setErro(''); }}
                   className="px-6 py-3 text-xs tracking-widest transition-colors"
-                  style={{ ...cinzel, background: abaForm === id ? '#c8a84b' : 'transparent', color: abaForm === id ? '#0f0e0c' : '#6a6050' }}>
+                  style={{ ...cinzel, background: abaForm === id ? '#c8a84b' : 'transparent', color: abaForm === id ? '#0f0e0c' : '#8a7e68' }}>
                   {label}
                 </button>
               ))}
@@ -1163,7 +1163,7 @@ useEffect(() => {
                       {gerando ? 'Gerando...' : 'Gerar NPC com IA →'}
                     </button>
                     <button onClick={() => setMostrarForm(false)}
-                      className="border border-[#c8a84b30] text-[#6a6050] px-6 py-2 text-xs tracking-widest hover:border-[#c8a84b60] transition-colors"
+                      className="border border-[#c8a84b30] text-[#9a8e78] px-6 py-2 text-xs tracking-widest hover:border-[#c8a84b60] transition-colors"
                       style={{ ...cinzel, borderRadius: '2px' }}>
                       Cancelar
                     </button>
@@ -1182,11 +1182,11 @@ useEffect(() => {
                       {pdfNome ? (
                         <>
                           <p style={cinzel} className="text-[#c8a84b] text-sm tracking-widest mb-1">{pdfNome}</p>
-                          <p className="text-[#4a4030] text-xs">Clique para trocar</p>
+                          <p className="text-[#8a7e68] text-xs">Clique para trocar</p>
                         </>
                       ) : (
                         <>
-                          <p style={cinzel} className="text-[#6a6050] text-sm tracking-widest mb-1">Clique para selecionar o PDF</p>
+                          <p style={cinzel} className="text-[#9a8e78] text-sm tracking-widest mb-1">Clique para selecionar o PDF</p>
                           <p className="text-[#3a3528] text-xs">Ficha de qualquer sistema</p>
                         </>
                       )}
@@ -1194,7 +1194,7 @@ useEffect(() => {
                   </div>
                   {pdfNome && (
                     <div className="border border-[#c8a84b15] bg-[#c8a84b05] px-4 py-3">
-                      <p className="text-[#6a6050] text-sm font-light">
+                      <p className="text-[#9a8e78] text-sm font-light">
                         ✦ A IA vai ler a ficha e criar o NPC diretamente — sem criar personagem.
                       </p>
                     </div>
@@ -1207,7 +1207,7 @@ useEffect(() => {
                       {gerando ? 'Importando...' : 'Importar PDF →'}
                     </button>
                     <button onClick={() => setMostrarForm(false)}
-                      className="border border-[#c8a84b30] text-[#6a6050] px-6 py-2 text-xs tracking-widest hover:border-[#c8a84b60] transition-colors"
+                      className="border border-[#c8a84b30] text-[#9a8e78] px-6 py-2 text-xs tracking-widest hover:border-[#c8a84b60] transition-colors"
                       style={{ ...cinzel, borderRadius: '2px' }}>
                       Cancelar
                     </button>
@@ -1237,7 +1237,7 @@ useEffect(() => {
         {!carregando && npcs.length === 0 && !mostrarForm && (
           <div className="flex flex-col items-center justify-center py-20 gap-4 border border-[#c8a84b15] bg-[#161410]">
             <span className="text-4xl opacity-20">◈</span>
-            <p style={cinzel} className="text-[#4a4030] text-sm tracking-widest">NENHUM NPC AINDA</p>
+            <p style={cinzel} className="text-[#8a7e68] text-sm tracking-widest">NENHUM NPC AINDA</p>
             <button onClick={() => setMostrarForm(true)}
               className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors mt-2"
               style={{ ...cinzel, borderRadius: '2px' }}>
@@ -1260,20 +1260,20 @@ useEffect(() => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-1 flex-wrap">
                         <h2 style={cinzel} className="text-[#f0e8d8] text-lg font-semibold">{d.name || npc.name}</h2>
-                        {d.race && <span className="text-[#4a4030] text-xs" style={cinzel}>{d.race}</span>}
+                        {d.race && <span className="text-[#8a7e68] text-xs" style={cinzel}>{d.race}</span>}
                         {getNota(npc.id, 'mood') && getNota(npc.id, 'mood') !== 'neutro' && (
                           <span title="Estado emocional">{HUMORES.find(h => h.id === getNota(npc.id, 'mood'))?.emoji}</span>
                         )}
-                        {d.level && <span className="text-[#4a4030] text-xs" style={cinzel}>Nível {d.level}</span>}
+                        {d.level && <span className="text-[#8a7e68] text-xs" style={cinzel}>Nível {d.level}</span>}
                       </div>
-                      <p className="text-[#6a6050] text-sm">
+                      <p className="text-[#9a8e78] text-sm">
                         {[d.occupation || d.class, d.alignment].filter(Boolean).join(' · ')}
                       </p>
                       {getNota(npc.id, 'secret') && !expandido && (
-                        <p className="text-[#4a3020] text-xs mt-1 font-light">🔒 Segredo registrado</p>
+                        <p className="text-[#8a7e68] text-xs mt-1 font-light">🔒 Segredo registrado</p>
                       )}
                     </div>
-                    <span style={cinzel} className="text-[#4a4030] text-lg">{expandido ? '∧' : '∨'}</span>
+                    <span style={cinzel} className="text-[#8a7e68] text-lg">{expandido ? '∧' : '∨'}</span>
                   </div>
                   
 
@@ -1380,14 +1380,14 @@ useEffect(() => {
                             <div className="space-y-2">  
                               {d.spellcasting.spells.map((spell, idx) => (
                                 <div key={idx} className="bg-[#0f0e0c] border border-[#c8a84b10] p-2 flex items-center gap-2 text-xs">
-                                  <span className="flex-1 text-[#6a6050]">{spell.name || 'Sem nome'}</span>
-                                  <span style={cinzel} className="text-[#4a4030] text-xs">N{spell.level || 0}</span>
-                                  <span style={cinzel} className="text-[#4a4030] text-xs">{spell.slots_used || 0}/{spell.slots || 0}</span>
+                                  <span className="flex-1 text-[#9a8e78]">{spell.name || 'Sem nome'}</span>
+                                  <span style={cinzel} className="text-[#8a7e68] text-xs">N{spell.level || 0}</span>
+                                  <span style={cinzel} className="text-[#8a7e68] text-xs">{spell.slots_used || 0}/{spell.slots || 0}</span>
                                 </div>
                               ))}
                             </div>
                           ) : (
-                            <p className="text-[#4a4030] text-xs text-center py-2">Sem feitiços</p>
+                            <p className="text-[#8a7e68] text-xs text-center py-2">Sem feitiços</p>
                           )}
                         </div>
                       )}
@@ -1409,7 +1409,7 @@ useEffect(() => {
                                     onClick={e => e.stopPropagation()}
                                     className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-lg w-full py-2 focus:outline-none focus:border-[#c8a84b50]"
                                     style={{ borderRadius: '2px' }} />
-                                  <span style={cinzel} className="text-[#3a3020] text-xs">
+                                  <span style={cinzel} className="text-[#7a6e58] text-xs">
                                     {Math.floor((valor - 10) / 2) >= 0 ? '+' : ''}{Math.floor((valor - 10) / 2)}
                                   </span>
                                 </div>
@@ -1426,7 +1426,7 @@ useEffect(() => {
                       ].map(({ label, campo }) => d[campo] ? (
                         <div key={campo}>
                           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">{label}</p>
-                          <p className="text-[#6a6050] text-sm leading-relaxed font-light">{d[campo]}</p>
+                          <p className="text-[#9a8e78] text-sm leading-relaxed font-light">{d[campo]}</p>
                         </div>
                       ) : null)}
 
@@ -1470,7 +1470,7 @@ useEffect(() => {
         <button key={h.id}
           onClick={e => { e.stopPropagation(); editarNotaLocal(npc.id, 'mood', h.id); }}
           className={`px-3 py-1 text-xs border transition-colors ${
-            ativo ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]' : 'border-[#c8a84b20] text-[#6a6050] hover:border-[#c8a84b50]'
+            ativo ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]' : 'border-[#c8a84b20] text-[#9a8e78] hover:border-[#c8a84b50]'
           }`}
           style={{ ...cinzel, borderRadius: '2px' }}>
           {h.emoji} {h.label}
@@ -1502,16 +1502,16 @@ useEffect(() => {
                         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">🧠 MEMÓRIA</p>
                         <div className="flex flex-col gap-2 mb-3">
                           {(d.memoria || []).length === 0 ? (
-  <p className="text-[#3a3020] text-xs">Nenhum evento registrado ainda.</p>
-) : (
-  d.memoria.map((m, i) => (
-    <div key={i} className="border border-[#c8a84b10] bg-[#0f0e0c] px-3 py-2 flex items-center justify-between gap-2">
-      <p className="text-[#6a6050] text-xs flex-1">{m.evento}</p>
-      <button onClick={e => { e.stopPropagation(); removerMemoria(npc.id, i); }}
-        className="text-red-900 hover:text-red-600 text-xs transition-colors flex-shrink-0">×</button>
-    </div>
-  ))
-)}
+                          <p className="text-[#7a6e58] text-xs">Nenhum evento registrado ainda.</p>
+                        ) : (
+                          d.memoria.map((m, i) => (
+                            <div key={i} className="border border-[#c8a84b10] bg-[#0f0e0c] px-3 py-2 flex items-center justify-between gap-2">
+                              <p className="text-[#9a8e78] text-xs flex-1">{m.evento}</p>
+                              <button onClick={e => { e.stopPropagation(); removerMemoria(npc.id, i); }}
+                                className="text-red-900 hover:text-red-600 text-xs transition-colors flex-shrink-0">×</button>
+                            </div>
+                          ))
+                        )}
                         </div>
                         <div className="flex gap-2">
                           <input
@@ -1545,7 +1545,7 @@ useEffect(() => {
                           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">INVENTÁRIO</p>
                           <div className="flex flex-wrap gap-2">
                             {d.inventory.map((item, i) => (
-                              <span key={i} className="border border-[#c8a84b15] text-[#6a6050] px-2 py-0.5 text-xs"
+                              <span key={i} className="border border-[#c8a84b15] text-[#9a8e78] px-2 py-0.5 text-xs"
                                 style={{ borderRadius: '2px' }}>{item}</span>
                             ))}
                           </div>
@@ -1562,7 +1562,7 @@ useEffect(() => {
                           e.stopPropagation();
                           abrirSkillNpc(f, d);
                         }}
-                        className="border border-[#c8a84b20] text-[#6a6050] px-2 py-0.5 text-xs hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors"
+                        className="border border-[#c8a84b20] text-[#9a8e78] px-2 py-0.5 text-xs hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors"
                         style={{ borderRadius: '2px' }}>
                         {f} ↗
                       </button>
@@ -1579,36 +1579,36 @@ useEffect(() => {
                       )}
 
                       <div className="flex justify-end gap-3 pt-2 border-t border-[#c8a84b10]">
-  {d.art_url ? (
-    <button onClick={e => { e.stopPropagation(); setImagemVisualizando({ url: d.art_url, tipo: 'npc', id: npc.id }); }}
-      className="text-[#c8a84b] hover:text-[#e0c060] text-xs border border-[#c8a84b30] hover:border-[#c8a84b60] px-4 py-1.5 transition-colors"
-      style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
-      🖼 Ver Imagem
-    </button>
-  ) : (
-    <button onClick={e => { e.stopPropagation(); setModalGerarArte({ tipo: 'npc', id: npc.id }); }}
-      className="text-[#c8a84b] hover:text-[#e0c060] text-xs border border-[#c8a84b30] hover:border-[#c8a84b60] px-4 py-1.5 transition-colors"
-      style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
-      🎨 Gerar Arte
-    </button>
-  )}
-  {getNota(npc.id, 'secret') && (
-  <button
-    onClick={e => {
-      e.stopPropagation();
-      setModalRevelarSegredo({ npc });
-    }}
-    className="text-[#8a5030] hover:text-[#c8a84b] text-xs border border-[#8a5030] hover:border-[#c8a84b] px-4 py-1.5 transition-colors"
-    style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
-    🔓 Revelar Segredo
-  </button>
-)}
-  <button onClick={() => deletarNpc(npc.id)}
-    className="text-red-900 hover:text-red-600 text-xs border border-red-900 hover:border-red-600 px-4 py-1.5 transition-colors"
-    style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
-    Deletar NPC
-  </button>
-</div>
+                        {d.art_url ? (
+                          <button onClick={e => { e.stopPropagation(); setImagemVisualizando({ url: d.art_url, tipo: 'npc', id: npc.id }); }}
+                            className="text-[#c8a84b] hover:text-[#e0c060] text-xs border border-[#c8a84b30] hover:border-[#c8a84b60] px-4 py-1.5 transition-colors"
+                            style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
+                            🖼 Ver Imagem
+                          </button>
+                        ) : (
+                          <button onClick={e => { e.stopPropagation(); setModalGerarArte({ tipo: 'npc', id: npc.id }); }}
+                            className="text-[#c8a84b] hover:text-[#e0c060] text-xs border border-[#c8a84b30] hover:border-[#c8a84b60] px-4 py-1.5 transition-colors"
+                            style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
+                            🎨 Gerar Arte
+                          </button>
+                        )}
+                        {getNota(npc.id, 'secret') && (
+                        <button
+                          onClick={e => {
+                            e.stopPropagation();
+                            setModalRevelarSegredo({ npc });
+                          }}
+                          className="text-[#8a5030] hover:text-[#c8a84b] text-xs border border-[#8a5030] hover:border-[#c8a84b] px-4 py-1.5 transition-colors"
+                          style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
+                          🔓 Revelar Segredo
+                        </button>
+                      )}
+                        <button onClick={() => deletarNpc(npc.id)}
+                          className="text-red-900 hover:text-red-600 text-xs border border-red-900 hover:border-red-600 px-4 py-1.5 transition-colors"
+                          style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
+                          Deletar NPC
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1628,10 +1628,10 @@ useEffect(() => {
           🔓 Revelar Segredo de {modalRevelarSegredo.npc.name}
         </p>
         <button onClick={() => setModalRevelarSegredo(null)}
-          className="text-[#4a4030] hover:text-[#c8a84b] text-xl">✕</button>
+          className="text-[#8a7e68] hover:text-[#c8a84b] text-xl">✕</button>
       </div>
 
-      <p className="text-[#6a6050] text-sm italic mb-4 border border-[#8a5030] bg-[#0f0e0c] p-3"
+      <p className="text-[#9a8e78] text-sm italic mb-4 border border-[#8a5030] bg-[#0f0e0c] p-3"
         style={{ borderRadius: '2px' }}>
         "{getNota(modalRevelarSegredo.npc.id, 'secret')}"
       </p>
@@ -1649,7 +1649,7 @@ useEffect(() => {
           <div className="flex flex-col gap-1 mb-4">
             {NIVEIS_SEGREDO.map((label, i) => (
               <p key={i} style={cinzel}
-                className={`text-xs ${i <= stagesSegredo.nivel_revelado ? 'text-[#c8a84b]' : 'text-[#3a3020]'}`}>
+                className={`text-xs ${i <= stagesSegredo.nivel_revelado ? 'text-[#c8a84b]' : 'text-[#7a6e58]'}`}>
                 {label}{i === stagesSegredo.nivel_revelado ? '  ← atual' : ''}
               </p>
             ))}
@@ -1659,10 +1659,10 @@ useEffect(() => {
             <p className="text-[#4a8a4a] text-sm text-center py-2">Segredo totalmente revelado.</p>
           ) : (
             <>
-              <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-2">
+              <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-2">
                 PRÓXIMO: {NIVEIS_SEGREDO[stagesSegredo.nivel_revelado + 1]}
               </p>
-              <p className="text-[#6a6050] text-sm italic mb-3 border border-[#8a5030] bg-[#0f0e0c] p-3"
+              <p className="text-[#9a8e78] text-sm italic mb-3 border border-[#8a5030] bg-[#0f0e0c] p-3"
                 style={{ borderRadius: '2px' }}>
                 "{stagesSegredo.nivel_revelado + 1 === 4
                   ? getNota(modalRevelarSegredo.npc.id, 'secret')
@@ -1689,7 +1689,7 @@ useEffect(() => {
 
       {!stagesSegredo && (
         <>
-          <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-3">REVELAR PARA:</p>
+          <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-3">REVELAR PARA:</p>
 
           <div className="flex flex-col gap-2 mb-4 max-h-48 overflow-y-auto">
             {/* Todos */}
@@ -1731,7 +1731,7 @@ useEffect(() => {
                 className="border border-[#c8a84b20] text-[#e8e0d0] px-4 py-2 text-sm text-left hover:bg-[#c8a84b08] transition-colors"
                 style={{ borderRadius: '2px' }}>
                 {p.data?.name || p.name}
-                <span className="text-[#4a4030] text-xs ml-2">{p.data?.race} · Nível {p.data?.level}</span>
+                <span className="text-[#8a7e68] text-xs ml-2">{p.data?.race} · Nível {p.data?.level}</span>
               </button>
             ))}
           </div>
@@ -1774,7 +1774,7 @@ useEffect(() => {
               className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors"
               style={{ ...cinzel, borderRadius: '2px' }}>
               PRÓXIMO TURNO →
-              <p className="text-[#3a3020] text-xs mt-2">Atalho: Espaço ou Enter para avançar turno</p>
+              <p className="text-[#7a6e58] text-xs mt-2">Atalho: Espaço ou Enter para avançar turno</p>
             </button>
           ) : (
             <button onClick={() => setCombateAtivo(true)}
@@ -1826,7 +1826,7 @@ useEffect(() => {
             className="w-full text-left px-3 py-2 text-sm hover:bg-[#c8a84b10] transition-colors flex items-center justify-between"
             style={cinzel}>
             <span className="text-[#e8e0d0]">{m.name}</span>
-            <span className="text-[#4a4030] text-xs">CR {m.cr} · HP {m.hp}</span>
+            <span className="text-[#8a7e68] text-xs">CR {m.cr} · HP {m.hp}</span>
           </button>
         ))}
       </div>
@@ -1853,12 +1853,12 @@ useEffect(() => {
 <div className="mb-6 space-y-2">
   {npcs.length > 0 && (
     <div>
-      <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-2">NPCS</p>
+      <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-2">NPCS</p>
       <div className="flex flex-wrap gap-2">
         {npcs.map(npc => (
           <button key={npc.id} onClick={() => adicionarPersonagem(npc)}
             disabled={combatentes.some(c => c.id === npc.id)}
-            className="border border-[#c8a84b20] text-[#6a6050] px-3 py-1 text-xs hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            className="border border-[#c8a84b20] text-[#9a8e78] px-3 py-1 text-xs hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             style={{ ...cinzel, borderRadius: '2px' }}>
             + {npc.name}
           </button>
@@ -1868,23 +1868,23 @@ useEffect(() => {
   )}
   {personagens.length > 0 && (
   <div>
-    <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-2">JOGADORES</p>
+    <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-2">JOGADORES</p>
     <div className="flex flex-wrap gap-2">
       {personagens.map(p => (
         <div key={p.id} className="flex items-center gap-1">
           <button onClick={() => adicionarPersonagem(p)}
             disabled={combatentes.some(c => c.id === p.id)}
-            className="border border-[#7ab8d420] text-[#6a6050] px-3 py-1 text-xs hover:border-[#7ab8d450] hover:text-[#7ab8d4] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            className="border border-[#7ab8d420] text-[#9a8e78] px-3 py-1 text-xs hover:border-[#7ab8d450] hover:text-[#7ab8d4] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             style={{ ...cinzel, borderRadius: '2px' }}>
             + {p.name}
           </button>
           <button onClick={() => window.open(`/personagens/${p.id}`, '_blank')}
-            className="text-[#4a4030] hover:text-[#c8a84b] text-xs transition-colors px-1"
+            className="text-[#8a7e68] hover:text-[#c8a84b] text-xs transition-colors px-1"
             title="Ver ficha">
             👁
           </button>
           <button onClick={() => setModalEntregarItem({ personagem: p })}
-            className="text-[#4a4030] hover:text-[#c8a84b] text-xs transition-colors px-1"
+            className="text-[#8a7e68] hover:text-[#c8a84b] text-xs transition-colors px-1"
             title="Entregar item">
             📦
           </button>
@@ -1897,7 +1897,7 @@ useEffect(() => {
 
   {/* Lista de combatentes */}
   {combatentes.length === 0 ? (
-    <p className="text-[#3a3020] text-sm text-center py-8">Nenhum combatente adicionado.</p>
+    <p className="text-[#7a6e58] text-sm text-center py-8">Nenhum combatente adicionado.</p>
   ) : (
     <div className="space-y-2">
       {combatentes.map((c, idx) => {
@@ -1972,13 +1972,13 @@ useEffect(() => {
                   onChange={e => atualizarCombatente(c.id, 'hpAtual', Number(e.target.value))}
                   className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] text-center text-lg w-16 py-1 focus:outline-none focus:border-[#c8a84b50]"
                   style={{ borderRadius: '2px' }} />
-                <span className="text-[#3a3020] text-sm">/</span>
-                <span style={cinzel} className="text-[#3a3020] text-sm w-10 text-center">{c.hpMax}</span>
+                <span className="text-[#7a6e58] text-sm">/</span>
+                <span style={cinzel} className="text-[#7a6e58] text-sm w-10 text-center">{c.hpMax}</span>
               </div>
 
               {/* Condições */}
 <button onClick={() => setModalCondicoes(c.id)}
-  className="text-[#4a4030] hover:text-[#8a4a8a] text-xs transition-colors px-1"
+  className="text-[#8a7e68] hover:text-[#8a4a8a] text-xs transition-colors px-1"
   title="Gerenciar condições">
   ⚕
 </button>
@@ -2061,7 +2061,7 @@ useEffect(() => {
                 <span className="text-[#a09880] text-sm">{item}</span>
                 <select onChange={e => e.target.value && entregarItem(item, e.target.value)}
                   defaultValue=""
-                  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#6a6050] px-2 py-1 text-xs focus:outline-none focus:border-[#c8a84b50]"
+                  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#9a8e78] px-2 py-1 text-xs focus:outline-none focus:border-[#c8a84b50]"
                   style={{ borderRadius: '2px' }}>
                   <option value="">Entregar para...</option>
                   {personagens.map(p => (
@@ -2097,7 +2097,7 @@ useEffect(() => {
                     </div>
                     <select onChange={e => e.target.value && entregarItem(item, e.target.value)}
                       defaultValue=""
-                      className="bg-[#161410] border border-[#c8a84b30] text-[#6a6050] px-2 py-1 text-xs focus:outline-none focus:border-[#c8a84b50]"
+                      className="bg-[#161410] border border-[#c8a84b30] text-[#9a8e78] px-2 py-1 text-xs focus:outline-none focus:border-[#c8a84b50]"
                       style={{ borderRadius: '2px' }}>
                       <option value="">Entregar para...</option>
                       {personagens.map(p => (
@@ -2105,7 +2105,7 @@ useEffect(() => {
                       ))}
                     </select>
                   </div>
-                  <p className="text-[#6a6050] text-sm font-light leading-relaxed">{item.descricao}</p>
+                  <p className="text-[#9a8e78] text-sm font-light leading-relaxed">{item.descricao}</p>
                 </div>
               );
             })}
@@ -2130,7 +2130,7 @@ useEffect(() => {
     className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 flex-1 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
     style={{ borderRadius: '2px' }} />
   <select value={novoItemRaridade} onChange={e => setNovoItemRaridade(e.target.value)}
-    className="bg-[#161410] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-xs focus:outline-none focus:border-[#c8a84b50]"
+    className="bg-[#161410] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 text-xs focus:outline-none focus:border-[#c8a84b50]"
     style={{ borderRadius: '2px' }}>
     <option value="">Raridade (IA decide)</option>
     {['Comum', 'Incomum', 'Raro', 'Muito Raro', 'Lendário'].map(r => (
@@ -2139,7 +2139,7 @@ useEffect(() => {
   </select>
   <div className="flex items-center gap-3 mt-2">
   <button onClick={() => setNovoItemIdentificado(p => !p)}
-    className={`px-3 py-1 text-xs border transition-colors ${novoItemIdentificado ? 'border-[#c8a84b30] text-[#4a4030]' : 'border-[#8a5030] text-[#8a5030] bg-[#8a503010]'}`}
+    className={`px-3 py-1 text-xs border transition-colors ${novoItemIdentificado ? 'border-[#c8a84b30] text-[#8a7e68]' : 'border-[#8a5030] text-[#8a5030] bg-[#8a503010]'}`}
     style={{ ...cinzel, borderRadius: '2px' }}>
     {novoItemIdentificado ? '✓ IDENTIFICADO' : '? NÃO IDENTIFICADO'}
   </button>
@@ -2166,7 +2166,7 @@ useEffect(() => {
   {/* Filtros */}
   <div className="flex gap-2 mb-4">
     <select value={filtroRaridade} onChange={e => setFiltroRaridade(e.target.value)}
-      className="bg-[#161410] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-xs focus:outline-none focus:border-[#c8a84b50]"
+      className="bg-[#161410] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 text-xs focus:outline-none focus:border-[#c8a84b50]"
       style={{ borderRadius: '2px' }}>
       <option value="">Todas raridades</option>
       {['Comum', 'Incomum', 'Raro', 'Muito Raro', 'Lendário'].map(r => (
@@ -2174,7 +2174,7 @@ useEffect(() => {
       ))}
     </select>
     <select value={filtroTipo} onChange={e => setFiltroTipo(e.target.value)}
-      className="bg-[#161410] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-xs focus:outline-none focus:border-[#c8a84b50]"
+      className="bg-[#161410] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 text-xs focus:outline-none focus:border-[#c8a84b50]"
       style={{ borderRadius: '2px' }}>
       <option value="">Todos tipos</option>
       {['Arma', 'Armadura', 'Poção', 'Anel', 'Varinha', 'Maravilha', 'Outro'].map(t => (
@@ -2187,7 +2187,7 @@ useEffect(() => {
   {loadingItems ? (
   <div className="flex items-center gap-3 justify-center py-8">
     <div className="w-6 h-6 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-    <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">CARREGANDO...</p>
+    <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">CARREGANDO...</p>
   </div>
 ) : (
   <div className="space-y-2">
@@ -2212,13 +2212,13 @@ useEffect(() => {
                     style2={{ borderRadius: '2px' }}>HOMEBREW</span>
                 )}
                 {item.requires_attunement && (
-                  <span style={cinzel} className="text-xs text-[#4a4030]">sintonização</span>
+                  <span style={cinzel} className="text-xs text-[#8a7e68]">sintonização</span>
                 )}
               </div>
               <div onClick={e => e.stopPropagation()}>
                 <select onChange={e => e.target.value && entregarItemMagico(item, e.target.value)}
                   defaultValue=""
-                  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#6a6050] px-2 py-1 text-xs focus:outline-none w-full sm:w-auto"
+                  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#9a8e78] px-2 py-1 text-xs focus:outline-none w-full sm:w-auto"
                   style={{ borderRadius: '2px' }}>
                   <option value="">Entregar...</option>
                   {personagens.map(p => (
@@ -2267,12 +2267,12 @@ useEffect(() => {
                 <p style={cinzel} className="text-[#8a5030] text-xs tracking-[2px] mb-2">? NÃO IDENTIFICADO PELO JOGADOR</p>
               )}
                 {item.description && (
-                <p className="text-[#6a6050] text-sm font-light leading-relaxed">{limparMarkdown(item.description)}</p>
+                <p className="text-[#9a8e78] text-sm font-light leading-relaxed">{limparMarkdown(item.description)}</p>
               )}
               {item.mechanics && (
                 <div className="bg-[#0f0e0c] border border-[#c8a84b10] px-3 py-2">
                 <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">MECÂNICA</p>
-                <p className="text-[#8a8070] text-sm leading-relaxed">{limparMarkdown(item.mechanics)}</p>
+                <p className="text-[#9a8e78] text-sm leading-relaxed">{limparMarkdown(item.mechanics)}</p>
                 </div>
                 )}
             <button onClick={async e => {
@@ -2316,14 +2316,14 @@ useEffect(() => {
 
   <div className="flex flex-col sm:flex-row gap-2 mb-6">
     <select value={rulesSistema} onChange={e => setRulesSistema(e.target.value)}
-      className="bg-[#161410] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-xs focus:outline-none focus:border-[#c8a84b50]"
+      className="bg-[#161410] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 text-xs focus:outline-none focus:border-[#c8a84b50]"
       style={{ borderRadius: '2px' }}>
       {sistemas.map(s => <option key={s} value={s}>{s}</option>)}
     </select>
     <input value={rulesQuery} onChange={e => setRulesQuery(e.target.value)}
       onKeyDown={e => e.key === 'Enter' && buscarRegra()}
       placeholder='Ex: "Caído", "Envenenado", "Grapple", "Ação de Espreita"...'
-      className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 flex-1 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
+      className="bg-[#161410] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 flex-1 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
       style={{ borderRadius: '2px' }} />
     <button onClick={buscarRegra} disabled={buscandoRegra}
       className="bg-[#c8a84b] text-[#0f0e0c] px-5 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50"
@@ -2335,7 +2335,7 @@ useEffect(() => {
   {buscandoRegra && (
     <div className="flex flex-col sm:flex-row gap-2 mb-6">
       <div className="w-6 h-6 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-      <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">CONSULTANDO...</p>
+      <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">CONSULTANDO...</p>
     </div>
   )}
 
@@ -2351,7 +2351,7 @@ useEffect(() => {
       </div>
       {rulesResult.fonte && (
         <div className="border-t border-[#c8a84b10] pt-3">
-          <p style={cinzel} className="text-[#4a4030] text-xs">📖 {rulesResult.fonte}</p>
+          <p style={cinzel} className="text-[#8a7e68] text-xs">📖 {rulesResult.fonte}</p>
         </div>
       )}
     </div>
@@ -2437,7 +2437,7 @@ useEffect(() => {
 
   {/* Lista de sessões */}
   {sessoes.length === 0 ? (
-    <p className="text-[#3a3020] text-sm text-center py-8">Nenhuma sessão registrada.</p>
+    <p className="text-[#7a6e58] text-sm text-center py-8">Nenhuma sessão registrada.</p>
   ) : (
     <div className="space-y-2">
       {sessoes.map(s => (
@@ -2450,12 +2450,12 @@ useEffect(() => {
               <span style={cinzel} className="text-[#e8e0d0] text-sm">{s.title}</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-[#4a4030] text-xs">
+              <span className="text-[#8a7e68] text-xs">
                 {new Date(s.created_at).toLocaleDateString('pt-BR')}
               </span>
               <button onClick={e => { e.stopPropagation(); deletarSessao(s.id); }}
                 className="text-red-900 hover:text-red-600 text-sm transition-colors">×</button>
-              <span className="text-[#4a4030] text-xs">{sessaoExpandida === s.id ? '▲' : '▼'}</span>
+              <span className="text-[#8a7e68] text-xs">{sessaoExpandida === s.id ? '▲' : '▼'}</span>
             </div>
           </div>
           {sessaoExpandida === s.id && s.summary && (
@@ -2553,7 +2553,7 @@ useEffect(() => {
       ))}
     </div>
     <select value={encounterConfig.bioma} onChange={e => setEncounterConfig(p => ({ ...p, bioma: e.target.value }))}
-      className="bg-[#161410] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-xs focus:outline-none focus:border-[#c8a84b50]"
+      className="bg-[#161410] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 text-xs focus:outline-none focus:border-[#c8a84b50]"
       style={{ borderRadius: '2px' }}>
       {['Floresta', 'Masmorra', 'Cidade', 'Deserto', 'Montanha', 'Pântano', 'Costa', 'Planície', 'Subterrâneo'].map(b => (
         <option key={b} value={b}>{b}</option>
@@ -2574,7 +2574,7 @@ useEffect(() => {
     </button>
   </div>
 
-  <label className="flex items-center gap-2 mb-4 text-[#6a6050] text-xs cursor-pointer">
+  <label className="flex items-center gap-2 mb-4 text-[#9a8e78] text-xs cursor-pointer">
       <input type="checkbox" checked={encounterConfig.usar_mundo}
         onChange={e => setEncounterConfig(p => ({ ...p, usar_mundo: e.target.checked }))} />
       <span style={cinzel} className="tracking-widest">USAR ESTADO DO MUNDO</span>
@@ -2584,7 +2584,7 @@ useEffect(() => {
     <div className="border border-[#c8a84b20] bg-[#161410] p-6 space-y-4">
       <div>
         <h3 style={cinzel} className="text-[#f0e8d8] text-lg font-semibold">{encounter.titulo}</h3>
-        <p className="text-[#8a8070] text-sm leading-relaxed mt-2 font-light">{encounter.descricao}</p>
+        <p className="text-[#9a8e78] text-sm leading-relaxed mt-2 font-light">{encounter.descricao}</p>
       </div>
 
       {encounter.inimigos?.length > 0 && (
@@ -2594,7 +2594,7 @@ useEffect(() => {
             {encounter.inimigos.map((inimigo, i) => (
               <div key={i} className="border border-[#c8a84b15] bg-[#0f0e0c] px-3 py-2 text-sm">
                 <span style={cinzel} className="text-[#e8e0d0]">{inimigo.quantidade}× {inimigo.nome}</span>
-                <span style={cinzel} className="text-[#4a4030] text-xs ml-2">CR {inimigo.cr}</span>
+                <span style={cinzel} className="text-[#8a7e68] text-xs ml-2">CR {inimigo.cr}</span>
               </div>
             ))}
           </div>
@@ -2635,7 +2635,7 @@ useEffect(() => {
     <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">ENVIAR MENSAGEM SECRETA</p>
     <div className="flex flex-col gap-3">
       <select value={personagemDestino} onChange={e => setPersonagemDestino(e.target.value)}
-        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
         style={{ borderRadius: '2px' }}>
         <option value="">Selecionar personagem...</option>
         {personagens.map(p => (
@@ -2661,7 +2661,7 @@ useEffect(() => {
   <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
     <div>
       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">PRESSÁGIOS</p>
-      <p className="text-[#4a4030] text-xs mt-1">Sinais do destino — revelados quando o tempo chegar</p>
+      <p className="text-[#8a7e68] text-xs mt-1">Sinais do destino — revelados quando o tempo chegar</p>
     </div>
     <button onClick={() => setAdicionandoPresagio(!adicionandoPresagio)}
       className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
@@ -2695,7 +2695,7 @@ useEffect(() => {
           Salvar
         </button>
         <button onClick={() => { setAdicionandoPresagio(false); setNovoPresagio(''); }}
-          className="border border-[#c8a84b20] text-[#4a4030] px-4 py-2 text-xs hover:text-[#c8a84b] transition-colors"
+          className="border border-[#c8a84b20] text-[#8a7e68] px-4 py-2 text-xs hover:text-[#c8a84b] transition-colors"
           style={{ ...cinzel, borderRadius: '2px' }}>
           Cancelar
         </button>
@@ -2705,7 +2705,7 @@ useEffect(() => {
 
   <div className="divide-y divide-[#c8a84b10]">
     {presagios.length === 0 ? (
-      <p className="px-6 py-6 text-[#3a3020] text-sm text-center" style={cinzel}>
+      <p className="px-6 py-6 text-[#7a6e58] text-sm text-center" style={cinzel}>
         Nenhum presságio registrado.
       </p>
     ) : (
@@ -2758,7 +2758,7 @@ useEffect(() => {
   <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
     <div>
       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">PROFECIAS</p>
-      <p className="text-[#4a4030] text-xs mt-1">Condições que, uma vez cumpridas, revelam seu significado</p>
+      <p className="text-[#8a7e68] text-xs mt-1">Condições que, uma vez cumpridas, revelam seu significado</p>
     </div>
     <button onClick={() => setAdicionandoProfecia(!adicionandoProfecia)}
       className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
@@ -2799,7 +2799,7 @@ useEffect(() => {
           Salvar
         </button>
         <button onClick={() => { setAdicionandoProfecia(false); setNovaProfeciaTexto(''); setNovaProfeciaCondicao(''); }}
-          className="border border-[#c8a84b20] text-[#4a4030] px-4 py-2 text-xs hover:text-[#c8a84b] transition-colors"
+          className="border border-[#c8a84b20] text-[#8a7e68] px-4 py-2 text-xs hover:text-[#c8a84b] transition-colors"
           style={{ ...cinzel, borderRadius: '2px' }}>
           Cancelar
         </button>
@@ -2809,7 +2809,7 @@ useEffect(() => {
 
   <div className="divide-y divide-[#c8a84b10]">
     {profecias.length === 0 ? (
-      <p className="px-6 py-6 text-[#3a3020] text-sm text-center" style={cinzel}>
+      <p className="px-6 py-6 text-[#7a6e58] text-sm text-center" style={cinzel}>
         Nenhuma profecia registrada.
       </p>
     ) : (
@@ -2851,7 +2851,7 @@ useEffect(() => {
                   {status.toUpperCase()}
                 </button>
               ))}
-              <span className="text-[#3a3020] text-xs ml-2" title="Só você vê">🔒 {p.condicao}</span>
+              <span className="text-[#7a6e58] text-xs ml-2" title="Só você vê">🔒 {p.condicao}</span>
             </div>
           </div>
         );
@@ -2874,7 +2874,7 @@ useEffect(() => {
       </button>
       {personagens.map(p => (
         <button key={p.id} onClick={() => enviarPresagio(modalEnviarPresagio, p.id)}
-          className="w-full border border-[#c8a84b15] text-[#6a6050] py-2 text-xs mb-2 hover:border-[#c8a84b40] hover:text-[#c8a84b] transition-colors"
+          className="w-full border border-[#c8a84b15] text-[#9a8e78] py-2 text-xs mb-2 hover:border-[#c8a84b40] hover:text-[#c8a84b] transition-colors"
           style={{ ...cinzel, borderRadius: '2px' }}>
           {p.name}
         </button>
@@ -2893,7 +2893,7 @@ useEffect(() => {
       onClick={() => setNomeAberto(prev => !prev)}
       className="flex items-center justify-between gap-4 px-4 py-3 w-full hover:bg-[#c8a84b08] transition-colors">
       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">GERAR NOME</p>
-      <span className="text-[#4a4030] text-xs transition-transform"
+      <span className="text-[#8a7e68] text-xs transition-transform"
         style={{ transform: nomeAberto ? 'rotate(180deg)' : 'rotate(0deg)' }}>▲</span>
     </button>
 
@@ -2902,7 +2902,7 @@ useEffect(() => {
       <div className="px-4 pb-4 border-t border-[#c8a84b15]">
         <div className="flex gap-2 mb-2 mt-3">
           <select value={racaNome} onChange={e => setRacaNome(e.target.value)}
-            className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#6a6050] px-2 py-1 text-xs focus:outline-none"
+            className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#8a7e68] px-2 py-1 text-xs focus:outline-none"
             style={{ borderRadius: '2px' }}>
             {['Humano','Elfo','Anão','Halfling','Gnomo','Meio-Orc','Tiefling','Draconato'].map(r => (
               <option key={r} value={r}>{r}</option>
@@ -2932,13 +2932,13 @@ useEffect(() => {
       <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">HABILIDADE</p>
         <button onClick={() => { setModalSkillNpc(null); setDescricaoSkillNpc(null); }}
-          className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">×</button>
+          className="text-[#8a7e68] hover:text-[#c8a84b] text-xl transition-colors">×</button>
       </div>
       <div className="px-6 py-6">
         {carregandoSkillNpc && (
           <div className="flex flex-col items-center py-10 gap-4">
             <div className="w-8 h-8 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-            <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">CONSULTANDO A IA...</p>
+            <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">CONSULTANDO A IA...</p>
           </div>
         )}
         {!carregandoSkillNpc && descricaoSkillNpc && !descricaoSkillNpc.error && (
@@ -2964,7 +2964,7 @@ useEffect(() => {
       </div>
       <div className="px-6 pb-6">
         <button onClick={() => { setModalSkillNpc(null); setDescricaoSkillNpc(null); }}
-          className="border border-[#c8a84b30] text-[#6a6050] px-6 py-2 text-xs tracking-widest hover:border-[#c8a84b60] hover:text-[#c8a84b] transition-colors w-full"
+          className="border border-[#c8a84b30] text-[#9a8e78] px-6 py-2 text-xs tracking-widest hover:border-[#c8a84b60] hover:text-[#c8a84b] transition-colors w-full"
           style={{ ...cinzel, borderRadius: '2px' }}>
           Fechar
         </button>
@@ -2985,19 +2985,19 @@ useEffect(() => {
           📦 Entregar Item para {modalEntregarItem.personagem.name}
         </p>
         <button onClick={() => { setModalEntregarItem(null); setAbaEntregarItem('digitar'); setJogadorOrigem(null); setItemSelecionado(null); }}
-          className="text-[#4a4030] hover:text-[#c8a84b] text-xl">✕</button>
+          className="text-[#8a7e68] hover:text-[#c8a84b] text-xl">✕</button>
       </div>
 
       {/* Abas */}
       <div className="flex gap-px mb-4 border-b border-[#c8a84b15]">
         <button onClick={() => setAbaEntregarItem('digitar')}
           className="px-4 py-2 text-xs transition-colors"
-          style={{ ...cinzel, borderBottom: abaEntregarItem === 'digitar' ? '2px solid #c8a84b' : '2px solid transparent', color: abaEntregarItem === 'digitar' ? '#c8a84b' : '#4a4030' }}>
+          style={{ ...cinzel, borderBottom: abaEntregarItem === 'digitar' ? '2px solid #c8a84b' : '2px solid transparent', color: abaEntregarItem === 'digitar' ? '#c8a84b' : '#8a7e68' }}>
           Digitar Item
         </button>
         <button onClick={() => setAbaEntregarItem('inventario')}
           className="px-4 py-2 text-xs transition-colors"
-          style={{ ...cinzel, borderBottom: abaEntregarItem === 'inventario' ? '2px solid #c8a84b' : '2px solid transparent', color: abaEntregarItem === 'inventario' ? '#c8a84b' : '#4a4030' }}>
+          style={{ ...cinzel, borderBottom: abaEntregarItem === 'inventario' ? '2px solid #c8a84b' : '2px solid transparent', color: abaEntregarItem === 'inventario' ? '#c8a84b' : '#8a7e68' }}>
           Do Inventário
         </button>
       </div>
@@ -3029,7 +3029,7 @@ useEffect(() => {
           {/* Seleciona jogador de origem */}
           {!jogadorOrigem ? (
             <>
-              <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-2">TIRAR DE QUAL JOGADOR:</p>
+              <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-2">TIRAR DE QUAL JOGADOR:</p>
               <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
                 {personagens
                   .filter(p => p.id !== modalEntregarItem.personagem.id)
@@ -3047,7 +3047,7 @@ useEffect(() => {
             <>
               <div className="flex items-center gap-2 mb-3">
                 <button onClick={() => { setJogadorOrigem(null); setItemSelecionado(null); }}
-                  className="text-[#4a4030] hover:text-[#c8a84b] text-xs">← Voltar</button>
+                  className="text-[#8a7e68] hover:text-[#c8a84b] text-xs">← Voltar</button>
                 <p style={cinzel} className="text-[#c8a84b] text-xs">
                   Inventário de {jogadorOrigem.data?.name || jogadorOrigem.name}
                 </p>
@@ -3133,7 +3133,7 @@ useEffect(() => {
       </div>
       <div className="px-6 py-6 flex flex-col gap-4">
         <div className="border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3">
-          <p className="text-[#6a6050] text-xs font-light">
+          <p className="text-[#9a8e78] text-xs font-light">
             ✦ Deixe em branco pra usar os dados já salvos, ou escreva sua própria descrição pra ter mais controle.
           </p>
         </div>
@@ -3142,7 +3142,7 @@ useEffect(() => {
           onChange={e => setDescricaoArteCustom(e.target.value)}
           placeholder="ex: um velho anão de barba prateada, cicatriz no olho esquerdo, armadura enferrujada..."
           rows={4}
-          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm resize-none"
+          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm resize-none"
           style={{ borderRadius: '2px' }} />
         <button onClick={confirmarGerarArte}
           disabled={gerandoArte}
@@ -3178,7 +3178,7 @@ useEffect(() => {
         {deletandoArte ? 'Deletando...' : '🗑 Deletar'}
       </button>
       <button onClick={() => setImagemVisualizando(null)}
-        className="border border-[#c8a84b20] text-[#4a4030] px-5 py-2 text-xs tracking-widest hover:border-[#c8a84b40] transition-colors"
+        className="border border-[#c8a84b20] text-[#8a7e68] px-5 py-2 text-xs tracking-widest hover:border-[#c8a84b40] transition-colors"
         style={{ ...cinzel, borderRadius: '2px' }}>
         Fechar
       </button>
@@ -3210,7 +3210,7 @@ useEffect(() => {
       </div>
       <div className="px-6 pb-6">
         <button onClick={() => setModalCondicoes(null)}
-          className="w-full border border-[#c8a84b20] text-[#4a4030] py-2 text-xs hover:border-[#c8a84b40] transition-colors"
+          className="w-full border border-[#c8a84b20] text-[#8a7e68] py-2 text-xs hover:border-[#c8a84b40] transition-colors"
           style={{ ...cinzel, borderRadius: '2px' }}>
           Fechar
         </button>
@@ -3229,10 +3229,10 @@ useEffect(() => {
       <div className="flex items-center justify-between mb-4">
         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px]">🌎 O MUNDO MUDOU</p>
         <button onClick={() => setCaixaMundoMudou(false)}
-          className="text-[#4a4030] hover:text-[#c8a84b] transition-colors">✕</button>
+          className="text-[#8a7e68] hover:text-[#c8a84b] transition-colors">✕</button>
       </div>
       {changelogNaoLido.length === 0 ? (
-        <p className="text-[#4a4030] text-sm text-center py-4">Nada novo.</p>
+        <p className="text-[#8a7e68] text-sm text-center py-4">Nada novo.</p>
       ) : (
         <div className="flex flex-col gap-3">
           {changelogNaoLido.map(item => (
@@ -3261,7 +3261,7 @@ useEffect(() => {
       <div className="flex flex-col gap-2">
         {consequenciasProntas.map(c => (
           <div key={c.id} className="border border-[#8a5030] bg-[#8a503010] p-4" style={{ borderRadius: '2px' }}>
-            <p className="text-[#4a4030] text-xs italic mb-1">Gatilho: {c.gatilho}</p>
+            <p className="text-[#8a7e68] text-xs italic mb-1">Gatilho: {c.gatilho}</p>
             <p className="text-[#e8e0d0] text-sm mb-3">{c.consequencia}</p>
             <div className="flex gap-2">
               <button onClick={() => revelarConsequencia(c.id, true)}
@@ -3311,7 +3311,7 @@ useEffect(() => {
 
 {opcoesEse.length > 0 && (
   <div className="flex flex-col gap-2">
-    <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px]">ESCOLHA UMA CONSEQUÊNCIA</p>
+    <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px]">ESCOLHA UMA CONSEQUÊNCIA</p>
     {opcoesEse.map((o, i) => (
       <button key={i} onClick={() => escolherEse(o)}
         className="text-left border border-[#c8a84b20] bg-[#0f0e0c] text-[#a09880] px-3 py-2 text-sm hover:border-[#c8a84b60] hover:text-[#e8e0d0] transition-colors"
@@ -3320,7 +3320,7 @@ useEffect(() => {
       </button>
     ))}
     <button onClick={() => setOpcoesEse([])}
-      className="text-[#4a4030] hover:text-[#c8a84b] text-xs self-end transition-colors">
+      className="text-[#8a7e68] hover:text-[#c8a84b] text-xs self-end transition-colors">
       Descartar opções
     </button>
   </div>
@@ -3365,7 +3365,7 @@ useEffect(() => {
       <div key={c.id} className={`border p-4 flex items-start justify-between ${c.status === 'oculta' ? 'border-[#c8a84b15] bg-[#161410]' : 'border-[#4a8a4a20] bg-[#161410]'}`}
         style={{ borderRadius: '2px' }}>
         <div>
-          <p className="text-[#4a4030] text-xs italic mb-1">{c.gatilho}</p>
+          <p className="text-[#8a7e68] text-xs italic mb-1">{c.gatilho}</p>
           <p className="text-sm" style={{ color: c.status === 'oculta' ? '#6a6050' : '#e8e0d0' }}>
             {c.status === 'oculta' ? '🔒 Oculta' : `🔓 ${c.consequencia}`}
           </p>
@@ -3411,7 +3411,7 @@ useEffect(() => {
       className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
       style={{ borderRadius: '2px' }} />
 
-    <label className="flex items-center gap-2 text-[#6a6050] text-xs cursor-pointer">
+    <label className="flex items-center gap-2 text-[#9a8e78] text-xs cursor-pointer">
       <input type="checkbox" checked={novoFato.todos_jogadores}
         onChange={e => setNovoFato(p => ({ ...p, todos_jogadores: e.target.checked }))} />
       <span style={cinzel} className="tracking-widest">TODOS OS JOGADORES SABEM</span>
@@ -3419,13 +3419,13 @@ useEffect(() => {
 
     {!novoFato.todos_jogadores && (
       <div>
-        <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-2">PERSONAGENS QUE SABEM</p>
+        <p style={cinzel} className="text-[#9a8e78] text-xs tracking-[2px] mb-2">PERSONAGENS QUE SABEM</p>
         <div className="flex flex-wrap gap-2">
           {personagens.map(p => (
             <button key={p.id} type="button"
               onClick={() => setNovoFato(prev => ({ ...prev, personagens_que_sabem: toggleSabedor(prev.personagens_que_sabem, p.id) }))}
               className={`border px-3 py-1 text-xs transition-colors ${
-                novoFato.personagens_que_sabem.includes(p.id) ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]' : 'border-[#c8a84b20] text-[#6a6050]'
+                novoFato.personagens_que_sabem.includes(p.id) ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]' : 'border-[#c8a84b20] text-[#8a7e68]'
               }`}
               style={{ borderRadius: '2px' }}>
               {p.data?.name || p.name}
@@ -3436,13 +3436,13 @@ useEffect(() => {
     )}
 
     <div>
-      <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-2">NPCS QUE SABEM</p>
+      <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-2">NPCS QUE SABEM</p>
       <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
         {npcs.map(n => (
           <button key={n.id} type="button"
             onClick={() => setNovoFato(prev => ({ ...prev, npcs_que_sabem: toggleSabedor(prev.npcs_que_sabem, n.id) }))}
             className={`border px-3 py-1 text-xs transition-colors ${
-              novoFato.npcs_que_sabem.includes(n.id) ? 'border-[#8a4a8a] text-[#8a4a8a] bg-[#8a4a8a10]' : 'border-[#c8a84b20] text-[#6a6050]'
+              novoFato.npcs_que_sabem.includes(n.id) ? 'border-[#8a4a8a] text-[#8a4a8a] bg-[#8a4a8a10]' : 'border-[#c8a84b20] text-[#9a8e78]'
             }`}
             style={{ borderRadius: '2px' }}>
             {n.name}
@@ -3459,7 +3459,7 @@ useEffect(() => {
   </div>
 
   <div className="flex items-center gap-2 mb-4">
-    <span style={cinzel} className="text-[#4a4030] text-xs tracking-[2px]">VER PELA PERSPECTIVA DE:</span>
+    <span style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px]">VER PELA PERSPECTIVA DE:</span>
     <select value={perspectivaFiltro} onChange={e => setPerspectivaFiltro(e.target.value)}
       className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-1 text-xs focus:outline-none"
       style={{ borderRadius: '2px' }}>
@@ -3475,7 +3475,7 @@ useEffect(() => {
 
   <div className="flex flex-col gap-2">
     {fatosMundo.filter(fatoVisivelNaPerspectiva).length === 0 ? (
-      <p className="text-[#3a3020] text-sm text-center py-6">
+      <p className="text-[#7a6e58] text-sm text-center py-6">
         {perspectivaFiltro === 'todos' ? 'Nenhum fato registrado.' : 'Ninguém aqui sabe de nada ainda.'}
       </p>
     ) : (
@@ -3483,7 +3483,7 @@ useEffect(() => {
         <div key={f.id} className="border border-[#c8a84b15] bg-[#161410] p-4 flex items-start justify-between" style={{ borderRadius: '2px' }}>
           <div>
             <p className="text-[#e8e0d0] text-sm mb-1">{f.texto}</p>
-            <p className="text-[#4a4030] text-xs">
+            <p className="text-[#8a7e68] text-xs">
               {f.todos_jogadores && 'Todos os jogadores'}
               {!f.todos_jogadores && f.personagens_que_sabem?.length > 0 &&
                 `Personagens: ${f.personagens_que_sabem.map(id => personagens.find(p => p.id === id)?.data?.name || personagens.find(p => p.id === id)?.name || '?').join(', ')}`}

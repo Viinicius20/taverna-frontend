@@ -149,7 +149,7 @@ export default function CriarPersonagem() {
           ⚔ TAVERNA
         </span>
         <button onClick={() => navigate('/')}
-          className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+          className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
           ← Voltar
         </button>
       </nav>
@@ -217,11 +217,11 @@ export default function CriarPersonagem() {
                     {pdfNome ? (
                       <>
                         <p style={cinzel} className="text-[#c8a84b] text-sm tracking-widest mb-1">{pdfNome}</p>
-                        <p className="text-[#4a4030] text-xs">Clique para trocar o arquivo</p>
+                        <p className="text-[#8a7e68] text-xs">Clique para trocar o arquivo</p>
                       </>
                     ) : (
                       <>
-                        <p style={cinzel} className="text-[#6a6050] text-sm tracking-widest mb-1">Clique para selecionar o PDF</p>
+                        <p style={cinzel} className="text-[#9a8e78] text-sm tracking-widest mb-1">Clique para selecionar o PDF</p>
                         <p className="text-[#3a3528] text-xs">D&D Beyond, Tormenta, Pathfinder e outros</p>
                       </>
                     )}
@@ -230,7 +230,7 @@ export default function CriarPersonagem() {
 
                 {pdfNome && (
                   <div className="border border-[#c8a84b15] bg-[#c8a84b05] px-4 py-3">
-                    <p className="text-[#6a6050] text-sm font-light">
+                    <p className="text-[#9a8e78] text-sm font-light">
                       ✦ A IA vai ler o PDF e extrair todos os dados da ficha automaticamente.
                     </p>
                   </div>
@@ -317,7 +317,7 @@ export default function CriarPersonagem() {
                       placeholder="Nome da classe"
                     />
                     <div className="flex items-center gap-1">
-                      <label className="text-[#6a6050] text-xs">Lvl:</label>
+                      <label className="text-[#9a8e78] text-xs">Lvl:</label>
                       <input 
                         type="number" 
                         min={1} 
@@ -385,7 +385,7 @@ export default function CriarPersonagem() {
                         onChange={e => editarAtributo(attr, e.target.value)}
                         className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] text-center text-xl font-light w-full py-3 focus:outline-none focus:border-[#c8a84b50]"
                         style={{ borderRadius: '2px' }} />
-                      <span className="text-[#4a4030] text-xs" style={cinzel}>
+                      <span className="text-[#8a7e68] text-xs" style={cinzel}>
                         {Math.floor((val - 10) / 2) >= 0 ? '+' : ''}{Math.floor((val - 10) / 2)}
                       </span>
                     </div>
@@ -436,7 +436,7 @@ export default function CriarPersonagem() {
                 </div>
                 <div className="p-6 flex flex-wrap gap-2">
                   {ficha.inventory.map((item, i) => (
-                    <span key={i} className="border border-[#c8a84b15] text-[#6a6050] px-3 py-1 text-sm"
+                    <span key={i} className="border border-[#c8a84b15] text-[#9a8e78] px-3 py-1 text-sm"
                       style={{ borderRadius: '2px' }}>
                       {item}
                     </span>

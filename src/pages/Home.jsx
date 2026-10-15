@@ -119,14 +119,14 @@ export default function Home() {
             <div className="flex items-center justify-between px-6 py-4 border-b border-[#c8a84b20]">
               <span style={cinzel} className="text-[#c8a84b] text-sm tracking-widest">⚔ TAVERNA</span>
               <button onClick={() => setDrawerAberto(false)}
-                className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">✕</button>
+                className="text-[#8a7e68] hover:text-[#c8a84b] text-xl transition-colors">✕</button>
             </div>
 
             {user && (
               <div className="px-6 py-4 border-b border-[#c8a84b15]">
-                <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-1">LOGADO COMO</p>
+                <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-1">LOGADO COMO</p>
                 <p style={cinzel} className="text-[#c8a84b] text-sm">{user.username}</p>
-                {isMestre && <span style={cinzel} className="text-[#3a3020] text-xs">Mestre</span>}
+                {isMestre && <span style={cinzel} className="text-[#7a6e58] text-xs">Mestre</span>}
               </div>
             )}
 
@@ -140,12 +140,12 @@ export default function Home() {
                     <span className={destaque ? 'text-[#c8a84b]' : 'text-[#a09880] group-hover:text-[#c8a84b] transition-colors'}>
                       {label}
                     </span>
-                    <span className="text-[#4a4030] group-hover:text-[#c8a84b] transition-colors text-xs">→</span>
+                    <span className="text-[#8a7e68] group-hover:text-[#c8a84b] transition-colors text-xs">→</span>
                   </button>
                 ))
               ) : (
                 <div className="px-6 py-8 text-center">
-                  <p style={cinzel} className="text-[#4a4030] text-xs mb-4">Entre na mesa para acessar todas as ferramentas.</p>
+                  <p style={cinzel} className="text-[#8a7e68] text-xs mb-4">Entre na mesa para acessar todas as ferramentas.</p>
                   <button onClick={() => { navigate('/login'); setDrawerAberto(false); }}
                     className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs font-bold w-full hover:bg-[#e0c060] transition-colors btn-shimmer"
                     style={{ ...cinzel, borderRadius: '2px' }}>
@@ -158,7 +158,7 @@ export default function Home() {
             <div className="px-6 py-4 border-t border-[#c8a84b15]">
               {user ? (
                 <button onClick={() => { logout(); setDrawerAberto(false); }}
-                  className="w-full text-left text-xs tracking-widest text-[#4a4030] hover:text-red-700 transition-colors"
+                  className="w-full text-left text-xs tracking-widest text-[#8a7e68] hover:text-red-700 transition-colors"
                   style={cinzel}>
                   Sair
                 </button>
@@ -241,17 +241,17 @@ export default function Home() {
           {monstro ? (
             <>
               <h3 style={cinzel} className="text-[#f0e8d8] text-xl font-bold mb-1">{monstro.nome}</h3>
-              <p style={cinzel} className="text-[#4a4030] text-xs mb-4">{monstro.tipo} · CR {monstro.cr}</p>
+              <p style={cinzel} className="text-[#8a7e68] text-xs mb-4">{monstro.tipo} · CR {monstro.cr}</p>
               <p className="text-[#8a8070] text-sm leading-relaxed font-light italic">{monstro.descricao}</p>
             </>
           ) : (
             <div className="flex items-center gap-3">
               <div className="w-5 h-5 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-              <p style={cinzel} className="text-[#4a4030] text-xs">INVOCANDO...</p>
+              <p style={cinzel} className="text-[#8a7e68] text-xs">INVOCANDO...</p>
             </div>
           )}
           <button onClick={buscarMonstroAleatorio}
-            className="mt-6 text-xs text-[#4a4030] hover:text-[#c8a84b] transition-colors"
+            className="mt-6 text-xs text-[#8a7e68] hover:text-[#c8a84b] transition-colors"
             style={cinzel}>
             ↻ Outro monstro
           </button>
@@ -263,7 +263,7 @@ export default function Home() {
           {imagemRevelada ? (
             imagemRevelada.text_content ? (
               <div className="cursor-pointer hover:opacity-90 transition-opacity" onClick={() => navigate('/galeria')}>
-                <p className="text-[#4a4030] text-xs mb-2" style={cinzel}>{imagemRevelada.category?.toUpperCase() || 'DOCUMENTO'}</p>
+                <p className="text-[#8a7e68] text-xs mb-2" style={cinzel}>{imagemRevelada.category?.toUpperCase() || 'DOCUMENTO'}</p>
                 <p className="text-[#a09880] text-sm leading-relaxed line-clamp-4 italic">
                   {imagemRevelada.text_content}
                 </p>
@@ -277,7 +277,7 @@ export default function Home() {
           ) : (
             <div className="flex flex-col items-center justify-center h-40 gap-3">
               <span className="text-3xl opacity-10">🗺</span>
-              <p style={cinzel} className="text-[#3a3020] text-xs">NENHUMA CENA REVELADA</p>
+              <p style={cinzel} className="text-[#7a6e58] text-xs">NENHUMA CENA REVELADA</p>
             </div>
           )}
         </div>
@@ -296,7 +296,7 @@ export default function Home() {
         {boato && (
           <div className="border border-[#c8a84b20] bg-[#161410] p-6" style={{ borderRadius: '2px' }}>
             <p className="text-[#a09880] text-base leading-relaxed mb-4 font-light italic">"{boato.boato}"</p>
-            <p style={cinzel} className="text-[#4a4030] text-xs">— {boato.fonte}</p>
+            <p style={cinzel} className="text-[#8a7e68] text-xs">— {boato.fonte}</p>
           </div>
         )}
       </div>

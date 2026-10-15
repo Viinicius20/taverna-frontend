@@ -17,7 +17,7 @@ export default function RolarDados() {
           ⚔ TAVERNA
         </span>
         <button onClick={() => navigate('/')}
-          className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+          className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
           ← Voltar
         </button>
       </nav>

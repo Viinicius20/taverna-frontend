@@ -91,7 +91,7 @@ async function toggleDescoberto(id, atual) {
         <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
           onClick={() => navigate('/')}>⚔ TAVERNA</span>
         <button onClick={() => navigate('/mestre')}
-          className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+          className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
           ← Área do Mestre
         </button>
       </nav>
@@ -117,13 +117,13 @@ async function toggleDescoberto(id, atual) {
                 className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
                 style={{ borderRadius: '2px' }} />
               <select value={novoCR} onChange={e => setNovoCR(e.target.value)}
-                className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-sm focus:outline-none"
+                className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 text-sm focus:outline-none"
                 style={{ borderRadius: '2px' }}>
                 <option value="">CR (IA decide)</option>
                 {CRS.map(cr => <option key={cr} value={cr}>CR {cr}</option>)}
               </select>
               <select value={novoTipo} onChange={e => setNovoTipo(e.target.value)}
-                className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-sm focus:outline-none"
+                className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 text-sm focus:outline-none"
                 style={{ borderRadius: '2px' }}>
                 <option value="">Tipo (IA decide)</option>
                 {TIPOS.map(t => <option key={t} value={t}>{t}</option>)}
@@ -149,13 +149,13 @@ async function toggleDescoberto(id, atual) {
             className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 flex-1 min-w-48 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
             style={{ borderRadius: '2px' }} />
           <select value={filtroCR} onChange={e => setFiltroCR(e.target.value)}
-            className="bg-[#161410] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-sm focus:outline-none"
+            className="bg-[#161410] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 text-sm focus:outline-none"
             style={{ borderRadius: '2px' }}>
             <option value="">Todos os CRs</option>
             {CRS.map(cr => <option key={cr} value={cr}>CR {cr}</option>)}
           </select>
           <select value={filtroTipo} onChange={e => setFiltroTipo(e.target.value)}
-            className="bg-[#161410] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-sm focus:outline-none"
+            className="bg-[#161410] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 text-sm focus:outline-none"
             style={{ borderRadius: '2px' }}>
             <option value="">Todos os tipos</option>
             {TIPOS.map(t => <option key={t} value={t}>{t}</option>)}
@@ -166,12 +166,12 @@ async function toggleDescoberto(id, atual) {
         {loading ? (
           <div className="flex items-center gap-3 justify-center py-16">
             <div className="w-6 h-6 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-            <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">CARREGANDO...</p>
+            <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">CARREGANDO...</p>
           </div>
         ) : monstros.length === 0 ? (
           <div className="text-center py-16">
-            <p style={cinzel} className="text-[#4a4030] text-sm">Nenhum monstro encontrado.</p>
-            <p className="text-[#3a3020] text-sm mt-2">Gere um com IA ou adicione pelo Supabase.</p>
+            <p style={cinzel} className="text-[#8a7e68] text-sm">Nenhum monstro encontrado.</p>
+            <p className="text-[#8a7e68] text-sm mt-2">Gere um com IA ou adicione pelo Supabase.</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -186,7 +186,7 @@ async function toggleDescoberto(id, atual) {
   <span style={cinzel} className="text-[#e8e0d0] text-sm font-bold">
     {m.discovered === false ? '??? Criatura Desconhecida' : m.name}
   </span>
-  <span className="text-[#4a4030] text-xs">{m.size} {m.type}</span>
+  <span className="text-[#8a7e68] text-xs">{m.size} {m.type}</span>
   {m.is_homebrew && (
     <span style={cinzel} className="text-xs border border-[#8a5030] text-[#8a5030] px-1.5 py-0.5">HOMEBREW</span>
   )}
@@ -195,9 +195,9 @@ async function toggleDescoberto(id, atual) {
   )}
 </div>
                     <div className="flex items-center gap-4 text-xs" style={cinzel}>
-                      <span className="text-[#6a6050]">HP <span className="text-[#e8e0d0]">{m.hp}</span></span>
-                      <span className="text-[#6a6050]">CA <span className="text-[#e8e0d0]">{m.ac}</span></span>
-                      <span className="text-[#4a4030]">{monstroDetalhes?.id === m.id ? '▲' : '▼'}</span>
+                      <span className="text-[#8a7e68]">HP <span className="text-[#e8e0d0]">{m.hp}</span></span>
+                      <span className="text-[#8a7e68]">CA <span className="text-[#e8e0d0]">{m.ac}</span></span>
+                      <span className="text-[#8a7e68]">{monstroDetalhes?.id === m.id ? '▲' : '▼'}</span>
                     </div>
                   </div>
                 </div>
@@ -208,7 +208,7 @@ async function toggleDescoberto(id, atual) {
 
     {/* Toggle de descoberto */}
     <div className="flex items-center justify-between border border-[#c8a84b15] bg-[#161410] px-4 py-3">
-      <span style={cinzel} className="text-[#4a4030] text-xs tracking-[2px]">
+      <span style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px]">
         {m.discovered === false ? '👁️ OS JOGADORES AINDA NÃO CONHECEM ESTA CRIATURA' : '✓ JOGADORES JÁ CONHECEM ESTA CRIATURA'}
       </span>
       <button onClick={e => { e.stopPropagation(); toggleDescoberto(m.id, m.discovered); }}
@@ -225,7 +225,7 @@ async function toggleDescoberto(id, atual) {
                           <div key={attr} className="border border-[#c8a84b15] py-2">
                             <p style={cinzel} className="text-[#c8a84b] text-xs">{attrLabel[attr] || attr.toUpperCase()}</p>
                             <p style={cinzel} className="text-[#e8e0d0] text-lg font-bold">{val}</p>
-                            <p className="text-[#4a4030] text-xs">{Math.floor((val-10)/2) >= 0 ? '+' : ''}{Math.floor((val-10)/2)}</p>
+                            <p className="text-[#8a7e68] text-xs">{Math.floor((val-10)/2) >= 0 ? '+' : ''}{Math.floor((val-10)/2)}</p>
                           </div>
                         ))}
                       </div>
@@ -233,11 +233,11 @@ async function toggleDescoberto(id, atual) {
 
                     {/* Info */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
-                      {m.speed && <div><span style={cinzel} className="text-[#4a4030] text-xs">VELOCIDADE </span><span className="text-[#a09880]">{m.speed}</span></div>}
-                      {m.senses && <div><span style={cinzel} className="text-[#4a4030] text-xs">SENTIDOS </span><span className="text-[#a09880]">{m.senses}</span></div>}
-                      {m.languages && <div><span style={cinzel} className="text-[#4a4030] text-xs">IDIOMAS </span><span className="text-[#a09880]">{m.languages}</span></div>}
-                      {m.damage_resistances && <div><span style={cinzel} className="text-[#4a4030] text-xs">RESISTÊNCIAS </span><span className="text-[#a09880]">{m.damage_resistances}</span></div>}
-                      {m.damage_immunities && <div><span style={cinzel} className="text-[#4a4030] text-xs">IMUNIDADES </span><span className="text-[#a09880]">{m.damage_immunities}</span></div>}
+                      {m.speed && <div><span style={cinzel} className="text-[#8a7e68] text-xs">VELOCIDADE </span><span className="text-[#a09880]">{m.speed}</span></div>}
+                      {m.senses && <div><span style={cinzel} className="text-[#8a7e68] text-xs">SENTIDOS </span><span className="text-[#a09880]">{m.senses}</span></div>}
+                      {m.languages && <div><span style={cinzel} className="text-[#8a7e68] text-xs">IDIOMAS </span><span className="text-[#a09880]">{m.languages}</span></div>}
+                      {m.damage_resistances && <div><span style={cinzel} className="text-[#8a7e68] text-xs">RESISTÊNCIAS </span><span className="text-[#a09880]">{m.damage_resistances}</span></div>}
+                      {m.damage_immunities && <div><span style={cinzel} className="text-[#8a7e68] text-xs">IMUNIDADES </span><span className="text-[#a09880]">{m.damage_immunities}</span></div>}
                     </div>
 
                     {/* Features */}
@@ -248,7 +248,7 @@ async function toggleDescoberto(id, atual) {
                           {m.features.map((f, i) => (
                             <div key={i}>
                               <span style={cinzel} className="text-[#e8e0d0] text-sm font-bold">{f.name}. </span>
-                              <span className="text-[#6a6050] text-sm">{f.description}</span>
+                              <span className="text-[#9a8e78] text-sm">{f.description}</span>
                             </div>
                           ))}
                         </div>
@@ -263,7 +263,7 @@ async function toggleDescoberto(id, atual) {
                           {m.actions.map((a, i) => (
                             <div key={i}>
                               <span style={cinzel} className="text-[#e8e0d0] text-sm font-bold">{a.name}. </span>
-                              <span className="text-[#6a6050] text-sm">{a.description}</span>
+                              <span className="text-[#9a8e78] text-sm">{a.description}</span>
                             </div>
                           ))}
                         </div>
@@ -278,7 +278,7 @@ async function toggleDescoberto(id, atual) {
                           {m.legendary_actions.map((a, i) => (
                             <div key={i}>
                               <span style={cinzel} className="text-[#e8e0d0] text-sm font-bold">{a.name}. </span>
-                              <span className="text-[#6a6050] text-sm">{a.description}</span>
+                              <span className="text-[#9a8e78] text-sm">{a.description}</span>
                             </div>
                           ))}
                         </div>
@@ -286,7 +286,7 @@ async function toggleDescoberto(id, atual) {
                     )}
 
                     {m.description && (
-                      <p className="text-[#4a4030] text-sm italic border-t border-[#c8a84b10] pt-3">{m.description}</p>
+                      <p className="text-[#8a7e68] text-sm italic border-t border-[#c8a84b10] pt-3">{m.description}</p>
                     )}
 
                     <div className="flex items-center gap-2 pt-2 border-t border-[#c8a84b10]">

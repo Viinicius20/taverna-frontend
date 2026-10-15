@@ -55,7 +55,7 @@ export default function ArquivoMestre() {
   }
 
   async function deletarItem(id) {
-    if (!window.confirm('Deletar este item?')) return;
+    if (!(await confirmar('Deletar este item?'))) return;
     try {
       await api.delete(`/arquivo-mestre/${id}`);
       setItens(prev => prev.filter(i => i.id !== id));
@@ -70,7 +70,7 @@ export default function ArquivoMestre() {
         <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
           onClick={() => navigate('/')}>⚔ TAVERNA</span>
         <button onClick={() => navigate('/mestre')}
-          className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+          className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
           ← Voltar
         </button>
       </nav>
@@ -110,12 +110,12 @@ export default function ArquivoMestre() {
         {carregando ? (
           <div className="flex items-center gap-3 justify-center py-16">
             <div className="w-6 h-6 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-            <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">CARREGANDO...</p>
+            <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">CARREGANDO...</p>
           </div>
         ) : (
           <div className="space-y-2">
             {itens.filter(i => i.categoria === categoriaAberta).length === 0 ? (
-              <p style={cinzel} className="text-[#3a3020] text-sm text-center py-10">NADA REGISTRADO NESSA CATEGORIA</p>
+              <p style={cinzel} className="text-[#7a6e58] text-sm text-center py-10">NADA REGISTRADO NESSA CATEGORIA</p>
             ) : (
               itens.filter(i => i.categoria === categoriaAberta).map(item => (
                 <div key={item.id} className="border border-[#c8a84b15] bg-[#161410] px-4 py-3 flex items-start justify-between gap-3" style={{ borderRadius: '2px' }}>

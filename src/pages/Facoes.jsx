@@ -63,7 +63,7 @@ async function recarregarFaccoesSilencioso() {
   }
 
   async function deletarFaccao(id) {
-    if (!window.confirm('Tem certeza que deseja deletar esta facção?')) return;
+    if (!(await confirmar('Tem certeza que deseja deletar esta facção?'))) return;
     try {
       await api.delete(`/factions/${id}`);
       setFaccoes(prev => prev.filter(f => f.id !== id));
@@ -78,7 +78,7 @@ async function recarregarFaccoesSilencioso() {
         <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
           onClick={() => navigate('/')}>⚔ TAVERNA</span>
         <button onClick={() => navigate('/mestre')}
-          className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+          className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
           ← Voltar
         </button>
       </nav>
@@ -116,10 +116,10 @@ async function recarregarFaccoesSilencioso() {
         {carregando ? (
           <div className="flex items-center gap-3 justify-center py-16">
             <div className="w-6 h-6 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-            <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">CARREGANDO...</p>
+            <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">CARREGANDO...</p>
           </div>
         ) : faccoes.length === 0 ? (
-          <p style={cinzel} className="text-[#3a3020] text-sm text-center py-16">NENHUMA FACÇÃO REGISTRADA</p>
+          <p style={cinzel} className="text-[#7a6e58] text-sm text-center py-16">NENHUMA FACÇÃO REGISTRADA</p>
         ) : (
           <div className="space-y-2">
             {faccoes.map(f => (
@@ -129,9 +129,9 @@ async function recarregarFaccoesSilencioso() {
                   <div className="flex items-center gap-3">
                     <span className="w-2 h-2 rounded-full" style={{ backgroundColor: REPUTACAO_COR[f.reputation] || '#8a8070' }} />
                     <span style={cinzel} className="text-[#e8e0d0] text-sm font-bold">{f.name}</span>
-                    <span className="text-[#4a4030] text-xs">{f.type}</span>
+                    <span className="text-[#8a7e68] text-xs">{f.type}</span>
                   </div>
-                  <span className="text-[#4a4030] text-xs">{faccaoExpandida === f.id ? '▲' : '▼'}</span>
+                  <span className="text-[#8a7e68] text-xs">{faccaoExpandida === f.id ? '▲' : '▼'}</span>
                 </div>
 
                 {faccaoExpandida === f.id && (
@@ -140,7 +140,7 @@ async function recarregarFaccoesSilencioso() {
                     {f.goals && (
                       <div>
                         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">OBJETIVOS</p>
-                        <p className="text-[#6a6050] text-sm">{f.goals}</p>
+                        <p className="text-[#9a8e78] text-sm">{f.goals}</p>
                       </div>
                     )}
                     <div>

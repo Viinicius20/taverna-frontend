@@ -74,7 +74,7 @@ export default function MundoVivo() {
 }
 
   async function deletarWorldLog(id) {
-  if (!window.confirm('Apagar essa cronica?')) return;
+  if (!(await confirmar('Apagar esta cronica?'))) return;
   try {
     await api.delete(`/world-log/${id}`);
     setWorldLog(prev => prev.filter(l => l.id !== id));
@@ -120,7 +120,7 @@ export default function MundoVivo() {
   }
 
   async function deletarEvento(id) {
-    if (!window.confirm('Tem certeza que deseja deletar este evento?')) return;
+    if (!(await confirmar('Tem certeza que deseja deletar este evento?'))) return;
     try {
       await api.delete(`/world-events/${id}`);
       setEventos(prev => prev.filter(e => e.id !== id));
@@ -149,7 +149,7 @@ function ignorarSugestao(id) {
 }
 
 async function deletarEventoRegional(id) {
-  if (!window.confirm('Deletar este evento?')) return;
+  if (!(await confirmar('Deletar este evento?'))) return;
   try {
     await api.delete(`/economia/eventos/${id}`);
     setEventosRegionais(prev => prev.filter(e => e.id !== id));
@@ -207,7 +207,7 @@ async function toggleFlag(id, valorAtual) {
 }
 
 async function deletarFlag(id) {
-  if (!window.confirm('Deletar esta flag?')) return;
+  if (!(await confirmar('Deletar esta flag?'))) return;
   try {
     await api.delete(`/flags/${id}`);
     setFlags(prev => prev.filter(f => f.id !== id));
@@ -267,7 +267,7 @@ async function avancarDiaViagem(id) {
 }
 
 async function deletarViagem(id) {
-  if (!window.confirm('Deletar esta viagem?')) return;
+  if (!(await confirmar('Deletar esta viagem?'))) return;
   try {
     await api.delete(`/viagem/${id}`);
     setViagens(prev => prev.filter(v => v.id !== id));
@@ -308,7 +308,7 @@ async function publicarGazeta(g) {
 }
 
 async function deletarGazeta(id) {
-  if (!window.confirm('Deletar esta edição?')) return;
+  if (!(await confirmar('Deletar esta edição?'))) return;
   try {
     await api.delete(`/gazeta/${id}`);
     setGazetas(prev => prev.filter(g => g.id !== id));
@@ -346,7 +346,7 @@ function iconeRelogio(nome) {
         <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
           onClick={() => navigate('/')}>⚔ TAVERNA</span>
         <button onClick={() => navigate('/mestre')}
-          className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+          className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
           ← Voltar
         </button>
       </nav>
@@ -447,12 +447,12 @@ function iconeRelogio(nome) {
     <div className="flex items-center justify-between mb-1">
       <span style={cinzel} className="text-[#8a4a8a] text-xs">{log.event_name}</span>
       <div className="flex items-center gap-2">
-        <span className="text-[#3a3020] text-xs">Sessão #{log.session_number}</span>
+        <span className="text-[#7a6e58] text-xs">Sessão #{log.session_number}</span>
         <button onClick={() => deletarWorldLog(log.id)}
           className="text-red-900 hover:text-red-600 text-xs transition-colors">×</button>
       </div>
     </div>
-    <p className="text-[#6a6050] text-sm">{log.description}</p>
+    <p className="text-[#9a8e78] text-sm">{log.description}</p>
   </div>
 ))}
     </div>
@@ -484,7 +484,7 @@ function iconeRelogio(nome) {
               ))}
             </div>
             {ev.next_event_name && (
-              <p className="text-[#4a4030] text-xs mt-2">
+              <p className="text-[#8a7e68] text-xs mt-2">
                 Ao completar → <span style={cinzel} className="text-[#8a4a8a]">{ev.next_event_name}</span>
               </p>
             )}
@@ -498,10 +498,10 @@ function iconeRelogio(nome) {
         {carregando ? (
           <div className="flex items-center gap-3 justify-center py-16">
             <div className="w-6 h-6 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-            <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">CARREGANDO...</p>
+            <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">CARREGANDO...</p>
           </div>
         ) : eventos.length === 0 ? (
-          <p style={cinzel} className="text-[#3a3020] text-sm text-center py-16">NENHUM EVENTO REGISTRADO</p>
+          <p style={cinzel} className="text-[#8a7e68] text-sm text-center py-16">NENHUM EVENTO REGISTRADO</p>
         ) : (
           <div className="space-y-2">
             {eventos.map(ev => (
@@ -512,24 +512,24 @@ function iconeRelogio(nome) {
                     <div className="flex items-center gap-2">
                       {ev.locked_by_master && <span title="Travado pelo mestre">🔒</span>}
                       <span style={cinzel} className="text-[#e8e0d0] text-sm font-bold">{ev.name}</span>
-                      {ev.deadline && <span className="text-[#4a4030] text-xs">· {ev.deadline}</span>}
+                      {ev.deadline && <span className="text-[#8a7e68] text-xs">· {ev.deadline}</span>}
                     </div>
                     <span style={{ ...cinzel, color: STATUS_COR[ev.status] }} className="text-xs">
                         {ev.status?.toUpperCase()}
                     </span>
                   </div>
                   <div className="h-1.5 bg-[#0f0e0c] rounded-full overflow-hidden">
-  <div className="h-full transition-all" style={{ width: `${ev.progress}%`, backgroundColor: STATUS_COR[ev.status] || '#c8a84b' }} />
-</div>
-<p className="text-[#4a4030] text-xs mt-1">
-  {ev.progress}%
-  {ev.next_event_name && (
-    <span className="ml-3">
-      → {ev.triggered_event_id ? '✓ ' : ''}
-      <span style={cinzel} className="text-[#8a4a8a]">{ev.next_event_name}</span>
-    </span>
-  )}
-</p>
+                    <div className="h-full transition-all" style={{ width: `${ev.progress}%`, backgroundColor: STATUS_COR[ev.status] || '#c8a84b' }} />
+                  </div>
+                  <p className="text-[#8a7e68] text-xs mt-1">
+                    {ev.progress}%
+                    {ev.next_event_name && (
+                      <span className="ml-3">
+                        → {ev.triggered_event_id ? '✓ ' : ''}
+                        <span style={cinzel} className="text-[#8a4a8a]">{ev.next_event_name}</span>
+                      </span>
+                    )}
+                  </p>
                 </div>
 
                 {expandido === ev.id && (
@@ -538,7 +538,7 @@ function iconeRelogio(nome) {
                     {ev.consequences && (
                       <div>
                         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">CONSEQUÊNCIAS AO CONCLUIR</p>
-                        <p className="text-[#6a6050] text-sm">{ev.consequences}</p>
+                        <p className="text-[#9a8e78] text-sm">{ev.consequences}</p>
                       </div>
                     )}
 
@@ -557,31 +557,31 @@ function iconeRelogio(nome) {
                     </div>
 
                     <div>
-  <button onClick={() => pedirSugestaoEvento(ev.id)}
-    disabled={gerandoSugestao === ev.id}
-    className="w-full border border-[#8a4a8a40] text-[#8a4a8a] py-2 text-xs tracking-widest hover:bg-[#8a4a8a10] transition-colors disabled:opacity-50"
-    style={{ ...cinzel, borderRadius: '2px' }}>
-    {gerandoSugestao === ev.id ? 'Pensando...' : '💭 Sugerir Desdobramento'}
-  </button>
+                      <button onClick={() => pedirSugestaoEvento(ev.id)}
+                        disabled={gerandoSugestao === ev.id}
+                        className="w-full border border-[#8a4a8a40] text-[#8a4a8a] py-2 text-xs tracking-widest hover:bg-[#8a4a8a10] transition-colors disabled:opacity-50"
+                        style={{ ...cinzel, borderRadius: '2px' }}>
+                        {gerandoSugestao === ev.id ? 'Pensando...' : '💭 Sugerir Desdobramento'}
+                      </button>
 
-  {sugestoes[ev.id] && (
-    <div className="mt-3 border border-[#8a4a8a30] bg-[#8a4a8a08] p-4">
-      <p className="text-[#e8e0d0] text-sm italic mb-3">{sugestoes[ev.id]}</p>
-      <div className="flex gap-2">
-        <button onClick={() => aprovarSugestao(ev, sugestoes[ev.id])}
-          className="flex-1 bg-[#8a4a8a] text-[#0f0e0c] py-1.5 text-xs font-bold hover:bg-[#a05aa0] transition-colors"
-          style={{ ...cinzel, borderRadius: '2px' }}>
-          ✓ Aprovar
-        </button>
-        <button onClick={() => ignorarSugestao(ev.id)}
-          className="flex-1 border border-[#c8a84b20] text-[#4a4030] py-1.5 text-xs hover:border-[#c8a84b40] transition-colors"
-          style={{ ...cinzel, borderRadius: '2px' }}>
-          ✕ Ignorar
-        </button>
-      </div>
-    </div>
-  )}
-</div>
+                      {sugestoes[ev.id] && (
+                        <div className="mt-3 border border-[#8a4a8a30] bg-[#8a4a8a08] p-4">
+                          <p className="text-[#e8e0d0] text-sm italic mb-3">{sugestoes[ev.id]}</p>
+                          <div className="flex gap-2">
+                            <button onClick={() => aprovarSugestao(ev, sugestoes[ev.id])}
+                              className="flex-1 bg-[#8a4a8a] text-[#0f0e0c] py-1.5 text-xs font-bold hover:bg-[#a05aa0] transition-colors"
+                              style={{ ...cinzel, borderRadius: '2px' }}>
+                              ✓ Aprovar
+                            </button>
+                            <button onClick={() => ignorarSugestao(ev.id)}
+                              className="flex-1 border border-[#c8a84b20] text-[#8a7e68] py-1.5 text-xs hover:border-[#c8a84b40] transition-colors"
+                              style={{ ...cinzel, borderRadius: '2px' }}>
+                              ✕ Ignorar
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
 
                     <div className="flex gap-2 justify-end pt-2">
                       <button onClick={() => toggleTrava(ev.id, ev.locked_by_master)}
@@ -625,15 +625,15 @@ function iconeRelogio(nome) {
   </div>
 
   {flags.length === 0 ? (
-    <p className="text-[#3a3020] text-sm text-center py-6">Nenhuma flag registrada.</p>
+    <p className="text-[#7a6e58] text-sm text-center py-6">Nenhuma flag registrada.</p>
   ) : (
     <div className="grid grid-cols-2 gap-2">
       {flags.map(f => (
         <div key={f.id} className={`border p-3 flex items-center justify-between ${f.value ? 'border-[#4a8a4a30] bg-[#4a8a4a08]' : 'border-[#c8a84b15] bg-[#161410]'}`}
           style={{ borderRadius: '2px' }}>
           <div>
-            <p style={cinzel} className={`text-sm ${f.value ? 'text-[#4a8a4a]' : 'text-[#6a6050]'}`}>{f.key}</p>
-            {f.description && <p className="text-[#3a3020] text-xs mt-0.5">{f.description}</p>}
+            <p style={cinzel} className={`text-sm ${f.value ? 'text-[#4a8a4a]' : 'text-[#9a8e78]'}`}>{f.key}</p>
+            {f.description && <p className="text-[#7a6e58] text-xs mt-0.5">{f.description}</p>}
           </div>
           <div className="flex items-center gap-2">
             <button onClick={() => toggleFlag(f.id, f.value)}
@@ -675,7 +675,7 @@ function iconeRelogio(nome) {
  
     <div className="grid grid-cols-2 gap-3">
       {['comida', 'armas', 'viagem', 'comercio'].map(campo => (
-        <label key={campo} className="flex items-center gap-2 text-[#6a6050] text-xs">
+        <label key={campo} className="flex items-center gap-2 text-[#9a8e78] text-xs">
           {campo}
           <input type="number" step="0.1" value={novoEventoRegional.modificadores[campo]}
             onChange={e => setNovoEventoRegional(prev => ({
@@ -695,7 +695,7 @@ function iconeRelogio(nome) {
   </div>
  
   {eventosRegionais.length === 0 ? (
-    <p className="text-[#3a3020] text-sm text-center py-6">Nenhum evento regional registrado.</p>
+    <p className="text-[#7a6e58] text-sm text-center py-6">Nenhum evento regional registrado.</p>
   ) : (
     <div className="grid grid-cols-2 gap-2">
       {eventosRegionais.map(ev => (
@@ -705,8 +705,8 @@ function iconeRelogio(nome) {
     style={{ borderRadius: '2px' }}>
     <div className="flex items-center justify-between">
       <div>
-        <p style={cinzel} className={`text-sm ${ev.ativo ? 'text-[#c8a84b]' : 'text-[#6a6050]'}`}>{ev.regiao} — {ev.tipo_evento}</p>
-        <p className="text-[#3a3020] text-xs mt-0.5">{ev.motivo}</p>
+        <p style={cinzel} className={`text-sm ${ev.ativo ? 'text-[#c8a84b]' : 'text-[#9a8e78]'}`}>{ev.regiao} — {ev.tipo_evento}</p>
+        <p className="text-[#7a6e58] text-xs mt-0.5">{ev.motivo}</p>
       </div>
       <div className="flex items-center gap-2">
   {ev.ativo && (
@@ -725,16 +725,16 @@ function iconeRelogio(nome) {
           const precoNovo = (p.preco_base * mod).toFixed(2);
           return (
             <div key={p.id} className="flex items-center justify-between text-xs">
-              <span className="text-[#6a6050]">{p.nome_item}</span>
+              <span className="text-[#9a8e78]">{p.nome_item}</span>
               <span>
-                <span className="text-[#3a3020] line-through mr-2">{p.preco_base} {p.moeda}</span>
+                <span className="text-[#7a6e58] line-through mr-2">{p.preco_base} {p.moeda}</span>
                 <span className={mod > 1 ? 'text-red-600' : 'text-green-600'}>{precoNovo} {p.moeda}</span>
               </span>
             </div>
           );
         })}
         {precos.filter(p => ev.modificadores[p.categoria]).length === 0 && (
-          <p className="text-[#3a3020] text-xs">Nenhum preço cadastrado nessa categoria.</p>
+          <p className="text-[#7a6e58] text-xs">Nenhum preço cadastrado nessa categoria.</p>
         )}
       </div>
     )}
@@ -786,7 +786,7 @@ function iconeRelogio(nome) {
     </button>
   </div>
   {viagens.length === 0 ? (
-    <p className="text-[#3a3020] text-sm text-center py-6">Nenhuma viagem registrada.</p>
+    <p className="text-[#7a6e58] text-sm text-center py-6">Nenhuma viagem registrada.</p>
   ) : (
     <div className="flex flex-col gap-2">
       {viagens.map(v => (
@@ -804,7 +804,7 @@ function iconeRelogio(nome) {
       className="text-red-900 hover:text-red-600 text-xs transition-colors">×</button>
   </div>
 </div>
-          <p className="text-[#6a6050] text-xs mt-1">
+          <p className="text-[#9a8e78] text-xs mt-1">
             Dia {v.dia_atual}/{v.tempo_estimado_dias} · Clima: {v.clima}
           </p>
  
@@ -848,7 +848,7 @@ function iconeRelogio(nome) {
   </div>
 
   {gazetas.length === 0 ? (
-    <p className="text-[#3a3020] text-sm text-center py-6">Nenhuma edição ainda.</p>
+    <p className="text-[#7a6e58] text-sm text-center py-6">Nenhuma edição ainda.</p>
   ) : (
     <div className="flex flex-col gap-3">
       {gazetas.map(g => {
@@ -858,7 +858,7 @@ function iconeRelogio(nome) {
             style={{ borderRadius: '2px' }}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex-1 mr-3">
-                <p style={cinzel} className="text-[#6a6050] text-xs tracking-[2px]">EDIÇÃO Nº {g.edicao}</p>
+                <p style={cinzel} className="text-[#9a8e78] text-xs tracking-[2px]">EDIÇÃO Nº {g.edicao}</p>
                 {rascunho ? (
                   <input value={g.titulo}
                     onChange={e => setGazetas(prev => prev.map(x => x.id === g.id ? { ...x, titulo: e.target.value } : x))}

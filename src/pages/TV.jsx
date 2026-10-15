@@ -61,7 +61,7 @@ export default function TV() {
         ))}
         </div>
     ) : (
-        <p style={cinzel} className="text-[#3a3020] text-xl tracking-[4px]">AGUARDANDO O MESTRE...</p>
+        <p style={cinzel} className="text-[#7a6e58] text-xl tracking-[4px]">AGUARDANDO O MESTRE...</p>
     )}
     </div>
 
@@ -69,7 +69,7 @@ export default function TV() {
         <p style={cinzel} className="text-[#c8a84b] text-sm tracking-[4px]">INICIATIVA</p>
 
         {!combate || combate.combatentes.length === 0 ? (
-          <p className="text-[#3a3020]">Sem combate no momento.</p>
+          <p className="text-[#7a6e58]">Sem combate no momento.</p>
         ) : combate.combatentes.map((c, idx) => {
           const ativo = combate.ativo && idx === combate.turno;
           const cor = COR_TIPO[c.tipo] || '#c8a84b';
@@ -88,12 +88,12 @@ export default function TV() {
                   <img src={c.avatar_url} alt="" className="w-8 h-8 object-cover" style={{ borderRadius: '2px' }} />
                 )}
                 <span style={{ ...cinzel, color: cor }} className="text-lg flex-1 truncate">{c.nome}</span>
-                <span className="text-[#6a6050] text-sm">{c.iniciativa}</span>
+                <span className="text-[#9a8e78] text-sm">{c.iniciativa}</span>
               </div>
               <div className="h-2 bg-[#161410] rounded-full overflow-hidden">
                 <div className="h-full transition-all" style={{ width: `${c.hp_pct}%`, backgroundColor: corHp }} />
               </div>
-              <p style={cinzel} className="text-xs text-[#6a6050] mt-1 tracking-widest">
+              <p style={cinzel} className="text-xs text-[#9a8e78] mt-1 tracking-widest">
                 {c.tipo === 'jogador' && c.hp_max ? `${c.hp_atual} / ${c.hp_max}` : estadoVida(c.hp_pct)}
               </p>
               {c.condicoes.length > 0 && (

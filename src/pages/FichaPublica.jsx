@@ -39,7 +39,7 @@ export default function FichaPublica() {
 
   if (erro) return (
     <div className="min-h-screen bg-[#0f0e0c] flex items-center justify-center">
-      <p style={cinzel} className="text-[#4a4030] text-sm">{erro}</p>
+      <p style={cinzel} className="text-[#8a7e68] text-sm">{erro}</p>
     </div>
   );
 
@@ -48,7 +48,7 @@ export default function FichaPublica() {
       <nav className="flex items-center justify-between px-8 py-4 border-b border-[#c8a84b20]">
         <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
           onClick={() => navigate('/')}>⚔ TAVERNA</span>
-        <span style={cinzel} className="text-[#4a4030] text-xs tracking-widest">FICHA PÚBLICA</span>
+        <span style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">FICHA PÚBLICA</span>
       </nav>
 
       <div className="max-w-2xl mx-auto px-8 py-12">
@@ -59,11 +59,11 @@ export default function FichaPublica() {
             {personagem?.system || 'D&D 5e'}
           </p>
           <h1 style={cinzel} className="text-4xl text-[#f0e8d8] font-bold mb-2">{ficha?.name}</h1>
-          <p className="text-[#6a6050]">
+          <p className="text-[#9a8e78]">
             {[ficha?.race, ficha?.class, ficha?.background].filter(Boolean).join(' · ')}
           </p>
           {ficha?.level && (
-            <p style={cinzel} className="text-[#4a4030] text-xs mt-1">Nível {ficha.level}</p>
+            <p style={cinzel} className="text-[#8a7e68] text-xs mt-1">Nível {ficha.level}</p>
           )}
         </div>
 
@@ -76,11 +76,11 @@ export default function FichaPublica() {
             <div className="p-6 grid grid-cols-6 gap-3">
               {Object.entries(ficha.attributes).map(([attr, val]) => (
                 <div key={attr} className="flex flex-col items-center border border-[#c8a84b15] bg-[#0f0e0c] p-3">
-                  <span style={cinzel} className="text-[#4a4030] text-xs mb-1">
+                  <span style={cinzel} className="text-[#8a7e68] text-xs mb-1">
                     {attrLabel[attr] || attr.toUpperCase()}
                   </span>
                   <span style={cinzel} className="text-[#c8a84b] text-xl">{val}</span>
-                  <span style={cinzel} className="text-[#3a3020] text-xs">
+                  <span style={cinzel} className="text-[#7a6e58] text-xs">
                     {Math.floor((val - 10) / 2) >= 0 ? '+' : ''}{Math.floor((val - 10) / 2)}
                   </span>
                 </div>
@@ -105,7 +105,7 @@ export default function FichaPublica() {
                 { label: 'DADO DE VIDA', val: ficha.combat.hit_dice },
               ].filter(i => i.val).map(({ label, val }) => (
                 <div key={label} className="flex flex-col items-center border border-[#c8a84b15] bg-[#0f0e0c] p-3">
-                  <span style={cinzel} className="text-[#4a4030] text-xs mb-1">{label}</span>
+                  <span style={cinzel} className="text-[#8a7e68] text-xs mb-1">{label}</span>
                   <span style={cinzel} className="text-[#c8a84b] text-lg">{val}</span>
                 </div>
               ))}
@@ -124,7 +124,7 @@ export default function FichaPublica() {
                 .filter(f => typeof f === 'string' && f.trim() && !f.startsWith('**'))
                 .map((f, i) => (
                   <span key={i}
-                    className="border border-[#c8a84b20] text-[#6a6050] px-3 py-1 text-xs"
+                    className="border border-[#c8a84b20] text-[#9a8e78] px-3 py-1 text-xs"
                     style={{ borderRadius: '2px' }}>
                     {f}
                   </span>
@@ -140,7 +140,7 @@ export default function FichaPublica() {
               <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">HISTÓRIA</p>
             </div>
             <div className="p-6">
-              <p className="text-[#6a6050] leading-relaxed font-light">{ficha.background_story}</p>
+              <p className="text-[#9a8e78] leading-relaxed font-light">{ficha.background_story}</p>
             </div>
           </div>
         )}

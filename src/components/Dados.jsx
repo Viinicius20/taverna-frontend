@@ -127,7 +127,7 @@ export default function Dados({ secreto = false }) {
               style={{ color: '#c8a84b' }}>
               {dado.symbol}
             </span>
-            <span style={cinzel} className="text-[#6a6050] text-xs tracking-widest">{dado.tipo}</span>
+            <span style={cinzel} className="text-[#9a8e78] text-xs tracking-widest">{dado.tipo}</span>
           </button>
         ))}
       </div>
@@ -149,11 +149,11 @@ export default function Dados({ secreto = false }) {
           )}
 
           <div className="flex items-center justify-center gap-3 mb-2 flex-wrap">
-            <span style={cinzel} className="text-[#4a4030] text-sm">
+            <span style={cinzel} className="text-[#8a7e68] text-sm">
               {ultimoResultado.quantidade}{ultimoResultado.dado}
               {ultimoResultado.modificador !== 0 ? (ultimoResultado.modificador > 0 ? `+${ultimoResultado.modificador}` : ultimoResultado.modificador) : ''}
             </span>
-            <span className="text-[#4a4030]">=</span>
+            <span className="text-[#8a7e68]">=</span>
             <span style={cinzel} className={`text-5xl font-bold ${
               ultimoResultado.critico ? 'text-[#c8a84b]' : ultimoResultado.falha ? 'text-red-500' : 'text-[#f0e8d8]'
             }`}>
@@ -164,13 +164,13 @@ export default function Dados({ secreto = false }) {
           {ultimoResultado.resultados.length > 1 && (
             <div className="flex justify-center gap-2 flex-wrap">
               {ultimoResultado.resultados.map((r, i) => (
-                <span key={i} className="border border-[#c8a84b20] text-[#6a6050] px-2 py-0.5 text-sm"
+                <span key={i} className="border border-[#c8a84b20] text-[#8a7e68] px-2 py-0.5 text-sm"
                   style={{ borderRadius: '2px', ...cinzel }}>
                   {r}
                 </span>
               ))}
               {ultimoResultado.modificador !== 0 && (
-                <span className="text-[#4a4030] text-sm self-center">
+                <span className="text-[#8a7e68] text-sm self-center">
                   {ultimoResultado.modificador > 0 ? `+${ultimoResultado.modificador}` : ultimoResultado.modificador}
                 </span>
               )}
@@ -183,9 +183,9 @@ export default function Dados({ secreto = false }) {
       {historico.length > 0 && (
         <div className="border border-[#c8a84b15] bg-[#161410]">
           <div className="px-4 py-3 border-b border-[#c8a84b10] flex items-center justify-between">
-            <p style={cinzel} className="text-[#4a4030] text-xs tracking-[3px]">HISTÓRICO</p>
+            <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[3px]">HISTÓRICO</p>
             <button onClick={limpar} style={cinzel}
-              className="text-[#3a3020] text-xs hover:text-[#6a6050] transition-colors tracking-widest">
+              className="text-[#8a7e68] text-xs hover:text-[#c8a84b] transition-colors tracking-widest">
               Limpar
             </button>
           </div>
@@ -195,13 +195,13 @@ export default function Dados({ secreto = false }) {
                 h.critico ? 'bg-[#c8a84b05]' : h.falha ? 'bg-red-950 bg-opacity-20' : ''
               }`}>
                 <div className="flex items-center gap-3">
-                  <span style={cinzel} className="text-[#4a4030] text-xs">{h.hora}</span>
-                  <span style={cinzel} className="text-[#6a6050] text-xs">
+                  <span style={cinzel} className="text-[#8a7e68] text-xs">{h.hora}</span>
+                  <span style={cinzel} className="text-[#8a7e68] text-xs">
                     {h.quantidade}{h.dado}
                     {h.modificador !== 0 ? (h.modificador > 0 ? `+${h.modificador}` : h.modificador) : ''}
                   </span>
                   {h.resultados.length > 1 && (
-                    <span className="text-[#3a3020] text-xs">
+                    <span className="text-[#7a6e58] text-xs">
                       [{h.resultados.join(', ')}]
                     </span>
                   )}

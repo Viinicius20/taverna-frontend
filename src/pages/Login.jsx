@@ -31,7 +31,7 @@ export default function Login() {
 
         <div className="flex flex-col gap-4">
           <div>
-            <label style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] block mb-2">SEU NOME / APELIDO</label>
+            <label style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] block mb-2">SEU NOME / APELIDO</label>
             <input
               type="text"
               value={username}
@@ -51,7 +51,7 @@ export default function Login() {
           </button>
         </div>
 
-        <p className="text-[#3a3020] text-xs text-center mt-6">
+        <p className="text-[#7a6e58] text-xs text-center mt-6">
           Seu progresso é salvo automaticamente.
         </p>
       </div>

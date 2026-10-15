@@ -65,7 +65,7 @@ export default function RolagemRapida() {
               {expr}
             </button>
             <button onClick={() => remover(expr)} aria-label={`Remover ${expr}`} title="Remover"
-              className="px-2 text-xs text-[#4a4030] hover:text-red-600 border-l border-[#c8a84b20]">×</button>
+              className="px-2 text-xs text-[#8a7e68] hover:text-red-600 border-l border-[#c8a84b20]">×</button>
           </span>
         ))}
       </div>
@@ -74,13 +74,13 @@ export default function RolagemRapida() {
         <div className="border border-[#c8a84b20] bg-[#161410] px-4 py-3 mb-3" style={{ borderRadius: '2px' }}>
           <div className="flex items-baseline gap-3">
             <span style={{ ...cinzel, color: corTotal(ultimo) }} className="text-3xl font-bold">{ultimo.total}</span>
-            <span style={cinzel} className="text-[#6a6050] text-xs">{ultimo.expr}</span>
-            <span className="text-[#4a4030] text-xs">{detalhe(ultimo)}</span>
+            <span style={cinzel} className="text-[#8a7e68] text-xs">{ultimo.expr}</span>
+            <span className="text-[#8a7e68] text-xs">{detalhe(ultimo)}</span>
           </div>
           {anteriores.length > 0 && (
             <div className="mt-2 flex flex-col gap-0.5">
               {anteriores.map(r => (
-                <p key={r.id} className="text-xs text-[#4a4030]">
+                <p key={r.id} className="text-xs text-[#8a7e68]">
                   {r.expr} → <span style={{ color: corTotal(r) }}>{r.total}</span> <span>{detalhe(r)}</span>
                 </p>
               ))}

@@ -81,7 +81,7 @@ export default function Campanhas() {
         <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
           onClick={() => navigate('/')}>⚔ TAVERNA</span>
         <button onClick={() => navigate(-1)}
-          className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+          className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
           ← Voltar
         </button>
       </nav>
@@ -148,7 +148,7 @@ export default function Campanhas() {
             </div>
           ) : campanhas.length === 0 ? (
             <div className="text-center py-16 border border-[#c8a84b15] bg-[#161410]">
-              <p style={cinzel} className="text-[#4a4030] text-sm">Nenhuma campanha criada.</p>
+              <p style={cinzel} className="text-[#8a7e68] text-sm">Nenhuma campanha criada.</p>
               <button onClick={() => setAba('criar')}
                 className="mt-4 bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors"
                 style={{ ...cinzel, borderRadius: '2px' }}>
@@ -162,10 +162,10 @@ export default function Campanhas() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <h3 style={cinzel} className="text-[#f0e8d8] text-lg font-semibold">{c.name}</h3>
-                      {c.description && <p className="text-[#6a6050] text-sm mt-1">{c.description}</p>}
+                      {c.description && <p className="text-[#9a8e78] text-sm mt-1">{c.description}</p>}
                     </div>
                     <div className="text-right">
-                      <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-1">CÓDIGO</p>
+                      <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-1">CÓDIGO</p>
                       <p style={cinzel} className="text-[#c8a84b] text-2xl font-bold tracking-widest">{c.code}</p>
                     </div>
                   </div>

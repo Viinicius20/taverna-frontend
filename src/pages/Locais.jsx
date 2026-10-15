@@ -63,7 +63,7 @@ export default function Locais() {
   }
 
   async function deletarLocal(id) {
-    if (!window.confirm('Tem certeza que deseja deletar este local?')) return;
+    if (!(await confirmar('Tem certeza que deseja deletar este local?'))) return;
     try {
       await api.delete(`/locations/${id}`);
       setLocais(prev => prev.filter(l => l.id !== id));
@@ -78,7 +78,7 @@ export default function Locais() {
         <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
           onClick={() => navigate('/')}>⚔ TAVERNA</span>
         <button onClick={() => navigate('/mestre')}
-          className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+          className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
           ← Voltar
         </button>
       </nav>
@@ -95,7 +95,7 @@ export default function Locais() {
             + Novo Local
           </button>
           <div className="flex flex-wrap items-center gap-2 mb-6">
-            <span style={cinzel} className="text-[#4a4030] text-xs tracking-[2px]">MODELOS:</span>
+            <span style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px]">MODELOS:</span>
             {MODELOS.local.map(m => (
               <button key={m.id} onClick={() => aplicarModeloLocal(m)}
                 className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
@@ -126,10 +126,10 @@ export default function Locais() {
         {carregando ? (
           <div className="flex items-center gap-3 justify-center py-16">
             <div className="w-6 h-6 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-            <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">CARREGANDO...</p>
+            <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">CARREGANDO...</p>
           </div>
         ) : locais.length === 0 ? (
-          <p style={cinzel} className="text-[#3a3020] text-sm text-center py-16">NENHUM LOCAL REGISTRADO</p>
+          <p style={cinzel} className="text-[#8a7e68] text-sm text-center py-16">NENHUM LOCAL REGISTRADO</p>
         ) : (
           <div className="space-y-2">
             {locais.map(l => {
@@ -140,14 +140,14 @@ export default function Locais() {
                     onClick={() => setExpandido(expandido === l.id ? null : l.id)}>
                     <div className="flex items-center gap-3">
                       <span style={cinzel} className="text-[#e8e0d0] text-sm font-bold">{l.name}</span>
-                      <span className="text-[#4a4030] text-xs">{l.type}</span>
+                      <span className="text-[#8a7e68] text-xs">{l.type}</span>
                       {faccaoVinculada && (
                         <span className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-2 py-0.5" style={{ borderRadius: '2px' }}>
                           🏛 {faccaoVinculada.name}
                         </span>
                       )}
                     </div>
-                    <span className="text-[#4a4030] text-xs">{expandido === l.id ? '▲' : '▼'}</span>
+                    <span className="text-[#8a7e68] text-xs">{expandido === l.id ? '▲' : '▼'}</span>
                   </div>
                   {expandido === l.id && (
                     <div className="px-6 pb-5 border-t border-[#c8a84b10] pt-4 flex flex-col gap-3">
@@ -162,13 +162,13 @@ export default function Locais() {
                       ].filter(({ val }) => val).map(({ label, val }) => (
                         <div key={label}>
                           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">{label}</p>
-                          <p className="text-[#6a6050] text-sm">{val}</p>
+                          <p className="text-[#9a8e78] text-sm">{val}</p>
                         </div>
                       ))}
 
                       <div className="grid grid-cols-2 gap-3 text-xs">
-                        {l.language && <div><span style={cinzel} className="text-[#4a4030]">IDIOMA </span><span className="text-[#a09880]">{l.language}</span></div>}
-                        {l.avg_level && <div><span style={cinzel} className="text-[#4a4030]">NÍVEL MÉDIO </span><span className="text-[#a09880]">{l.avg_level}</span></div>}
+                        {l.language && <div><span style={cinzel} className="text-[#8a7e68]">IDIOMA </span><span className="text-[#a09880]">{l.language}</span></div>}
+                        {l.avg_level && <div><span style={cinzel} className="text-[#8a7e68]">NÍVEL MÉDIO </span><span className="text-[#a09880]">{l.avg_level}</span></div>}
                       </div>
 
                       <div>

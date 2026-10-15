@@ -83,7 +83,7 @@ export default function NotasSessao() {
       <div className="flex items-center justify-between mb-4">
         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">ANOTAÇÕES DA SESSÃO</p>
         <button onClick={encerrarSessao} style={{ ...cinzel, borderRadius: '2px' }}
-          className="border border-[#c8a84b30] text-[#6a6050] px-3 py-1 text-xs hover:border-[#c8a84b60] transition-colors">
+          className="border border-[#c8a84b30] text-[#8a7e68] px-3 py-1 text-xs hover:border-[#c8a84b60] transition-colors">
           Encerrar sessão
         </button>
       </div>
@@ -95,7 +95,7 @@ export default function NotasSessao() {
           ))}
         </div>
       ) : (
-        <p className="text-[#3a3020] text-sm italic mb-4">Nada fixado. O mestre confia na memória, o que é corajoso.</p>
+        <p className="text-[#7a6e58] text-sm italic mb-4">Nada fixado. O mestre confia na memória, o que é corajoso.</p>
       )}
 
       <div className="flex flex-wrap items-center gap-2">

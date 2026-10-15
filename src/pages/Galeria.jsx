@@ -130,7 +130,7 @@ useEffect(() => {
 }
 
   async function deletarImagem(id) {
-    if (!window.confirm('Deletar esta imagem?')) return;
+    if (!(await confirmar('Deletar esta imagem?'))) return;
     try {
       await api.delete(`/gallery/${id}`);
       buscarImagens();
@@ -156,7 +156,7 @@ async function gerarHandout() {
 }
 
 async function deletarHandout(id) {
-  if (!window.confirm('Tem certeza que deseja deletar este handout?')) return;
+  if (!(await confirmar('Tem certeza que deseja deletar este handout?'))) return;
   try {
     await api.delete(`/gallery/${id}`);
     buscarImagens();
@@ -361,21 +361,21 @@ if (!isMestre) {
             📺 TV
           </a>
         <button onClick={() => navigate(-1)} style={cinzel}
-          className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors">← Voltar</button>
+          className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors">← Voltar</button>
       </nav>
 
       <div className="flex-1 flex flex-col items-center justify-center px-4">
         {carregando ? (
           <div className="flex flex-col items-center gap-4">
             <div className="w-8 h-8 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-            <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">AGUARDANDO...</p>
+            <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">AGUARDANDO...</p>
           </div>
         ) : imagemRevelada ? (
   <div className="w-full max-w-4xl mx-auto px-4">
     <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4 text-center">O MESTRE REVELOU</p>
     {imagemRevelada.text_content ? (
       <div className="border border-[#c8a84b20] bg-[#161410] p-8" style={{ borderRadius: '2px' }}>
-        <p className="text-[#4a4030] text-xs mb-3 text-center" style={cinzel}>
+        <p className="text-[#8a7e68] text-xs mb-3 text-center" style={cinzel}>
           {imagemRevelada.category?.toUpperCase() || 'DOCUMENTO'}
         </p>
         <p className="text-[#e8e0d0] text-base leading-relaxed whitespace-pre-wrap text-center italic">
@@ -411,8 +411,8 @@ if (!isMestre) {
         ) : (
           <div className="flex flex-col items-center gap-4 text-center">
             <span className="text-4xl opacity-20">🗺</span>
-            <p style={cinzel} className="text-[#4a4030] text-sm tracking-widest">NENHUMA IMAGEM REVELADA</p>
-            <p className="text-[#3a3020] text-xs">Aguarde o Mestre revelar algo...</p>
+            <p style={cinzel} className="text-[#8a7e68] text-sm tracking-widest">NENHUMA IMAGEM REVELADA</p>
+            <p className="text-[#7a6e58] text-xs">Aguarde o Mestre revelar algo...</p>
           </div>
         )}
       </div>
@@ -435,7 +435,7 @@ if (!isMestre) {
           onClick={() => navigate('/')}>⚔ TAVERNA</span>
         <div className="flex gap-4 items-center">
           <button onClick={() => navigate('/mestre')} style={cinzel}
-            className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors">← Mestre</button>
+            className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors">← Mestre</button>
 
           {/* Categoria ao subir token */}
           {aba === 'tokens' && (
@@ -445,7 +445,7 @@ if (!isMestre) {
       onChange={e => setUploadCategoria(e.target.value)}
       placeholder="Categoria..."
       list="categorias-lista"
-      className="bg-[#161410] border border-[#c8a84b20] text-[#6a6050] px-3 py-2 text-xs focus:outline-none w-36"
+      className="bg-[#161410] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 text-xs focus:outline-none w-36"
       style={{ ...cinzel, borderRadius: '2px' }}
     />
     <datalist id="categorias-lista">
@@ -493,7 +493,7 @@ if (!isMestre) {
                   <p className="text-[#e8e0d0] text-sm mt-1">{imagemRevelada.name}</p>
                 </div>
                 <button onClick={() => esconderImagem(imagemRevelada.id)}
-                  className="border border-[#c8a84b30] text-[#4a4030] px-4 py-2 text-xs hover:border-[#c8a84b60] hover:text-[#c8a84b] transition-colors"
+                  className="border border-[#c8a84b30] text-[#8a7e68] px-4 py-2 text-xs hover:border-[#c8a84b60] hover:text-[#c8a84b] transition-colors"
                   style={{ ...cinzel, borderRadius: '2px' }}>
                   Esconder
                 </button>
@@ -503,7 +503,7 @@ if (!isMestre) {
             {mapas.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-24 gap-4 border border-[#c8a84b15] bg-[#161410]">
                 <span className="text-4xl opacity-20">🗺</span>
-                <p style={cinzel} className="text-[#4a4030] text-sm tracking-widest">NENHUM MAPA AINDA</p>
+                <p style={cinzel} className="text-[#8a7e68] text-sm tracking-widest">NENHUM MAPA AINDA</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -519,24 +519,24 @@ if (!isMestre) {
                       </div>
                     )}
                     <div className="p-3">
-                      <p style={cinzel} className="text-[#6a6050] text-xs truncate mb-2">{img.name}</p>
+                      <p style={cinzel} className="text-[#9a8e78] text-xs truncate mb-2">{img.name}</p>
                       <div className="flex gap-2">
-  {img.revealed ? (
-    <button onClick={() => esconderImagem(img.id)}
-      className="flex-1 border border-[#c8a84b30] text-[#4a4030] py-1.5 text-xs hover:border-[#c8a84b60] hover:text-[#c8a84b] transition-colors"
-      style={{ ...cinzel, borderRadius: '2px' }}>Esconder</button>
-  ) : (
-    <button onClick={() => revelarImagem(img.id)}
-      className="flex-1 bg-[#c8a84b] text-[#0f0e0c] py-1.5 text-xs font-bold hover:bg-[#e0c060] transition-colors"
-      style={{ ...cinzel, borderRadius: '2px' }}>Revelar</button>
-  )}
-  <button onClick={() => { setMapaAtivo(img); setModoMapa(true); buscarTokensNoMapa(img.id); }}
-    className="border border-[#c8a84b30] text-[#c8a84b] px-2 py-1.5 text-xs hover:bg-[#c8a84b10] transition-colors"
-    style={{ ...cinzel, borderRadius: '2px' }}>🎯</button>
-  <button onClick={() => deletarImagem(img.id)}
-    className="border border-red-900 text-red-900 px-2 py-1.5 text-xs hover:border-red-600 hover:text-red-600 transition-colors"
-    style={{ ...cinzel, borderRadius: '2px' }}>×</button>
-</div>
+                        {img.revealed ? (
+                          <button onClick={() => esconderImagem(img.id)}
+                            className="flex-1 border border-[#c8a84b30] text-[#8a7e68] py-1.5 text-xs hover:border-[#c8a84b60] hover:text-[#c8a84b] transition-colors"
+                            style={{ ...cinzel, borderRadius: '2px' }}>Esconder</button>
+                        ) : (
+                          <button onClick={() => revelarImagem(img.id)}
+                            className="flex-1 bg-[#c8a84b] text-[#0f0e0c] py-1.5 text-xs font-bold hover:bg-[#e0c060] transition-colors"
+                            style={{ ...cinzel, borderRadius: '2px' }}>Revelar</button>
+                        )}
+                        <button onClick={() => { setMapaAtivo(img); setModoMapa(true); buscarTokensNoMapa(img.id); }}
+                          className="border border-[#c8a84b30] text-[#c8a84b] px-2 py-1.5 text-xs hover:bg-[#c8a84b10] transition-colors"
+                          style={{ ...cinzel, borderRadius: '2px' }}>🎯</button>
+                        <button onClick={() => deletarImagem(img.id)}
+                          className="border border-red-900 text-red-900 px-2 py-1.5 text-xs hover:border-red-600 hover:text-red-600 transition-colors"
+                          style={{ ...cinzel, borderRadius: '2px' }}>×</button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -579,8 +579,8 @@ if (!isMestre) {
             {tokensFiltrados.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-24 gap-4 border border-[#c8a84b15] bg-[#161410]">
                 <span className="text-4xl opacity-20">⬡</span>
-                <p style={cinzel} className="text-[#4a4030] text-sm tracking-widest">NENHUM TOKEN AINDA</p>
-                <p className="text-[#3a3020] text-xs">Selecione a categoria e clique em + UPLOAD</p>
+                <p style={cinzel} className="text-[#8a7e68] text-sm tracking-widest">NENHUM TOKEN AINDA</p>
+                <p className="text-[#7a6e58] text-xs">Selecione a categoria e clique em + UPLOAD</p>
               </div>
             ) : (
               <div className="grid grid-cols-3 sm:grid-cols-5 gap-4">
@@ -596,7 +596,7 @@ if (!isMestre) {
                         ×
                       </button>
                     </div>
-                    <p style={cinzel} className="text-[#4a4030] text-xs text-center truncate w-full">{token.category}</p>
+                    <p style={cinzel} className="text-[#8a7e68] text-xs text-center truncate w-full">{token.category}</p>
                   </div>
                 ))}
               </div>
@@ -644,7 +644,7 @@ if (!isMestre) {
     {/* Lista */}
     <div className="space-y-2">
       {handouts.length === 0 ? (
-        <p className="text-[#3a3020] text-sm text-center py-8">Nenhum handout ainda.</p>
+        <p className="text-[#7a6e58] text-sm text-center py-8">Nenhum handout ainda.</p>
       ) : (
         handouts.map(h => (
           <div key={h.id} className="border border-[#c8a84b15] bg-[#161410] p-4"
@@ -685,7 +685,7 @@ if (!isMestre) {
     <div className="flex items-center justify-between px-4 py-3 border-b border-[#c8a84b20] bg-[#161410]">
       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">🎯 MODO MAPA — {mapaAtivo.name}</p>
       <button onClick={() => setModoMapa(false)}
-        className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors">✕</button>
+        className="text-[#8a7e68] hover:text-[#c8a84b] text-xl transition-colors">✕</button>
     </div>
 
     <div className="flex flex-1 overflow-hidden">
@@ -797,7 +797,7 @@ if (!isMestre) {
               className="flex flex-col items-center gap-1 cursor-grab">
               <img src={token.url} alt={token.name}
                 className="w-12 h-12 rounded-full object-cover border border-[#c8a84b20]" />
-              <p style={cinzel} className="text-[#4a4030] text-xs text-center truncate w-full">{token.category}</p>
+              <p style={cinzel} className="text-[#8a7e68] text-xs text-center truncate w-full">{token.category}</p>
             </div>
           ))}
         </div>

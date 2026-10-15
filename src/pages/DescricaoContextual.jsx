@@ -77,7 +77,7 @@ async function verificarConhecimento() {
         <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
           onClick={() => navigate('/')}>⚔ TAVERNA</span>
         <button onClick={() => navigate('/mestre')}
-          className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+          className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
           ← Voltar
         </button>
       </nav>
@@ -126,12 +126,12 @@ async function verificarConhecimento() {
 
         {historico.length > 1 && (
           <div>
-            <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-3">HISTÓRICO DA SESSÃO</p>
+            <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-3">HISTÓRICO DA SESSÃO</p>
             <div className="space-y-2">
               {historico.slice(1).map(h => (
                 <div key={h.id} className="border border-[#c8a84b10] bg-[#0f0e0c] p-4">
-                  <p className="text-[#4a4030] text-xs mb-1">{h.contexto}</p>
-                  <p className="text-[#6a6050] text-sm italic">{h.descricao}</p>
+                  <p className="text-[#8a7e68] text-xs mb-1">{h.contexto}</p>
+                  <p className="text-[#9a8e78] text-sm italic">{h.descricao}</p>
                 </div>
               ))}
             </div>

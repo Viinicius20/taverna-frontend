@@ -39,7 +39,7 @@ export default function EnviarHandout({ handoutId, personagens = [], onEnviado }
               return (
                 <button key={p.id} onClick={() => alternar(p.id)}
                   className={`px-3 py-1 text-xs border transition-colors ${
-                    ativo ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]' : 'border-[#c8a84b20] text-[#6a6050] hover:border-[#c8a84b50]'
+                    ativo ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]' : 'border-[#c8a84b20] text-[#8a7e68] hover:border-[#c8a84b50]'
                   }`}
                   style={{ ...cinzel, borderRadius: '2px' }}>
                   {p.data?.name || p.name}
@@ -58,7 +58,7 @@ export default function EnviarHandout({ handoutId, personagens = [], onEnviado }
               style={{ ...cinzel, borderRadius: '2px' }}>
               Todos os jogadores
             </button>
-            {msg && <span className="text-xs text-[#6a6050]">{msg}</span>}
+            {msg && <span className="text-xs text-[#8a7e68]">{msg}</span>}
           </div>
         </div>
       )}

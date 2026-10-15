@@ -71,7 +71,7 @@ export default function Personagens() {
   }
 
   async function deletarPersonagem(id) {
-    if (!window.confirm('Tem certeza que deseja deletar este personagem? Essa ação não pode ser desfeita.')) return;
+    if (!(await confirmar('Tem certeza que deseja deletar este personagem? Essa ação não pode ser desfeita.'))) return;
     setDeletando(id);
     try {
       await api.delete(`/characters/${id}`);
@@ -122,7 +122,7 @@ export default function Personagens() {
         </span>
         <div className="flex gap-6 items-center">
           <button onClick={() => navigate('/')}
-            className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+            className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
             ← Voltar
           </button>
           <button onClick={() => navigate('/personagens/criar')}
@@ -138,7 +138,7 @@ export default function Personagens() {
         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">ÁREA DO JOGADOR</p>
 <h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold mb-2">Meus Personagens</h1>
 <p className="text-[#7a7060] mb-10 font-light">
-  Todos os seus aventureiros em um só lugar. <span className="text-[#4a4030]">Clique em uma habilidade para ver sua descrição.</span>
+  Todos os seus aventureiros em um só lugar. <span className="text-[#8a7e68]">Clique em uma habilidade para ver sua descrição.</span>
 </p>
 
 {personagens.length > 0 && (
@@ -148,7 +148,7 @@ export default function Personagens() {
     setEscolhendo(true);
     buscarPersonagens();
   }} style={cinzel}
-    className="text-[#4a4030] text-xs tracking-widest hover:text-[#c8a84b] transition-colors mb-6 block">
+    className="text-[#8a7e68] text-xs tracking-widest hover:text-[#c8a84b] transition-colors mb-6 block">
     ↩ Trocar personagem
   </button>
 )}
@@ -194,7 +194,7 @@ export default function Personagens() {
             <div key={p.id} className="bg-[#161410] hover:bg-[#1a1814] transition-colors p-4 flex items-center justify-between">
               <div>
                 <p style={cinzel} className="text-[#f0e8d8] text-sm">{p.data?.name || p.name}</p>
-                <p className="text-[#4a4030] text-xs mt-1">
+                <p className="text-[#8a7e68] text-xs mt-1">
   {[
     p.data?.race,
     p.data?.classes?.length
@@ -221,7 +221,7 @@ export default function Personagens() {
     ) : (
       <div className="flex flex-col items-center justify-center py-24 gap-4 border border-[#c8a84b15] bg-[#161410]">
         <span className="text-4xl opacity-20">⚔</span>
-        <p style={cinzel} className="text-[#4a4030] text-sm tracking-widest">NENHUM PERSONAGEM AINDA</p>
+        <p style={cinzel} className="text-[#8a7e68] text-sm tracking-widest">NENHUM PERSONAGEM AINDA</p>
         <button onClick={() => navigate('/personagens/criar')}
           className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors mt-2"
           style={{ ...cinzel, borderRadius: '2px' }}>
@@ -272,11 +272,11 @@ export default function Personagens() {
                           {p.system || 'D&D 5e'}
                         </span>
                         {(d.total_level || d.level) && (
-  <span className="text-[#4a4030] text-xs" style={cinzel}>Nível {d.total_level || d.level}</span>
+  <span className="text-[#8a7e68] text-xs" style={cinzel}>Nível {d.total_level || d.level}</span>
 )}
                       </div>
 
-                      <p className="text-[#6a6050] text-sm mb-4">
+                      <p className="text-[#8a7e68] text-sm mb-4">
   {[d.race, classesTexto, d.background].filter(Boolean).join(' · ')}
 </p>
 
@@ -285,11 +285,11 @@ export default function Personagens() {
                         <div className="flex gap-4 flex-wrap mb-4">
                           {Object.entries(attrs).map(([attr, val]) => (
                             <div key={attr} className="flex flex-col items-center gap-0.5">
-                              <span style={cinzel} className="text-[#4a4030] text-xs">
+                              <span style={cinzel} className="text-[#8a7e68] text-xs">
                                 {attrLabel[attr] || attr.toUpperCase()}
                               </span>
                               <span className="text-[#c8a84b] text-sm font-light">{val}</span>
-                              <span style={cinzel} className="text-[#3a3020] text-xs">
+                              <span style={cinzel} className="text-[#7a6e58] text-xs">
                                 {Math.floor((val - 10) / 2) >= 0 ? '+' : ''}{Math.floor((val - 10) / 2)}
                               </span>
                             </div>
@@ -300,7 +300,7 @@ export default function Personagens() {
                       {/* Features clicáveis */}
                       {d.features && d.features.length > 0 && (
                         <div>
-                          <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest mb-2">
+                          <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest mb-2">
                             HABILIDADES — clique para ver descrição
                           </p>
                           <div className="flex flex-wrap gap-2">
@@ -346,7 +346,7 @@ export default function Personagens() {
         )}
 
         {!carregando && personagens.length > 0 && (
-          <p style={cinzel} className="text-[#3a3020] text-xs tracking-widest text-center mt-6">
+          <p style={cinzel} className="text-[#7a6e58] text-xs tracking-widest text-center mt-6">
             {personagens.length} {personagens.length === 1 ? 'PERSONAGEM' : 'PERSONAGENS'}
           </p>
         )}
@@ -364,7 +364,7 @@ export default function Personagens() {
             <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
               <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">HABILIDADE</p>
               <button onClick={fecharModal}
-                className="text-[#4a4030] hover:text-[#c8a84b] text-xl transition-colors leading-none">
+                className="text-[#8a7e68] hover:text-[#c8a84b] text-xl transition-colors leading-none">
                 ×
               </button>
             </div>
@@ -374,7 +374,7 @@ export default function Personagens() {
               {carregandoSkill && (
                 <div className="flex flex-col items-center py-10 gap-4">
                   <div className="w-8 h-8 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-                  <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">CONSULTANDO A IA...</p>
+                  <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">CONSULTANDO A IA...</p>
                 </div>
               )}
 
@@ -405,8 +405,8 @@ export default function Personagens() {
                   {/* Origem */}
                   {descricaoSkill.source && (
                     <div>
-                      <p style={cinzel} className="text-[#4a4030] text-xs tracking-[2px] mb-1">ORIGEM</p>
-                      <p className="text-[#6a6050] text-sm font-light">{descricaoSkill.source}</p>
+                      <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-1">ORIGEM</p>
+                      <p className="text-[#8a7e68] text-sm font-light">{descricaoSkill.source}</p>
                     </div>
                   )}
 
@@ -440,7 +440,7 @@ export default function Personagens() {
 
             <div className="px-6 pb-6">
               <button onClick={fecharModal}
-                className="border border-[#c8a84b30] text-[#6a6050] px-6 py-2 text-xs tracking-widest hover:border-[#c8a84b60] hover:text-[#c8a84b] transition-colors w-full"
+                className="border border-[#c8a84b30] text-[#9a8e78] px-6 py-2 text-xs tracking-widest hover:border-[#c8a84b60] hover:text-[#c8a84b] transition-colors w-full"
                 style={{ ...cinzel, borderRadius: '2px' }}>
                 Fechar
               </button>

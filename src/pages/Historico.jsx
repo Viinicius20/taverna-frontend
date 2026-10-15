@@ -55,7 +55,7 @@ async function encerrarSessao() {
 }
 
 async function deletarSessao(id) {
-  if (!window.confirm('Deletar esta sessão?')) return;
+  if (!(await confirmar('Deletar esta sessão?'))) return;
   try {
     await api.delete(`/sessions/${id}`);
     setSessoes(prev => prev.filter(s => s.id !== id));
@@ -70,7 +70,7 @@ async function deletarSessao(id) {
         <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
           onClick={() => navigate('/')}>⚔ TAVERNA</span>
         <button onClick={() => navigate('/')}
-          className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
+          className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
           Voltar
         </button>
         <button onClick={encerrarSessao}
@@ -88,10 +88,10 @@ async function deletarSessao(id) {
         {carregando ? (
           <div className="flex items-center gap-3 justify-center py-16">
             <div className="w-6 h-6 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-            <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest">CARREGANDO...</p>
+            <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">CARREGANDO...</p>
           </div>
         ) : sessoes.length === 0 ? (
-          <p style={cinzel} className="text-[#3a3020] text-sm text-center py-16">NENHUMA SESSÃO REGISTRADA</p>
+          <p style={cinzel} className="text-[#7a6e58] text-sm text-center py-16">NENHUMA SESSÃO REGISTRADA</p>
         ) : (
           <div className="space-y-2">
             {sessoes.map(s => (
@@ -104,10 +104,10 @@ async function deletarSessao(id) {
                     <span style={cinzel} className="text-[#e8e0d0] text-sm">{s.title}</span>
                   </div>
                   <div className="flex items-center gap-3">
-  <span className="text-[#4a4030] text-xs">
+  <span className="text-[#8a7e68] text-xs">
     {new Date(s.created_at).toLocaleDateString('pt-BR')}
   </span>
-  <span className="text-[#4a4030] text-xs">{expandida === s.id ? '▲' : '▼'}</span>
+  <span className="text-[#8a7e68] text-xs">{expandida === s.id ? '▲' : '▼'}</span>
   <button
     onClick={e => { e.stopPropagation(); deletarSessao(s.id); }}
     className="text-red-900 hover:text-red-600 text-sm transition-colors px-1">

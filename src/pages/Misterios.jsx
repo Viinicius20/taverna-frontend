@@ -56,7 +56,7 @@ async function criar() {
   }
 
   async function apagar(m) {
-    if (!window.confirm(`Apagar "${m.title}"?`)) return;
+    if (!(await confirmar(`Apagar "${m.title}"?`))) return;
     try { await api.delete(`/misterios/${m.id}`); carregar(); }
     catch { setErro('Erro ao apagar.'); }
   }
@@ -80,7 +80,7 @@ const visiveis = lista.filter(m =>
       <nav className="flex items-center justify-between px-8 py-4 border-b border-[#c8a84b20]">
         <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold">⚔ TAVERNA</span>
         <button onClick={() => navigate('/mestre')} style={cinzel}
-          className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors">← Mestre</button>
+          className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors">← Mestre</button>
       </nav>
 
       <div className="max-w-3xl mx-auto px-8 py-12">
@@ -97,7 +97,7 @@ const visiveis = lista.filter(m =>
             className="bg-[#0f0e0c] border border-[#c8a84b20] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50] resize-none"
             style={{ borderRadius: '2px' }} />
           <div className="flex items-center gap-3">
-            <label style={cinzel} className="text-[#6a6050] text-xs">PISTAS NO TOTAL</label>
+            <label style={cinzel} className="text-[#9a8e78] text-xs">PISTAS NO TOTAL</label>
             <input type="number" min={1} max={50} value={total} onChange={e => setTotal(e.target.value)}
               className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] w-16 px-2 py-1 text-center text-sm focus:outline-none"
               style={{ borderRadius: '2px' }} />
@@ -131,7 +131,7 @@ const visiveis = lista.filter(m =>
           ].map(f => (
             <button key={f.id} onClick={() => setFiltro(f.id)} style={{ ...cinzel, borderRadius: '2px' }}
                 className={`px-3 py-1 text-xs border transition-colors ${
-                  filtro === f.id ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]' : 'border-[#c8a84b20] text-[#6a6050] hover:border-[#c8a84b50]'
+                  filtro === f.id ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]' : 'border-[#c8a84b20] text-[#9a8e78] hover:border-[#c8a84b50]'
                 }`}>
                 {f.label}
             </button>
@@ -139,13 +139,13 @@ const visiveis = lista.filter(m =>
         </div>
 
         {!carregando && lista.length > 0 && visiveis.length === 0 && (
-            <p className="text-[#3a3020] text-sm text-center py-10 italic">Nenhum mistério com esse filtro.</p>
+            <p className="text-[#7a6e58] text-sm text-center py-10 italic">Nenhum mistério com esse filtro.</p>
         )}
 
         {carregando ? (
-          <p style={cinzel} className="text-[#4a4030] text-xs tracking-widest text-center py-10">CARREGANDO...</p>
+          <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest text-center py-10">CARREGANDO...</p>
         ) : lista.length === 0 ? (
-          <p className="text-[#3a3020] text-sm text-center py-10 italic">Nenhum mistério. O mundo é suspeitosamente tranquilo.</p>
+          <p className="text-[#7a6e58] text-sm text-center py-10 italic">Nenhum mistério. O mundo é suspeitosamente tranquilo.</p>
         ) : (
           <div className="flex flex-col gap-3">
             {visiveis.map(m => {
@@ -164,7 +164,7 @@ const visiveis = lista.filter(m =>
                         {m.npcs?.name && <span style={cinzel} className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-2 py-0.5">👤 {m.npcs.name}</span>}
                         {m.locations?.name && <span style={cinzel} className="text-xs border border-[#7ab8d430] text-[#7ab8d4] px-2 py-0.5">📍 {m.locations.name}</span>}
                       </div>
-                      {m.description && <p className="text-[#6a6050] text-sm mt-1 italic">{m.description}</p>}
+                      {m.description && <p className="text-[#9a8e78] text-sm mt-1 italic">{m.description}</p>}
                     </div>
                     <button onClick={() => apagar(m)} className="text-red-900 hover:text-red-600 text-lg" title="Apagar">×</button>
                   </div>
@@ -175,7 +175,7 @@ const visiveis = lista.filter(m =>
                     <span style={cinzel} className="text-[#c8a84b] text-xs">{m.clues_found}/{m.clues_total} pistas encontradas</span>
                     <div className="flex gap-2">
                       <button onClick={() => mudarPistas(m, -1)} style={{ ...cinzel, borderRadius: '2px' }}
-                        className="border border-[#c8a84b30] text-[#6a6050] px-3 py-1 text-xs hover:border-[#c8a84b60]">−</button>
+                        className="border border-[#c8a84b30] text-[#9a8e78] px-3 py-1 text-xs hover:border-[#c8a84b60]">−</button>
                       <button onClick={() => mudarPistas(m, 1)} style={{ ...cinzel, borderRadius: '2px' }}
                         className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10]">+ Pista</button>
                     </div>
