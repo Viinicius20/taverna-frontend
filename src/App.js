@@ -19,6 +19,7 @@ import Locais from './pages/Locais';
 import MundoVivo from './pages/MundoVivo';
 import ArquivoMestre from './pages/ArquivoMestre';
 import Misterios from "./pages/Misterios";
+import TV from './pages/TV';
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
           <Route path="/mundo-vivo" element={<MundoVivo />} />
           <Route path="/arquivo-mestre" element={<ArquivoMestre />} />
           <Route path="/misterios" element={<Misterios />} />
+          <Route path="/tv" element={<TV />} />
         </Routes>
       </BrowserRouter>
     </UserProvider>

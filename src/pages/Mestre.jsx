@@ -128,6 +128,17 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
+  const t = setTimeout(() => {
+    api.put(`/combat/${CAMPANHA_ID}`, {
+      combatentes,
+      turno_atual: turnoAtual,
+      combate_ativo: combateAtivo,
+    }).catch(() => {});
+  }, 600);
+  return () => clearTimeout(t);
+}, [combatentes, turnoAtual, combateAtivo]);
+
+useEffect(() => {
   api.get(`/consequencias/${CAMPANHA_ID}`).then(res => setConsequencias(res.data.data || [])).catch(() => setConsequencias([]));
   api.get(`/consequencias/prontas/${CAMPANHA_ID}`).then(res => setConsequenciasProntas(res.data.data || [])).catch(() => setConsequenciasProntas([]));
   api.get(`/flags/${CAMPANHA_ID}`).then(res => setFlagsDisponiveis(res.data.data || [])).catch(() => setFlagsDisponiveis([]));
@@ -1726,6 +1737,11 @@ useEffect(() => {
     <div className="flex gap-2">
       {combatentes.length > 0 && (
         <>
+        <a href="/tv" target="_blank" rel="noreferrer"
+          className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-2 text-xs hover:bg-[#c8a84b10] transition-colors"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          📺 TV
+        </a>
           <button onClick={ordenarIniciativa}
             className="border border-[#c8a84b40] text-[#c8a84b] px-4 py-2 text-xs hover:bg-[#c8a84b10] transition-colors"
             style={{ ...cinzel, borderRadius: '2px' }}>
