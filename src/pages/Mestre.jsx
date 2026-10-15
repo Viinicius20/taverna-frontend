@@ -778,20 +778,18 @@ async function removerMemoria(npcId, index) {
   }
 }
 
-useEffect(() => {
-  const checarChangeLog = async () => {
-    try {
-      const res = await api.get(`/world-changelog/${CAMPANHA_ID}`);
-      const naoLidos = (res.data.data || []).filter(c => !c.visto_mestre);
-      setChangelogNaoLido(naoLidos);
-      if (naoLidos.length > 0) setCaixaMundoMudou(true);
-    } catch {}
-  };
-
-  checarChangeLog();
-  const interval = setInterval(checarChangeLog, 10000);
-  return () => clearInterval(interval);
-}, []);
+usePolling(async () => {
+  try {
+    const res = await api.get(`/world-changelog/${CAMPANHA_ID}/nao-lido-mestre`);
+    const naoLidos = res.data.data || [];
+    setChangelogNaoLido(naoLidos);
+    const temNovo = naoLidos.some(c => !changelogsJaMostrados.current.has(c.id));
+    if (temNovo) {
+      naoLidos.forEach(c => changelogsJaMostrados.current.add(c.id));
+      setCaixaMundoMudou(true);
+    }
+  } catch {}
+}, 15000);
 
   async function marcarChangelogLido(id) {
     try {

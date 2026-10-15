@@ -5,6 +5,7 @@ import html2pdf from 'html2pdf.js';
 import { createPortal } from 'react-dom';
 import { normalizarClasseParaEN } from '../utils/classTranslation';
 import TextoWiki from '../components/TextoWiki';
+import usePolling from '../utils/usePolling';
 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
@@ -372,6 +373,8 @@ export default function Ficha() {
   const [wikiPaginas, setWikiPaginas] = useState([]);
   const [wikiAberta, setWikiAberta] = useState(null);
 
+  const downtimeJaMostrados = useRef(new Set());
+
 
 
 
@@ -416,20 +419,40 @@ function temArquetipoValido(valor) {
   return true;
 }
 
-useEffect(() => {
+usePolling(async () => {
   if (!id) return;
-  const checarDowntime = async () => {
-    try {
-      const res = await api.get(`/downtime/resolvidos-nao-vistos/${id}`);
-      const novos = res.data.data || [];
-      setDowntimeResolvidos(novos);
-      if (novos.length > 0) setModalDowntimeResultado(true);
-    } catch {}
-  };
-  checarDowntime();
-  const interval = setInterval(checarDowntime, 10000);
-  return () => clearInterval(interval);
-}, [id]);
+  try {
+    const res = await api.get(`/world-changelog/${CAMPANHA_ID}/nao-lido/${id}`);
+    const naoLidos = res.data.data || [];
+    setChangelogNaoLido(naoLidos);
+    const temNovo = naoLidos.some(c => !changelogsJaMostrados.current.has(c.id));
+    if (temNovo) {
+      naoLidos.forEach(c => changelogsJaMostrados.current.add(c.id));
+      setCaixaMundoMudou(true);
+    }
+  } catch {}
+}, 15000);
+
+usePolling(async () => {
+  if (!id) return;
+  try {
+    const res = await api.get(`/downtime/resolvidos-nao-vistos/${id}`);
+    const novos = res.data.data || [];
+    setDowntimeResolvidos(novos);
+    const temNovo = novos.some(d => !downtimeJaMostrados.current.has(d.id));
+    if (temNovo) {
+      novos.forEach(d => downtimeJaMostrados.current.add(d.id));
+      setModalDowntimeResultado(true);
+    }
+  } catch {}
+}, 15000);
+
+usePolling(async () => {
+  try {
+    const res = await api.get(`/secret-messages/${personagens[0].id}`);
+    setTemMensagem((res.data.data || []).length > 0);
+  } catch {}
+}, 15000, personagens.length > 0);
 
 useEffect(() => {
   if (abaAtiva !== 'wiki') return;
@@ -1014,13 +1037,6 @@ await fazerLevelUpComClasse(proximoNivel, null);
   await fazerLevelUpComClasse(proximoNivelTotal, classeName);
 }
 
-  useEffect(() => {
-  if (!id) return;
-  buscarMensagensSecretas();
-  const interval = setInterval(buscarMensagensSecretas, 5000);
-  return () => clearInterval(interval);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
 
   useEffect(() => {
   if (Notification.permission === 'default') {
@@ -1214,26 +1230,6 @@ function rolarPericia(nomeSkill, bonus) {
   setTimeout(() => setResultadoRolagem(null), 5000);
 }
 
-useEffect(() => {
-  if (!id) return;
-
-  const checarChangelog = async () => {
-    try {
-      const res = await api.get(`/world-changelog/${CAMPANHA_ID}/nao-lido/${id}`);
-      const naoLidos = res.data.data || [];
-      setChangelogNaoLido(naoLidos);
-      const temNovo = naoLidos.some(c => !changelogsJaMostrados.current.has(c.id));
-      if (temNovo) {
-        naoLidos.forEach(c => changelogsJaMostrados.current.add(c.id));
-        setCaixaMundoMudou(true);
-      }
-    } catch {}
-  };
-
-  checarChangelog();
-  const interval = setInterval(checarChangelog, 10000);
-  return () => clearInterval(interval);
-}, [id]);
 
 async function marcarChangelogLido(changelogId) {
   try {
