@@ -369,6 +369,9 @@ export default function Ficha() {
   const [notaAberta, setNotaAberta] = useState(null);
   const [salvandoNota, setSalvandoNota] = useState(false);
 
+  const [wikiPaginas, setWikiPaginas] = useState([]);
+  const [wikiAberta, setWikiAberta] = useState(null);
+
 
 
 
