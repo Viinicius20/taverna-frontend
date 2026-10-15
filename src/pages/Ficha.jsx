@@ -363,6 +363,11 @@ export default function Ficha() {
 
   const [handoutsRecebidos, setHandoutsRecebidos] = useState([]);
 
+  const [diario, setDiario] = useState(null);
+  const [notasDiario, setNotasDiario] = useState({}); 
+  const [notaAberta, setNotaAberta] = useState(null);
+  const [salvandoNota, setSalvandoNota] = useState(false);
+
 
 
 
@@ -421,6 +426,17 @@ useEffect(() => {
   const interval = setInterval(checarDowntime, 10000);
   return () => clearInterval(interval);
 }, [id]);
+
+useEffect(() => {
+  if (abaAtiva !== 'diario' || !id) return;
+  api.get(`/diario/${id}`).then(res => {
+    const d = res.data.data;
+    setDiario(d);
+    const mapa = {};
+    (d.notas || []).forEach(n => { mapa[n.session_number] = n.texto; });
+    setNotasDiario(mapa);
+  }).catch(() => setDiario(null));
+}, [abaAtiva, id]);
 
 useEffect(() => {
   if (!id) return;
@@ -513,6 +529,19 @@ function abrirProximaPendencia(fila) {
     setAsiPendente({ classNameAlvo: proxima.classNameAlvo, nivelAlvo: proxima.nivelAlvo });
     setModalAsi(true);
   }
+}
+
+async function salvarNotaDiario(sessionNumber) {
+  setSalvandoNota(true);
+  try {
+    await api.put(`/diario/${id}/nota`, {
+      session_number: sessionNumber,
+      texto: notasDiario[sessionNumber] || '',
+    });
+  } catch {
+    alert('Erro ao salvar a anotação.');
+  }
+  setSalvandoNota(false);
 }
 
   async function confirmarAsi(tipo, alocacao, featNome, featDescricao) {
@@ -1375,6 +1404,7 @@ async function abrirGazeta() {
     { id: 'downtime', label: '🌙 DOWNTIME' },
     { id: 'momentos', label: '📜 CRÔNICA' },
     { id: 'documentos', label: '🎫 DOCUMENTOS' },
+    { id: 'diario', label: '📖 DIÁRIO' },
   ].map(({ id, label }) => (
     <button key={id} onClick={() => setAbaAtiva(id)}
       className="px-4 py-3 text-xs tracking-widest whitespace-nowrap transition-colors border-b-2"
@@ -3251,6 +3281,89 @@ style={{
           </div>
         ))}
       </div>
+    )}
+  </div>
+)}
+
+{abaAtiva === 'diario' && (
+  <div className="flex flex-col gap-6 mb-6">
+    {!diario ? (
+      <p className="text-[#3a3020] text-sm text-center py-6">Carregando...</p>
+    ) : (
+      <>
+        <div className="border border-[#c8a84b20] bg-[#161410] p-6">
+          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">O QUE EU SEI</p>
+          {diario.fatos.length === 0 ? (
+            <p className="text-[#3a3020] text-sm">Nada descoberto ainda.</p>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {diario.fatos.map(f => (
+                <p key={f.id} className="text-[#a09880] text-sm leading-relaxed border-l-2 border-[#c8a84b30] pl-3">
+                  {f.texto}
+                </p>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="border border-[#c8a84b20] bg-[#161410] p-6">
+          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">QUEM EU CONHEÇO</p>
+          {diario.npcs.length === 0 ? (
+            <p className="text-[#3a3020] text-sm">Ninguém ainda.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {diario.npcs.map(n => (
+                <div key={n.id} className="flex items-center gap-3 border border-[#c8a84b15] bg-[#0f0e0c] p-3"
+                  style={{ borderRadius: '2px' }}>
+                  {n.art_url && (
+                    <img src={n.art_url} alt="" className="w-12 h-12 object-cover" style={{ borderRadius: '2px' }} />
+                  )}
+                  <div>
+                    <p style={cinzel} className="text-[#e8e0d0] text-sm">{n.name}</p>
+                    <p className="text-[#6a6050] text-xs">{[n.race, n.occupation].filter(Boolean).join(' · ')}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="border border-[#c8a84b20] bg-[#161410] p-6">
+          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">MINHAS ANOTAÇÕES</p>
+          <div className="flex flex-col gap-2">
+            {[{ session_number: 0, title: 'Anotações gerais' },
+              ...diario.sessoes.map(s => ({ session_number: s.session_number, title: s.title || `Sessão ${s.session_number}` })),
+            ].map(s => (
+              <div key={s.session_number} className="border border-[#c8a84b15] bg-[#0f0e0c]" style={{ borderRadius: '2px' }}>
+                <button onClick={() => setNotaAberta(notaAberta === s.session_number ? null : s.session_number)}
+                  className="w-full flex items-center justify-between px-4 py-3 text-left">
+                  <span style={cinzel} className="text-[#e8e0d0] text-sm">
+                    {s.session_number > 0 && <span className="text-[#6a6050] mr-2">#{s.session_number}</span>}
+                    {s.title}
+                  </span>
+                  <span className="text-[#4a4030] text-xs">
+                    {notasDiario[s.session_number] ? '✎ ' : ''}{notaAberta === s.session_number ? '▲' : '▼'}
+                  </span>
+                </button>
+                {notaAberta === s.session_number && (
+                  <div className="px-4 pb-4">
+                    <textarea value={notasDiario[s.session_number] || ''} rows={5}
+                      onChange={e => setNotasDiario(prev => ({ ...prev, [s.session_number]: e.target.value }))}
+                      placeholder="O que aconteceu, o que você suspeita, perguntas pendentes..."
+                      className="w-full bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm mb-2 focus:outline-none focus:border-[#c8a84b50]"
+                      style={{ borderRadius: '2px' }} />
+                    <button onClick={() => salvarNotaDiario(s.session_number)} disabled={salvandoNota}
+                      className="border border-[#c8a84b50] text-[#c8a84b] px-4 py-1 text-xs hover:bg-[#c8a84b10] disabled:opacity-30"
+                      style={{ ...cinzel, borderRadius: '2px' }}>
+                      {salvandoNota ? 'Salvando...' : 'Salvar'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </>
     )}
   </div>
 )}

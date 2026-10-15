@@ -170,6 +170,15 @@ async function recarregarNpcsSilencioso() {
   } catch {}
 }
 
+async function apresentarNpc(npcId, valor) {
+  if (!valor) return;
+  try {
+    await api.post(`/npcs/${npcId}/apresentar`,
+      valor === 'todos' ? { todos: true } : { character_ids: [valor] });
+    alert('NPC apresentado no diário!');
+  } catch { alert('Erro ao apresentar NPC.'); }
+}
+
   async function gerarNpc() {
     if (!descNpc.trim()) return;
     setGerando(true);
@@ -1473,6 +1482,18 @@ useEffect(() => {
 <div>
   <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">RELAÇÃO COM OS JOGADORES</p>
   <PainelReputacao tipo="npc" id={npc.id} pontos={npc.relation_score || 0} onMudou={recarregarNpcsSilencioso} />
+</div>~
+
+<div>
+  <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">📖 APRESENTAR NO DIÁRIO</p>
+  <select defaultValue="" onClick={e => e.stopPropagation()}
+    onChange={e => { apresentarNpc(npc.id, e.target.value); e.target.value = ''; }}
+    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
+    style={{ borderRadius: '2px' }}>
+    <option value="" disabled>Escolher...</option>
+    <option value="todos">Todos os jogadores</option>
+    {personagens.map(p => <option key={p.id} value={p.id}>{p.data?.name || p.name}</option>)}
+  </select>
 </div>
 
                       {/* MEMÓRIA DO NPC */}
