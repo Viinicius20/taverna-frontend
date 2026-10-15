@@ -4,6 +4,7 @@ import api from '../services/api';
 import html2pdf from 'html2pdf.js';
 import { createPortal } from 'react-dom';
 import { normalizarClasseParaEN } from '../utils/classTranslation';
+import TextoWiki from '../components/TextoWiki';
 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
@@ -426,6 +427,13 @@ useEffect(() => {
   const interval = setInterval(checarDowntime, 10000);
   return () => clearInterval(interval);
 }, [id]);
+
+useEffect(() => {
+  if (abaAtiva !== 'wiki') return;
+  api.get(`/wiki/${CAMPANHA_ID}/jogador`)
+    .then(res => setWikiPaginas(res.data.data || []))
+    .catch(() => setWikiPaginas([]));
+}, [abaAtiva]);
 
 useEffect(() => {
   if (abaAtiva !== 'diario' || !id) return;
@@ -1405,6 +1413,7 @@ async function abrirGazeta() {
     { id: 'momentos', label: '📜 CRÔNICA' },
     { id: 'documentos', label: '🎫 DOCUMENTOS' },
     { id: 'diario', label: '📖 DIÁRIO' },
+    { id: 'wiki', label: '📚 WIKI' },
   ].map(({ id, label }) => (
     <button key={id} onClick={() => setAbaAtiva(id)}
       className="px-4 py-3 text-xs tracking-widest whitespace-nowrap transition-colors border-b-2"
@@ -3331,9 +3340,10 @@ style={{
         <div className="border border-[#c8a84b20] bg-[#161410] p-6">
           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">MINHAS ANOTAÇÕES</p>
           <div className="flex flex-col gap-2">
-            {[{ session_number: 0, title: 'Anotações gerais' },
-              ...diario.sessoes.map(s => ({ session_number: s.session_number, title: s.title || `Sessão ${s.session_number}` })),
-            ].map(s => (
+            {diario.sessoes.length === 0 && (
+              <p className="text-[#3a3020] text-sm">As sessões aparecem aqui depois que o mestre as encerra.</p>
+            )}
+            {diario.sessoes.map(s => ({ session_number: s.session_number, title: s.title || `Sessão ${s.session_number}` })).map(s => (
               <div key={s.session_number} className="border border-[#c8a84b15] bg-[#0f0e0c]" style={{ borderRadius: '2px' }}>
                 <button onClick={() => setNotaAberta(notaAberta === s.session_number ? null : s.session_number)}
                   className="w-full flex items-center justify-between px-4 py-3 text-left">
@@ -3363,6 +3373,42 @@ style={{
             ))}
           </div>
         </div>
+      </>
+    )}
+  </div>
+)}
+
+{/* Aba WIki */}
+{abaAtiva === 'wiki' && (
+  <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6">
+    {wikiAberta ? (() => {
+      const p = wikiPaginas.find(x => x.id === wikiAberta);
+      if (!p) return null;
+      return (
+        <>
+          <button onClick={() => setWikiAberta(null)} className="text-[#6a6050] hover:text-[#c8a84b] text-xs mb-4">← Voltar</button>
+          <p style={cinzel} className="text-[#6a6050] text-xs tracking-[2px]">{p.categoria.toUpperCase()}</p>
+          <h3 style={cinzel} className="text-[#e8e0d0] text-lg mb-3">{p.titulo}</h3>
+          <TextoWiki texto={p.conteudo} paginas={wikiPaginas} onAbrir={setWikiAberta} />
+        </>
+      );
+    })() : (
+      <>
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">WIKI DA CAMPANHA</p>
+        {wikiPaginas.length === 0 ? (
+          <p className="text-[#3a3020] text-sm text-center py-6">Nenhuma página revelada ainda.</p>
+        ) : (
+          <div className="flex flex-col gap-1">
+            {wikiPaginas.map(p => (
+              <button key={p.id} onClick={() => setWikiAberta(p.id)}
+                className="text-left border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3 hover:border-[#c8a84b50] transition-colors"
+                style={{ borderRadius: '2px' }}>
+                <span style={cinzel} className="text-[#e8e0d0] text-sm">{p.titulo}</span>
+                <span className="text-[#4a4030] text-xs ml-2">{p.categoria}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </>
     )}
   </div>

@@ -20,6 +20,7 @@ import MundoVivo from './pages/MundoVivo';
 import ArquivoMestre from './pages/ArquivoMestre';
 import Misterios from "./pages/Misterios";
 import TV from './pages/TV';
+import Wiki from './pages/Wiki';
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
           <Route path="/arquivo-mestre" element={<ArquivoMestre />} />
           <Route path="/misterios" element={<Misterios />} />
           <Route path="/tv" element={<TV />} />
+          <Route path="/wiki" element={<Wiki />} />
         </Routes>
       </BrowserRouter>
     </UserProvider>

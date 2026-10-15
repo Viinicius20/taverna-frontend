@@ -855,6 +855,7 @@ const menuItemsMestre = [
   { label: '📜 Narração', rota: '/mestre/descricao' },
   { label: '🗺 Locais', rota: '/locais' },
   { label: '🌎 Mundo Vivo', rota: '/mundo-vivo' },
+  { label: '📚 Wiki', rota: '/wiki' },
   { label: '📂 Arquivo Secreto', rota: '/arquivo-mestre' },
   { label: '❓ Mistérios', rota: '/misterios' }
 ];
