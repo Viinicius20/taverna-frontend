@@ -35,16 +35,35 @@ export default function TV() {
   const combate = dados?.combate;
   const imagem = dados?.imagem;
   const handout = dados?.handout;
+  const tokensNoMapa = dados?.tokens || [];
+  
 
   return (
     <div className="h-screen bg-[#0f0e0c] text-[#e8e0d0] flex overflow-hidden" style={crimson}>
       <div className="flex-1 min-w-0 flex items-center justify-center p-4">
-        {imagem?.url ? (
-          <img src={imagem.url} alt={imagem.name} className="max-h-full max-w-full object-contain" />
-        ) : (
-          <p style={cinzel} className="text-[#3a3020] text-xl tracking-[4px]">AGUARDANDO O MESTRE...</p>
-        )}
-      </div>
+  {imagem?.url ? (
+    <div className="relative inline-block max-h-full max-w-full">
+        <img src={imagem.url} alt={imagem.name}
+            className="block max-h-[calc(100vh-2rem)] max-w-full object-contain" />
+        {tokensNoMapa.map(token => (
+            <img key={token.id} src={token.token_url} alt="token"
+            style={{
+                position: 'absolute',
+                left: `${token.x}%`,
+                top: `${token.y}%`,
+                width: '40px',
+                height: '40px',
+                objectFit: 'cover',
+                borderRadius: '50%',
+                transform: `translate(-50%, -50%) scale(${token.scale || 1}) rotate(${token.rotation || 0}deg)`,
+                pointerEvents: 'none',
+            }} />
+        ))}
+        </div>
+    ) : (
+        <p style={cinzel} className="text-[#3a3020] text-xl tracking-[4px]">AGUARDANDO O MESTRE...</p>
+    )}
+    </div>
 
       <div className="w-[26rem] shrink-0 border-l border-[#c8a84b20] bg-[#161410] flex flex-col p-5 gap-3 overflow-y-auto">
         <p style={cinzel} className="text-[#c8a84b] text-sm tracking-[4px]">INICIATIVA</p>

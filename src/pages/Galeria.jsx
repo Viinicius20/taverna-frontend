@@ -355,6 +355,11 @@ if (!isMestre) {
       <nav className="flex items-center justify-between px-8 py-4 border-b border-[#c8a84b20]">
         <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
           onClick={() => navigate('/')}>⚔ TAVERNA</span>
+          <a href="/tv" target="_blank" rel="noreferrer"
+            className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-2 text-xs hover:bg-[#c8a84b10] transition-colors"
+            style={{ ...cinzel, borderRadius: '2px' }}>
+            📺 TV
+          </a>
         <button onClick={() => navigate(-1)} style={cinzel}
           className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors">← Voltar</button>
       </nav>
