@@ -7,7 +7,6 @@ import { createPortal } from 'react-dom';
 import PainelReputacao from "../components/PainelReputacao";
 import RolagemRapida from "../components/RolagemRapida";
 import { MODELOS } from '../utils/modelos';
-import { useState, useEffect, useRef } from 'react';
 import usePolling from '../utils/usePolling';
 
 
