@@ -23,6 +23,7 @@ import TV from './pages/TV';
 import Wiki from './pages/Wiki';
 import Toasts from './components/Toasts';
 import { instalarAlertGlobal } from './utils/notificar';
+import ConfirmHost from './components/ConfirmHost';
 
 instalarAlertGlobal();
 
@@ -31,6 +32,7 @@ function App() {
     <UserProvider> {/* ← wrappa tudo */}
       <BrowserRouter>
       <Toasts />
+      <ConfirmHost />
         <Routes>
           <Route path="/login" element={<Login />} /> {/* ← adiciona */}
           <Route path="/" element={<Home />} />

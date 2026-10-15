@@ -11,3 +11,9 @@ export function instalarAlertGlobal() {
     notificar(texto, tipo);
   };
 }
+
+export function confirmar(msg) {
+  return new Promise(resolve => {
+    window.dispatchEvent(new CustomEvent('taverna-confirm', { detail: { msg: String(msg), resolve } }));
+  });
+}
