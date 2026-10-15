@@ -7,6 +7,8 @@ import { createPortal } from 'react-dom';
 import PainelReputacao from "../components/PainelReputacao";
 import RolagemRapida from "../components/RolagemRapida";
 import { MODELOS } from '../utils/modelos';
+import { useState, useEffect, useRef } from 'react';
+import usePolling from '../utils/usePolling';
 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
@@ -121,6 +123,7 @@ export default function Mestre() {
   const [aba, setAba] = useState('painel');
   const [opcoesEse, setOpcoesEse] = useState([]);
   const [gerandoEse, setGerandoEse] = useState(false);
+  const changelogsJaMostrados = useRef(new Set());
 
   
 

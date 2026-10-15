@@ -420,34 +420,6 @@ function temArquetipoValido(valor) {
 }
 
 usePolling(async () => {
-  if (!id) return;
-  try {
-    const res = await api.get(`/world-changelog/${CAMPANHA_ID}/nao-lido/${id}`);
-    const naoLidos = res.data.data || [];
-    setChangelogNaoLido(naoLidos);
-    const temNovo = naoLidos.some(c => !changelogsJaMostrados.current.has(c.id));
-    if (temNovo) {
-      naoLidos.forEach(c => changelogsJaMostrados.current.add(c.id));
-      setCaixaMundoMudou(true);
-    }
-  } catch {}
-}, 15000);
-
-usePolling(async () => {
-  if (!id) return;
-  try {
-    const res = await api.get(`/downtime/resolvidos-nao-vistos/${id}`);
-    const novos = res.data.data || [];
-    setDowntimeResolvidos(novos);
-    const temNovo = novos.some(d => !downtimeJaMostrados.current.has(d.id));
-    if (temNovo) {
-      novos.forEach(d => downtimeJaMostrados.current.add(d.id));
-      setModalDowntimeResultado(true);
-    }
-  } catch {}
-}, 15000);
-
-usePolling(async () => {
   try {
     const res = await api.get(`/secret-messages/${personagens[0].id}`);
     setTemMensagem((res.data.data || []).length > 0);
