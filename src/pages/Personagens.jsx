@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useUser } from '../context/UserContext';
+import usePolling from '../utils/usePolling';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -38,20 +39,12 @@ export default function Personagens() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
   
-  useEffect(() => {
-  if (!personagens[0]?.id) return;
-  
-  const checarMensagens = async () => {
-    try {
-      const res = await api.get(`/secret-messages/${personagens[0].id}`);
-      setTemMensagem((res.data.data || []).length > 0);
-    } catch {}
-  };
-
-  checarMensagens();
-  const interval = setInterval(checarMensagens, 10000);
-  return () => clearInterval(interval);
-  }, [personagens]);
+usePolling(async () => {
+  try {
+    const res = await api.get(`/secret-messages/${personagens[0].id}`);
+    setTemMensagem((res.data.data || []).length > 0);
+  } catch {}
+}, 15000, personagens.length > 0);
 
   async function buscarPersonagens() {
   setCarregando(true);
