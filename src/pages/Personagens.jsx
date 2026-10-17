@@ -189,14 +189,14 @@ usePolling(async () => {
               <div>
                 <p style={cinzel} className="text-[#f0e8d8] text-sm">{p.data?.name || p.name}</p>
                 <p className="text-[#8a7e68] text-xs mt-1">
-  {[
-    p.data?.race,
-    p.data?.classes?.length
-      ? p.data.classes.map(c => `${c.name} ${c.level}`).join(" / ")
-      : p.data?.class,
-    `Nível ${p.data?.total_level || p.data?.level || 1}`
-  ].filter(Boolean).join(' · ')}
-</p>
+                  {[
+                    p.data?.race,
+                    p.data?.classes?.length
+                      ? p.data.classes.map(c => `${c.name} ${c.level}`).join(" / ")
+                      : p.data?.class,
+                    `Nível ${p.data?.total_level || p.data?.level || 1}`
+                  ].filter(Boolean).join(' · ')}
+                </p>
               </div>
               <button
                 onClick={async () => {
@@ -245,34 +245,35 @@ usePolling(async () => {
                   <div className="p-6 flex items-start justify-between gap-4">
 
                     <div className="flex-1 min-w-0">
-  {/* Avatar */}
-  {p.avatar_url && (
-    <img src={p.avatar_url} alt={d.name}
-      className="w-14 h-14 rounded object-cover mb-3 border border-[#c8a84b20]"
-      style={{ borderRadius: '2px' }} />
-  )}
+                      {/* Avatar */}
+                      {p.avatar_url && (
+                        <img src={p.avatar_url} alt={d.name}
+                          className="w-14 h-14 rounded object-cover mb-3 border border-[#c8a84b20]"
+                          style={{ borderRadius: '2px' }} />
+                      )}
+
                       {/* Nome e badges */}
                       <div className="flex items-center gap-3 mb-2 flex-wrap">
                         <h2 style={cinzel}
-  className="text-[#f0e8d8] text-lg font-semibold cursor-pointer hover:text-[#c8a84b] transition-colors"
-  onClick={() => navigate(`/personagens/${p.id}`)}>
-  {d.name || p.name || 'Sem nome'}
-  {temMensagem && (
-    <span className="ml-2 inline-block w-2 h-2 rounded-full bg-[#8a4a8a] animate-pulse" />
-  )}
-</h2>
-                        <span className="border border-[#c8a84b25] text-[#c8a84b] px-2 py-0.5 text-xs"
-                          style={{ ...cinzel, borderRadius: '2px' }}>
-                          {p.system || 'D&D 5e'}
-                        </span>
-                        {(d.total_level || d.level) && (
-  <span className="text-[#8a7e68] text-xs" style={cinzel}>Nível {d.total_level || d.level}</span>
-)}
-                      </div>
+                          className="text-[#f0e8d8] text-lg font-semibold cursor-pointer hover:text-[#c8a84b] transition-colors"
+                          onClick={() => navigate(`/personagens/${p.id}`)}>
+                          {d.name || p.name || 'Sem nome'}
+                          {temMensagem && (
+                            <span className="ml-2 inline-block w-2 h-2 rounded-full bg-[#8a4a8a] animate-pulse" />
+                          )}
+                        </h2>
+                                                <span className="border border-[#c8a84b25] text-[#c8a84b] px-2 py-0.5 text-xs"
+                                                  style={{ ...cinzel, borderRadius: '2px' }}>
+                                                  {p.system || 'D&D 5e'}
+                                                </span>
+                                                {(d.total_level || d.level) && (
+                          <span className="text-[#8a7e68] text-xs" style={cinzel}>Nível {d.total_level || d.level}</span>
+                        )}
+                                              </div>
 
-                      <p className="text-[#8a7e68] text-sm mb-4">
-  {[d.race, classesTexto, d.background].filter(Boolean).join(' · ')}
-</p>
+                                              <p className="text-[#8a7e68] text-sm mb-4">
+                          {[d.race, classesTexto, d.background].filter(Boolean).join(' · ')}
+                        </p>
 
                       {/* Atributos */}
                       {Object.keys(attrs).length > 0 && (

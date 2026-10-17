@@ -1392,32 +1392,32 @@ async function abrirGazeta() {
         )}
 
         {/* NAVEGAÇÃO DE ABAS */}
-<div className="flex gap-1 border-b border-[#c8a84b20] mb-6 overflow-x-auto scroll-tema">
-  {[
-    { id: 'principal', label: 'PRINCIPAL' },
-    ...(ficha.spellcasting ? [{ id: 'magias', label: 'MAGIAS' }] : []),
-    { id: 'atributos', label: 'ATRIBUTOS' },
-    { id: 'habilidades', label: 'HABILIDADES' },
-    { id: 'inventario', label: 'INVENTÁRIO' },
-    { id: 'personagem', label: 'PERSONAGEM' },
-    { id: 'notas', label: 'NOTAS' },
-    { id: 'downtime', label: '🌙 DOWNTIME' },
-    { id: 'momentos', label: '📜 CRÔNICA' },
-    { id: 'documentos', label: '🎫 DOCUMENTOS' },
-    { id: 'diario', label: '📖 DIÁRIO' },
-    { id: 'wiki', label: '📚 WIKI' },
-  ].map(({ id, label }) => (
-    <button key={id} onClick={() => setAbaAtiva(id)}
-      className="px-4 py-3 text-xs tracking-widest whitespace-nowrap transition-colors border-b-2"
-      style={{
-        ...cinzel,
-        borderColor: abaAtiva === id ? 'var(--cor-classe, #c8a84b)' : 'transparent',
-        color: abaAtiva === id ? 'var(--cor-classe, #c8a84b)' : '#6a6050',
-      }}>
-      {label}
-    </button>
-  ))}
-</div>
+          <div className="flex gap-1 border-b border-[#c8a84b20] mb-6 overflow-x-auto scroll-tema">
+            {[
+              { id: 'principal', label: 'PRINCIPAL' },
+              ...(ficha.spellcasting ? [{ id: 'magias', label: 'MAGIAS' }] : []),
+              { id: 'atributos', label: 'ATRIBUTOS' },
+              { id: 'habilidades', label: 'HABILIDADES' },
+              { id: 'inventario', label: 'INVENTÁRIO' },
+              { id: 'personagem', label: 'PERSONAGEM' },
+              { id: 'notas', label: 'NOTAS' },
+              { id: 'downtime', label: '🌙 DOWNTIME' },
+              { id: 'momentos', label: '📜 CRÔNICA' },
+              { id: 'documentos', label: '🎫 DOCUMENTOS' },
+              { id: 'diario', label: '📖 DIÁRIO' },
+              { id: 'wiki', label: '📚 WIKI' },
+            ].map(({ id, label }) => (
+              <button key={id} onClick={() => setAbaAtiva(id)}
+                className="px-4 py-3 text-xs tracking-widest whitespace-nowrap transition-colors border-b-2"
+                style={{
+                  ...cinzel,
+                  borderColor: abaAtiva === id ? 'var(--cor-classe, #c8a84b)' : 'transparent',
+                  color: abaAtiva === id ? 'var(--cor-classe, #c8a84b)' : '#6a6050',
+                }}>
+                {label}
+              </button>
+            ))}
+          </div>
 
 {(abaAtiva === 'principal' || exportandoPDF) && (
 <>

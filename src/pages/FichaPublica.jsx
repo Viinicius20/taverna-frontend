@@ -4,6 +4,7 @@ import api from '../services/api';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
+const IGNORAR = /^(core .* traits|creature type|languages|ability score (improvement|increases?))$/i;
 
 const attrLabel = { str: 'FOR', dex: 'DES', con: 'CON', int: 'INT', wis: 'SAB', cha: 'CAR' };
 
@@ -14,6 +15,7 @@ export default function FichaPublica() {
   const [personagem, setPersonagem] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
+  const [abaAtiva, setAbaAtiva] = useState('principal');
 
   useEffect(() => {
     buscarPersonagem();
@@ -43,6 +45,25 @@ export default function FichaPublica() {
     </div>
   );
 
+const habilidades = (ficha?.features || [])
+  .map(f => (typeof f === 'string'
+    ? { nome: f, origem: 'classe' }
+    : { nome: f?.nome || f?.name, origem: f?.origem || 'classe' }))
+  .map(f => ({ ...f, nome: String(f.nome || '').replace(/\*\*/g, '').trim() }))
+  .filter(f => f.nome && !IGNORAR.test(f.nome));
+
+const unicas = [...new Map(habilidades.map(h => [h.nome, h])).values()];
+const grupos = [
+  { titulo: 'CLASSE', itens: unicas.filter(h => h.origem !== 'racial') },
+  { titulo: 'RAÇA', itens: unicas.filter(h => h.origem === 'racial') },
+].filter(g => g.itens.length > 0);
+
+const ABAS = [
+  { id: 'principal', label: 'PRINCIPAL' },
+  ...(grupos.length > 0 ? [{ id: 'habilidades', label: 'HABILIDADES' }] : []),
+  ...(ficha?.background_story ? [{ id: 'historia', label: 'HISTÓRIA' }] : []),
+];
+
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0]" style={crimson}>
       <nav className="flex items-center justify-between px-8 py-4 border-b border-[#c8a84b20]">
@@ -67,13 +88,31 @@ export default function FichaPublica() {
           )}
         </div>
 
+        {ABAS.length > 1 && (
+          <div className="flex gap-1 border-b border-[#c8a84b20] mb-6 overflow-x-auto scroll-tema">
+            {ABAS.map(({ id, label }) => (
+              <button key={id} onClick={() => setAbaAtiva(id)}
+                className="px-4 py-3 text-xs tracking-widest whitespace-nowrap transition-colors border-b-2"
+                style={{
+                  ...cinzel,
+                  borderColor: abaAtiva === id ? 'var(--cor-classe, #c8a84b)' : 'transparent',
+                  color: abaAtiva === id ? 'var(--cor-classe, #c8a84b)' : '#6a6050',
+                }}>
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Atributos */}
+        {abaAtiva === 'principal' && (
+        <>
         {ficha?.attributes && Object.keys(ficha.attributes).length > 0 && (
           <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
             <div className="px-6 py-4 border-b border-[#c8a84b15]">
               <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">ATRIBUTOS</p>
             </div>
-            <div className="p-6 grid grid-cols-6 gap-3">
+            <div className="p-6 grid grid-cols-3 sm:grid-cols-6 gap-3">
               {Object.entries(ficha.attributes).map(([attr, val]) => (
                 <div key={attr} className="flex flex-col items-center border border-[#c8a84b15] bg-[#0f0e0c] p-3">
                   <span style={cinzel} className="text-[#8a7e68] text-xs mb-1">
@@ -88,8 +127,12 @@ export default function FichaPublica() {
             </div>
           </div>
         )}
+        </>
+        )}
 
         {/* Combat */}
+        {abaAtiva === 'principal' && (
+          <>
         {ficha?.combat && (
           <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
             <div className="px-6 py-4 border-b border-[#c8a84b15]">
@@ -112,28 +155,41 @@ export default function FichaPublica() {
             </div>
           </div>
         )}
+        </>
+        )}
 
         {/* Habilidades */}
-        {ficha?.features && ficha.features.length > 0 && (
+        {abaAtiva === 'habilidades' && grupos.length > 0 && (
+          <>
+        {grupos.length > 0 && (
           <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
             <div className="px-6 py-4 border-b border-[#c8a84b15]">
               <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">HABILIDADES</p>
             </div>
-            <div className="p-6 flex flex-wrap gap-2">
-              {ficha.features
-                .filter(f => typeof f === 'string' && f.trim() && !f.startsWith('**'))
-                .map((f, i) => (
-                  <span key={i}
-                    className="border border-[#c8a84b20] text-[#9a8e78] px-3 py-1 text-xs"
-                    style={{ borderRadius: '2px' }}>
-                    {f}
-                  </span>
-                ))}
+            <div className="p-6 flex flex-col gap-4">
+              {grupos.map(g => (
+                <div key={g.titulo}>
+                  <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-2">{g.titulo}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {g.itens.map(h => (
+                      <span key={h.nome} title={h.nome}
+                        className="border border-[#c8a84b20] text-[#9a8e78] px-3 py-1 text-xs"
+                        style={{ borderRadius: '2px' }}>
+                        {h.nome}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
+        </>
+        )}
 
         {/* História */}
+        {abaAtiva === 'historia' && ficha?.background_story && (
+          <>
         {ficha?.background_story && (
           <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
             <div className="px-6 py-4 border-b border-[#c8a84b15]">
@@ -143,6 +199,8 @@ export default function FichaPublica() {
               <p className="text-[#9a8e78] leading-relaxed font-light">{ficha.background_story}</p>
             </div>
           </div>
+        )}
+        </>
         )}
 
         {/* Botão copiar link */}
