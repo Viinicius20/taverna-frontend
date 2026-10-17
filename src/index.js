@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+import api from './services/api';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -55,13 +56,9 @@ async function configurarPush() {
       return;
     }
 
-    const saveRes = await fetch(`${API_URL}/push/subscribe`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: user.id, subscription })
-    });
+    const saveRes = await api.post('/push/subscribe', { user_id: user.id, subscription });
 
-    console.log('Subscription salva:', await saveRes.json());
+    console.log('Subscription salva:', saveRes.data);
   } catch (e) {
     console.error('Erro ao configurar push:', e);
   }
