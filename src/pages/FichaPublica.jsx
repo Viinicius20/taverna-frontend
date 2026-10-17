@@ -24,7 +24,7 @@ export default function FichaPublica() {
 
   async function buscarPersonagem() {
     try {
-      const res = await api.get(`/characters/${id}`);
+      const res = await api.get(`/ficha-publica/${id}`);
       setPersonagem(res.data.data);
       setFicha(res.data.data.data);
     } catch {
@@ -189,7 +189,7 @@ const ABAS = [
 
         {/* História */}
         {abaAtiva === 'historia' && ficha?.background_story && (
-          <>
+        <>
         {ficha?.background_story && (
           <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
             <div className="px-6 py-4 border-b border-[#c8a84b15]">
