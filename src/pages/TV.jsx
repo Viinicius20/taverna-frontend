@@ -66,6 +66,9 @@ export default function TV() {
     </div>
 
       <div className="w-[26rem] shrink-0 border-l border-[#c8a84b20] bg-[#161410] flex flex-col p-5 gap-3 overflow-y-auto">
+        {dados?.calendario && (
+          <p style={cinzel} className="text-[#c8a84b] text-lg tracking-[2px] mb-2">📅 {dados.calendario}</p>
+        )}
         <p style={cinzel} className="text-[#c8a84b] text-sm tracking-[4px]">INICIATIVA</p>
 
         {!combate || combate.combatentes.length === 0 ? (

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { MODELOS } from '../utils/modelos';
+import CalendarioMestre from '../components/CalendarioMestre';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -604,96 +605,103 @@ function iconeRelogio(nome) {
         )}
 
         {/* FLAGS DA CAMPANHA */}
-<div className="mt-12">
-  <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
-  <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
-  <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Flags</h2>
+          <div className="mt-12">
+            <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+            <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
+            <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Flags</h2>
 
-  <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6 flex flex-col gap-3">
-    <input value={novaFlagKey} onChange={e => setNovaFlagKey(e.target.value)}
-      placeholder="Nome da flag (ex: rei_morto, portal_aberto)"
-      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
-      style={{ borderRadius: '2px' }} />
-    <input value={novaFlagDesc} onChange={e => setNovaFlagDesc(e.target.value)}
-      placeholder="Descrição (opcional)"
-      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
-      style={{ borderRadius: '2px' }} />
-    <button onClick={criarFlag} disabled={!novaFlagKey.trim() || criandoFlag}
-      className="bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] transition-colors disabled:opacity-30"
-      style={{ ...cinzel, borderRadius: '2px' }}>
-      {criandoFlag ? 'Criando...' : '+ Nova Flag'}
-    </button>
-  </div>
+            <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6 flex flex-col gap-3">
+              <input value={novaFlagKey} onChange={e => setNovaFlagKey(e.target.value)}
+                placeholder="Nome da flag (ex: rei_morto, portal_aberto)"
+                className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+                style={{ borderRadius: '2px' }} />
+              <input value={novaFlagDesc} onChange={e => setNovaFlagDesc(e.target.value)}
+                placeholder="Descrição (opcional)"
+                className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+                style={{ borderRadius: '2px' }} />
+              <button onClick={criarFlag} disabled={!novaFlagKey.trim() || criandoFlag}
+                className="bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] transition-colors disabled:opacity-30"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                {criandoFlag ? 'Criando...' : '+ Nova Flag'}
+              </button>
+            </div>
 
-  {flags.length === 0 ? (
-    <p className="text-[#7a6e58] text-sm text-center py-6">Nenhuma flag registrada.</p>
-  ) : (
-    <div className="grid grid-cols-2 gap-2">
-      {flags.map(f => (
-        <div key={f.id} className={`border p-3 flex items-center justify-between ${f.value ? 'border-[#4a8a4a30] bg-[#4a8a4a08]' : 'border-[#c8a84b15] bg-[#161410]'}`}
-          style={{ borderRadius: '2px' }}>
-          <div>
-            <p style={cinzel} className={`text-sm ${f.value ? 'text-[#4a8a4a]' : 'text-[#9a8e78]'}`}>{f.key}</p>
-            {f.description && <p className="text-[#7a6e58] text-xs mt-0.5">{f.description}</p>}
-          </div>
-          <div className="flex items-center gap-2">
-            <button onClick={() => toggleFlag(f.id, f.value)}
-              className="text-xs px-2 py-1 border transition-colors"
-              style={{ borderRadius: '2px', ...cinzel, borderColor: f.value ? '#4a8a4a' : '#c8a84b30', color: f.value ? '#4a8a4a' : '#4a4030' }}>
-              {f.value ? 'TRUE' : 'FALSE'}
-            </button>
-            <button onClick={() => deletarFlag(f.id)}
-              className="text-red-900 hover:text-red-600 text-xs transition-colors">×</button>
-          </div>
+            <div className="mt-12">
+              <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+              <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
+              <h2 style={cinzel} className="text-xl text-[#c8a84b] font-semibold mb-6">📅 Calendário</h2>
+              <CalendarioMestre />
+            </div>
+
+          {flags.length === 0 ? (
+            <p className="text-[#7a6e58] text-sm text-center py-6">Nenhuma flag registrada.</p>
+          ) : (
+            <div className="grid grid-cols-2 gap-2">
+              {flags.map(f => (
+                <div key={f.id} className={`border p-3 flex items-center justify-between ${f.value ? 'border-[#4a8a4a30] bg-[#4a8a4a08]' : 'border-[#c8a84b15] bg-[#161410]'}`}
+                  style={{ borderRadius: '2px' }}>
+                  <div>
+                    <p style={cinzel} className={`text-sm ${f.value ? 'text-[#4a8a4a]' : 'text-[#9a8e78]'}`}>{f.key}</p>
+                    {f.description && <p className="text-[#7a6e58] text-xs mt-0.5">{f.description}</p>}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => toggleFlag(f.id, f.value)}
+                      className="text-xs px-2 py-1 border transition-colors"
+                      style={{ borderRadius: '2px', ...cinzel, borderColor: f.value ? '#4a8a4a' : '#c8a84b30', color: f.value ? '#4a8a4a' : '#4a4030' }}>
+                      {f.value ? 'TRUE' : 'FALSE'}
+                    </button>
+                    <button onClick={() => deletarFlag(f.id)}
+                      className="text-red-900 hover:text-red-600 text-xs transition-colors">×</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      ))}
-    </div>
-  )}
-</div>
 
-{/* ECONOMIA VIVA */}
-<div className="mt-12">
-  <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
-  <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
-  <h2 style={cinzel} className="text-xl text-[#c8a84b] font-semibold mb-6">💰 Economia Viva</h2>
- 
-  <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6 flex flex-col gap-3">
-    <input value={novoEventoRegional.regiao}
-      onChange={e => setNovoEventoRegional(prev => ({ ...prev, regiao: e.target.value }))}
-      placeholder="Região"
-      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
-      style={{ borderRadius: '2px' }} />
-    <input value={novoEventoRegional.tipo_evento}
-      onChange={e => setNovoEventoRegional(prev => ({ ...prev, tipo_evento: e.target.value }))}
-      placeholder="Tipo (guerra, peste...)"
-      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
-      style={{ borderRadius: '2px' }} />
-    <input value={novoEventoRegional.motivo}
-      onChange={e => setNovoEventoRegional(prev => ({ ...prev, motivo: e.target.value }))}
-      placeholder="Motivo (ex: Guerra regional)"
-      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
-      style={{ borderRadius: '2px' }} />
- 
-    <div className="grid grid-cols-2 gap-3">
-      {['comida', 'armas', 'viagem', 'comercio'].map(campo => (
-        <label key={campo} className="flex items-center gap-2 text-[#9a8e78] text-xs">
-          {campo}
-          <input type="number" step="0.1" value={novoEventoRegional.modificadores[campo]}
-            onChange={e => setNovoEventoRegional(prev => ({
-              ...prev, modificadores: { ...prev.modificadores, [campo]: parseFloat(e.target.value) }
-            }))}
-            className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-2 py-1 text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
-            style={{ borderRadius: '2px' }} />
-        </label>
-      ))}
-    </div>
- 
-    <button onClick={criarEventoRegional} disabled={!novoEventoRegional.regiao.trim() || !novoEventoRegional.motivo.trim() || criandoEventoRegional}
-      className="bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] transition-colors disabled:opacity-30"
-      style={{ ...cinzel, borderRadius: '2px' }}>
-      {criandoEventoRegional ? 'Criando...' : '+ Criar Evento'}
-    </button>
-  </div>
+        {/* ECONOMIA VIVA */}
+        <div className="mt-12">
+          <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+          <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
+          <h2 style={cinzel} className="text-xl text-[#c8a84b] font-semibold mb-6">💰 Economia Viva</h2>
+        
+          <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6 flex flex-col gap-3">
+            <input value={novoEventoRegional.regiao}
+              onChange={e => setNovoEventoRegional(prev => ({ ...prev, regiao: e.target.value }))}
+              placeholder="Região"
+              className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+              style={{ borderRadius: '2px' }} />
+            <input value={novoEventoRegional.tipo_evento}
+              onChange={e => setNovoEventoRegional(prev => ({ ...prev, tipo_evento: e.target.value }))}
+              placeholder="Tipo (guerra, peste...)"
+              className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+              style={{ borderRadius: '2px' }} />
+            <input value={novoEventoRegional.motivo}
+              onChange={e => setNovoEventoRegional(prev => ({ ...prev, motivo: e.target.value }))}
+              placeholder="Motivo (ex: Guerra regional)"
+              className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+              style={{ borderRadius: '2px' }} />
+        
+            <div className="grid grid-cols-2 gap-3">
+              {['comida', 'armas', 'viagem', 'comercio'].map(campo => (
+                <label key={campo} className="flex items-center gap-2 text-[#9a8e78] text-xs">
+                  {campo}
+                  <input type="number" step="0.1" value={novoEventoRegional.modificadores[campo]}
+                    onChange={e => setNovoEventoRegional(prev => ({
+                      ...prev, modificadores: { ...prev.modificadores, [campo]: parseFloat(e.target.value) }
+                    }))}
+                    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-2 py-1 text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
+                    style={{ borderRadius: '2px' }} />
+                </label>
+              ))}
+            </div>
+        
+            <button onClick={criarEventoRegional} disabled={!novoEventoRegional.regiao.trim() || !novoEventoRegional.motivo.trim() || criandoEventoRegional}
+              className="bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] transition-colors disabled:opacity-30"
+              style={{ ...cinzel, borderRadius: '2px' }}>
+              {criandoEventoRegional ? 'Criando...' : '+ Criar Evento'}
+            </button>
+          </div>
  
   {eventosRegionais.length === 0 ? (
     <p className="text-[#7a6e58] text-sm text-center py-6">Nenhum evento regional registrado.</p>

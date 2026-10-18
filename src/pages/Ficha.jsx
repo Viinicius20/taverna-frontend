@@ -7,6 +7,7 @@ import { normalizarClasseParaEN } from '../utils/classTranslation';
 import TextoWiki from '../components/TextoWiki';
 import usePolling from '../utils/usePolling';
 import { notificar } from '../utils/notificar';
+import DataMundo from '../components/DataMundo';
 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
@@ -1344,6 +1345,7 @@ async function abrirCofre(h) {
 
     {/* Nome e classe */}
     <div>
+      <DataMundo campanhaId={CAMPANHA_ID} />
       <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">FICHA DO PERSONAGEM</p>
       <h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold">
         <span style={{ color: 'var(--cor-classe, #c8a84b)' }} className="mr-2">{getIconeClasse(classeParaTema)}</span>
