@@ -6,6 +6,7 @@ import { createPortal } from 'react-dom';
 import { normalizarClasseParaEN } from '../utils/classTranslation';
 import TextoWiki from '../components/TextoWiki';
 import usePolling from '../utils/usePolling';
+import { notificar } from '../utils/notificar';
 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
@@ -375,6 +376,8 @@ export default function Ficha() {
 
   const downtimeJaMostrados = useRef(new Set());
 
+  const [respostasCofre, setRespostasCofre] = useState({});
+  const [abrindoCofre, setAbrindoCofre] = useState(null);
 
 
 
@@ -1239,6 +1242,18 @@ async function abrirGazeta() {
     setGazetaAtual(null);
   }
   setModalGazeta(true);
+}
+
+async function abrirCofre(h) {
+  setAbrindoCofre(h.id);
+  try {
+    const res = await api.post(`/gallery/${h.id}/abrir`, { character_id: id, resposta: respostasCofre[h.id] || '' });
+    setHandoutsRecebidos(prev => prev.map(x => x.id === h.id ? res.data.data : x));
+    notificar('Documento aberto!', 'sucesso');
+  } catch (e) {
+    notificar(e.response?.data?.detail || 'Erro ao abrir o documento.', 'erro');
+  }
+  setAbrindoCofre(null);
 }
 
 
@@ -2624,96 +2639,96 @@ style={{
         )}
 
         {/* PERSONALIDADE & MOTIVAÇÕES */}
-{(abaAtiva === 'personagem' || exportandoPDF) && (
-<div className="border border-[#c8a84b20] bg-[#161410] mb-6">
-  <div className="px-6 py-4 border-b border-[#c8a84b15]">
-    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">PERSONALIDADE & MOTIVAÇÕES</p>
-  </div>
-  <div className="p-6 flex flex-col gap-5">
-    {[
-      { label: 'APARÊNCIA', campo: 'appearance', placeholder: 'Como você se parece fisicamente...' },
-      { label: 'IDEAIS', campo: 'ideais', placeholder: 'O que guia suas ações e decisões...' },
-      { label: 'VÍNCULOS', campo: 'vinculos', placeholder: 'Pessoas, lugares ou coisas que você protege...' },
-      { label: 'DEFEITOS', campo: 'defeitos', placeholder: 'Suas fraquezas e vícios...' },
-      { label: 'OBJETIVO ATUAL', campo: 'objetivo_atual', placeholder: 'O que você busca alcançar agora...' },
-      { label: 'MEDOS E FOBIAS', campo: 'medos', placeholder: 'Aquilo que te assombra...' },
-    ].map(({ label, campo, placeholder }) => (
-      <div key={campo}>
-        <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-2">{label}</label>
-        <textarea
-          value={ficha[campo] || ''}
-          onChange={e => editarCampo(campo, e.target.value)}
-          placeholder={placeholder}
-          rows={2}
-          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#a09880] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b50] resize-none placeholder-[#3a3020] text-sm"
-          style={{ borderRadius: '2px', lineHeight: '1.7' }} />
-      </div>
-    ))}
-  </div>
-</div>
-)}
+          {(abaAtiva === 'personagem' || exportandoPDF) && (
+          <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+            <div className="px-6 py-4 border-b border-[#c8a84b15]">
+              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">PERSONALIDADE & MOTIVAÇÕES</p>
+            </div>
+            <div className="p-6 flex flex-col gap-5">
+              {[
+                { label: 'APARÊNCIA', campo: 'appearance', placeholder: 'Como você se parece fisicamente...' },
+                { label: 'IDEAIS', campo: 'ideais', placeholder: 'O que guia suas ações e decisões...' },
+                { label: 'VÍNCULOS', campo: 'vinculos', placeholder: 'Pessoas, lugares ou coisas que você protege...' },
+                { label: 'DEFEITOS', campo: 'defeitos', placeholder: 'Suas fraquezas e vícios...' },
+                { label: 'OBJETIVO ATUAL', campo: 'objetivo_atual', placeholder: 'O que você busca alcançar agora...' },
+                { label: 'MEDOS E FOBIAS', campo: 'medos', placeholder: 'Aquilo que te assombra...' },
+              ].map(({ label, campo, placeholder }) => (
+                <div key={campo}>
+                  <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-2">{label}</label>
+                  <textarea
+                    value={ficha[campo] || ''}
+                    onChange={e => editarCampo(campo, e.target.value)}
+                    placeholder={placeholder}
+                    rows={2}
+                    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#a09880] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b50] resize-none placeholder-[#3a3020] text-sm"
+                    style={{ borderRadius: '2px', lineHeight: '1.7' }} />
+                </div>
+              ))}
+            </div>
+          </div>
+          )}
 
         {/* IDIOMAS */}
         {(abaAtiva === 'personagem' || exportandoPDF) && (
-<div className="border border-[#c8a84b20] bg-[#161410] mb-6">
-  <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
-    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">IDIOMAS</p>
-    <button onClick={() => {
-      const novo = prompt('Nome do idioma:');
-      if (!novo?.trim()) return;
-      const atuais = ficha.languages || [];
-      editarCampo('languages', [...atuais, novo.trim()]);
-    }}
-      className="text-[#8a7e68] text-xs tracking-widest hover:text-[#c8a84b] transition-colors"
-      style={cinzel}>
-      + Adicionar
-    </button>
-  </div>
-  <div className="p-6 flex flex-wrap gap-2">
-    {(ficha.languages || []).length === 0 ? (
-      <p className="text-[#7a6e58] text-sm">Nenhum idioma registrado.</p>
-    ) : (
-      ficha.languages.map((idioma, i) => (
-        <span key={i} className="border border-[#c8a84b15] text-[#9a8e78] px-3 py-1 text-sm flex items-center gap-2"
-          style={{ borderRadius: '2px' }}>
-          {idioma}
-          <button onClick={() => {
-            const novos = ficha.languages.filter((_, idx) => idx !== i);
-            editarCampo('languages', novos);
-          }}
-            className="text-red-900 hover:text-red-600 text-xs">×</button>
-        </span>
-      ))
-    )}
-  </div>
-</div>
-)}
+          <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+            <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
+              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">IDIOMAS</p>
+              <button onClick={() => {
+                const novo = prompt('Nome do idioma:');
+                if (!novo?.trim()) return;
+                const atuais = ficha.languages || [];
+                editarCampo('languages', [...atuais, novo.trim()]);
+              }}
+                className="text-[#8a7e68] text-xs tracking-widest hover:text-[#c8a84b] transition-colors"
+                style={cinzel}>
+                + Adicionar
+              </button>
+            </div>
+            <div className="p-6 flex flex-wrap gap-2">
+              {(ficha.languages || []).length === 0 ? (
+                <p className="text-[#7a6e58] text-sm">Nenhum idioma registrado.</p>
+              ) : (
+                ficha.languages.map((idioma, i) => (
+                  <span key={i} className="border border-[#c8a84b15] text-[#9a8e78] px-3 py-1 text-sm flex items-center gap-2"
+                    style={{ borderRadius: '2px' }}>
+                    {idioma}
+                    <button onClick={() => {
+                      const novos = ficha.languages.filter((_, idx) => idx !== i);
+                      editarCampo('languages', novos);
+                    }}
+                      className="text-red-900 hover:text-red-600 text-xs">×</button>
+                  </span>
+                ))
+              )}
+            </div>
+          </div>
+          )}
         
         {/* NOTAS PRIVADAS */}
-{(abaAtiva === 'notas' || exportandoPDF) && (
-<div className="border border-[#c8a84b20] bg-[#161410] mb-6">
-  <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
-    <div>
-      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">NOTAS PRIVADAS</p>
-      <p style={cinzel} className="text-[#8a7e68]text-xs mt-1">Só você vê isso</p>
-    </div>
-    <span className="text-[#8a7e68] text-xs">🔒</span>
-    <div className="border border-[#c8a84b20] bg-[#161410] mb-6" data-pdf-hide></div>
-  </div>
-  <div className="p-6">
-    <textarea
-      value={notas}
-      onChange={e => {
-        setNotas(e.target.value);
-        setFicha(prev => ({ ...prev, notas_privadas: e.target.value }));
-      }}
-      placeholder="Anotações, segredos, objetivos pessoais do personagem..."
-      rows={5}
-      className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#a09880] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b50] resize-none placeholder-[#3a3020]"
-      style={{ fontSize: '1rem', borderRadius: '2px', lineHeight: '1.7' }} />
-  </div>
-</div>
-)}
+          {(abaAtiva === 'notas' || exportandoPDF) && (
+          <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
+            <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
+              <div>
+                <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">NOTAS PRIVADAS</p>
+                <p style={cinzel} className="text-[#8a7e68]text-xs mt-1">Só você vê isso</p>
+              </div>
+              <span className="text-[#8a7e68] text-xs">🔒</span>
+              <div className="border border-[#c8a84b20] bg-[#161410] mb-6" data-pdf-hide></div>
+            </div>
+            <div className="p-6">
+              <textarea
+                value={notas}
+                onChange={e => {
+                  setNotas(e.target.value);
+                  setFicha(prev => ({ ...prev, notas_privadas: e.target.value }));
+                }}
+                placeholder="Anotações, segredos, objetivos pessoais do personagem..."
+                rows={5}
+                className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#a09880] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b50] resize-none placeholder-[#3a3020]"
+                style={{ fontSize: '1rem', borderRadius: '2px', lineHeight: '1.7' }} />
+            </div>
+          </div>
+          )}
 
         <div className="flex gap-4">
           <button onClick={salvarFicha} disabled={salvando}
@@ -2785,21 +2800,21 @@ style={{
         )}
 
         {modalRevisao && fichaPreview && (
-  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
-    <div className="modal-anim bg-[#161410] border border-[#c8a84b30] max-w-lg w-full max-h-[85vh] flex flex-col"
-      style={{ borderRadius: '2px' }}>
+          <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4">
+            <div className="modal-anim bg-[#161410] border border-[#c8a84b30] max-w-lg w-full max-h-[85vh] flex flex-col"
+              style={{ borderRadius: '2px' }}>
 
-      {/* Header */}
-      <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between flex-shrink-0">
-        <div>
-          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">REVISÃO DE LEVEL UP</p>
-          <p style={cinzel} className="text-[#8a7e68] text-xs mt-1">
-            Nível {ficha.level} → {fichaPreview.level}
-          </p>
-        </div>
-        <button onClick={() => setModalRevisao(false)}
-          className="text-[#8a7e68] hover:text-[#c8a84b] text-xl transition-colors">×</button>
-      </div>
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between flex-shrink-0">
+                <div>
+                  <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">REVISÃO DE LEVEL UP</p>
+                  <p style={cinzel} className="text-[#8a7e68] text-xs mt-1">
+                    Nível {ficha.level} → {fichaPreview.level}
+                  </p>
+                </div>
+                <button onClick={() => setModalRevisao(false)}
+                  className="text-[#8a7e68] hover:text-[#c8a84b] text-xl transition-colors">×</button>
+              </div>
         
 
       {/* Lista de mudanças */}
@@ -3102,309 +3117,332 @@ style={{
       </div>
 
       {abaAtiva === 'downtime' && (
-  <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6">
-    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">O QUE SEU PERSONAGEM FEZ?</p>
-    <div className="grid grid-cols-2 gap-2 mb-4">
-      {ATIVIDADES_DOWNTIME.map(a => (
-        <button key={a} onClick={() => setAtividadeDowntime(a)}
-          className={`border px-3 py-2 text-xs capitalize transition-colors ${
-            atividadeDowntime === a ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]' : 'border-[#c8a84b20] text-[#9a8e78]'
-          }`}
-          style={{ borderRadius: '2px' }}>
-          {a}
-        </button>
-      ))}
-    </div>
-    <textarea value={focoDowntime} onChange={e => setFocoDowntime(e.target.value)}
-      placeholder="Algum detalhe? (opcional — ex: 'treinando com espadas', 'investigando o Vazio')"
-      rows={3}
-      className="w-full bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm mb-4 focus:outline-none focus:border-[#c8a84b50]"
-      style={{ borderRadius: '2px' }} />
-    <button onClick={enviarDowntime} disabled={!atividadeDowntime || enviandoDowntime}
-      className="w-full bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] transition-colors disabled:opacity-30"
-      style={{ ...cinzel, borderRadius: '2px' }}>
-      {enviandoDowntime ? 'Enviando...' : 'Enviar para o Mestre'}
-    </button>
-  </div>
-)}
-
-      {caixaMensagens && (
-  <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 px-4"
-    onClick={() => setCaixaMensagens(false)}>
-    <div className="bg-[#0f0e0c] border border-[#8a4a8a50] max-w-md w-full p-6 mb-4 sm:mb-0"
-      style={{ borderRadius: '2px', boxShadow: '0 0 30px #8a4a8a20' }}
-      onClick={e => e.stopPropagation()}>
-      <div className="flex items-center justify-between mb-4">
-        <p style={cinzel} className="text-[#8a4a8a] text-xs tracking-[4px]">🔮 SUSSURROS DO MESTRE</p>
-        <button onClick={() => setCaixaMensagens(false)}
-          className="text-[#8a7e68] hover:text-[#c8a84b] transition-colors">✕</button>
-      </div>
-      {mensagensSecretas.length === 0 ? (
-        <p className="text-[#8a7e68] text-sm text-center py-4">Nenhum sussurro novo.</p>
-      ) : (
-        <div className="flex flex-col gap-3">
-          {mensagensSecretas.map(msg => (
-            <div key={msg.id} className="border border-[#8a4a8a30] bg-[#161410] p-4">
-              <p className="text-[#e8e0d0] text-sm leading-relaxed italic mb-3">"{msg.message}"</p>
-              <button onClick={() => marcarComoLida(msg.id)}
-                className="border border-[#8a4a8a50] text-[#8a4a8a] px-3 py-1 text-xs hover:bg-[#8a4a8a10] transition-colors w-full"
-                style={{ ...cinzel, borderRadius: '2px' }}>
-                ENTENDIDO
+        <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6">
+          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">O QUE SEU PERSONAGEM FEZ?</p>
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            {ATIVIDADES_DOWNTIME.map(a => (
+              <button key={a} onClick={() => setAtividadeDowntime(a)}
+                className={`border px-3 py-2 text-xs capitalize transition-colors ${
+                  atividadeDowntime === a ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]' : 'border-[#c8a84b20] text-[#9a8e78]'
+                }`}
+                style={{ borderRadius: '2px' }}>
+                {a}
               </button>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  </div>
-)}
-
-{modalDowntimeResultado && (
-  <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 px-4"
-    onClick={() => setModalDowntimeResultado(false)}>
-    <div className="bg-[#0f0e0c] border border-[#8a4a8a50] max-w-md w-full p-6 mb-4 sm:mb-0"
-      style={{ borderRadius: '2px', boxShadow: '0 0 30px #8a4a8a20' }}
-      onClick={e => e.stopPropagation()}>
-      <div className="flex items-center justify-between mb-4">
-        <p style={cinzel} className="text-[#8a4a8a] text-xs tracking-[4px]">🌙 RESULTADO DO DOWNTIME</p>
-        <button onClick={() => setModalDowntimeResultado(false)}
-          className="text-[#8a7e68] hover:text-[#c8a84b] transition-colors">✕</button>
-      </div>
-      <div className="flex flex-col gap-3">
-        {downtimeResolvidos.map(d => (
-          <div key={d.id} className="border border-[#8a4a8a30] bg-[#161410] p-4">
-            <p style={cinzel} className="text-[#c8a84b] text-xs capitalize mb-1">
-              {d.atividade} {d.status === 'rejeitado' && '(não aconteceu)'}
-            </p>
-            <p className="text-[#e8e0d0] text-sm leading-relaxed italic mb-3">"{d.consequencia_final}"</p>
-            <button onClick={() => marcarDowntimeVisto(d.id)}
-              className="border border-[#8a4a8a50] text-[#8a4a8a] px-3 py-1 text-xs hover:bg-[#8a4a8a10] transition-colors w-full"
-              style={{ ...cinzel, borderRadius: '2px' }}>
-              ENTENDIDO
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-)}
-
-{abaAtiva === 'momentos' && (
-  <Momentos
-    momentos={ficha.momentos || []}
-    onChange={lista => setFicha(f => ({ ...f, momentos: lista }))}
-  />
-)}
-
-{caixaMundoMudou && (
-  <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 px-4"
-    onClick={() => setCaixaMundoMudou(false)}>
-    <div className="bg-[#0f0e0c] border border-[#c8a84b50] max-w-md w-full p-6 mb-4 sm:mb-0"
-      style={{ borderRadius: '2px', boxShadow: '0 0 30px #c8a84b20' }}
-      onClick={e => e.stopPropagation()}>
-      <div className="flex items-center justify-between mb-4">
-        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px]">🌎 O MUNDO MUDOU</p>
-        <button onClick={() => setCaixaMundoMudou(false)}
-          className="text-[#8a7e68] hover:text-[#c8a84b] transition-colors">✕</button>
-      </div>
-      {changelogNaoLido.length === 0 ? (
-        <p className="text-[#8a7e68] text-sm text-center py-4">Nada novo.</p>
-      ) : (
-        <div className="flex flex-col gap-3">
-          {changelogNaoLido.map(item => (
-            <div key={item.id} className="border border-[#c8a84b30] bg-[#161410] p-4">
-              <p className="text-[#e8e0d0] text-sm leading-relaxed whitespace-pre-line mb-3">{item.content}</p>
-              <button onClick={() => marcarChangelogLido(item.id)}
-                className="border border-[#c8a84b50] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors w-full"
-                style={{ ...cinzel, borderRadius: '2px' }}>
-                ENTENDIDO
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  </div>
-)}
-
-<button onClick={abrirGazeta}
-  className="fixed bottom-4 left-4 z-40 border border-[#c8a84b50] bg-[#0f0e0c] text-[#c8a84b] px-3 py-2 text-xs hover:bg-[#c8a84b10] transition-colors"
-  style={{ ...cinzel, borderRadius: '2px' }}>
-  📰 GAZETA
-</button>
-
-{modalGazeta && (
-  <div className="fixed inset-0 bg-black bg-opacity-70 flex items-end sm:items-center justify-center z-50 px-4"
-    onClick={() => setModalGazeta(false)}>
-    <div className="bg-[#0f0e0c] border border-[#c8a84b50] max-w-md w-full max-h-[80vh] overflow-y-auto p-6 mb-4 sm:mb-0"
-      style={{ borderRadius: '2px', boxShadow: '0 0 30px #c8a84b20' }}
-      onClick={e => e.stopPropagation()}>
-      <div className="flex items-center justify-between mb-4">
-        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px]">📰 GAZETA</p>
-        <button onClick={() => setModalGazeta(false)}
-          className="text-[#8a7e68] hover:text-[#c8a84b] transition-colors">✕</button>
-      </div>
-      {!gazetaAtual ? (
-        <p className="text-[#8a7e68] text-sm text-center py-4">Nenhuma edição publicada ainda.</p>
-      ) : (
-        <>
-          <p style={cinzel} className="text-[#9a8e78] text-xs tracking-[2px]">EDIÇÃO Nº {gazetaAtual.edicao}</p>
-          <h3 style={cinzel} className="text-[#e8e0d0] text-lg mb-4">{gazetaAtual.titulo}</h3>
-          <div className="flex flex-col gap-3">
-            {(gazetaAtual.noticias || []).map((n, i) => (
-              <div key={i} className="flex items-start gap-2 border-t border-[#c8a84b15] pt-3">
-                <span>{n.icone}</span>
-                <p className="text-[#8a8070] text-sm leading-relaxed">{n.texto}</p>
-              </div>
             ))}
           </div>
-        </>
+          <textarea value={focoDowntime} onChange={e => setFocoDowntime(e.target.value)}
+            placeholder="Algum detalhe? (opcional — ex: 'treinando com espadas', 'investigando o Vazio')"
+            rows={3}
+            className="w-full bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm mb-4 focus:outline-none focus:border-[#c8a84b50]"
+            style={{ borderRadius: '2px' }} />
+          <button onClick={enviarDowntime} disabled={!atividadeDowntime || enviandoDowntime}
+            className="w-full bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] transition-colors disabled:opacity-30"
+            style={{ ...cinzel, borderRadius: '2px' }}>
+            {enviandoDowntime ? 'Enviando...' : 'Enviar para o Mestre'}
+          </button>
+        </div>
       )}
-    </div>
-  </div>
-)}
 
-{abaAtiva === 'documentos' && (
-  <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6">
-    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">DOCUMENTOS RECEBIDOS</p>
-    {handoutsRecebidos.length === 0 ? (
-      <p className="text-[#7a6e58] text-sm text-center py-6">Nenhum documento recebido ainda.</p>
-    ) : (
-      <div className="flex flex-col gap-3">
-        {handoutsRecebidos.map(h => (
-          <div key={h.id} className="border border-[#c8a84b15] bg-[#0f0e0c] p-4" style={{ borderRadius: '2px' }}>
-            <p style={cinzel} className="text-[#e8e0d0] text-sm mb-2">{h.name}</p>
-            {h.url ? (
-              <img src={h.url} alt={h.name} className="w-full rounded" />
+      {caixaMensagens && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 px-4"
+          onClick={() => setCaixaMensagens(false)}>
+          <div className="bg-[#0f0e0c] border border-[#8a4a8a50] max-w-md w-full p-6 mb-4 sm:mb-0"
+            style={{ borderRadius: '2px', boxShadow: '0 0 30px #8a4a8a20' }}
+            onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <p style={cinzel} className="text-[#8a4a8a] text-xs tracking-[4px]">🔮 SUSSURROS DO MESTRE</p>
+              <button onClick={() => setCaixaMensagens(false)}
+                className="text-[#8a7e68] hover:text-[#c8a84b] transition-colors">✕</button>
+            </div>
+            {mensagensSecretas.length === 0 ? (
+              <p className="text-[#8a7e68] text-sm text-center py-4">Nenhum sussurro novo.</p>
             ) : (
-              <p className="text-[#a09880] text-sm whitespace-pre-wrap leading-relaxed">{limparTexto(h.text_content)}</p>
+              <div className="flex flex-col gap-3">
+                {mensagensSecretas.map(msg => (
+                  <div key={msg.id} className="border border-[#8a4a8a30] bg-[#161410] p-4">
+                    <p className="text-[#e8e0d0] text-sm leading-relaxed italic mb-3">"{msg.message}"</p>
+                    <button onClick={() => marcarComoLida(msg.id)}
+                      className="border border-[#8a4a8a50] text-[#8a4a8a] px-3 py-1 text-xs hover:bg-[#8a4a8a10] transition-colors w-full"
+                      style={{ ...cinzel, borderRadius: '2px' }}>
+                      ENTENDIDO
+                    </button>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
-        ))}
-      </div>
-    )}
-  </div>
-)}
+        </div>
+      )}
 
-{abaAtiva === 'diario' && (
-  <div className="flex flex-col gap-6 mb-6">
-    {!diario ? (
-      <p className="text-[#7a6e58] text-sm text-center py-6">Carregando...</p>
-    ) : (
-      <>
-        <div className="border border-[#c8a84b20] bg-[#161410] p-6">
-          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">O QUE EU SEI</p>
-          {diario.fatos.length === 0 ? (
-            <p className="text-[#7a6e58] text-sm">Nada descoberto ainda.</p>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {diario.fatos.map(f => (
-                <p key={f.id} className="text-[#a09880] text-sm leading-relaxed border-l-2 border-[#c8a84b30] pl-3">
-                  {f.texto}
-                </p>
+      {modalDowntimeResultado && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 px-4"
+          onClick={() => setModalDowntimeResultado(false)}>
+          <div className="bg-[#0f0e0c] border border-[#8a4a8a50] max-w-md w-full p-6 mb-4 sm:mb-0"
+            style={{ borderRadius: '2px', boxShadow: '0 0 30px #8a4a8a20' }}
+            onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <p style={cinzel} className="text-[#8a4a8a] text-xs tracking-[4px]">🌙 RESULTADO DO DOWNTIME</p>
+              <button onClick={() => setModalDowntimeResultado(false)}
+                className="text-[#8a7e68] hover:text-[#c8a84b] transition-colors">✕</button>
+            </div>
+            <div className="flex flex-col gap-3">
+              {downtimeResolvidos.map(d => (
+                <div key={d.id} className="border border-[#8a4a8a30] bg-[#161410] p-4">
+                  <p style={cinzel} className="text-[#c8a84b] text-xs capitalize mb-1">
+                    {d.atividade} {d.status === 'rejeitado' && '(não aconteceu)'}
+                  </p>
+                  <p className="text-[#e8e0d0] text-sm leading-relaxed italic mb-3">"{d.consequencia_final}"</p>
+                  <button onClick={() => marcarDowntimeVisto(d.id)}
+                    className="border border-[#8a4a8a50] text-[#8a4a8a] px-3 py-1 text-xs hover:bg-[#8a4a8a10] transition-colors w-full"
+                    style={{ ...cinzel, borderRadius: '2px' }}>
+                    ENTENDIDO
+                  </button>
+                </div>
               ))}
             </div>
-          )}
+          </div>
         </div>
+      )}
 
-        <div className="border border-[#c8a84b20] bg-[#161410] p-6">
-          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">QUEM EU CONHEÇO</p>
-          {diario.npcs.length === 0 ? (
-            <p className="text-[#7a6e58] text-sm">Ninguém ainda.</p>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {diario.npcs.map(n => (
-                <div key={n.id} className="flex items-center gap-3 border border-[#c8a84b15] bg-[#0f0e0c] p-3"
-                  style={{ borderRadius: '2px' }}>
-                  {n.art_url && (
-                    <img src={n.art_url} alt="" className="w-12 h-12 object-cover" style={{ borderRadius: '2px' }} />
-                  )}
-                  <div>
-                    <p style={cinzel} className="text-[#e8e0d0] text-sm">{n.name}</p>
-                    <p className="text-[#9a8e78] text-xs">{[n.race, n.occupation].filter(Boolean).join(' · ')}</p>
+      {abaAtiva === 'momentos' && (
+        <Momentos
+          momentos={ficha.momentos || []}
+          onChange={lista => setFicha(f => ({ ...f, momentos: lista }))}
+        />
+      )}
+
+      {caixaMundoMudou && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 px-4"
+          onClick={() => setCaixaMundoMudou(false)}>
+          <div className="bg-[#0f0e0c] border border-[#c8a84b50] max-w-md w-full p-6 mb-4 sm:mb-0"
+            style={{ borderRadius: '2px', boxShadow: '0 0 30px #c8a84b20' }}
+            onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px]">🌎 O MUNDO MUDOU</p>
+              <button onClick={() => setCaixaMundoMudou(false)}
+                className="text-[#8a7e68] hover:text-[#c8a84b] transition-colors">✕</button>
+            </div>
+            {changelogNaoLido.length === 0 ? (
+              <p className="text-[#8a7e68] text-sm text-center py-4">Nada novo.</p>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {changelogNaoLido.map(item => (
+                  <div key={item.id} className="border border-[#c8a84b30] bg-[#161410] p-4">
+                    <p className="text-[#e8e0d0] text-sm leading-relaxed whitespace-pre-line mb-3">{item.content}</p>
+                    <button onClick={() => marcarChangelogLido(item.id)}
+                      className="border border-[#c8a84b50] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors w-full"
+                      style={{ ...cinzel, borderRadius: '2px' }}>
+                      ENTENDIDO
+                    </button>
                   </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      <button onClick={abrirGazeta}
+        className="fixed bottom-4 left-4 z-40 border border-[#c8a84b50] bg-[#0f0e0c] text-[#c8a84b] px-3 py-2 text-xs hover:bg-[#c8a84b10] transition-colors"
+        style={{ ...cinzel, borderRadius: '2px' }}>
+        📰 GAZETA
+      </button>
+
+      {modalGazeta && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-end sm:items-center justify-center z-50 px-4"
+          onClick={() => setModalGazeta(false)}>
+          <div className="bg-[#0f0e0c] border border-[#c8a84b50] max-w-md w-full max-h-[80vh] overflow-y-auto p-6 mb-4 sm:mb-0"
+            style={{ borderRadius: '2px', boxShadow: '0 0 30px #c8a84b20' }}
+            onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px]">📰 GAZETA</p>
+              <button onClick={() => setModalGazeta(false)}
+                className="text-[#8a7e68] hover:text-[#c8a84b] transition-colors">✕</button>
+            </div>
+            {!gazetaAtual ? (
+              <p className="text-[#8a7e68] text-sm text-center py-4">Nenhuma edição publicada ainda.</p>
+            ) : (
+              <>
+                <p style={cinzel} className="text-[#9a8e78] text-xs tracking-[2px]">EDIÇÃO Nº {gazetaAtual.edicao}</p>
+                <h3 style={cinzel} className="text-[#e8e0d0] text-lg mb-4">{gazetaAtual.titulo}</h3>
+                <div className="flex flex-col gap-3">
+                  {(gazetaAtual.noticias || []).map((n, i) => (
+                    <div key={i} className="flex items-start gap-2 border-t border-[#c8a84b15] pt-3">
+                      <span>{n.icone}</span>
+                      <p className="text-[#8a8070] text-sm leading-relaxed">{n.texto}</p>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {abaAtiva === 'documentos' && (
+        <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6">
+          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">DOCUMENTOS RECEBIDOS</p>
+          {handoutsRecebidos.length === 0 ? (
+            <p className="text-[#7a6e58] text-sm text-center py-6">Nenhum documento recebido ainda.</p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {handoutsRecebidos.map(h => (
+                <div key={h.id} className="border border-[#c8a84b15] bg-[#0f0e0c] p-4" style={{ borderRadius: '2px' }}>
+                  <p style={cinzel} className="text-[#e8e0d0] text-sm mb-2">{h.name}</p>
+                  {h.bloqueado ? (
+                    <div>
+                      <p style={cinzel} className="text-[#8a5030] text-xs tracking-[2px] mb-2">🔒 DOCUMENTO TRANCADO</p>
+                      {h.cofre_dica && <p className="text-[#9a8e78] text-sm italic mb-3">"{h.cofre_dica}"</p>}
+                      <div className="flex gap-2">
+                        <input value={respostasCofre[h.id] || ''}
+                          onChange={e => setRespostasCofre(prev => ({ ...prev, [h.id]: e.target.value }))}
+                          onKeyDown={e => { if (e.key === 'Enter') abrirCofre(h); }}
+                          placeholder="Sua resposta..."
+                          className="flex-1 bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+                          style={{ borderRadius: '2px' }} />
+                        <button onClick={() => abrirCofre(h)} disabled={abrindoCofre === h.id}
+                          className="border border-[#c8a84b50] text-[#c8a84b] px-4 py-2 text-xs hover:bg-[#c8a84b10] disabled:opacity-30"
+                          style={{ ...cinzel, borderRadius: '2px' }}>
+                          {abrindoCofre === h.id ? '...' : 'ABRIR'}
+                        </button>
+                      </div>
+                    </div>
+                  ) : h.url ? (
+                    <img src={h.url} alt={h.name} className="w-full rounded" />
+                  ) : (
+                    <p className="text-[#a09880] text-sm whitespace-pre-wrap leading-relaxed">{limparTexto(h.text_content)}</p>
+                  )}
+                  {h.url ? (
+                    <img src={h.url} alt={h.name} className="w-full rounded" />
+                  ) : (
+                    <p className="text-[#a09880] text-sm whitespace-pre-wrap leading-relaxed">{limparTexto(h.text_content)}</p>
+                  )}
                 </div>
               ))}
             </div>
           )}
         </div>
+      )}
 
-        <div className="border border-[#c8a84b20] bg-[#161410] p-6">
-          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">MINHAS ANOTAÇÕES</p>
-          <div className="flex flex-col gap-2">
-            {diario.sessoes.length === 0 && (
-              <p className="text-[#7a6e58] text-sm">As sessões aparecem aqui depois que o mestre as encerra.</p>
-            )}
-            {diario.sessoes.map(s => ({ session_number: s.session_number, title: s.title || `Sessão ${s.session_number}` })).map(s => (
-              <div key={s.session_number} className="border border-[#c8a84b15] bg-[#0f0e0c]" style={{ borderRadius: '2px' }}>
-                <button onClick={() => setNotaAberta(notaAberta === s.session_number ? null : s.session_number)}
-                  className="w-full flex items-center justify-between px-4 py-3 text-left">
-                  <span style={cinzel} className="text-[#e8e0d0] text-sm">
-                    {s.session_number > 0 && <span className="text-[#9a8e78] mr-2">#{s.session_number}</span>}
-                    {s.title}
-                  </span>
-                  <span className="text-[#8a7e68] text-xs">
-                    {notasDiario[s.session_number] ? '✎ ' : ''}{notaAberta === s.session_number ? '▲' : '▼'}
-                  </span>
-                </button>
-                {notaAberta === s.session_number && (
-                  <div className="px-4 pb-4">
-                    <textarea value={notasDiario[s.session_number] || ''} rows={5}
-                      onChange={e => setNotasDiario(prev => ({ ...prev, [s.session_number]: e.target.value }))}
-                      placeholder="O que aconteceu, o que você suspeita, perguntas pendentes..."
-                      className="w-full bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm mb-2 focus:outline-none focus:border-[#c8a84b50]"
-                      style={{ borderRadius: '2px' }} />
-                    <button onClick={() => salvarNotaDiario(s.session_number)} disabled={salvandoNota}
-                      className="border border-[#c8a84b50] text-[#c8a84b] px-4 py-1 text-xs hover:bg-[#c8a84b10] disabled:opacity-30"
-                      style={{ ...cinzel, borderRadius: '2px' }}>
-                      {salvandoNota ? 'Salvando...' : 'Salvar'}
-                    </button>
+      {abaAtiva === 'diario' && (
+        <div className="flex flex-col gap-6 mb-6">
+          {!diario ? (
+            <p className="text-[#7a6e58] text-sm text-center py-6">Carregando...</p>
+          ) : (
+            <>
+              <div className="border border-[#c8a84b20] bg-[#161410] p-6">
+                <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">O QUE EU SEI</p>
+                {diario.fatos.length === 0 ? (
+                  <p className="text-[#7a6e58] text-sm">Nada descoberto ainda.</p>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {diario.fatos.map(f => (
+                      <p key={f.id} className="text-[#a09880] text-sm leading-relaxed border-l-2 border-[#c8a84b30] pl-3">
+                        {f.texto}
+                      </p>
+                    ))}
                   </div>
                 )}
               </div>
-            ))}
-          </div>
-        </div>
-      </>
-    )}
-  </div>
-)}
 
-{/* Aba WIki */}
-{abaAtiva === 'wiki' && (
-  <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6">
-    {wikiAberta ? (() => {
-      const p = wikiPaginas.find(x => x.id === wikiAberta);
-      if (!p) return null;
-      return (
-        <>
-          <button onClick={() => setWikiAberta(null)} className="text-[#9a8e78] hover:text-[#c8a84b] text-xs mb-4">← Voltar</button>
-          <p style={cinzel} className="text-[#9a8e78] text-xs tracking-[2px]">{p.categoria.toUpperCase()}</p>
-          <h3 style={cinzel} className="text-[#e8e0d0] text-lg mb-3">{p.titulo}</h3>
-          <TextoWiki texto={p.conteudo} paginas={wikiPaginas} onAbrir={setWikiAberta} />
+              <div className="border border-[#c8a84b20] bg-[#161410] p-6">
+                <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">QUEM EU CONHEÇO</p>
+                {diario.npcs.length === 0 ? (
+                  <p className="text-[#7a6e58] text-sm">Ninguém ainda.</p>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {diario.npcs.map(n => (
+                      <div key={n.id} className="flex items-center gap-3 border border-[#c8a84b15] bg-[#0f0e0c] p-3"
+                        style={{ borderRadius: '2px' }}>
+                        {n.art_url && (
+                          <img src={n.art_url} alt="" className="w-12 h-12 object-cover" style={{ borderRadius: '2px' }} />
+                        )}
+                        <div>
+                          <p style={cinzel} className="text-[#e8e0d0] text-sm">{n.name}</p>
+                          <p className="text-[#9a8e78] text-xs">{[n.race, n.occupation].filter(Boolean).join(' · ')}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="border border-[#c8a84b20] bg-[#161410] p-6">
+                <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">MINHAS ANOTAÇÕES</p>
+                <div className="flex flex-col gap-2">
+                  {diario.sessoes.length === 0 && (
+                    <p className="text-[#7a6e58] text-sm">As sessões aparecem aqui depois que o mestre as encerra.</p>
+                  )}
+                  {diario.sessoes.map(s => ({ session_number: s.session_number, title: s.title || `Sessão ${s.session_number}` })).map(s => (
+                    <div key={s.session_number} className="border border-[#c8a84b15] bg-[#0f0e0c]" style={{ borderRadius: '2px' }}>
+                      <button onClick={() => setNotaAberta(notaAberta === s.session_number ? null : s.session_number)}
+                        className="w-full flex items-center justify-between px-4 py-3 text-left">
+                        <span style={cinzel} className="text-[#e8e0d0] text-sm">
+                          {s.session_number > 0 && <span className="text-[#9a8e78] mr-2">#{s.session_number}</span>}
+                          {s.title}
+                        </span>
+                        <span className="text-[#8a7e68] text-xs">
+                          {notasDiario[s.session_number] ? '✎ ' : ''}{notaAberta === s.session_number ? '▲' : '▼'}
+                        </span>
+                      </button>
+                      {notaAberta === s.session_number && (
+                        <div className="px-4 pb-4">
+                          <textarea value={notasDiario[s.session_number] || ''} rows={5}
+                            onChange={e => setNotasDiario(prev => ({ ...prev, [s.session_number]: e.target.value }))}
+                            placeholder="O que aconteceu, o que você suspeita, perguntas pendentes..."
+                            className="w-full bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm mb-2 focus:outline-none focus:border-[#c8a84b50]"
+                            style={{ borderRadius: '2px' }} />
+                          <button onClick={() => salvarNotaDiario(s.session_number)} disabled={salvandoNota}
+                            className="border border-[#c8a84b50] text-[#c8a84b] px-4 py-1 text-xs hover:bg-[#c8a84b10] disabled:opacity-30"
+                            style={{ ...cinzel, borderRadius: '2px' }}>
+                            {salvandoNota ? 'Salvando...' : 'Salvar'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Aba WIki */}
+      {abaAtiva === 'wiki' && (
+        <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6">
+          {wikiAberta ? (() => {
+            const p = wikiPaginas.find(x => x.id === wikiAberta);
+            if (!p) return null;
+            return (
+              <>
+                <button onClick={() => setWikiAberta(null)} className="text-[#9a8e78] hover:text-[#c8a84b] text-xs mb-4">← Voltar</button>
+                <p style={cinzel} className="text-[#9a8e78] text-xs tracking-[2px]">{p.categoria.toUpperCase()}</p>
+                <h3 style={cinzel} className="text-[#e8e0d0] text-lg mb-3">{p.titulo}</h3>
+                <TextoWiki texto={p.conteudo} paginas={wikiPaginas} onAbrir={setWikiAberta} />
+              </>
+            );
+          })() : (
+          <>
+          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">WIKI DA CAMPANHA</p>
+          {wikiPaginas.length === 0 ? (
+            <p className="text-[#9a8e78] text-sm text-center py-6">Nenhuma página revelada ainda.</p>
+          ) : (
+            <div className="flex flex-col gap-1">
+              {wikiPaginas.map(p => (
+                <button key={p.id} onClick={() => setWikiAberta(p.id)}
+                  className="text-left border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3 hover:border-[#c8a84b50] transition-colors"
+                  style={{ borderRadius: '2px' }}>
+                  <span style={cinzel} className="text-[#e8e0d0] text-sm">{p.titulo}</span>
+                  <span className="text-[#8a7e68] text-xs ml-2">{p.categoria}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </>
-      );
-    })() : (
-      <>
-        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">WIKI DA CAMPANHA</p>
-        {wikiPaginas.length === 0 ? (
-          <p className="text-[#9a8e78] text-sm text-center py-6">Nenhuma página revelada ainda.</p>
-        ) : (
-          <div className="flex flex-col gap-1">
-            {wikiPaginas.map(p => (
-              <button key={p.id} onClick={() => setWikiAberta(p.id)}
-                className="text-left border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-3 hover:border-[#c8a84b50] transition-colors"
-                style={{ borderRadius: '2px' }}>
-                <span style={cinzel} className="text-[#e8e0d0] text-sm">{p.titulo}</span>
-                <span className="text-[#8a7e68] text-xs ml-2">{p.categoria}</span>
-              </button>
-            ))}
-          </div>
-        )}
-      </>
-    )}
-  </div>
-)}
+      )}
+    </div>
+  )}
 
 
     </div>

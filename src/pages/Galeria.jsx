@@ -5,6 +5,7 @@ import api from '../services/api';
 import { useUser } from '../context/UserContext';
 import { TIPOS_DOC } from "../constants/tiposDoc";
 import EnviarHandout from "../components/EnviarHandout";
+import CofreHandout from '../components/CofreHandout';
 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
@@ -659,7 +660,7 @@ if (!isMestre) {
                 {h.revealed && (
                   <p style={cinzel} className="text-[#4a8a4a] text-xs tracking-[2px] mb-2">VISÍVEL PARA TODOS</p>
                 )}
-                <EnviarHandout handoutId={h.id} personagens={personagens} onEnviado={buscarImagens} />
+                <EnviarHandout handoutId={h.id} personagens={personagens} onEnviado={buscarImagens} /> <CofreHandout handout={h} onMudou={buscarImagens} />
                 <button onClick={() => deletarHandout(h.id)}
                   className="text-xs border border-red-900 text-red-900 px-2 py-0.5 hover:bg-red-900 hover:text-white transition-colors"
                   style={{ borderRadius: '2px', ...cinzel }}>
