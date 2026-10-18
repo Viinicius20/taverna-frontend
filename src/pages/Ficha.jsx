@@ -3269,7 +3269,7 @@ style={{
               <p className="text-[#8a7e68] text-sm text-center py-4">Nenhuma edição publicada ainda.</p>
             ) : (
               <>
-                <p style={cinzel} className="text-[#9a8e78] text-xs tracking-[2px]">EDIÇÃO Nº {gazetaAtual.edicao}</p>
+                <p style={cinzel} className="text-[#9a8e78] text-xs tracking-[2px]">EDIÇÃO Nº {gazetaAtual.edicao}{gazetaAtual.data_mundo ? ` · ${gazetaAtual.data_mundo}` : ''}</p>
                 <h3 style={cinzel} className="text-[#e8e0d0] text-lg mb-4">{gazetaAtual.titulo}</h3>
                 <div className="flex flex-col gap-3">
                   {(gazetaAtual.noticias || []).map((n, i) => (

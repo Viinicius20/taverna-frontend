@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { MODELOS } from '../utils/modelos';
 import CalendarioMestre from '../components/CalendarioMestre';
+import PrazoEvento from '../components/PrazoEvento';
+import { notificar } from '../utils/notificar';
+import { CAMPANHA_ID } from '../config'; 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -54,6 +57,9 @@ export default function MundoVivo() {
   const [gazetas, setGazetas] = useState([]);
   const [gerandoGazeta, setGerandoGazeta] = useState(false);
   const [nomeJornal, setNomeJornal] = useState('');
+
+  const [avancando, setAvancando] = useState(false);
+  const [versaoCal, setVersaoCal] = useState(0);
 
   useEffect(() => {
   buscarEventos();
@@ -318,7 +324,21 @@ async function deletarGazeta(id) {
     alert('Erro ao deletar.');
   }
 }
- 
+
+async function avancarDowntime() {
+  if (avancando) return;
+  if (!window.confirm('Avançar 7 dias no calendário da campanha?')) return;
+  setAvancando(true);
+  try {
+    const res = await api.post(`/calendario/${CAMPANHA_ID}/avancar`, { dias: 7, motivo: 'Downtime' });
+    notificar(`+7 dias: ${res.data.data.texto}`, 'sucesso');
+    setVersaoCal(v => v + 1);
+  } catch {
+    notificar('Erro ao avançar o calendário.', 'erro');
+  }
+  setAvancando(false);
+}
+
 
 useEffect(() => {
   buscarEventos();
@@ -545,7 +565,7 @@ function iconeRelogio(nome) {
                     )}
 
                     <div>
-                      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">AVANÇAR PROGRESSO</p>
+                      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">AVANÇAR PROGRESSO</p> <PrazoEvento evento={ev} onMudou={buscarEventos} />
                       <div className="flex gap-2">
                         {[-20, -10, 10, 20].map(delta => (
                           <button key={delta} onClick={() => atualizarProgresso(ev.id, ev.progress + delta)}
@@ -629,8 +649,17 @@ function iconeRelogio(nome) {
             <div className="mt-12">
               <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
               <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
-              <h2 style={cinzel} className="text-xl text-[#c8a84b] font-semibold mb-6">📅 Calendário</h2>
-              <CalendarioMestre />
+
+              <div className="flex items-center justify-between mb-6">
+                <h2 style={cinzel} className="text-xl text-[#c8a84b] font-semibold">📅 Calendário</h2>
+                <button onClick={avancarDowntime} disabled={avancando}
+                  className="border border-[#c8a84b50] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors disabled:opacity-30"
+                  style={{ ...cinzel, borderRadius: '2px' }}>
+                  {avancando ? '⏳ AVANÇANDO...' : '📅 +7 DIAS'}
+                </button>
+              </div>
+
+              <CalendarioMestre key={versaoCal} />
             </div>
 
           {flags.length === 0 ? (
@@ -867,7 +896,7 @@ function iconeRelogio(nome) {
             style={{ borderRadius: '2px' }}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex-1 mr-3">
-                <p style={cinzel} className="text-[#9a8e78] text-xs tracking-[2px]">EDIÇÃO Nº {g.edicao}</p>
+                <p style={cinzel} className="text-[#9a8e78] text-xs tracking-[2px]">EDIÇÃO Nº {g.edicao}{g.data_mundo ? ` · ${g.data_mundo}` : ''}</p>
                 {rascunho ? (
                   <input value={g.titulo}
                     onChange={e => setGazetas(prev => prev.map(x => x.id === g.id ? { ...x, titulo: e.target.value } : x))}

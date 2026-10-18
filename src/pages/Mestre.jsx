@@ -1062,49 +1062,49 @@ useEffect(() => {
         </div>
 
         <div className="flex gap-1 border-b border-[#c8a84b20] mb-6 overflow-x-auto scroll-tema">
-  {[
-    { id: 'painel', label: 'Painel' },
-    { id: 'npcs', label: `NPCs (${npcs.length})` },
-  ].map(a => (
-    <button key={a.id} onClick={() => setAba(a.id)}
-      style={cinzel}
-      className={`px-4 py-3 text-xs tracking-[2px] uppercase whitespace-nowrap border-b-2 transition-colors ${
-        aba === a.id ? 'border-[#c8a84b] text-[#c8a84b]' : 'border-transparent text-[#8a7e68] hover:text-[#a09880]'
-      }`}>
-      {a.label}
-    </button>
-  ))}
-</div>
-
-        {/* DRAWER */}
-{drawerAberto && (
-  <div className="fixed inset-0 z-50 flex justify-end">
-    <div className="absolute inset-0 bg-black bg-opacity-60"
-      onClick={() => setDrawerAberto(false)} />
-    <div className="relative w-72 bg-[#0f0e0c] border-l border-[#c8a84b20] h-full flex flex-col"
-      style={{ animation: 'slideIn 0.2s ease' }}>
-      <div className="flex items-center justify-between px-6 py-4 border-b border-[#c8a84b20]">
-        <span style={cinzel} className="text-[#c8a84b] text-sm tracking-widest">⚔ FERRAMENTAS</span>
-        <button onClick={() => setDrawerAberto(false)}
-          className="text-[#8a7e68] hover:text-[#c8a84b] text-xl transition-colors">✕</button>
-      </div>
-
-      <div className="flex-1 overflow-y-auto py-4">
-        {menuItemsMestre.map(({ label, rota }) => (
-          <button key={label}
-            onClick={() => { navigate(rota); setDrawerAberto(false); }}
-            className="w-full text-left px-6 py-3 text-sm hover:bg-[#161410] transition-colors flex items-center justify-between group"
-            style={cinzel}>
-            <span className="text-[#a09880] group-hover:text-[#c8a84b] transition-colors">
-              {label}
-            </span>
-            <span className="text-[#8a7e68] group-hover:text-[#c8a84b] transition-colors text-xs">→</span>
+        {[
+          { id: 'painel', label: 'Painel' },
+          { id: 'npcs', label: `NPCs (${npcs.length})` },
+        ].map(a => (
+          <button key={a.id} onClick={() => setAba(a.id)}
+            style={cinzel}
+            className={`px-4 py-3 text-xs tracking-[2px] uppercase whitespace-nowrap border-b-2 transition-colors ${
+              aba === a.id ? 'border-[#c8a84b] text-[#c8a84b]' : 'border-transparent text-[#8a7e68] hover:text-[#a09880]'
+            }`}>
+            {a.label}
           </button>
         ))}
       </div>
-    </div>
-  </div>
-)}
+
+        {/* DRAWER */}
+        {drawerAberto && (
+          <div className="fixed inset-0 z-50 flex justify-end">
+            <div className="absolute inset-0 bg-black bg-opacity-60"
+              onClick={() => setDrawerAberto(false)} />
+            <div className="relative w-72 bg-[#0f0e0c] border-l border-[#c8a84b20] h-full flex flex-col"
+              style={{ animation: 'slideIn 0.2s ease' }}>
+              <div className="flex items-center justify-between px-6 py-4 border-b border-[#c8a84b20]">
+                <span style={cinzel} className="text-[#c8a84b] text-sm tracking-widest">⚔ FERRAMENTAS</span>
+                <button onClick={() => setDrawerAberto(false)}
+                  className="text-[#8a7e68] hover:text-[#c8a84b] text-xl transition-colors">✕</button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto py-4">
+                {menuItemsMestre.map(({ label, rota }) => (
+                  <button key={label}
+                    onClick={() => { navigate(rota); setDrawerAberto(false); }}
+                    className="w-full text-left px-6 py-3 text-sm hover:bg-[#161410] transition-colors flex items-center justify-between group"
+                    style={cinzel}>
+                    <span className="text-[#a09880] group-hover:text-[#c8a84b] transition-colors">
+                      {label}
+                    </span>
+                    <span className="text-[#8a7e68] group-hover:text-[#c8a84b] transition-colors text-xs">→</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* FORM NOVO NPC */}
         {aba === 'npcs' && (
@@ -1432,71 +1432,71 @@ useEffect(() => {
                       ) : null)}
 
                       {/* CAMPOS EDITÁVEIS DO MESTRE */}
-{[
-  { label: '🔒 SEGREDO', campo: 'secret', placeholder: 'O que este NPC esconde dos aventureiros...', cor: '#8a5030', rows: 3 },
-  { label: 'NOTAS DO MESTRE', campo: 'notes', placeholder: 'Anotações privadas sobre este NPC...', cor: '#8a5030', rows: 4 },
-].map(({ label, campo, placeholder, cor, rows }) => (
-  <div key={campo}>
-    <label style={{ ...cinzel, color: cor }} className="text-xs tracking-[2px] block mb-2">{label}</label>
-    <textarea
-      value={getNota(npc.id, campo)}
-      onChange={e => editarNotaLocal(npc.id, campo, e.target.value)}
-      onClick={e => e.stopPropagation()}
-      placeholder={placeholder}
-      rows={rows}
-      className="bg-[#0f0e0c] text-[#a09880] px-4 py-3 w-full focus:outline-none placeholder-[#2a2520] text-sm"
-      style={{ borderRadius: '2px', lineHeight: '1.7', border: 'none', borderLeft: '2px solid rgba(180,80,40,0.3)', resize: 'vertical' }} />
-  </div>
-))}
+                      {[
+                        { label: '🔒 SEGREDO', campo: 'secret', placeholder: 'O que este NPC esconde dos aventureiros...', cor: '#8a5030', rows: 3 },
+                        { label: 'NOTAS DO MESTRE', campo: 'notes', placeholder: 'Anotações privadas sobre este NPC...', cor: '#8a5030', rows: 4 },
+                      ].map(({ label, campo, placeholder, cor, rows }) => (
+                        <div key={campo}>
+                          <label style={{ ...cinzel, color: cor }} className="text-xs tracking-[2px] block mb-2">{label}</label>
+                          <textarea
+                            value={getNota(npc.id, campo)}
+                            onChange={e => editarNotaLocal(npc.id, campo, e.target.value)}
+                            onClick={e => e.stopPropagation()}
+                            placeholder={placeholder}
+                            rows={rows}
+                            className="bg-[#0f0e0c] text-[#a09880] px-4 py-3 w-full focus:outline-none placeholder-[#2a2520] text-sm"
+                            style={{ borderRadius: '2px', lineHeight: '1.7', border: 'none', borderLeft: '2px solid rgba(180,80,40,0.3)', resize: 'vertical' }} />
+                        </div>
+                      ))}
 
-{/* LOCAL ATUAL */}
-<div>
-  <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">📍 LOCAL ATUAL</label>
-  <input
-    value={getNota(npc.id, 'location')}
-    onChange={e => editarNotaLocal(npc.id, 'location', e.target.value)}
-    onClick={e => e.stopPropagation()}
-    placeholder="Ex: Porto de Valdris"
-    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
-    style={{ borderRadius: '2px' }} />
-</div>
+                      {/* LOCAL ATUAL */}
+                      <div>
+                        <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">📍 LOCAL ATUAL</label>
+                        <input
+                          value={getNota(npc.id, 'location')}
+                          onChange={e => editarNotaLocal(npc.id, 'location', e.target.value)}
+                          onClick={e => e.stopPropagation()}
+                          placeholder="Ex: Porto de Valdris"
+                          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
+                          style={{ borderRadius: '2px' }} />
+                      </div>
 
-{/* HUMOR */}
-<div>
-  <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">ESTADO EMOCIONAL</p>
-  <div className="flex flex-wrap gap-2">
-    {HUMORES.map(h => {
-      const ativo = (getNota(npc.id, 'mood') || 'neutro') === h.id;
-      return (
-        <button key={h.id}
-          onClick={e => { e.stopPropagation(); editarNotaLocal(npc.id, 'mood', h.id); }}
-          className={`px-3 py-1 text-xs border transition-colors ${
-            ativo ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]' : 'border-[#c8a84b20] text-[#9a8e78] hover:border-[#c8a84b50]'
-          }`}
-          style={{ ...cinzel, borderRadius: '2px' }}>
-          {h.emoji} {h.label}
-        </button>
-      );
-    })}
-  </div>
-</div>
+                      {/* HUMOR */}
+                      <div>
+                        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">ESTADO EMOCIONAL</p>
+                        <div className="flex flex-wrap gap-2">
+                          {HUMORES.map(h => {
+                            const ativo = (getNota(npc.id, 'mood') || 'neutro') === h.id;
+                            return (
+                              <button key={h.id}
+                                onClick={e => { e.stopPropagation(); editarNotaLocal(npc.id, 'mood', h.id); }}
+                                className={`px-3 py-1 text-xs border transition-colors ${
+                                  ativo ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]' : 'border-[#c8a84b20] text-[#9a8e78] hover:border-[#c8a84b50]'
+                                }`}
+                                style={{ ...cinzel, borderRadius: '2px' }}>
+                                {h.emoji} {h.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
 
-<div>
-  <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">RELAÇÃO COM OS JOGADORES</p>
-  <PainelReputacao tipo="npc" id={npc.id} pontos={npc.relation_score || 0} onMudou={recarregarNpcsSilencioso} />
-</div>~
+                      <div>
+                        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">RELAÇÃO COM OS JOGADORES</p>
+                        <PainelReputacao tipo="npc" id={npc.id} pontos={npc.relation_score || 0} onMudou={recarregarNpcsSilencioso} />
+                      </div>~
 
-<div>
-  <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">📖 APRESENTAR NO DIÁRIO</p>
-  <select defaultValue="" onClick={e => e.stopPropagation()}
-    onChange={e => { apresentarNpc(npc.id, e.target.value); e.target.value = ''; }}
-    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
-    style={{ borderRadius: '2px' }}>
-    <option value="" disabled>Escolher...</option>
-    <option value="todos">Todos os jogadores</option>
-    {personagens.map(p => <option key={p.id} value={p.id}>{p.data?.name || p.name}</option>)}
-  </select>
-</div>
+                      <div>
+                        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">📖 APRESENTAR NO DIÁRIO</p>
+                        <select defaultValue="" onClick={e => e.stopPropagation()}
+                          onChange={e => { apresentarNpc(npc.id, e.target.value); e.target.value = ''; }}
+                          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
+                          style={{ borderRadius: '2px' }}>
+                          <option value="" disabled>Escolher...</option>
+                          <option value="todos">Todos os jogadores</option>
+                          {personagens.map(p => <option key={p.id} value={p.id}>{p.data?.name || p.name}</option>)}
+                        </select>
+                      </div>
 
                       {/* MEMÓRIA DO NPC */}
                       <div>
