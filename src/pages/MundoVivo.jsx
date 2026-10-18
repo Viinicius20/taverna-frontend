@@ -6,10 +6,10 @@ import { MODELOS } from '../utils/modelos';
 import CalendarioMestre from '../components/CalendarioMestre';
 import PrazoEvento from '../components/PrazoEvento';
 import { notificar } from '../utils/notificar';
-import { CAMPANHA_ID } from '../config'; 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
+const CAMPANHA_ID = '00000000-0000-0000-0000-000000000001';
 
 const STATUS_COR = {
   ativo: '#c8a84b',
