@@ -444,8 +444,12 @@ useEffect(() => {
   if (!id) return;
   api.get(`/gallery/handouts-para/${id}`)
     .then(res => setHandoutsRecebidos(res.data.data || []))
-    .catch(() => setHandoutsRecebidos([]));
+    .catch(e => {
+  setHandoutsRecebidos([]);
+  notificar(e.response?.data?.detail || 'Erro ao carregar documentos.', 'erro');
+});
 }, [id, abaAtiva]);
+
 useEffect(() => {
   async function init() {
     buscarPersonagem();

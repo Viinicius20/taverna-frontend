@@ -11,6 +11,7 @@ import CofreHandout from '../components/CofreHandout';
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const CAMPANHA_ID = '00000000-0000-0000-0000-000000000001';
 const tipoDoc = cat => TIPOS_DOC[cat] || { label: cat, cor: '#c8a84b' };
+const limparTexto = t => (t || '').replace(/\\n/g, '\n').replace(/\*\*/g, '').replace(/^"|"$/g, '').trim();
 
 const CATEGORIAS_TOKEN = ['Nobre', 'Cultista', 'Aberração', 'Bandido', 'Goblin', 'Humanoide', 'Undead', 'Gigante', 'Besta', 'Dragão', 'Demônio', 'Construto', 'Outro'];
 
@@ -671,7 +672,7 @@ if (!isMestre) {
             {h.url ? (
               <img src={h.url} alt="handout" className="w-full rounded" />
             ) : (
-              <p className="text-[#a09880] text-sm whitespace-pre-wrap leading-relaxed">{h.text_content}</p>
+                 <p className="text-[#a09880] text-sm whitespace-pre-wrap leading-relaxed">{limparTexto(h.text_content)}</p>
             )}
           </div>
         ))
