@@ -50,6 +50,19 @@ export default function CalendarioMestre() {
     } catch (e) { notificar(e.response?.data?.detail || 'Erro ao definir a data.', 'erro'); }
   }
 
+async function voltarAte(h) {
+  if (!(await confirmar('Voltar o tempo até antes desta linha? Esta linha e as mais novas são desfeitas e a data recua.'))) return;
+  try {
+    const res = await api.post(`/calendario/${CAMPANHA_ID}/voltar`, { log_id: h.id });
+    notificar(`Data: ${res.data.data.texto}`, 'sucesso');
+    carregar();
+  } catch (e) { notificar(e.response?.data?.detail || 'Erro ao voltar o tempo.', 'erro'); }
+}
+
+const reversivel = h =>
+  !['Meses reconfigurados', 'Calendário reiniciado'].includes(h.motivo) &&
+  ((h.dia_antes != null && h.dia_depois != null) || h.dias > 0);
+
   async function salvarMeses() {
     try {
       await api.put(`/calendario/${CAMPANHA_ID}/meses`, { meses });
@@ -101,14 +114,12 @@ export default function CalendarioMestre() {
           <div className="flex flex-col gap-2">
             <p style={cinzel} className="text-[#9a8e78] text-xs tracking-[2px]">MESES DO MUNDO</p>
             {meses.map((m, i) => (
-              <div key={i} className="flex gap-2">
-                <input value={m.nome} maxLength={30}
-                  onChange={e => setMeses(prev => prev.map((x, j) => j === i ? { ...x, nome: e.target.value } : x))}
-                  className={`${campo} flex-1`} style={{ borderRadius: '2px' }} />
-                <input type="number" min="1" max="60" value={m.dias}
-                  onChange={e => setMeses(prev => prev.map((x, j) => j === i ? { ...x, dias: Number(e.target.value) } : x))}
-                  className={`${campo} w-20`} style={{ borderRadius: '2px' }} />
-                <button onClick={() => setMeses(prev => prev.filter((_, j) => j !== i))}
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {reversivel(h) && (
+                  <button onClick={() => voltarAte(h)} title="Voltar o tempo até antes desta linha"
+                    className="text-[#c8a84b] hover:text-[#e0c060] text-xs">↶</button>
+                )}
+                <button onClick={() => apagarLinha(h.id)} title="Apagar só o registro (a data não muda)"
                   className="text-red-900 hover:text-red-600 text-xs">×</button>
               </div>
             ))}
