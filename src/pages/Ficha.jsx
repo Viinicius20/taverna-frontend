@@ -8,6 +8,7 @@ import TextoWiki from '../components/TextoWiki';
 import usePolling from '../utils/usePolling';
 import { notificar } from '../utils/notificar';
 import DataMundo from '../components/DataMundo';
+import SessaoZeroFicha from "../components/SessaoZeroFicha";
 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
@@ -1427,6 +1428,7 @@ async function abrirCofre(h) {
               { id: 'documentos', label: '🎫 DOCUMENTOS' },
               { id: 'diario', label: '📖 DIÁRIO' },
               { id: 'wiki', label: '📚 WIKI' },
+              { id: 'sessaozero', label: '🧭 SESSÃO ZERO' }
             ].map(({ id, label }) => (
               <button key={id} onClick={() => setAbaAtiva(id)}
                 className="px-4 py-3 text-xs tracking-widest whitespace-nowrap transition-colors border-b-2"
@@ -3449,6 +3451,8 @@ style={{
       )}
     </div>
   )}
+
+  {abaAtiva === 'sessaozero' && <SessaoZeroFicha personagemId={id} />}
 
 
     </div>
