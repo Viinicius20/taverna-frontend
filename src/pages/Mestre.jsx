@@ -483,7 +483,7 @@ useEffect(() => {
   const salvarAoSair = () => { if (Object.keys(filaNotas.current).length) enviarNotas(); };
   window.addEventListener('pagehide', salvarAoSair);
   return () => { window.removeEventListener('pagehide', salvarAoSair); salvarAoSair(); };
-}, []);
+}, []); // eslint-disable-next-line react-hooks/exhaustive-deps
 
   function getNota(id, campo, fallback = '') {
     return notasLocais[`${id}_${campo}`] ?? fallback;
