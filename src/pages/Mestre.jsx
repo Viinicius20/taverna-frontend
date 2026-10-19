@@ -8,6 +8,7 @@ import PainelReputacao from "../components/PainelReputacao";
 import RolagemRapida from "../components/RolagemRapida";
 import { MODELOS } from '../utils/modelos';
 import usePolling from '../utils/usePolling';
+import { notificar } from '../utils/notificar';
 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
@@ -424,11 +425,65 @@ async function buscarRegra() {
   setBuscandoRegra(false);
 }
 
-  function editarNotaLocal(id, campo, valor) {
-    const novas = { ...notasLocais, [`${id}_${campo}`]: valor };
-    setNotasLocais(novas);
-    localStorage.setItem('taverna-notas-npcs', JSON.stringify(novas));
+const filaNotas = useRef({});      
+const timerNotas = useRef(null);
+
+async function enviarNotas() {
+  const fila = filaNotas.current;
+  filaNotas.current = {};
+  for (const [npcId, notas] of Object.entries(fila)) {
+    try {
+      await api.put(`/npc-notas/${CAMPANHA_ID}/${npcId}`, { notas });
+    } catch {
+      filaNotas.current[npcId] = { ...notas, ...(filaNotas.current[npcId] || {}) };
+      notificar('Erro ao salvar as notas do NPC. Tentando de novo.', 'erro');
+      clearTimeout(timerNotas.current);
+      timerNotas.current = setTimeout(enviarNotas, 5000);
+    }
   }
+}
+
+function editarNotaLocal(id, campo, valor) {
+  setNotasLocais(prev => {
+    const novas = { ...prev, [`${id}_${campo}`]: valor };
+    localStorage.setItem('taverna-notas-npcs', JSON.stringify(novas));   // segunda cópia, por enquanto
+    return novas;
+  });
+  filaNotas.current[id] = { ...(filaNotas.current[id] || {}), [campo]: valor };
+  clearTimeout(timerNotas.current);
+  timerNotas.current = setTimeout(enviarNotas, 800);
+}
+
+useEffect(() => {
+  const achatar = mapa => {
+    const plano = {};
+    for (const [npcId, campos] of Object.entries(mapa || {})) {
+      for (const [campo, valor] of Object.entries(campos || {})) plano[`${npcId}_${campo}`] = valor;
+    }
+    return plano;
+  };
+
+  async function sincronizar() {
+    try {
+      let res;
+      if (localStorage.getItem('taverna-notas-migradas') === '1') {
+        res = await api.get(`/npc-notas/${CAMPANHA_ID}`);
+      } else {
+        const local = JSON.parse(localStorage.getItem('taverna-notas-npcs') || '{}');
+        res = await api.post(`/npc-notas/${CAMPANHA_ID}/migrar`, { notas: local });
+        localStorage.setItem('taverna-notas-migradas', '1');
+      }
+      setNotasLocais(prev => ({ ...prev, ...achatar(res.data.data) }));
+    } catch { /* sem servidor: segue com as notas do navegador */ }
+  }
+  sincronizar();
+}, []);
+
+useEffect(() => {
+  const salvarAoSair = () => { if (Object.keys(filaNotas.current).length) enviarNotas(); };
+  window.addEventListener('pagehide', salvarAoSair);
+  return () => { window.removeEventListener('pagehide', salvarAoSair); salvarAoSair(); };
+}, []);
 
   function getNota(id, campo, fallback = '') {
     return notasLocais[`${id}_${campo}`] ?? fallback;
@@ -859,7 +914,8 @@ const menuItemsMestre = [
   { label: '📚 Wiki', rota: '/wiki' },
   { label: '📂 Arquivo Secreto', rota: '/arquivo-mestre' },
   { label: '❓ Mistérios', rota: '/misterios' },
-  { label: 'Vínculos', rota: '/relacoes' }
+  { label: '🔗Vínculos', rota: '/relacoes' },
+  { label: 'Sessão zero', rota: '/sessao-zero' }
 ];
 
 const HUMORES = [
