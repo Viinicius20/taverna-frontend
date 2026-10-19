@@ -32,9 +32,9 @@ export default function SessaoZero() {
     setGerando(true);
     try {
       const res = await api.post(`/sessao-zero/campanha/${CAMPANHA_ID}/gerar`);
-      setProposta(res.data.data);
+      setProposta({ ganchos: [], npcs: [], vinculos: [], fatos: [], ...res.data.data });
       setNomes(res.data.personagens || {});
-      setFora({ ganchos: {}, npcs: {}, vinculos: {} });
+      setFora({ ganchos: {}, npcs: {}, vinculos: {}, fatos: {} });
     } catch (e) {
       const d = e.response?.data?.detail;
       notificar(typeof d === 'string' ? d : 'Erro ao gerar a proposta.', 'erro');
@@ -154,7 +154,7 @@ export default function SessaoZero() {
                     <Marca grupo="fatos" i={i} />
                     <span className="text-sm">{f.texto}<br />
                         <span className="text-xs text-[#6a6050]">
-                        {f.todos ? '👥 Todos os jogadores' : `🔒 Só: ${f.personagens.map(id => nomes[id] || 'jogador').join(', ')}`}
+                        {f.todos ? '👥 Todos os jogadores' : `🔒 Só: ${(f.personagens || []).map(id => nomes[id] || 'jogador').join(', ')}`}
                         </span>
                     </span>
                     </label>
