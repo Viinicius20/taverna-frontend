@@ -858,7 +858,8 @@ const menuItemsMestre = [
   { label: '🌎 Mundo Vivo', rota: '/mundo-vivo' },
   { label: '📚 Wiki', rota: '/wiki' },
   { label: '📂 Arquivo Secreto', rota: '/arquivo-mestre' },
-  { label: '❓ Mistérios', rota: '/misterios' }
+  { label: '❓ Mistérios', rota: '/misterios' },
+  { label: 'Vínculos', rota: '/relacoes' }
 ];
 
 const HUMORES = [

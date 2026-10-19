@@ -24,6 +24,7 @@ import Wiki from './pages/Wiki';
 import Toasts from './components/Toasts';
 import { instalarAlertGlobal } from './utils/notificar';
 import ConfirmHost from './components/ConfirmHost';
+import Relacoes from "./pages/Relacoes";
 
 instalarAlertGlobal();
 
@@ -55,6 +56,7 @@ function App() {
           <Route path="/misterios" element={<Misterios />} />
           <Route path="/tv" element={<TV />} />
           <Route path="/wiki" element={<Wiki />} />
+          <Route path="/relacoes" element={<Relacoes />} />
         </Routes>
       </BrowserRouter>
     </UserProvider>
