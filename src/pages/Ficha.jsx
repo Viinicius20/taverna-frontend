@@ -3219,6 +3219,8 @@ style={{
         />
       )}
 
+      {abaAtiva === 'sessaozero' && <SessaoZeroFicha personagemId={id} />}
+
       {caixaMundoMudou && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 px-4"
           onClick={() => setCaixaMundoMudou(false)}>
@@ -3451,9 +3453,6 @@ style={{
       )}
     </div>
   )}
-
-  {abaAtiva === 'sessaozero' && <SessaoZeroFicha personagemId={id} />}
-
 
     </div>
   );

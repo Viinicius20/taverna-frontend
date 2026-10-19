@@ -23,7 +23,7 @@ export default function SessaoZero() {
     try {
       const res = await api.get(`/sessao-zero/campanha/${CAMPANHA_ID}/respostas`);
       setJogadores(res.data.data || []);
-    } catch { notificar('Erro ao carregar as respostas.', 'erro'); }
+    } catch (e) { notificar(`Erro ao carregar as respostas (${e.response?.status ?? 'rede'}).`, 'erro'); }
   }, []);
 
   useEffect(() => { carregar(); }, [carregar]);

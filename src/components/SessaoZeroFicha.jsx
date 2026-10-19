@@ -16,7 +16,7 @@ export default function SessaoZeroFicha({ personagemId }) {
         setPerguntas(p.data.data || {});
         setRespostas(r.data.data || {});
       })
-      .catch(() => { if (ativo) setEstado('erro'); });
+      .catch(e => { if (ativo) setEstado(`erro ${e.response?.status ?? 'de rede'}`); });
     return () => { ativo = false; };
   }, [personagemId]);
 
@@ -26,7 +26,7 @@ export default function SessaoZeroFicha({ personagemId }) {
       const res = await api.put(`/sessao-zero/personagem/${personagemId}`, { respostas });
       setRespostas(res.data.data || {});
       setEstado('salvo');
-    } catch { setEstado('erro'); }
+    } catch (e) { setEstado(`erro ${e.response?.status ?? 'de rede'}`); }
   }
 
   return (
@@ -56,7 +56,7 @@ export default function SessaoZeroFicha({ personagemId }) {
           {estado === 'salvando' ? 'Salvando...' : 'Salvar respostas'}
         </button>
         {estado === 'salvo' && <span className="text-[#4a8a4a] text-xs">Salvo.</span>}
-        {estado === 'erro' && <span className="text-red-400 text-xs">Erro ao carregar ou salvar.</span>}
+        {estado.startsWith('erro') && <span className="text-red-400 text-xs">Erro ao carregar ou salvar ({estado.slice(5)}).</span>}
       </div>
     </div>
   );
