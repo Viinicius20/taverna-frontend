@@ -425,12 +425,13 @@ async function buscarRegra() {
   setBuscandoRegra(false);
 }
 
-const filaNotas = useRef({});      
+const filaNotas = useRef({});
 const timerNotas = useRef(null);
 
-async function enviarNotas() {
+const enviarNotas = useCallback(async () => {
   const fila = filaNotas.current;
   filaNotas.current = {};
+
   for (const [npcId, notas] of Object.entries(fila)) {
     try {
       await api.put(`/npc-notas/${CAMPANHA_ID}/${npcId}`, { notas });
@@ -441,7 +442,7 @@ async function enviarNotas() {
       timerNotas.current = setTimeout(enviarNotas, 5000);
     }
   }
-}
+}, []); // se notificar ou api mudarem, coloca aqui
 
 function editarNotaLocal(id, campo, valor) {
   setNotasLocais(prev => {
