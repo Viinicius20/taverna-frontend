@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { notificar } from '../utils/notificar';
+import MapaRelacoes from '../components/MapaRelacoes';
+import { VINCULOS } from '../constants/vinculos';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -10,11 +12,6 @@ const CAMPANHA_ID = '00000000-0000-0000-0000-000000000001';
 const CAMINHO_LOCAIS = `/locations/${CAMPANHA_ID}`;   // copie o caminho real da página Mistérios
 
 const TIPOS = { npc: 'NPCs', faction: 'Facções', location: 'Locais', character: 'Jogadores' };
-const VINCULOS = {
-  conhece: 'conhece', aliado: 'é aliado de', rival: 'é rival de', inimigo: 'é inimigo de',
-  familia: 'é da família de', serve: 'serve', lidera: 'lidera', teme: 'teme',
-  deve_favor: 'deve um favor a', vive_em: 'vive em',
-};
 const campo = 'bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]';
 
 const mensagem = (e, padrao) => (typeof e.response?.data?.detail === 'string' ? e.response.data.detail : padrao);
@@ -29,6 +26,7 @@ export default function Relacoes() {
   const [nota, setNota] = useState('');
   const [secreto, setSecreto] = useState(true);
   const [erro, setErro] = useState('');
+  const [vista, setVista] = useState('lista');
 
   const carregarEntidades = useCallback(async () => {
     const lista = [];
@@ -126,25 +124,45 @@ export default function Relacoes() {
           {erro && <p className="text-red-400 text-sm">{erro}</p>}
         </div>
 
-        {grafo.arestas.length === 0 ? (
-          <p className="text-[#3a3020] text-sm text-center py-10 italic">Nenhum vínculo ainda. O mundo está cheio de estranhos.</p>
+        <div className="flex gap-2 mb-4">
+            {[['lista', 'Lista'], ['mapa', 'Mapa']].map(([id, rotulo]) => (
+                <button key={id} onClick={() => setVista(id)}
+                className="px-4 py-1.5 text-xs border transition-colors"
+                style={{
+                    ...cinzel, borderRadius: '2px',
+                    borderColor: vista === id ? '#c8a84b' : '#c8a84b20',
+                    color: vista === id ? '#c8a84b' : '#6a6050',
+                }}>
+                {rotulo}
+                </button>
+            ))}
+        </div>
+
+        {vista === 'mapa' ? (
+        grafo.nos.length === 0 ? (
+            <p className="text-[#3a3020] text-sm text-center py-10 italic">Crie alguns vínculos para ver o mapa.</p>
         ) : (
-          <div className="flex flex-col gap-2">
+            <MapaRelacoes grafo={grafo} />
+        )
+        ) : grafo.arestas.length === 0 ? (
+        <p className="text-[#3a3020] text-sm text-center py-10 italic">Nenhum vínculo ainda. O mundo está cheio de estranhos.</p>
+        ) : (
+        <div className="flex flex-col gap-2">
             {grafo.arestas.map(a => (
-              <div key={a.id} className="flex items-center justify-between gap-3 border border-[#c8a84b15] bg-[#161410] px-4 py-3">
+            <div key={a.id} className="flex items-center justify-between gap-3 border border-[#c8a84b15] bg-[#161410] px-4 py-3">
                 <div>
-                  <p className="text-sm">
+                <p className="text-sm">
                     <span className="text-[#f0e8d8]">{nomes[a.source]}</span>
                     <span className="text-[#6a6050]"> {VINCULOS[a.kind] || a.kind} </span>
                     <span className="text-[#f0e8d8]">{nomes[a.target]}</span>
                     {a.secret && <span title="Secreto"> 🔒</span>}
-                  </p>
-                  {a.note && <p className="text-xs text-[#6a6050] italic mt-1">{a.note}</p>}
+                </p>
+                {a.note && <p className="text-xs text-[#6a6050] italic mt-1">{a.note}</p>}
                 </div>
                 <button onClick={() => apagar(a.id)} className="text-red-900 hover:text-red-600 text-lg" title="Apagar">×</button>
-              </div>
+            </div>
             ))}
-          </div>
+        </div>
         )}
       </div>
     </div>
