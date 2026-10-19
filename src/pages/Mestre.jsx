@@ -480,10 +480,17 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
-  const salvarAoSair = () => { if (Object.keys(filaNotas.current).length) enviarNotas(); };
+  const salvarAoSair = () => {
+    if (Object.keys(filaNotas.current).length) enviarNotas();
+  };
+
   window.addEventListener('pagehide', salvarAoSair);
-  return () => { window.removeEventListener('pagehide', salvarAoSair); salvarAoSair(); };
-}, []); // eslint-disable-next-line react-hooks/exhaustive-deps
+
+  return () => {
+    window.removeEventListener('pagehide', salvarAoSair);
+    salvarAoSair();
+  };
+}, [enviarNotas]);
 
   function getNota(id, campo, fallback = '') {
     return notasLocais[`${id}_${campo}`] ?? fallback;
