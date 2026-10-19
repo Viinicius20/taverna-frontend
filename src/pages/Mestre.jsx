@@ -1,5 +1,5 @@
 import { confirmar } from '../utils/notificar';
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import Dados from '../components/Dados';
@@ -9,6 +9,7 @@ import RolagemRapida from "../components/RolagemRapida";
 import { MODELOS } from '../utils/modelos';
 import usePolling from '../utils/usePolling';
 import { notificar } from '../utils/notificar';
+
 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
