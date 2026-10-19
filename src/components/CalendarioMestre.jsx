@@ -15,6 +15,7 @@ export default function CalendarioMestre() {
   const [editando, setEditando] = useState(false);
   const [form, setForm] = useState({ ano: 1, mes: 1, dia: 1 });
   const [meses, setMeses] = useState([]);
+  const reversivel = h => h.dias > 0;
 
   async function carregar() {
     try {
@@ -50,19 +51,6 @@ export default function CalendarioMestre() {
     } catch (e) { notificar(e.response?.data?.detail || 'Erro ao definir a data.', 'erro'); }
   }
 
-async function voltarAte(h) {
-  if (!(await confirmar('Voltar o tempo até antes desta linha? Esta linha e as mais novas são desfeitas e a data recua.'))) return;
-  try {
-    const res = await api.post(`/calendario/${CAMPANHA_ID}/voltar`, { log_id: h.id });
-    notificar(`Data: ${res.data.data.texto}`, 'sucesso');
-    carregar();
-  } catch (e) { notificar(e.response?.data?.detail || 'Erro ao voltar o tempo.', 'erro'); }
-}
-
-const reversivel = h =>
-  !['Meses reconfigurados', 'Calendário reiniciado'].includes(h.motivo) &&
-  ((h.dia_antes != null && h.dia_depois != null) || h.dias > 0);
-
   async function salvarMeses() {
     try {
       await api.put(`/calendario/${CAMPANHA_ID}/meses`, { meses });
@@ -70,6 +58,31 @@ const reversivel = h =>
       carregar();
     } catch (e) { notificar(e.response?.data?.detail || 'Erro ao salvar os meses.', 'erro'); }
   }
+
+async function voltarAte(h) {
+  if (!window.confirm('Voltar o tempo até antes desta linha? Esta linha e as mais novas são desfeitas e a data recua.')) return;
+  try {
+    const res = await api.post(`/calendario/${CAMPANHA_ID}/voltar`, { log_id: h.id });
+    notificar(`Data: ${res.data.data.texto}`, 'sucesso');
+    carregar();
+  } catch (e) { notificar(e.response?.data?.detail || 'Erro ao voltar o tempo.', 'erro'); }
+}
+
+async function apagarLinha(id) {
+  if (!window.confirm('Apagar só o registro? A data do calendário não muda.')) return;
+  try {
+    await api.delete(`/calendario/${CAMPANHA_ID}/historico/${id}`);
+    carregar();
+  } catch (e) { notificar(e.response?.data?.detail || 'Erro ao apagar o registro.', 'erro'); }
+}
+
+async function limparHistorico() {
+  if (!window.confirm('Apagar todo o histórico? A data do calendário não muda.')) return;
+  try {
+    await api.delete(`/calendario/${CAMPANHA_ID}/historico`);
+    carregar();
+  } catch (e) { notificar(e.response?.data?.detail || 'Erro ao limpar o histórico.', 'erro'); }
+}
 
   if (!cal) return <p className="text-[#7a6e58] text-sm">Carregando calendário...</p>;
 
@@ -114,12 +127,14 @@ const reversivel = h =>
           <div className="flex flex-col gap-2">
             <p style={cinzel} className="text-[#9a8e78] text-xs tracking-[2px]">MESES DO MUNDO</p>
             {meses.map((m, i) => (
-              <div className="flex items-center gap-2 flex-shrink-0">
-                {reversivel(h) && (
-                  <button onClick={() => voltarAte(h)} title="Voltar o tempo até antes desta linha"
-                    className="text-[#c8a84b] hover:text-[#e0c060] text-xs">↶</button>
-                )}
-                <button onClick={() => apagarLinha(h.id)} title="Apagar só o registro (a data não muda)"
+              <div key={i} className="flex gap-2">
+                <input value={m.nome} maxLength={30}
+                  onChange={e => setMeses(prev => prev.map((x, j) => j === i ? { ...x, nome: e.target.value } : x))}
+                  className={`${campo} flex-1`} style={{ borderRadius: '2px' }} />
+                <input type="number" min="1" max="60" value={m.dias}
+                  onChange={e => setMeses(prev => prev.map((x, j) => j === i ? { ...x, dias: Number(e.target.value) } : x))}
+                  className={`${campo} w-20`} style={{ borderRadius: '2px' }} />
+                <button onClick={() => setMeses(prev => prev.filter((_, j) => j !== i))}
                   className="text-red-900 hover:text-red-600 text-xs">×</button>
               </div>
             ))}
@@ -132,16 +147,30 @@ const reversivel = h =>
         </div>
       )}
 
-      {historico.length > 0 && (
-        <div className="border-t border-[#c8a84b15] pt-4 flex flex-col gap-1">
-          <p style={cinzel} className="text-[#9a8e78] text-xs tracking-[2px] mb-1">HISTÓRICO</p>
-          {historico.map(h => (
-            <p key={h.id} className="text-xs text-[#9a8e78]">
-              {h.dias > 0 ? `+${h.dias}d` : 'ajuste'} · {h.data_depois}{h.motivo ? ` · ${h.motivo}` : ''}
-            </p>
-          ))}
-        </div>
-      )}
+        {historico.length > 0 && (
+          <div className="border-t border-[#c8a84b15] pt-4 flex flex-col gap-1">
+            <div className="flex items-center justify-between mb-1">
+              <p style={cinzel} className="text-[#9a8e78] text-xs tracking-[2px]">HISTÓRICO</p>
+              <button onClick={limparHistorico} className="text-red-900 hover:text-red-600 text-xs"
+                style={cinzel}>LIMPAR</button>
+            </div>
+            {historico.map(h => (
+              <div key={h.id} className="flex items-center justify-between gap-2">
+                <p className="text-xs text-[#9a8e78]">
+                  {h.dias > 0 ? `+${h.dias}d` : 'ajuste'} · {h.data_depois}{h.motivo ? ` · ${h.motivo}` : ''}
+                </p>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {reversivel(h) && (
+                    <button onClick={() => voltarAte(h)} title="Voltar o tempo até antes desta linha"
+                      className="text-[#c8a84b] hover:text-[#e0c060] text-xs">↶</button>
+                  )}
+                  <button onClick={() => apagarLinha(h.id)} title="Apagar só o registro (a data não muda)"
+                    className="text-red-900 hover:text-red-600 text-xs">×</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
     </div>
   );
 }
