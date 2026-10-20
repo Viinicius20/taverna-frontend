@@ -1423,12 +1423,12 @@ async function abrirCofre(h) {
               { id: 'inventario', label: 'INVENTÁRIO' },
               { id: 'personagem', label: 'PERSONAGEM' },
               { id: 'notas', label: 'NOTAS' },
-              { id: 'downtime', label: '🌙 DOWNTIME' },
-              { id: 'momentos', label: '📜 CRÔNICA' },
-              { id: 'documentos', label: '🎫 DOCUMENTOS' },
+              { id: 'downtime', label: 'DOWNTIME' },
+              { id: 'momentos', label: 'CRÔNICA' },
+              { id: 'documentos', label: 'DOCUMENTOS' },
               { id: 'diario', label: '📖 DIÁRIO' },
-              { id: 'wiki', label: '📚 WIKI' },
-              { id: 'sessaozero', label: '🧭 SESSÃO ZERO' }
+              { id: 'wiki', label: 'WIKI' },
+              { id: 'sessaozero', label: 'SESSÃO ZERO' }
             ].map(({ id, label }) => (
               <button key={id} onClick={() => setAbaAtiva(id)}
                 className="px-4 py-3 text-xs tracking-widest whitespace-nowrap transition-colors border-b-2"
