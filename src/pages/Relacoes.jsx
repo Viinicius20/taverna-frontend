@@ -4,6 +4,7 @@ import api from '../services/api';
 import { notificar } from '../utils/notificar';
 import MapaRelacoes from '../components/MapaRelacoes';
 import { VINCULOS } from '../constants/vinculos';
+import { notificar, confirmar } from '../utils/notificar';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -27,6 +28,7 @@ export default function Relacoes() {
   const [secreto, setSecreto] = useState(true);
   const [erro, setErro] = useState('');
   const [vista, setVista] = useState('lista');
+  const [como, setComo] = useState('');
 
   const carregarEntidades = useCallback(async () => {
     const lista = [];
@@ -46,14 +48,17 @@ export default function Relacoes() {
     setEntidades(lista);
   }, []);
 
-  const carregarGrafo = useCallback(async () => {
-    try {
-      const res = await api.get(`/relacoes/${CAMPANHA_ID}/grafo`);
-      setGrafo(res.data.data);
-    } catch { setErro('Erro ao carregar os vínculos.'); }
-  }, []);
+const carregarGrafo = useCallback(async () => {
+  try {
+    const id = como ? como.split(':')[1] : null;
+    const res = await api.get(`/relacoes/${CAMPANHA_ID}/grafo`, { params: id ? { como: id } : {} });
+    setGrafo(res.data.data);
+    setErro('');
+  } catch { setErro('Erro ao carregar os vínculos.'); }
+}, [como]);
 
-  useEffect(() => { carregarEntidades(); carregarGrafo(); }, [carregarEntidades, carregarGrafo]);
+useEffect(() => { carregarEntidades(); }, [carregarEntidades]);
+useEffect(() => { carregarGrafo(); }, [carregarGrafo]);
 
   const nomes = useMemo(() => Object.fromEntries(grafo.nos.map(n => [n.id, n.label])), [grafo]);
 
@@ -72,7 +77,7 @@ export default function Relacoes() {
   }
 
   async function apagar(id) {
-    if (!window.confirm('Apagar este vínculo?')) return;
+    if (!(await confirmar('Apagar este vínculo?'))) return;
     try { await api.delete(`/relacoes/${CAMPANHA_ID}/${id}`); carregarGrafo(); }
     catch { notificar('Erro ao apagar o vínculo.', 'erro'); }
   }
@@ -124,6 +129,16 @@ export default function Relacoes() {
           {erro && <p className="text-red-400 text-sm">{erro}</p>}
         </div>
 
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          <span style={cinzel} className="text-[#7a6e58] text-xs tracking-[2px]">VER COMO:</span>
+          <select value={como} onChange={e => setComo(e.target.value)} className={campo} style={{ borderRadius: '2px' }}>
+            <option value="">Mestre (tudo)</option>
+            {entidades.filter(e => e.tipo === 'character').sort((a, b) => a.nome.localeCompare(b.nome))
+              .map(e => <option key={e.chave} value={e.chave}>{e.nome}</option>)}
+          </select>
+          {como && <span className="text-xs text-[#8a5030]">👁 Visão do jogador: sem facções, locais nem vínculos secretos</span>}
+        </div>
+
         <div className="flex gap-2 mb-4">
             {[['lista', 'Lista'], ['mapa', 'Mapa']].map(([id, rotulo]) => (
                 <button key={id} onClick={() => setVista(id)}
@@ -140,12 +155,16 @@ export default function Relacoes() {
 
         {vista === 'mapa' ? (
         grafo.nos.length === 0 ? (
-            <p className="text-[#3a3020] text-sm text-center py-10 italic">Crie alguns vínculos para ver o mapa.</p>
+            <p className="text-[#7a6e58] text-sm text-center py-10 italic">
+              {como ? 'Esse personagem ainda não conhece ninguém.' : 'Crie alguns vínculos para ver o mapa.'}
+            </p>
         ) : (
             <MapaRelacoes grafo={grafo} />
         )
         ) : grafo.arestas.length === 0 ? (
-        <p className="text-[#3a3020] text-sm text-center py-10 italic">Nenhum vínculo ainda. O mundo está cheio de estranhos.</p>
+        <p className="text-[#7a6e58] text-sm text-center py-10 italic">
+          {como ? 'Nenhum vínculo visível para esse personagem.' : 'Nenhum vínculo ainda. O mundo está cheio de estranhos.'}
+        </p>
         ) : (
         <div className="flex flex-col gap-2">
             {grafo.arestas.map(a => (

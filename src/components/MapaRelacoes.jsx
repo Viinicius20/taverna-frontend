@@ -22,6 +22,8 @@ export default function MapaRelacoes({ grafo }) {
   const [largura, setLargura] = useState(600);
   const [visiveis, setVisiveis] = useState({ npc: true, faction: true, location: true, character: true });
   const [selecionado, setSelecionado] = useState(null);
+  const fg = useRef(null);
+  const ajustar = useRef(true);
 
   useEffect(() => {
     if (!caixa.current) return undefined;
@@ -38,6 +40,12 @@ export default function MapaRelacoes({ grafo }) {
     const links = grafo.arestas
       .filter(a => ids.has(a.source) && ids.has(a.target))
       .map(a => ({ ...a }));
+    const grau = {};
+    links.forEach(l => {
+      grau[l.source] = (grau[l.source] || 0) + 1;
+      grau[l.target] = (grau[l.target] || 0) + 1;
+    });
+    nodes.forEach(n => { n.grau = grau[n.id] || 0; });
     return { nodes, links };
   }, [grafo, visiveis]);
 
@@ -53,10 +61,22 @@ export default function MapaRelacoes({ grafo }) {
     return s;
   }, [dados, selecionado]);
 
-  const desenharNo = useCallback((no, ctx, escala) => {
-    const raio = 6;
-    const foco = !selecionado || no.id === selecionado || vizinhos.has(no.id);
-    ctx.globalAlpha = foco ? 1 : 0.2;
+useEffect(() => {
+  ajustar.current = true;
+  if (!fg.current) return;
+  fg.current.d3Force('charge')?.strength(-140);
+  fg.current.d3Force('link')?.distance(70);
+  fg.current.d3ReheatSimulation();
+}, [dados]);
+
+useEffect(() => {
+  if (selecionado && !dados.nodes.some(n => n.id === selecionado)) setSelecionado(null);
+}, [dados, selecionado]);
+
+const desenharNo = useCallback((no, ctx, escala) => {
+  const raio = 5 + Math.min(5, no.grau || 0) * 0.8;
+  const foco = !selecionado || no.id === selecionado || vizinhos.has(no.id);
+  ctx.globalAlpha = foco ? 1 : 0.2;
 
     ctx.beginPath();
     ctx.arc(no.x, no.y, raio + 2.5, 0, 2 * Math.PI);
@@ -69,16 +89,37 @@ export default function MapaRelacoes({ grafo }) {
     ctx.fillStyle = COR_TIPO[no.tipo];      // miolo = tipo
     ctx.fill();
 
+  if (escala >= 0.6 || (selecionado && foco)) {
     ctx.font = `${11 / escala}px serif`;
     ctx.fillStyle = '#e8e0d0';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     ctx.fillText(no.label, no.x, no.y + raio + 4 / escala);
-    ctx.globalAlpha = 1;
-  }, [selecionado, vizinhos]);
+  }
+  ctx.globalAlpha = 1;
+}, [selecionado, vizinhos]);
 
   const corLigacao = l => (selecionado && (idDe(l.source) === selecionado || idDe(l.target) === selecionado)
     ? '#c8a84b' : 'rgba(200,168,75,0.25)');
+
+  const rotuloLigacao = (l, ctx, escala) => {
+    if (!selecionado) return;
+    if (idDe(l.source) !== selecionado && idDe(l.target) !== selecionado) return;
+    const a = l.source;
+    const b = l.target;
+    if (typeof a !== 'object' || typeof b !== 'object') return;
+    const x = (a.x + b.x) / 2;
+    const y = (a.y + b.y) / 2;
+    const texto = VINCULOS[l.kind] || l.kind;
+    ctx.font = `${10 / escala}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const w = ctx.measureText(texto).width + 6 / escala;
+    ctx.fillStyle = 'rgba(15,14,12,0.85)';
+    ctx.fillRect(x - w / 2, y - 7 / escala, w, 14 / escala);
+    ctx.fillStyle = '#c8a84b';
+    ctx.fillText(texto, x, y);
+  };
 
   const ligacoes = selecionado
     ? grafo.arestas.filter(a => a.source === selecionado || a.target === selecionado)
@@ -98,6 +139,11 @@ export default function MapaRelacoes({ grafo }) {
             {NOME_TIPO[t]}
           </button>
         ))}
+        <button onClick={() => { ajustar.current = true; fg.current?.d3ReheatSimulation(); }}
+          className="px-3 py-1 text-xs border border-[#c8a84b30] text-[#9a8e78] hover:text-[#c8a84b] transition-colors"
+          style={{ ...cinzel, borderRadius: '2px' }}>
+          ↻ Reorganizar
+        </button>
         <span className="text-xs text-[#6a6050] ml-auto">
           anel: <span style={{ color: '#4a8a4a' }}>aliada</span> · <span style={{ color: '#8a8070' }}>neutra</span> · <span style={{ color: '#c84b4b' }}>hostil</span> · tracejado = secreto
         </span>
@@ -115,7 +161,7 @@ export default function MapaRelacoes({ grafo }) {
           nodePointerAreaPaint={(no, cor, ctx) => {
             ctx.fillStyle = cor;
             ctx.beginPath();
-            ctx.arc(no.x, no.y, 9, 0, 2 * Math.PI);
+            ctx.arc(no.x, no.y, 12, 0, 2 * Math.PI);
             ctx.fill();
           }}
           nodeLabel={n => `${n.label} (${NOME_TIPO[n.tipo]})`}
@@ -127,6 +173,12 @@ export default function MapaRelacoes({ grafo }) {
           linkLabel={l => `${VINCULOS[l.kind] || l.kind}${l.note ? ` — ${l.note}` : ''}`}
           onNodeClick={no => setSelecionado(s => (s === no.id ? null : no.id))}
           onBackgroundClick={() => setSelecionado(null)}
+          ref={fg}
+          onEngineStop={() => {
+            if (ajustar.current) { fg.current?.zoomToFit(400, 60); ajustar.current = false; }
+          }}
+          linkCanvasObjectMode={() => 'after'}
+          linkCanvasObject={rotuloLigacao}
         />
       </div>
 
