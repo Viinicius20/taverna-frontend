@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import { notificar } from '../utils/notificar';
+import { notificar, confirmar } from '../utils/notificar';
 import MapaRelacoes from '../components/MapaRelacoes';
 import { VINCULOS } from '../constants/vinculos';
-import { notificar, confirmar } from '../utils/notificar';
+
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
