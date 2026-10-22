@@ -61,6 +61,7 @@ function App() {
           <Route path="/wiki" element={<Wiki />} />
           <Route path="/relacoes" element={<Relacoes />} />
           <Route path="/sessao-zero" element={<SessaoZero />} />
+          {process.env.NODE_ENV !== 'production' && <Route path="/erro-teste" element={<Quebra />} />}
         </Routes>
         </LimiteDeErro>
       </BrowserRouter>
@@ -69,6 +70,6 @@ function App() {
 }
 
 function Quebra() { throw new Error('Erro de teste'); }
-{process.env.NODE_ENV !== 'production' && <Route path="/erro-teste" element={<Quebra />} />}
+
 
 export default App;
