@@ -156,7 +156,7 @@ export default function CriarPersonagem() {
 
       <div className="max-w-3xl mx-auto px-8 py-12">
 
-        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">CRIAÇÃO DE PERSONAGEM</p>
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 70">CRIAÇÃO DE PERSONAGEM</p>
         <h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold mb-2">Novo Personagem</h1>
         <p className="text-[#7a7060] mb-8 font-light">Crie do zero com IA ou importe uma ficha em PDF.</p>
 
@@ -191,7 +191,7 @@ export default function CriarPersonagem() {
                 <div>
                   <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] block mb-2">DESCRIÇÃO DO PERSONAGEM</label>
                   <textarea value={descricao} onChange={e => setDescricao(e.target.value)}
-                    placeholder="Ex: guerreiro lvl 5 meio elfo que tem o background assombrado e é da família Silva, prefere combate defensivo e carrega um escudo de família..."
+                    placeholder="Ex: guerreiro lvl 5 meio elfo que tem o background assombrado e é da família Silva, prefere combate defensivo e carrega um escudo de família..." aria-label="Ex: guerreiro lvl 5 meio elfo que tem o background assombrado e é da família Silva, prefere combate defensivo e carrega um escudo de família..."
                     rows={5}
                     className="bg-[#161410] border border-[#c8a84b30] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b60] resize-none placeholder-[#3a3528]"
                     style={{ fontSize: '1rem', borderRadius: '2px', lineHeight: '1.7' }} />
@@ -314,7 +314,7 @@ export default function CriarPersonagem() {
                       onChange={e => editarClasse(idx, 'name', e.target.value)}
                       className="flex-1 bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-2 py-1 text-sm focus:outline-none focus:border-[#c8a84b50]"
                       style={{ borderRadius: '2px' }}
-                      placeholder="Nome da classe"
+                      placeholder="Nome da classe" aria-label="Nome da classe"
                     />
                     <div className="flex items-center gap-1">
                       <label className="text-[#9a8e78] text-xs">Lvl:</label>
@@ -344,7 +344,7 @@ export default function CriarPersonagem() {
                   <input 
                     value={novaClasse}
                     onChange={e => setNovaClasse(e.target.value)}
-                    placeholder="Nova classe"
+                    placeholder="Nova classe" aria-label="Nova classe"
                     className="flex-1 bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
                     style={{ borderRadius: '2px' }}
                   />
@@ -464,7 +464,7 @@ export default function CriarPersonagem() {
 
             <div className="flex gap-4">
               <button onClick={salvarPersonagem} disabled={salvando}
-                className="bg-[#c8a84b] text-[#0f0e0c] px-8 py-3 text-sm tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50"
+                className="bg-[#c8a84b] text-[#0f0e0c] px-8 py-3 text-sm tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:50"
                 style={{ ...cinzel, borderRadius: '2px' }}>
                 {salvando ? 'Salvando...' : 'Salvar Personagem'}
               </button>

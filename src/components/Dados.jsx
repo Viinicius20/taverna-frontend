@@ -106,8 +106,8 @@ export default function Dados({ secreto = false }) {
         </div>
 
         {secreto && (
-          <div className="border border-[#8a503020] bg-[#8a503010] px-3 py-2">
-            <p style={cinzel} className="text-[#8a5030] text-xs tracking-widest">🔒 ROLAGEM SECRETA</p>
+          <div className="border border-[#b0705020] bg-[#b0705010] px-3 py-2">
+            <p style={cinzel} className="text-[#b07050] text-xs tracking-widest">🔒 ROLAGEM SECRETA</p>
             <p className="text-[#4a3020] text-xs font-light">Só você vê</p>
           </div>
         )}
@@ -201,7 +201,7 @@ export default function Dados({ secreto = false }) {
                     {h.modificador !== 0 ? (h.modificador > 0 ? `+${h.modificador}` : h.modificador) : ''}
                   </span>
                   {h.resultados.length > 1 && (
-                    <span className="text-[#7a6e58] text-xs">
+                    <span className="text-[#8a7e68] text-xs">
                       [{h.resultados.join(', ')}]
                     </span>
                   )}

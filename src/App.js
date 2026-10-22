@@ -27,6 +27,7 @@ import ConfirmHost from './components/ConfirmHost';
 import Relacoes from "./pages/Relacoes";
 import SessaoZero from "./pages/SessaoZero";
 import LimiteDeErro from './components/LimiteDeErro';
+import { useEffect } from 'react';
 
 instalarAlertGlobal();
 
@@ -70,6 +71,16 @@ function App() {
 }
 
 function Quebra() { throw new Error('Erro de teste'); }
+
+useEffect(() => {
+  const aoTeclar = e => {
+    if (e.key !== 'Escape') return;
+    const fundo = [...document.querySelectorAll('.fixed.inset-0')].pop();
+    if (fundo) fundo.click();
+  };
+  document.addEventListener('keydown', aoTeclar);
+  return () => document.removeEventListener('keydown', aoTeclar);
+}, []);
 
 
 export default App;

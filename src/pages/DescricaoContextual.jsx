@@ -83,7 +83,7 @@ async function verificarConhecimento() {
       </nav>
 
       <div className="max-w-2xl mx-auto px-6 py-10">
-        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">NARRAÇÃO</p>
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 70">NARRAÇÃO</p>
         <h1 style={cinzel} className="text-2xl text-[#f0e8d8] font-semibold mb-8">Descrição de Cena</h1>
 
         <div className="flex gap-2 mb-8">
@@ -105,7 +105,7 @@ async function verificarConhecimento() {
         <div className="border border-[#c8a84b30] bg-[#161410] mb-8 p-6">
           <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] block mb-2">CONTEXTO</label>
           <textarea value={contexto} onChange={e => setContexto(e.target.value)}
-            placeholder="Ex: os jogadores entram numa taverna abandonada há anos, com um lobo faminto escondido nas sombras..."
+            placeholder="Ex: os jogadores entram numa taverna abandonada há anos, com um lobo faminto escondido nas sombras..." aria-label="Ex: os jogadores entram numa taverna abandonada há anos, com um lobo faminto escondido nas sombras..."
             rows={4}
             className="bg-[#0f0e0c] border border-[#c8a84b30] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b60] resize-none mb-4"
             style={{ borderRadius: '2px' }} />
@@ -145,7 +145,7 @@ async function verificarConhecimento() {
     <div className="border border-[#c8a84b30] bg-[#161410] mb-8 p-6">
       <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] block mb-2">O QUE OS JOGADORES FIZERAM?</label>
       <textarea value={situacao} onChange={e => setSituacao(e.target.value)}
-        placeholder="Ex: os jogadores decidiram libertar o prisioneiro em vez de entregá-lo ao capitão da guarda..."
+        placeholder="Ex: os jogadores decidiram libertar o prisioneiro em vez de entregá-lo ao capitão da guarda..." aria-label="Ex: os jogadores decidiram libertar o prisioneiro em vez de entregá-lo ao capitão da guarda..."
         rows={3}
         className="bg-[#0f0e0c] border border-[#c8a84b30] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b60] resize-none mb-4"
         style={{ borderRadius: '2px' }} />
@@ -197,7 +197,7 @@ async function verificarConhecimento() {
 
       <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] block mb-2">TÓPICO</label>
       <textarea value={topico} onChange={e => setTopico(e.target.value)}
-        placeholder="Ex: a lenda do Duque Valerius, esse símbolo arcano gravado na parede..."
+        placeholder="Ex: a lenda do Duque Valerius, esse símbolo arcano gravado na parede..." aria-label="Ex: a lenda do Duque Valerius, esse símbolo arcano gravado na parede..."
         rows={2}
         className="bg-[#0f0e0c] border border-[#c8a84b30] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b60] resize-none mb-4"
         style={{ borderRadius: '2px' }} />

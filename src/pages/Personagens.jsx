@@ -259,7 +259,7 @@ usePolling(async () => {
                           onClick={() => navigate(`/personagens/${p.id}`)}>
                           {d.name || p.name || 'Sem nome'}
                           {temMensagem && (
-                            <span className="ml-2 inline-block w-2 h-2 rounded-full bg-[#8a4a8a] animate-pulse" />
+                            <span className="ml-2 inline-block w-2 h-2 rounded-full bg-[#a86aa8] animate-pulse" />
                           )}
                         </h2>
                                                 <span className="border border-[#c8a84b25] text-[#c8a84b] px-2 py-0.5 text-xs"
@@ -284,7 +284,7 @@ usePolling(async () => {
                                 {attrLabel[attr] || attr.toUpperCase()}
                               </span>
                               <span className="text-[#c8a84b] text-sm font-light">{val}</span>
-                              <span style={cinzel} className="text-[#7a6e58] text-xs">
+                              <span style={cinzel} className="text-[#8a7e68] text-xs">
                                 {Math.floor((val - 10) / 2) >= 0 ? '+' : ''}{Math.floor((val - 10) / 2)}
                               </span>
                             </div>
@@ -341,7 +341,7 @@ usePolling(async () => {
         )}
 
         {!carregando && personagens.length > 0 && (
-          <p style={cinzel} className="text-[#7a6e58] text-xs tracking-widest text-center mt-6">
+          <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest text-center mt-6">
             {personagens.length} {personagens.length === 1 ? 'PERSONAGEM' : 'PERSONAGENS'}
           </p>
         )}

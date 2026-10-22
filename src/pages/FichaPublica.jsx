@@ -119,7 +119,7 @@ const ABAS = [
                     {attrLabel[attr] || attr.toUpperCase()}
                   </span>
                   <span style={cinzel} className="text-[#c8a84b] text-xl">{val}</span>
-                  <span style={cinzel} className="text-[#7a6e58] text-xs">
+                  <span style={cinzel} className="text-[#8a7e68] text-xs">
                     {Math.floor((val - 10) / 2) >= 0 ? '+' : ''}{Math.floor((val - 10) / 2)}
                   </span>
                 </div>

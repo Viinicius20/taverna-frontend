@@ -92,7 +92,7 @@ async function deletarSessao(id) {
             <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">CARREGANDO...</p>
           </div>
         ) : sessoes.length === 0 ? (
-          <p style={cinzel} className="text-[#7a6e58] text-sm text-center py-16">NENHUMA SESSÃO REGISTRADA</p>
+          <p style={cinzel} className="text-[#8a7e68] text-sm text-center py-16">NENHUMA SESSÃO REGISTRADA</p>
         ) : (
           <div className="space-y-2">
             {sessoes.map(s => (
@@ -105,16 +105,16 @@ async function deletarSessao(id) {
                     <span style={cinzel} className="text-[#e8e0d0] text-sm">{s.title}</span>
                   </div>
                   <div className="flex items-center gap-3">
-  <span className="text-[#8a7e68] text-xs">
-    {new Date(s.created_at).toLocaleDateString('pt-BR')}
-  </span>
-  <span className="text-[#8a7e68] text-xs">{expandida === s.id ? '▲' : '▼'}</span>
-  <button
-    onClick={e => { e.stopPropagation(); deletarSessao(s.id); }}
-    className="text-red-900 hover:text-red-600 text-sm transition-colors px-1">
-    ×
-  </button>
-</div>
+                    <span className="text-[#8a7e68] text-xs">
+                      {new Date(s.created_at).toLocaleDateString('pt-BR')}
+                    </span>
+                    <span className="text-[#8a7e68] text-xs">{expandida === s.id ? '▲' : '▼'}</span>
+                    <button
+                      onClick={e => { e.stopPropagation(); deletarSessao(s.id); }}
+                      className="text-red-600 hover:text-red-600 text-sm transition-colors px-1">
+                      ×
+                    </button>
+                  </div>
                 </div>
                 {expandida === s.id && s.summary && (
                   <div className="px-4 pb-4 border-t border-[#c8a84b10] pt-3">

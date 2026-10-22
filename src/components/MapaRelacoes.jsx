@@ -4,7 +4,7 @@ import { VINCULOS } from '../constants/vinculos';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 
-const COR_TIPO = { npc: '#c8a84b', faction: '#8a4a8a', location: '#6a9a8a', character: '#7ab8d4' };
+const COR_TIPO = { npc: '#c8a84b', faction: '#a86aa8', location: '#6a9a8a', character: '#7ab8d4' };
 const NOME_TIPO = { npc: 'NPCs', faction: 'Facções', location: 'Locais', character: 'Jogadores' };
 
 // a biblioteca troca source/target por objetos depois de desenhar

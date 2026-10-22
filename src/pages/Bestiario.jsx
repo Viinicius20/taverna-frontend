@@ -97,7 +97,7 @@ async function toggleDescoberto(id, atual) {
       </nav>
 
       <div className="max-w-5xl mx-auto px-8 py-12">
-        <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">MESTRE</p>
+        <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 70">MESTRE</p>
         <div className="flex items-center justify-between mb-8">
           <h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold">Bestiário</h1>
           <button onClick={() => setShowForm(!showForm)}
@@ -113,7 +113,7 @@ async function toggleDescoberto(id, atual) {
             <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">GERAR MONSTRO COM IA</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
               <input value={novoNome} onChange={e => setNovoNome(e.target.value)}
-                placeholder="Nome do monstro *"
+                placeholder="Nome do monstro *" aria-label="Nome do monstro *"
                 className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
                 style={{ borderRadius: '2px' }} />
               <select value={novoCR} onChange={e => setNovoCR(e.target.value)}
@@ -129,12 +129,12 @@ async function toggleDescoberto(id, atual) {
                 {TIPOS.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
               <input value={novaDescricao} onChange={e => setNovaDescricao(e.target.value)}
-                placeholder="Descrição opcional..."
+                placeholder="Descrição opcional..." aria-label="Descrição opcional..."
                 className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
                 style={{ borderRadius: '2px' }} />
             </div>
             <button onClick={gerarMonstro} disabled={gerando || !novoNome.trim()}
-              className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50"
+              className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors disabled:50"
               style={{ ...cinzel, borderRadius: '2px' }}>
               {gerando ? '⟳ GERANDO...' : '✦ GERAR'}
             </button>
@@ -145,7 +145,7 @@ async function toggleDescoberto(id, atual) {
         {/* Filtros */}
         <div className="flex flex-wrap gap-3 mb-6">
           <input value={busca} onChange={e => setBusca(e.target.value)}
-            placeholder="Buscar por nome..."
+            placeholder="Buscar por nome..." aria-label="Buscar por nome..."
             className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 flex-1 min-w-48 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
             style={{ borderRadius: '2px' }} />
           <select value={filtroCR} onChange={e => setFiltroCR(e.target.value)}
@@ -182,18 +182,18 @@ async function toggleDescoberto(id, atual) {
                   onClick={() => setMonstroDetalhes(monstroDetalhes?.id === m.id ? null : m)}>
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-3">
-  <span style={cinzel} className="text-[#c8a84b] text-xs w-12">CR {m.cr}</span>
-  <span style={cinzel} className="text-[#e8e0d0] text-sm font-bold">
-    {m.discovered === false ? '??? Criatura Desconhecida' : m.name}
-  </span>
-  <span className="text-[#8a7e68] text-xs">{m.size} {m.type}</span>
-  {m.is_homebrew && (
-    <span style={cinzel} className="text-xs border border-[#8a5030] text-[#8a5030] px-1.5 py-0.5">HOMEBREW</span>
-  )}
-  {m.discovered === false && (
-    <span style={cinzel} className="text-xs border border-[#4a6a8a] text-[#4a6a8a] px-1.5 py-0.5">NÃO DESCOBERTO</span>
-  )}
-</div>
+                      <span style={cinzel} className="text-[#c8a84b] text-xs w-12">CR {m.cr}</span>
+                      <span style={cinzel} className="text-[#e8e0d0] text-sm font-bold">
+                        {m.discovered === false ? '??? Criatura Desconhecida' : m.name}
+                      </span>
+                      <span className="text-[#8a7e68] text-xs">{m.size} {m.type}</span>
+                      {m.is_homebrew && (
+                        <span style={cinzel} className="text-xs border border-[#b07050] text-[#b07050] px-1.5 py-0.5">HOMEBREW</span>
+                      )}
+                      {m.discovered === false && (
+                        <span style={cinzel} className="text-xs border border-[#b07050] text-[#b07050] px-1.5 py-0.5">NÃO DESCOBERTO</span>
+                      )}
+                    </div>
                     <div className="flex items-center gap-4 text-xs" style={cinzel}>
                       <span className="text-[#8a7e68]">HP <span className="text-[#e8e0d0]">{m.hp}</span></span>
                       <span className="text-[#8a7e68]">CA <span className="text-[#e8e0d0]">{m.ac}</span></span>
@@ -313,7 +313,7 @@ async function toggleDescoberto(id, atual) {
 
   {m.is_homebrew && (
     <button onClick={() => { if (window.confirm(`Deletar "${m.name}"?`)) deletarMonstro(m.id); }}
-      className="text-xs border border-red-900 text-red-900 px-3 py-1 hover:bg-red-900 hover:text-white transition-colors"
+      className="text-xs border border-red-900 text-red-600 px-3 py-1 hover:bg-red-900 hover:text-white transition-colors"
       style={{ ...cinzel, borderRadius: '2px' }}>
       🗑 DELETAR
     </button>

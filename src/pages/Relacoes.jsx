@@ -114,7 +114,7 @@ useEffect(() => { carregarGrafo(); }, [carregarGrafo]);
             </select>
           </div>
           <input value={nota} onChange={e => setNota(e.target.value)} maxLength={300}
-            placeholder="Nota (opcional): por que existe esse vínculo?" className={campo} style={{ borderRadius: '2px' }} />
+            placeholder="Nota (opcional): por que existe esse vínculo?" aria-label="Nota (opcional): por que existe esse vínculo?" className={campo} style={{ borderRadius: '2px' }} />
           <div className="flex items-center gap-3">
             <label className="flex items-center gap-2 text-xs text-[#6a6050] cursor-pointer" style={cinzel}>
               <input type="checkbox" checked={secreto} onChange={e => setSecreto(e.target.checked)} />
@@ -130,13 +130,13 @@ useEffect(() => { carregarGrafo(); }, [carregarGrafo]);
         </div>
 
         <div className="flex flex-wrap items-center gap-2 mb-4">
-          <span style={cinzel} className="text-[#7a6e58] text-xs tracking-[2px]">VER COMO:</span>
+          <span style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px]">VER COMO:</span>
           <select value={como} onChange={e => setComo(e.target.value)} className={campo} style={{ borderRadius: '2px' }}>
             <option value="">Mestre (tudo)</option>
             {entidades.filter(e => e.tipo === 'character').sort((a, b) => a.nome.localeCompare(b.nome))
               .map(e => <option key={e.chave} value={e.chave}>{e.nome}</option>)}
           </select>
-          {como && <span className="text-xs text-[#8a5030]">👁 Visão do jogador: sem facções, locais nem vínculos secretos</span>}
+          {como && <span className="text-xs text-[#b07050]">👁 Visão do jogador: sem facções, locais nem vínculos secretos</span>}
         </div>
 
         <div className="flex gap-2 mb-4">
@@ -155,14 +155,14 @@ useEffect(() => { carregarGrafo(); }, [carregarGrafo]);
 
         {vista === 'mapa' ? (
         grafo.nos.length === 0 ? (
-            <p className="text-[#7a6e58] text-sm text-center py-10 italic">
+            <p className="text-[#8a7e68] text-sm text-center py-10 italic">
               {como ? 'Esse personagem ainda não conhece ninguém.' : 'Crie alguns vínculos para ver o mapa.'}
             </p>
         ) : (
             <MapaRelacoes grafo={grafo} />
         )
         ) : grafo.arestas.length === 0 ? (
-        <p className="text-[#7a6e58] text-sm text-center py-10 italic">
+        <p className="text-[#8a7e68] text-sm text-center py-10 italic">
           {como ? 'Nenhum vínculo visível para esse personagem.' : 'Nenhum vínculo ainda. O mundo está cheio de estranhos.'}
         </p>
         ) : (
@@ -178,7 +178,7 @@ useEffect(() => { carregarGrafo(); }, [carregarGrafo]);
                 </p>
                 {a.note && <p className="text-xs text-[#6a6050] italic mt-1">{a.note}</p>}
                 </div>
-                <button onClick={() => apagar(a.id)} className="text-red-900 hover:text-red-600 text-lg" title="Apagar">×</button>
+                <button onClick={() => apagar(a.id)} className="text-red-600 hover:text-red-600 text-lg" title="Apagar">×</button>
             </div>
             ))}
         </div>

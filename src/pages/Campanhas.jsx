@@ -87,7 +87,7 @@ export default function Campanhas() {
       </nav>
 
       <div className="max-w-3xl mx-auto px-8 py-12">
-        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">CAMPANHAS</p>
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 70">CAMPANHAS</p>
         <h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold mb-8">Suas Campanhas</h1>
 
         {/* Abas */}
@@ -121,18 +121,18 @@ export default function Campanhas() {
             <div className="flex flex-col gap-3">
               <input value={novaCampanha.name}
                 onChange={e => setNovaCampanha(p => ({ ...p, name: e.target.value }))}
-                placeholder="Nome da campanha..."
+                placeholder="Nome da campanha..." aria-label="Nome da campanha..."
                 className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
                 style={{ borderRadius: '2px' }} />
               <textarea value={novaCampanha.description}
                 onChange={e => setNovaCampanha(p => ({ ...p, description: e.target.value }))}
-                placeholder="Descrição opcional..."
+                placeholder="Descrição opcional..." aria-label="Descrição opcional..."
                 rows={3}
                 className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50] resize-none"
                 style={{ borderRadius: '2px' }} />
               {erro && <p className="text-red-400 text-sm">{erro}</p>}
               <button onClick={criarCampanha} disabled={criando || !novaCampanha.name.trim()}
-                className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50 self-start"
+                className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors disabled:50 self-start"
                 style={{ ...cinzel, borderRadius: '2px' }}>
                 {criando ? '⟳ CRIANDO...' : '✦ CRIAR CAMPANHA'}
               </button>
@@ -182,12 +182,12 @@ export default function Campanhas() {
     <div className="flex flex-col sm:flex-row gap-3">
       <input value={codigo}
         onChange={e => setCodigo(e.target.value.toUpperCase())}
-        placeholder="Ex: TVRN42"
+        placeholder="Ex: TVRN42" aria-label="Ex: TVRN42"
         maxLength={6}
         className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] px-4 py-3 flex-1 text-center text-xl tracking-widest font-bold focus:outline-none focus:border-[#c8a84b50]"
         style={{ ...cinzel, borderRadius: '2px' }} />
       <button onClick={entrarCampanha} disabled={entrando || codigo.length !== 6}
-        className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-3 text-xs font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50 w-full sm:w-auto"
+        className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-3 text-xs font-bold hover:bg-[#e0c060] transition-colors disabled:50 w-full sm:w-auto"
         style={{ ...cinzel, borderRadius: '2px' }}>
         {entrando ? '⟳' : 'ENTRAR →'}
       </button>

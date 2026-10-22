@@ -122,3 +122,16 @@ html, body {
   scrollbar-width: thin;
   scrollbar-color: var(--cor-classe, #c8a84b) #161410;
 }
+
+*:focus-visible { outline: 2px solid var(--cor-classe, #c8a84b) !important; outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+button[class*="text-red-"] { position: relative; }
+button[class*="text-red-"]::after { content: ""; position: absolute; inset: -6px; }

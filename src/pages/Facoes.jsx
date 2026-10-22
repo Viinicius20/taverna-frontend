@@ -87,7 +87,7 @@ async function recarregarFaccoesSilencioso() {
       <div className="max-w-3xl mx-auto px-6 py-10">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">MUNDO</p>
+            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 70">MUNDO</p>
             <h1 style={cinzel} className="text-2xl text-[#f0e8d8] font-semibold">Facções</h1>
           </div>
           <button onClick={() => setMostrarForm(!mostrarForm)}
@@ -101,7 +101,7 @@ async function recarregarFaccoesSilencioso() {
           <div className="border border-[#c8a84b30] bg-[#161410] mb-8 p-6">
             <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] block mb-2">DESCRIÇÃO</label>
             <textarea value={descricaoFaccao} onChange={e => setDescricaoFaccao(e.target.value)}
-              placeholder="Ex: uma guilda de mercadores corrupta que controla o comércio da cidade..."
+              placeholder="Ex: uma guilda de mercadores corrupta que controla o comércio da cidade..." aria-label="Ex: uma guilda de mercadores corrupta que controla o comércio da cidade..."
               rows={3}
               className="bg-[#0f0e0c] border border-[#c8a84b30] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b60] resize-none mb-4"
               style={{ borderRadius: '2px' }} />
@@ -120,7 +120,7 @@ async function recarregarFaccoesSilencioso() {
             <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">CARREGANDO...</p>
           </div>
         ) : faccoes.length === 0 ? (
-          <p style={cinzel} className="text-[#7a6e58] text-sm text-center py-16">NENHUMA FACÇÃO REGISTRADA</p>
+          <p style={cinzel} className="text-[#8a7e68] text-sm text-center py-16">NENHUMA FACÇÃO REGISTRADA</p>
         ) : (
           <div className="space-y-2">
             {faccoes.map(f => (
@@ -149,7 +149,7 @@ async function recarregarFaccoesSilencioso() {
                       <PainelReputacao tipo="faction" id={f.id} pontos={f.reputation_score || 0} onMudou={recarregarFaccoesSilencioso} />
                     </div>
                     <button onClick={() => deletarFaccao(f.id)}
-                      className="text-red-900 hover:text-red-600 text-xs border border-red-900 hover:border-red-600 px-3 py-1.5 transition-colors self-end"
+                      className="text-red-600 hover:text-red-600 text-xs border border-red-600 hover:border-red-600 px-3 py-1.5 transition-colors self-end"
                       style={{ ...cinzel, borderRadius: '2px' }}>
                       Deletar
                     </button>

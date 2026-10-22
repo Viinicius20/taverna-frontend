@@ -79,7 +79,7 @@ async function apagarLog(logId) {
           className="w-20 bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center px-2 py-2 text-sm focus:outline-none"
           style={{ borderRadius: '2px' }} />
         <input value={motivo} onChange={e => setMotivo(e.target.value)} maxLength={300}
-          placeholder="Motivo (ex: Salvou o capitão)"
+          placeholder="Motivo (ex: Salvou o capitão)" aria-label="Motivo (ex: Salvou o capitão)"
           className="flex-1 bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
           style={{ borderRadius: '2px' }} />
         <button onClick={aplicar} disabled={!motivo.trim() || !Number(delta)}
@@ -95,10 +95,10 @@ async function apagarLog(logId) {
         <p className="text-xs text-[#8a7e68]">
           <span style={{ color: h.delta > 0 ? COR.aliada : COR.hostil }}>{h.delta > 0 ? '+' : ''}{h.delta}</span>
           {' · '}{h.reason}
-          <span className="text-[#7a6e58]"> · {new Date(h.created_at).toLocaleDateString('pt-BR')}{h.source === 'evento' ? ' · evento' : ''}</span>
+          <span className="text-[#8a7e68]"> · {new Date(h.created_at).toLocaleDateString('pt-BR')}{h.source === 'evento' ? ' · evento' : ''}</span>
         </p>
         <button onClick={() => apagarLog(h.id)}
-          className="text-red-900 hover:text-red-600 text-xs transition-colors flex-shrink-0">×</button>
+          className="text-red-600 hover:text-red-600 text-xs transition-colors flex-shrink-0">×</button>
       </div>
     ))}
   </div>

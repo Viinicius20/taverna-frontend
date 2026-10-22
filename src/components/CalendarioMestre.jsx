@@ -84,7 +84,7 @@ async function limparHistorico() {
   } catch (e) { notificar(e.response?.data?.detail || 'Erro ao limpar o histórico.', 'erro'); }
 }
 
-  if (!cal) return <p className="text-[#7a6e58] text-sm">Carregando calendário...</p>;
+  if (!cal) return <p className="text-[#8a7e68] text-sm">Carregando calendário...</p>;
 
   return (
     <div className="border border-[#c8a84b20] bg-[#161410] p-6 flex flex-col gap-4">
@@ -103,7 +103,7 @@ async function limparHistorico() {
         </button>
       </div>
       <input value={motivo} onChange={e => setMotivo(e.target.value)} maxLength={200}
-        placeholder="Motivo (opcional): viagem, descanso longo..."
+        placeholder="Motivo (opcional): viagem, descanso longo..." aria-label="Motivo (opcional): viagem, descanso longo..."
         className={campo} style={{ borderRadius: '2px' }} />
 
       <button onClick={() => setEditando(!editando)} className="text-xs text-[#9a8e78] hover:text-[#c8a84b] self-start">
@@ -135,7 +135,7 @@ async function limparHistorico() {
                   onChange={e => setMeses(prev => prev.map((x, j) => j === i ? { ...x, dias: Number(e.target.value) } : x))}
                   className={`${campo} w-20`} style={{ borderRadius: '2px' }} />
                 <button onClick={() => setMeses(prev => prev.filter((_, j) => j !== i))}
-                  className="text-red-900 hover:text-red-600 text-xs">×</button>
+                  className="text-red-600 hover:text-red-600 text-xs">×</button>
               </div>
             ))}
             <div className="flex gap-2">
@@ -151,7 +151,7 @@ async function limparHistorico() {
           <div className="border-t border-[#c8a84b15] pt-4 flex flex-col gap-1">
             <div className="flex items-center justify-between mb-1">
               <p style={cinzel} className="text-[#9a8e78] text-xs tracking-[2px]">HISTÓRICO</p>
-              <button onClick={limparHistorico} className="text-red-900 hover:text-red-600 text-xs"
+              <button onClick={limparHistorico} className="text-red-600 hover:text-red-600 text-xs"
                 style={cinzel}>LIMPAR</button>
             </div>
             {historico.map(h => (
@@ -165,7 +165,7 @@ async function limparHistorico() {
                       className="text-[#c8a84b] hover:text-[#e0c060] text-xs">↶</button>
                   )}
                   <button onClick={() => apagarLinha(h.id)} title="Apagar só o registro (a data não muda)"
-                    className="text-red-900 hover:text-red-600 text-xs">×</button>
+                    className="text-red-600 hover:text-red-600 text-xs">×</button>
                 </div>
               </div>
             ))}

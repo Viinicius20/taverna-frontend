@@ -111,7 +111,7 @@ export default function Locais() {
           <div className="border border-[#c8a84b30] bg-[#161410] mb-8 p-6">
             <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] block mb-2">DESCRIÇÃO</label>
             <textarea value={descricao} onChange={e => setDescricao(e.target.value)}
-              placeholder="Ex: uma cidade portuária corrupta controlada por contrabandistas..."
+              placeholder="Ex: uma cidade portuária corrupta controlada por contrabandistas..." aria-label="Ex: uma cidade portuária corrupta controlada por contrabandistas..."
               rows={3}
               className="bg-[#0f0e0c] border border-[#c8a84b30] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b60] resize-none mb-4"
               style={{ borderRadius: '2px' }} />
@@ -186,7 +186,7 @@ export default function Locais() {
                       </div>
 
                       <button onClick={() => deletarLocal(l.id)}
-                        className="text-red-900 hover:text-red-600 text-xs border border-red-900 hover:border-red-600 px-3 py-1.5 transition-colors self-end"
+                        className="text-red-600 hover:text-red-600 text-xs border border-red-600 hover:border-red-600 px-3 py-1.5 transition-colors self-end"
                         style={{ ...cinzel, borderRadius: '2px' }}>
                         Deletar
                       </button>

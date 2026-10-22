@@ -26,7 +26,7 @@ export default function EnviarHandout({ handoutId, personagens = [], onEnviado }
   return (
     <div className="mt-3">
       <button onClick={() => { setAberto(a => !a); setMsg(''); }}
-        className="text-xs border border-[#8a5030] text-[#8a5030] px-3 py-1 hover:bg-[#8a503020] transition-colors"
+        className="text-xs border border-[#b07050] text-[#b07050] px-3 py-1 hover:bg-[#b0705020] transition-colors"
         style={{ ...cinzel, borderRadius: '2px' }}>
         {aberto ? 'FECHAR' : 'ENVIAR PARA...'}
       </button>

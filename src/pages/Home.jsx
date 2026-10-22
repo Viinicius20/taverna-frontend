@@ -126,7 +126,7 @@ export default function Home() {
               <div className="px-6 py-4 border-b border-[#c8a84b15]">
                 <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-1">LOGADO COMO</p>
                 <p style={cinzel} className="text-[#c8a84b] text-sm">{user.username}</p>
-                {isMestre && <span style={cinzel} className="text-[#7a6e58] text-xs">Mestre</span>}
+                {isMestre && <span style={cinzel} className="text-[#8a7e68] text-xs">Mestre</span>}
               </div>
             )}
 
@@ -179,7 +179,7 @@ export default function Home() {
         <div className="max-w-5xl mx-auto px-8 pt-8">
           <NotasSessao />
           {proximos.length > 0 && (
-            <div className="border border-[#8a5030] bg-[#8a503010] p-4 mb-8" style={{ borderRadius: '2px' }}>
+            <div className="border border-[#b07050] bg-[#b0705010] p-4 mb-8" style={{ borderRadius: '2px' }}>
               <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">⚠ O MUNDO ESTÁ PRESTES A MUDAR</p>
               <div className="flex flex-col gap-3">
                 {proximos.map(ev => {
@@ -277,7 +277,7 @@ export default function Home() {
           ) : (
             <div className="flex flex-col items-center justify-center h-40 gap-3">
               <span className="text-3xl opacity-10">🗺</span>
-              <p style={cinzel} className="text-[#7a6e58] text-xs">NENHUMA CENA REVELADA</p>
+              <p style={cinzel} className="text-[#8a7e68] text-xs">NENHUMA CENA REVELADA</p>
             </div>
           )}
         </div>

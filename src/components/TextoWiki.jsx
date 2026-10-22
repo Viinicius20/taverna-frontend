@@ -1,4 +1,4 @@
-const COR = { npc: '#c8a84b', local: '#7ab8d4', faccao: '#8a4a8a' };
+const COR = { npc: '#c8a84b', local: '#7ab8d4', faccao: '#a86aa8' };
 const ICONE = { npc: '🧑', local: '📍', faccao: '🏛' };
 
 export default function TextoWiki({ texto = '', paginas = [], entidades = [], onAbrir }) {

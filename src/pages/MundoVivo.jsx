@@ -14,7 +14,7 @@ const CAMPANHA_ID = '00000000-0000-0000-0000-000000000001';
 const STATUS_COR = {
   ativo: '#c8a84b',
   concluido: '#4a8a4a',
-  congelado: '#4a6a8a',
+  congelado: '#6a8aaa',
   cancelado: '#6a6050',
 };
 
@@ -395,21 +395,21 @@ function iconeRelogio(nome) {
         {mostrarForm && (
   <div className="border border-[#c8a84b30] bg-[#161410] mb-8 p-6 flex flex-col gap-3">
     <input value={novoEvento.name} onChange={e => setNovoEvento(prev => ({ ...prev, name: e.target.value }))}
-      placeholder="Nome do evento (ex: Golpe em Valdris)"
+      placeholder="Nome do evento (ex: Golpe em Valdris)" aria-label="Nome do evento (ex: Golpe em Valdris)"
       className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
       style={{ borderRadius: '2px' }} />
     <textarea value={novoEvento.description} onChange={e => setNovoEvento(prev => ({ ...prev, description: e.target.value }))}
-      placeholder="Descrição do que está acontecendo..."
+      placeholder="Descrição do que está acontecendo..." aria-label="Descrição do que está acontecendo..."
       rows={2}
       className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50] resize-none"
       style={{ borderRadius: '2px' }} />
 
     <input value={novoEvento.next_event_name} onChange={e => setNovoEvento(prev => ({ ...prev, next_event_name: e.target.value }))}
-      placeholder="(Opcional) Nome do evento que nasce quando este terminar"
+      placeholder="(Opcional) Nome do evento que nasce quando este terminar" aria-label="(Opcional) Nome do evento que nasce quando este terminar"
       className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
       style={{ borderRadius: '2px' }} />
     <textarea value={novoEvento.next_event_description} onChange={e => setNovoEvento(prev => ({ ...prev, next_event_description: e.target.value }))}
-      placeholder="(Opcional) Descrição desse próximo evento"
+      placeholder="(Opcional) Descrição desse próximo evento" aria-label="(Opcional) Descrição desse próximo evento"
       rows={2}
       className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50] resize-none"
       style={{ borderRadius: '2px' }} />
@@ -434,16 +434,16 @@ function iconeRelogio(nome) {
 
 <input value={novoEvento.sets_flag_key} 
   onChange={e => setNovoEvento(prev => ({ ...prev, sets_flag_key: e.target.value.toLowerCase().replace(/\s+/g, '_') }))}
-  placeholder="(Opcional) Ativa qual flag ao concluir (ex: rei_morto)"
+  placeholder="(Opcional) Ativa qual flag ao concluir (ex: rei_morto)" aria-label="(Opcional) Ativa qual flag ao concluir (ex: rei_morto)"
   className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
   style={{ borderRadius: '2px' }} />
 
     <input value={novoEvento.deadline} onChange={e => setNovoEvento(prev => ({ ...prev, deadline: e.target.value }))}
-      placeholder="Prazo (opcional, ex: próxima lua cheia, 4 dias)"
+      placeholder="Prazo (opcional, ex: próxima lua cheia, 4 dias)" aria-label="Prazo (opcional, ex: próxima lua cheia, 4 dias)"
       className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
       style={{ borderRadius: '2px' }} />
     <textarea value={novoEvento.consequences} onChange={e => setNovoEvento(prev => ({ ...prev, consequences: e.target.value }))}
-      placeholder="O que acontece quando chegar a 100%..."
+      placeholder="O que acontece quando chegar a 100%..." aria-label="O que acontece quando chegar a 100%..."
       rows={2}
       className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50] resize-none"
       style={{ borderRadius: '2px' }} />
@@ -459,18 +459,18 @@ function iconeRelogio(nome) {
 {worldLog.length > 0 && (
   <div className="mt-12">
     <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
-    <p style={cinzel} className="text-[#8a4a8a] text-xs tracking-[4px] mb-2 opacity-70">CRÔNICAS OCULTAS</p>
+    <p style={cinzel} className="text-[#a86aa8] text-xs tracking-[4px] mb-2 opacity-70">CRÔNICAS OCULTAS</p>
     <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">O Mundo Que Vocês Não Viram</h2>
 
     <div className="space-y-2">
       {worldLog.map(log => (
-  <div key={log.id} className="border border-[#8a4a8a15] bg-[#161410] px-4 py-3" style={{ borderRadius: '2px' }}>
+  <div key={log.id} className="border border-[#a86aa815] bg-[#161410] px-4 py-3" style={{ borderRadius: '2px' }}>
     <div className="flex items-center justify-between mb-1">
-      <span style={cinzel} className="text-[#8a4a8a] text-xs">{log.event_name}</span>
+      <span style={cinzel} className="text-[#a86aa8] text-xs">{log.event_name}</span>
       <div className="flex items-center gap-2">
-        <span className="text-[#7a6e58] text-xs">Sessão #{log.session_number}</span>
+        <span className="text-[#8a7e68] text-xs">Sessão #{log.session_number}</span>
         <button onClick={() => deletarWorldLog(log.id)}
-          className="text-red-900 hover:text-red-600 text-xs transition-colors">×</button>
+          className="text-red-600 hover:text-red-600 text-xs transition-colors">×</button>
       </div>
     </div>
     <p className="text-[#9a8e78] text-sm">{log.description}</p>
@@ -482,7 +482,7 @@ function iconeRelogio(nome) {
 
 {!carregando && eventos.filter(e => e.status === 'ativo').length > 0 && (
   <div className="mb-8">
-    <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-3 opacity-70">RELÓGIOS ATIVOS</p>
+    <p style={cinzel} className="text-[#6a8aaa] text-xs tracking-[4px] mb-3 opacity-70">RELÓGIOS ATIVOS</p>
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
       {eventos.filter(e => e.status === 'ativo').map(ev => {
         const segmentos = 10;
@@ -506,7 +506,7 @@ function iconeRelogio(nome) {
             </div>
             {ev.next_event_name && (
               <p className="text-[#8a7e68] text-xs mt-2">
-                Ao completar → <span style={cinzel} className="text-[#8a4a8a]">{ev.next_event_name}</span>
+                Ao completar → <span style={cinzel} className="text-[#a86aa8]">{ev.next_event_name}</span>
               </p>
             )}
           </div>
@@ -547,29 +547,29 @@ function iconeRelogio(nome) {
                     {ev.next_event_name && (
                       <span className="ml-3">
                         → {ev.triggered_event_id ? '✓ ' : ''}
-                        <span style={cinzel} className="text-[#8a4a8a]">{ev.next_event_name}</span>
+                        <span style={cinzel} className="text-[#a86aa8]">{ev.next_event_name}</span>
                       </span>
                     )}
                   </p>
                 </div>
 
                 {expandido === ev.id && (
-                  <div className="px-6 pb-5 border-t border-[#c8a84b10] pt-4 flex flex-col gap-3" onClick={e => e.stopPropagation()}>
+                  <div className="px-6 pb-5 border-t border-[#a86aa810] pt-4 flex flex-col gap-3" onClick={e => e.stopPropagation()}>
                     {ev.description && <p className="text-[#8a8070] text-sm leading-relaxed">{ev.description}</p>}
                     {ev.consequences && (
                       <div>
-                        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">CONSEQUÊNCIAS AO CONCLUIR</p>
+                        <p style={cinzel} className="text-[#a86aa8] text-xs tracking-[2px] mb-1">CONSEQUÊNCIAS AO CONCLUIR</p>
                         <p className="text-[#9a8e78] text-sm">{ev.consequences}</p>
                       </div>
                     )}
 
                     <div>
-                      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">AVANÇAR PROGRESSO</p> <PrazoEvento evento={ev} onMudou={buscarEventos} />
+                      <p style={cinzel} className="text-[#a86aa8] text-xs tracking-[2px] mb-2">AVANÇAR PROGRESSO</p> <PrazoEvento evento={ev} onMudou={buscarEventos} />
                       <div className="flex gap-2">
                         {[-20, -10, 10, 20].map(delta => (
                           <button key={delta} onClick={() => atualizarProgresso(ev.id, ev.progress + delta)}
                             disabled={ev.locked_by_master}
-                            className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors disabled:opacity-30"
+                            className="border border-[#a86aa830] text-[#a86aa8] px-3 py-1 text-xs hover:bg-[#a86aa810] transition-colors disabled:opacity-30"
                             style={{ ...cinzel, borderRadius: '2px' }}>
                             {delta > 0 ? '+' : ''}{delta}%
                           </button>
@@ -580,17 +580,17 @@ function iconeRelogio(nome) {
                     <div>
                       <button onClick={() => pedirSugestaoEvento(ev.id)}
                         disabled={gerandoSugestao === ev.id}
-                        className="w-full border border-[#8a4a8a40] text-[#8a4a8a] py-2 text-xs tracking-widest hover:bg-[#8a4a8a10] transition-colors disabled:opacity-50"
+                        className="w-full border border-[#a86aa840] text-[#a86aa8] py-2 text-xs tracking-widest hover:bg-[#a86aa810] transition-colors disabled:opacity-50"
                         style={{ ...cinzel, borderRadius: '2px' }}>
                         {gerandoSugestao === ev.id ? 'Pensando...' : '💭 Sugerir Desdobramento'}
                       </button>
 
                       {sugestoes[ev.id] && (
-                        <div className="mt-3 border border-[#8a4a8a30] bg-[#8a4a8a08] p-4">
+                        <div className="mt-3 border border-[#a86aa830] bg-[#a86aa808] p-4">
                           <p className="text-[#e8e0d0] text-sm italic mb-3">{sugestoes[ev.id]}</p>
                           <div className="flex gap-2">
                             <button onClick={() => aprovarSugestao(ev, sugestoes[ev.id])}
-                              className="flex-1 bg-[#8a4a8a] text-[#0f0e0c] py-1.5 text-xs font-bold hover:bg-[#a05aa0] transition-colors"
+                              className="flex-1 bg-[#a86aa8] text-[#0f0e0c] py-1.5 text-xs font-bold hover:bg-[#c8a84b] transition-colors"
                               style={{ ...cinzel, borderRadius: '2px' }}>
                               ✓ Aprovar
                             </button>
@@ -606,12 +606,12 @@ function iconeRelogio(nome) {
 
                     <div className="flex gap-2 justify-end pt-2">
                       <button onClick={() => toggleTrava(ev.id, ev.locked_by_master)}
-                        className="border border-[#4a6a8a40] text-[#4a6a8a] px-3 py-1.5 text-xs hover:bg-[#4a6a8a10] transition-colors"
+                        className="border border-[#6a8aaa40] text-[#6a8aaa] px-3 py-1.5 text-xs hover:bg-[#6a8aaa10] transition-colors"
                         style={{ ...cinzel, borderRadius: '2px' }}>
                         {ev.locked_by_master ? '🔓 Destravar' : '🔒 Travar'}
                       </button>
                       <button onClick={() => deletarEvento(ev.id)}
-                        className="text-red-900 hover:text-red-600 text-xs border border-red-900 hover:border-red-600 px-3 py-1.5 transition-colors"
+                        className="text-red-600 hover:text-red-600 text-xs border border-red-600 hover:border-red-600 px-3 py-1.5 transition-colors"
                         style={{ ...cinzel, borderRadius: '2px' }}>
                         Deletar
                       </button>
@@ -626,20 +626,20 @@ function iconeRelogio(nome) {
         {/* FLAGS DA CAMPANHA */}
           <div className="mt-12">
             <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
-            <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
+            <p style={cinzel} className="text-[#6a8aaa] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
             <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Flags</h2>
 
             <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6 flex flex-col gap-3">
               <input value={novaFlagKey} onChange={e => setNovaFlagKey(e.target.value)}
-                placeholder="Nome da flag (ex: rei_morto, portal_aberto)"
+                placeholder="Nome da flag (ex: rei_morto, portal_aberto)" aria-label="Nome da flag (ex: rei_morto, portal_aberto)"
                 className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
                 style={{ borderRadius: '2px' }} />
               <input value={novaFlagDesc} onChange={e => setNovaFlagDesc(e.target.value)}
-                placeholder="Descrição (opcional)"
+                placeholder="Descrição (opcional)" aria-label="Descrição (opcional)"
                 className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
                 style={{ borderRadius: '2px' }} />
               <button onClick={criarFlag} disabled={!novaFlagKey.trim() || criandoFlag}
-                className="bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] transition-colors disabled:opacity-30"
+                className="bg-[#6a8aaa] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#7a9aaa] transition-colors disabled:opacity-30"
                 style={{ ...cinzel, borderRadius: '2px' }}>
                 {criandoFlag ? 'Criando...' : '+ Nova Flag'}
               </button>
@@ -647,7 +647,7 @@ function iconeRelogio(nome) {
 
             <div className="mt-12">
               <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
-              <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
+              <p style={cinzel} className="text-[#6a8aaa] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
 
               <div className="flex items-center justify-between mb-6">
                 <h2 style={cinzel} className="text-xl text-[#c8a84b] font-semibold">📅 Calendário</h2>
@@ -662,15 +662,15 @@ function iconeRelogio(nome) {
             </div>
 
           {flags.length === 0 ? (
-            <p className="text-[#7a6e58] text-sm text-center py-6">Nenhuma flag registrada.</p>
+            <p className="text-[#8a7e68] text-sm text-center py-6">Nenhuma flag registrada.</p>
           ) : (
             <div className="grid grid-cols-2 gap-2">
               {flags.map(f => (
                 <div key={f.id} className={`border p-3 flex items-center justify-between ${f.value ? 'border-[#4a8a4a30] bg-[#4a8a4a08]' : 'border-[#c8a84b15] bg-[#161410]'}`}
                   style={{ borderRadius: '2px' }}>
                   <div>
-                    <p style={cinzel} className={`text-sm ${f.value ? 'text-[#4a8a4a]' : 'text-[#9a8e78]'}`}>{f.key}</p>
-                    {f.description && <p className="text-[#7a6e58] text-xs mt-0.5">{f.description}</p>}
+                    <p style={cinzel} className={`text-sm ${f.value ? 'text-[#4a8a4a]' : 'text-[#8a7e68]'}`}>{f.key}</p>
+                    {f.description && <p className="text-[#8a7e68] text-xs mt-0.5">{f.description}</p>}
                   </div>
                   <div className="flex items-center gap-2">
                     <button onClick={() => toggleFlag(f.id, f.value)}
@@ -679,7 +679,7 @@ function iconeRelogio(nome) {
                       {f.value ? 'TRUE' : 'FALSE'}
                     </button>
                     <button onClick={() => deletarFlag(f.id)}
-                      className="text-red-900 hover:text-red-600 text-xs transition-colors">×</button>
+                      className="text-red-600 hover:text-red-600 text-xs transition-colors">×</button>
                   </div>
                 </div>
               ))}
@@ -690,23 +690,23 @@ function iconeRelogio(nome) {
         {/* ECONOMIA VIVA */}
         <div className="mt-12">
           <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
-          <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
+          <p style={cinzel} className="text-[#6a8aaa] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
           <h2 style={cinzel} className="text-xl text-[#c8a84b] font-semibold mb-6">💰 Economia Viva</h2>
         
           <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6 flex flex-col gap-3">
             <input value={novoEventoRegional.regiao}
               onChange={e => setNovoEventoRegional(prev => ({ ...prev, regiao: e.target.value }))}
-              placeholder="Região"
+              placeholder="Região" aria-label="Região"
               className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
               style={{ borderRadius: '2px' }} />
             <input value={novoEventoRegional.tipo_evento}
               onChange={e => setNovoEventoRegional(prev => ({ ...prev, tipo_evento: e.target.value }))}
-              placeholder="Tipo (guerra, peste...)"
+              placeholder="Tipo (guerra, peste...)" aria-label="Tipo (guerra, peste...)"
               className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
               style={{ borderRadius: '2px' }} />
             <input value={novoEventoRegional.motivo}
               onChange={e => setNovoEventoRegional(prev => ({ ...prev, motivo: e.target.value }))}
-              placeholder="Motivo (ex: Guerra regional)"
+              placeholder="Motivo (ex: Guerra regional)" aria-label="Motivo (ex: Guerra regional)"
               className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
               style={{ borderRadius: '2px' }} />
         
@@ -725,34 +725,34 @@ function iconeRelogio(nome) {
             </div>
         
             <button onClick={criarEventoRegional} disabled={!novoEventoRegional.regiao.trim() || !novoEventoRegional.motivo.trim() || criandoEventoRegional}
-              className="bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] transition-colors disabled:opacity-30"
+              className="bg-[#6a8aaa] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] transition-colors disabled:opacity-30"
               style={{ ...cinzel, borderRadius: '2px' }}>
               {criandoEventoRegional ? 'Criando...' : '+ Criar Evento'}
             </button>
           </div>
  
-  {eventosRegionais.length === 0 ? (
-    <p className="text-[#7a6e58] text-sm text-center py-6">Nenhum evento regional registrado.</p>
-  ) : (
-    <div className="grid grid-cols-2 gap-2">
-      {eventosRegionais.map(ev => (
-  <div key={ev.id}
-    onClick={() => setEventoExpandido(prev => prev === ev.id ? null : ev.id)}
-    className={`border p-3 cursor-pointer ${ev.ativo ? 'border-[#c8a84b30] bg-[#c8a84b08]' : 'border-[#c8a84b15] bg-[#161410]'}`}
-    style={{ borderRadius: '2px' }}>
-    <div className="flex items-center justify-between">
-      <div>
-        <p style={cinzel} className={`text-sm ${ev.ativo ? 'text-[#c8a84b]' : 'text-[#9a8e78]'}`}>{ev.regiao} — {ev.tipo_evento}</p>
-        <p className="text-[#7a6e58] text-xs mt-0.5">{ev.motivo}</p>
+        {eventosRegionais.length === 0 ? (
+          <p className="text-[#8a7e68] text-sm text-center py-6">Nenhum evento regional registrado.</p>
+        ) : (
+          <div className="grid grid-cols-2 gap-2">
+            {eventosRegionais.map(ev => (
+        <div key={ev.id}
+          onClick={() => setEventoExpandido(prev => prev === ev.id ? null : ev.id)}
+          className={`border p-3 cursor-pointer ${ev.ativo ? 'border-[#c8a84b30] bg-[#c8a84b08]' : 'border-[#c8a84b15] bg-[#161410]'}`}
+          style={{ borderRadius: '2px' }}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p style={cinzel} className={`text-sm ${ev.ativo ? 'text-[#c8a84b]' : 'text-[#8a7e68]'}`}>{ev.regiao} — {ev.tipo_evento}</p>
+              <p className="text-[#8a7e68] text-xs mt-0.5">{ev.motivo}</p>
+            </div>
+            <div className="flex items-center gap-2">
+        {ev.ativo && (
+          <button onClick={(e) => { e.stopPropagation(); encerrarEventoRegional(ev.id); }}
+            className="text-xs text-[#c8a84b] hover:text-[#e8c76a] transition-colors">Encerrar</button>
+        )}
+        <button onClick={(e) => { e.stopPropagation(); deletarEventoRegional(ev.id); }}
+          className="text-red-600 hover:text-red-600 text-xs transition-colors">×</button>
       </div>
-      <div className="flex items-center gap-2">
-  {ev.ativo && (
-    <button onClick={(e) => { e.stopPropagation(); encerrarEventoRegional(ev.id); }}
-      className="text-xs text-[#c8a84b] hover:text-[#e8c76a] transition-colors">Encerrar</button>
-  )}
-  <button onClick={(e) => { e.stopPropagation(); deletarEventoRegional(ev.id); }}
-    className="text-red-900 hover:text-red-600 text-xs transition-colors">×</button>
-</div>
     </div>
 
     {eventoExpandido === ev.id && (
@@ -762,16 +762,16 @@ function iconeRelogio(nome) {
           const precoNovo = (p.preco_base * mod).toFixed(2);
           return (
             <div key={p.id} className="flex items-center justify-between text-xs">
-              <span className="text-[#9a8e78]">{p.nome_item}</span>
+              <span className="text-[#8a7e68]">{p.nome_item}</span>
               <span>
-                <span className="text-[#7a6e58] line-through mr-2">{p.preco_base} {p.moeda}</span>
+                <span className="text-[#8a7e68] line-through mr-2">{p.preco_base} {p.moeda}</span>
                 <span className={mod > 1 ? 'text-red-600' : 'text-green-600'}>{precoNovo} {p.moeda}</span>
               </span>
             </div>
           );
         })}
         {precos.filter(p => ev.modificadores[p.categoria]).length === 0 && (
-          <p className="text-[#7a6e58] text-xs">Nenhum preço cadastrado nessa categoria.</p>
+          <p className="text-[#8a7e68] text-xs">Nenhum preço cadastrado nessa categoria.</p>
         )}
       </div>
     )}
@@ -781,66 +781,66 @@ function iconeRelogio(nome) {
   )}
 </div>
  
-{/* VIAGEM COMO SISTEMA */}
-<div className="mt-12">
-  <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
-  <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
-  <h2 style={cinzel} className="text-xl text-[#c8a84b] font-semibold mb-6">🧭 Viagem</h2>
+            {/* VIAGEM COMO SISTEMA */}
+            <div className="mt-12">
+              <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+              <p style={cinzel} className="text-[#6a8aaa] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
+              <h2 style={cinzel} className="text-xl text-[#c8a84b] font-semibold mb-6">🧭 Viagem</h2>
 
-  <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6 flex flex-col gap-3">
-    <div className="flex flex-col sm:flex-row gap-3">
-      <select value={novaViagem.origem_id}
-        onChange={e => setNovaViagem(prev => ({ ...prev, origem_id: e.target.value }))}
-        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 focus:outline-none focus:border-[#c8a84b50]"
-        style={{ borderRadius: '2px' }}>
-        <option value="">Origem</option>
-        {locais.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-      </select>
-      <select value={novaViagem.destino_id}
-        onChange={e => setNovaViagem(prev => ({ ...prev, destino_id: e.target.value }))}
-        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 focus:outline-none focus:border-[#c8a84b50]"
-        style={{ borderRadius: '2px' }}>
-        <option value="">Destino</option>
-        {locais.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-      </select>
-    </div>
-    <div className="flex flex-col sm:flex-row gap-3">
-      <input type="number" min="1" value={novaViagem.tempo_estimado_dias}
-        onChange={e => setNovaViagem(prev => ({ ...prev, tempo_estimado_dias: e.target.value }))}
-        placeholder="Tempo estimado (dias)"
-        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 focus:outline-none focus:border-[#c8a84b50]"
-        style={{ borderRadius: '2px' }} />
-      <input value={novaViagem.clima}
-        onChange={e => setNovaViagem(prev => ({ ...prev, clima: e.target.value }))}
-        placeholder="Clima (opcional)"
-        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 focus:outline-none focus:border-[#c8a84b50]"
-        style={{ borderRadius: '2px' }} />
-    </div>
-    <button onClick={iniciarViagem} disabled={!novaViagem.origem_id || !novaViagem.destino_id || !novaViagem.tempo_estimado_dias || iniciandoViagem}
-      className="bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] transition-colors disabled:opacity-30"
-      style={{ ...cinzel, borderRadius: '2px' }}>
-      {iniciandoViagem ? 'Calculando...' : 'Iniciar Viagem'}
-    </button>
-  </div>
-  {viagens.length === 0 ? (
-    <p className="text-[#7a6e58] text-sm text-center py-6">Nenhuma viagem registrada.</p>
-  ) : (
-    <div className="flex flex-col gap-2">
-      {viagens.map(v => (
-        <div key={v.id} className="border border-[#c8a84b20] bg-[#161410] p-4"
-          style={{ borderRadius: '2px' }}>
-          <div className="flex items-center justify-between">
-  <p style={cinzel} className="text-[#e8e0d0] text-sm">
-    {v.origem?.name || '?'} → {v.destino?.name || '?'}
-  </p>
-  <div className="flex items-center gap-2">
-    <p style={{ color: STATUS_COR[v.status] || '#6a6050' }} className="text-xs uppercase tracking-wider">
-      {v.status}
-    </p>
-    <button onClick={() => deletarViagem(v.id)}
-      className="text-red-900 hover:text-red-600 text-xs transition-colors">×</button>
-  </div>
-</div>
+              <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6 flex flex-col gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <select value={novaViagem.origem_id}
+                    onChange={e => setNovaViagem(prev => ({ ...prev, origem_id: e.target.value }))}
+                    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 focus:outline-none focus:border-[#c8a84b50]"
+                    style={{ borderRadius: '2px' }}>
+                    <option value="">Origem</option>
+                    {locais.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                  </select>
+                  <select value={novaViagem.destino_id}
+                    onChange={e => setNovaViagem(prev => ({ ...prev, destino_id: e.target.value }))}
+                    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 focus:outline-none focus:border-[#c8a84b50]"
+                    style={{ borderRadius: '2px' }}>
+                    <option value="">Destino</option>
+                    {locais.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                  </select>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <input type="number" min="1" value={novaViagem.tempo_estimado_dias}
+                    onChange={e => setNovaViagem(prev => ({ ...prev, tempo_estimado_dias: e.target.value }))}
+                    placeholder="Tempo estimado (dias)" aria-label="Tempo estimado (dias)"
+                    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 focus:outline-none focus:border-[#c8a84b50]"
+                    style={{ borderRadius: '2px' }} />
+                  <input value={novaViagem.clima}
+                    onChange={e => setNovaViagem(prev => ({ ...prev, clima: e.target.value }))}
+                    placeholder="Clima (opcional)" aria-label="Clima (opcional)"
+                    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 focus:outline-none focus:border-[#c8a84b50]"
+                    style={{ borderRadius: '2px' }} />
+                </div>
+                <button onClick={iniciarViagem} disabled={!novaViagem.origem_id || !novaViagem.destino_id || !novaViagem.tempo_estimado_dias || iniciandoViagem}
+                  className="bg-[#6a8aaa] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#7a9aaa] transition-colors disabled:opacity-30"
+                  style={{ ...cinzel, borderRadius: '2px' }}>
+                  {iniciandoViagem ? 'Calculando...' : 'Iniciar Viagem'}
+                </button>
+              </div>
+              {viagens.length === 0 ? (
+                <p className="text-[#8a7e68] text-sm text-center py-6">Nenhuma viagem registrada.</p>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {viagens.map(v => (
+                    <div key={v.id} className="border border-[#c8a84b20] bg-[#161410] p-4"
+                      style={{ borderRadius: '2px' }}>
+                      <div className="flex items-center justify-between">
+              <p style={cinzel} className="text-[#e8e0d0] text-sm">
+                {v.origem?.name || '?'} → {v.destino?.name || '?'}
+              </p>
+              <div className="flex items-center gap-2">
+                <p style={{ color: STATUS_COR[v.status] || '#6a6050' }} className="text-xs uppercase tracking-wider">
+                  {v.status}
+                </p>
+                <button onClick={() => deletarViagem(v.id)}
+                  className="text-red-600 hover:text-red-600 text-xs transition-colors">×</button>
+              </div>
+            </div>
           <p className="text-[#9a8e78] text-xs mt-1">
             Dia {v.dia_atual}/{v.tempo_estimado_dias} · Clima: {v.clima}
           </p>
@@ -869,23 +869,23 @@ function iconeRelogio(nome) {
 {/* GAZETA DO MUNDO */}
 <div className="mt-12">
   <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
-  <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
+  <p style={cinzel} className="text-[#6a8aaa] text-xs tracking-[4px] mb-2 opacity-70">ESTADO DO MUNDO</p>
   <h2 style={cinzel} className="text-xl text-[#c8a84b] font-semibold mb-6">📰 Gazeta</h2>
 
   <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6 flex flex-col sm:flex-row gap-3">
     <input value={nomeJornal} onChange={e => setNomeJornal(e.target.value)}
-      placeholder="Nome do jornal (ex: Gazeta de Valdris)"
+      placeholder="Nome do jornal (ex: Gazeta de Valdris)" aria-label="Nome do jornal (ex: Gazeta de Valdris)"
       className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm flex-1 focus:outline-none focus:border-[#c8a84b50]"
       style={{ borderRadius: '2px' }} />
     <button onClick={gerarGazeta} disabled={gerandoGazeta}
-      className="bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] transition-colors disabled:opacity-30"
+      className="bg-[#6a8aaa] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#7a9aaa] transition-colors disabled:opacity-30"
       style={{ ...cinzel, borderRadius: '2px' }}>
       {gerandoGazeta ? 'Escrevendo...' : '+ Nova Edição'}
     </button>
   </div>
 
   {gazetas.length === 0 ? (
-    <p className="text-[#7a6e58] text-sm text-center py-6">Nenhuma edição ainda.</p>
+    <p className="text-[#8a7e68] text-sm text-center py-6">Nenhuma edição ainda.</p>
   ) : (
     <div className="flex flex-col gap-3">
       {gazetas.map(g => {
@@ -910,7 +910,7 @@ function iconeRelogio(nome) {
                   {rascunho ? 'Rascunho' : 'Publicada'}
                 </span>
                 <button onClick={() => deletarGazeta(g.id)}
-                  className="text-red-900 hover:text-red-600 text-xs transition-colors">×</button>
+                  className="text-red-600 hover:text-red-600 text-xs transition-colors">×</button>
               </div>
             </div>
 
@@ -925,7 +925,7 @@ function iconeRelogio(nome) {
                         className="flex-1 bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-2 py-1 text-sm focus:outline-none focus:border-[#c8a84b50]"
                         style={{ borderRadius: '2px' }} />
                       <button onClick={() => removerNoticia(g.id, i)}
-                        className="text-red-900 hover:text-red-600 text-xs mt-1">×</button>
+                        className="text-red-600 hover:text-red-600 text-xs mt-1">×</button>
                     </>
                   ) : (
                     <p className="text-[#8a8070] text-sm leading-relaxed">{n.texto}</p>

@@ -53,10 +53,10 @@ export default function SessaoZeroFicha({ personagemId }) {
         <p className="text-[#9a8e78] text-sm leading-relaxed">
           Suas respostas ajudam o mestre a ligar seu personagem ao grupo e ao mundo.
         </p>
-        <p className="text-[#8a5030] text-xs mt-2">🔒 Só você e o mestre leem.</p>
+        <p className="text-[#b07050] text-xs mt-2">🔒 Só você e o mestre leem.</p>
       </div>
 
-      {carregando && <p className="text-[#7a6e58] text-sm">Carregando perguntas...</p>}
+      {carregando && <p className="text-[#8a7e68] text-sm">Carregando perguntas...</p>}
       {!carregando && chaves.length === 0 && erro && (
         <p className="text-red-400 text-sm">Não foi possível carregar as perguntas ({estado.slice(5)}).</p>
       )}
@@ -83,13 +83,13 @@ export default function SessaoZeroFicha({ personagemId }) {
               <span className="text-[#e8e0d0] text-sm">{perguntas[chave]}</span>
             </label>
             <textarea id={`sz-${chave}`} value={valor} rows={3} maxLength={LIMITE}
-              placeholder="Escreva aqui..."
+              placeholder="Escreva aqui..." aria-label="Escreva aqui..."
               onChange={e => { setRespostas(r => ({ ...r, [chave]: e.target.value })); setEstado(''); }}
               className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full text-sm leading-relaxed focus:outline-none focus:border-[#c8a84b50] resize-none"
               style={{ borderRadius: '2px' }} />
             <div className="flex justify-between items-center mt-1">
               <span className="text-xs" style={{ color: COR }}>{valor.trim() ? '✓' : ''}</span>
-              <span className={`text-xs ${perto ? 'text-[#c8a84b]' : 'text-[#7a6e58]'}`}>{valor.length}/{LIMITE}</span>
+              <span className={`text-xs ${perto ? 'text-[#c8a84b]' : 'text-[#8a7e68]'}`}>{valor.length}/{LIMITE}</span>
             </div>
           </div>
         );

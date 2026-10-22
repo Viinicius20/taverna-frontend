@@ -17,7 +17,7 @@ const CATEGORIAS_TOKEN = ['Nobre', 'Cultista', 'Aberração', 'Bandido', 'Goblin
 
 const COR_CATEGORIA = {
   'Nobre': '#6a6a6a', 'Cultista': '#8a4a20', 'Aberração': '#4a8a4a',
-  'Bandido': '#4a6a8a', 'Goblin': '#6a8a20', 'Humanoide': '#4a6aaa',
+  'Bandido': '#6a8aaa', 'Goblin': '#6a8a20', 'Humanoide': '#4a6aaa',
   'Undead': '#8a6020', 'Gigante': '#8a4a4a', 'Besta': '#6a8a6a',
   'Dragão': '#c8a84b', 'Demônio': '#8a2020', 'Construto': '#6a6a8a', 'Outro': '#4a4030'
 };
@@ -415,7 +415,7 @@ if (!isMestre) {
           <div className="flex flex-col items-center gap-4 text-center">
             <span className="text-4xl opacity-20">🗺</span>
             <p style={cinzel} className="text-[#8a7e68] text-sm tracking-widest">NENHUMA IMAGEM REVELADA</p>
-            <p className="text-[#7a6e58] text-xs">Aguarde o Mestre revelar algo...</p>
+            <p className="text-[#8a7e68] text-xs">Aguarde o Mestre revelar algo...</p>
           </div>
         )}
       </div>
@@ -446,7 +446,7 @@ if (!isMestre) {
     <input
       value={uploadCategoria}
       onChange={e => setUploadCategoria(e.target.value)}
-      placeholder="Categoria..."
+      placeholder="Categoria..." aria-label="Categoria..."
       list="categorias-lista"
       className="bg-[#161410] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 text-xs focus:outline-none w-36"
       style={{ ...cinzel, borderRadius: '2px' }}
@@ -537,7 +537,7 @@ if (!isMestre) {
                           className="border border-[#c8a84b30] text-[#c8a84b] px-2 py-1.5 text-xs hover:bg-[#c8a84b10] transition-colors"
                           style={{ ...cinzel, borderRadius: '2px' }}>🎯</button>
                         <button onClick={() => deletarImagem(img.id)}
-                          className="border border-red-900 text-red-900 px-2 py-1.5 text-xs hover:border-red-600 hover:text-red-600 transition-colors"
+                          className="border border-red-600 text-red-600 px-2 py-1.5 text-xs hover:border-red-600 hover:text-red-600 transition-colors"
                           style={{ ...cinzel, borderRadius: '2px' }}>×</button>
                       </div>
                     </div>
@@ -583,7 +583,7 @@ if (!isMestre) {
               <div className="flex flex-col items-center justify-center py-24 gap-4 border border-[#c8a84b15] bg-[#161410]">
                 <span className="text-4xl opacity-20">⬡</span>
                 <p style={cinzel} className="text-[#8a7e68] text-sm tracking-widest">NENHUM TOKEN AINDA</p>
-                <p className="text-[#7a6e58] text-xs">Selecione a categoria e clique em + UPLOAD</p>
+                <p className="text-[#8a7e68] text-xs">Selecione a categoria e clique em + UPLOAD</p>
               </div>
             ) : (
               <div className="grid grid-cols-3 sm:grid-cols-5 gap-4">
@@ -629,11 +629,11 @@ if (!isMestre) {
       ))}
       </div>
       <input value={remetente} onChange={e => setRemetente(e.target.value)} maxLength={80}
-       placeholder="Remetente (opcional): ex: Capitão da Guarda, Culto da Estigma"
+       placeholder="Remetente (opcional): ex: Capitão da Guarda, Culto da Estigma" aria-label="Remetente (opcional): ex: Capitão da Guarda, Culto da Estigma"
         className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full mb-3 focus:outline-none focus:border-[#c8a84b50] text-sm"
         style={{ borderRadius: '2px' }} />
       <textarea value={descricaoHandout} onChange={e => setDescricaoHandout(e.target.value)}
-        placeholder="Ex: uma carta de amor nunca entregue, escondida há 20 anos..."
+        placeholder="Ex: uma carta de amor nunca entregue, escondida há 20 anos..." aria-label="Ex: uma carta de amor nunca entregue, escondida há 20 anos..."
         rows={2}
         className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full mb-3 focus:outline-none focus:border-[#c8a84b50] resize-none text-sm"
         style={{ borderRadius: '2px' }} />
@@ -647,7 +647,7 @@ if (!isMestre) {
     {/* Lista */}
     <div className="space-y-2">
       {handouts.length === 0 ? (
-        <p className="text-[#7a6e58] text-sm text-center py-8">Nenhum handout ainda.</p>
+        <p className="text-[#8a7e68] text-sm text-center py-8">Nenhum handout ainda.</p>
       ) : (
         handouts.map(h => (
           <div key={h.id} className="border border-[#c8a84b15] bg-[#161410] p-4"
@@ -663,7 +663,7 @@ if (!isMestre) {
                 )}
                 <EnviarHandout handoutId={h.id} personagens={personagens} onEnviado={buscarImagens} /> <CofreHandout handout={h} onMudou={buscarImagens} />
                 <button onClick={() => deletarHandout(h.id)}
-                  className="text-xs border border-red-900 text-red-900 px-2 py-0.5 hover:bg-red-900 hover:text-white transition-colors"
+                  className="text-xs border border-red-600 text-red-600 px-2 py-0.5 hover:bg-red-600 hover:text-white transition-colors"
                   style={{ borderRadius: '2px', ...cinzel }}>
                   DELETAR
                 </button>
@@ -782,7 +782,7 @@ if (!isMestre) {
 <div className="w-48 bg-[#161410] border-l border-[#c8a84b20] overflow-y-auto p-3">
   <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-3">TOKENS</p>
   <input
-    placeholder="Buscar..."
+    placeholder="Buscar..." aria-label="Buscar..."
     onChange={e => setBuscaToken(e.target.value)}
     className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-2 py-1 text-xs w-full focus:outline-none focus:border-[#c8a84b50] mb-3 placeholder-[#3a3020]"
     style={{ borderRadius: '2px' }}

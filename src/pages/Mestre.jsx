@@ -901,9 +901,9 @@ const LISTA_CONDICOES = [
   { label: 'Caído', cor: '#8a2020' },
   { label: 'Envenenado', cor: '#4a8a20' },
   { label: 'Paralisado', cor: '#8a6020' },
-  { label: 'Enfeitiçado', cor: '#8a4a8a' },
+  { label: 'Enfeitiçado', cor: '#a86aa8' },
   { label: 'Amedrontado', cor: '#6a4020' },
-  { label: 'Atordoado', cor: '#4a6a8a' },
+  { label: 'Atordoado', cor: '#6a8aaa' },
   { label: 'Invisível', cor: '#6a6a6a' },
   { label: 'Surdo', cor: '#4a4030' },
   { label: 'Cego', cor: '#303030' },
@@ -1217,7 +1217,7 @@ useEffect(() => {
                   <div>
                     <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] block mb-2">DESCRIÇÃO DO NPC</label>
                     <textarea value={descNpc} onChange={e => setDescNpc(e.target.value)}
-                      placeholder="Ex: taberneiro anão idoso que esconde um passado como assassino, desconfiado de estranhos..."
+                      placeholder="Ex: taberneiro anão idoso que esconde um passado como assassino, desconfiado de estranhos..." aria-label="Ex: taberneiro anão idoso que esconde um passado como assassino, desconfiado de estranhos..."
                       rows={3}
                       className="bg-[#0f0e0c] border border-[#c8a84b30] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b60] resize-none placeholder-[#3a3528]"
                       style={{ fontSize: '1rem', borderRadius: '2px', lineHeight: '1.7' }} />
@@ -1476,7 +1476,7 @@ useEffect(() => {
                                     onClick={e => e.stopPropagation()}
                                     className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-lg w-full py-2 focus:outline-none focus:border-[#c8a84b50]"
                                     style={{ borderRadius: '2px' }} />
-                                  <span style={cinzel} className="text-[#7a6e58] text-xs">
+                                  <span style={cinzel} className="text-[#8a7e68] text-xs">
                                     {Math.floor((valor - 10) / 2) >= 0 ? '+' : ''}{Math.floor((valor - 10) / 2)}
                                   </span>
                                 </div>
@@ -1499,8 +1499,8 @@ useEffect(() => {
 
                       {/* CAMPOS EDITÁVEIS DO MESTRE */}
                       {[
-                        { label: '🔒 SEGREDO', campo: 'secret', placeholder: 'O que este NPC esconde dos aventureiros...', cor: '#8a5030', rows: 3 },
-                        { label: 'NOTAS DO MESTRE', campo: 'notes', placeholder: 'Anotações privadas sobre este NPC...', cor: '#8a5030', rows: 4 },
+                        { label: '🔒 SEGREDO', campo: 'secret', placeholder: 'O que este NPC esconde dos aventureiros...', cor: '#b07050', rows: 3 },
+                        { label: 'NOTAS DO MESTRE', campo: 'notes', placeholder: 'Anotações privadas sobre este NPC...', cor: '#b07050', rows: 4 },
                       ].map(({ label, campo, placeholder, cor, rows }) => (
                         <div key={campo}>
                           <label style={{ ...cinzel, color: cor }} className="text-xs tracking-[2px] block mb-2">{label}</label>
@@ -1522,7 +1522,7 @@ useEffect(() => {
                           value={getNota(npc.id, 'location')}
                           onChange={e => editarNotaLocal(npc.id, 'location', e.target.value)}
                           onClick={e => e.stopPropagation()}
-                          placeholder="Ex: Porto de Valdris"
+                          placeholder="Ex: Porto de Valdris" aria-label="Ex: Porto de Valdris"
                           className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
                           style={{ borderRadius: '2px' }} />
                       </div>
@@ -1569,13 +1569,13 @@ useEffect(() => {
                         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">🧠 MEMÓRIA</p>
                         <div className="flex flex-col gap-2 mb-3">
                           {(d.memoria || []).length === 0 ? (
-                          <p className="text-[#7a6e58] text-xs">Nenhum evento registrado ainda.</p>
+                          <p className="text-[#8a7e68] text-xs">Nenhum evento registrado ainda.</p>
                         ) : (
                           d.memoria.map((m, i) => (
                             <div key={i} className="border border-[#c8a84b10] bg-[#0f0e0c] px-3 py-2 flex items-center justify-between gap-2">
                               <p className="text-[#9a8e78] text-xs flex-1">{m.evento}</p>
                               <button onClick={e => { e.stopPropagation(); removerMemoria(npc.id, i); }}
-                                className="text-red-900 hover:text-red-600 text-xs transition-colors flex-shrink-0">×</button>
+                                className="text-red-600 hover:text-red-600 text-xs transition-colors flex-shrink-0">×</button>
                             </div>
                           ))
                         )}
@@ -1585,7 +1585,7 @@ useEffect(() => {
                             value={novaMemoria[npc.id] || ''}
                             onChange={e => setNovaMemoria(prev => ({ ...prev, [npc.id]: e.target.value }))}
                             onClick={e => e.stopPropagation()}
-                            placeholder="Ex: jogadores mentiram sobre o preço..."
+                            placeholder="Ex: jogadores mentiram sobre o preço..." aria-label="Ex: jogadores mentiram sobre o preço..."
                             className="flex-1 bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
                             style={{ borderRadius: '2px' }} />
                           <button onClick={e => { e.stopPropagation(); adicionarMemoria(npc.id); }}
@@ -1596,12 +1596,12 @@ useEffect(() => {
                         </div>
                         <button onClick={e => { e.stopPropagation(); pedirSugestao(npc.id); }}
                           disabled={gerandoSugestao === npc.id}
-                          className="mt-3 w-full border border-[#8a4a8a40] text-[#8a4a8a] py-2 text-xs tracking-widest hover:bg-[#8a4a8a10] transition-colors disabled:opacity-50"
+                          className="mt-3 w-full border border-[#a86aa840] text-[#a86aa8] py-2 text-xs tracking-widest hover:bg-[#a86aa810] transition-colors disabled:opacity-50"
                           style={{ ...cinzel, borderRadius: '2px' }}>
                           {gerandoSugestao === npc.id ? 'Pensando...' : '💭 Sugerir Reação'}
                         </button>
                         {sugestaoNpc[npc.id] && (
-                          <div className="mt-3 border border-[#8a4a8a30] bg-[#8a4a8a08] p-3">
+                          <div className="mt-3 border border-[#a86aa830] bg-[#a86aa808] p-3">
                             <p className="text-[#e8e0d0] text-sm italic">{sugestaoNpc[npc.id]}</p>
                           </div>
                         )}
@@ -1665,13 +1665,13 @@ useEffect(() => {
                             e.stopPropagation();
                             setModalRevelarSegredo({ npc });
                           }}
-                          className="text-[#8a5030] hover:text-[#c8a84b] text-xs border border-[#8a5030] hover:border-[#c8a84b] px-4 py-1.5 transition-colors"
+                          className="text-[#b07050] hover:text-[#c8a84b] text-xs border border-[#b07050] hover:border-[#c8a84b] px-4 py-1.5 transition-colors"
                           style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
                           🔓 Revelar Segredo
                         </button>
                       )}
                         <button onClick={() => deletarNpc(npc.id)}
-                          className="text-red-900 hover:text-red-600 text-xs border border-red-900 hover:border-red-600 px-4 py-1.5 transition-colors"
+                          className="text-red-600 hover:text-red-600 text-xs border border-red-600 hover:border-red-600 px-4 py-1.5 transition-colors"
                           style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
                           Deletar NPC
                         </button>
@@ -1687,25 +1687,25 @@ useEffect(() => {
         {modalRevelarSegredo && (
   <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 px-4"
     onClick={() => setModalRevelarSegredo(null)}>
-    <div className="bg-[#161410] border border-[#8a5030] max-w-md w-full p-6"
+    <div className="bg-[#161410] border border-[#b07050] max-w-md w-full p-6"
       style={{ borderRadius: '2px' }}
       onClick={e => e.stopPropagation()}>
       <div className="flex justify-between items-start mb-4">
-        <p style={cinzel} className="text-[#8a5030] text-sm font-bold">
+        <p style={cinzel} className="text-[#b07050] text-sm font-bold">
           🔓 Revelar Segredo de {modalRevelarSegredo.npc.name}
         </p>
         <button onClick={() => setModalRevelarSegredo(null)}
           className="text-[#8a7e68] hover:text-[#c8a84b] text-xl">✕</button>
       </div>
 
-      <p className="text-[#9a8e78] text-sm italic mb-4 border border-[#8a5030] bg-[#0f0e0c] p-3"
+      <p className="text-[#9a8e78] text-sm italic mb-4 border border-[#b07050] bg-[#0f0e0c] p-3"
         style={{ borderRadius: '2px' }}>
         "{getNota(modalRevelarSegredo.npc.id, 'secret')}"
       </p>
 
       {!stagesSegredo && (
         <button onClick={gerarStages} disabled={gerandoStages}
-          className="w-full border border-[#8a4a8a50] text-[#8a4a8a] px-4 py-2 text-xs mb-4 hover:bg-[#8a4a8a10] transition-colors disabled:opacity-30"
+          className="w-full border border-[#a86aa850] text-[#a86aa8] px-4 py-2 text-xs mb-4 hover:bg-[#a86aa810] transition-colors disabled:opacity-30"
           style={{ ...cinzel, borderRadius: '2px' }}>
           {gerandoStages ? 'Gerando...' : '✨ Criar revelação gradual com IA'}
         </button>
@@ -1716,7 +1716,7 @@ useEffect(() => {
           <div className="flex flex-col gap-1 mb-4">
             {NIVEIS_SEGREDO.map((label, i) => (
               <p key={i} style={cinzel}
-                className={`text-xs ${i <= stagesSegredo.nivel_revelado ? 'text-[#c8a84b]' : 'text-[#7a6e58]'}`}>
+                className={`text-xs ${i <= stagesSegredo.nivel_revelado ? 'text-[#c8a84b]' : 'text-[#8a7e68]'}`}>
                 {label}{i === stagesSegredo.nivel_revelado ? '  ← atual' : ''}
               </p>
             ))}
@@ -1729,7 +1729,7 @@ useEffect(() => {
               <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-2">
                 PRÓXIMO: {NIVEIS_SEGREDO[stagesSegredo.nivel_revelado + 1]}
               </p>
-              <p className="text-[#9a8e78] text-sm italic mb-3 border border-[#8a5030] bg-[#0f0e0c] p-3"
+              <p className="text-[#9a8e78] text-sm italic mb-3 border border-[#b07050] bg-[#0f0e0c] p-3"
                 style={{ borderRadius: '2px' }}>
                 "{stagesSegredo.nivel_revelado + 1 === 4
                   ? getNota(modalRevelarSegredo.npc.id, 'secret')
@@ -1820,7 +1820,7 @@ useEffect(() => {
 <div>
   <div className="flex items-center justify-between mb-2">
     <div>
-      <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">ENCONTRO ATUAL</p>
+      <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 opacity-70">ENCONTRO ATUAL</p>
       <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold">Painel de Combate</h2>
     </div>
     <div className="flex gap-2">
@@ -1841,17 +1841,17 @@ useEffect(() => {
               className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors"
               style={{ ...cinzel, borderRadius: '2px' }}>
               PRÓXIMO TURNO →
-              <p className="text-[#7a6e58] text-xs mt-2">Atalho: Espaço ou Enter para avançar turno</p>
+              <p className="text-[#8a7e68] text-xs mt-2">Atalho: Espaço ou Enter para avançar turno</p>
             </button>
           ) : (
             <button onClick={() => setCombateAtivo(true)}
-              className="bg-[#8a5030] text-[#f0e8d8] px-4 py-2 text-xs font-bold hover:bg-[#a06040] transition-colors"
+              className="bg-[#b07050] text-[#f0e8d8] px-4 py-2 text-xs font-bold hover:bg-[#c08060] transition-colors"
               style={{ ...cinzel, borderRadius: '2px' }}>
               ⚔ INICIAR
             </button>
           )}
           <button onClick={resetarCombate}
-            className="border border-red-900 text-red-900 px-3 py-2 text-xs hover:border-red-600 hover:text-red-600 transition-colors"
+            className="border border-red-600 text-red-600 px-3 py-2 text-xs hover:border-red-600 hover:text-red-600 transition-colors"
             style={{ ...cinzel, borderRadius: '2px' }}>
             ✕
           </button>
@@ -1878,7 +1878,7 @@ useEffect(() => {
           setSugestoesMonstro([]);
         }
       }}
-      placeholder="Nome do monstro..."
+      placeholder="Nome do monstro..." aria-label="Nome do monstro..."
       className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
       style={{ borderRadius: '2px' }} />
     {sugestoesMonstro.length > 0 && (
@@ -1901,7 +1901,7 @@ useEffect(() => {
   </div>
   <div className="flex gap-2">
     <input value={novoMonstro.hp} onChange={e => setNovoMonstro(p => ({ ...p, hp: e.target.value }))}
-      placeholder="HP" type="number" min={1}
+      placeholder="HP" aria-label="HP" type="number" min={1}
       className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-20 text-sm text-center focus:outline-none focus:border-[#c8a84b50]"
       style={{ borderRadius: '2px' }} />
     <input value={novoMonstro.qtd} onChange={e => setNovoMonstro(p => ({ ...p, qtd: Math.max(1, Number(e.target.value)) }))}
@@ -1964,7 +1964,7 @@ useEffect(() => {
 
   {/* Lista de combatentes */}
   {combatentes.length === 0 ? (
-    <p className="text-[#7a6e58] text-sm text-center py-8">Nenhum combatente adicionado.</p>
+    <p className="text-[#8a7e68] text-sm text-center py-8">Nenhum combatente adicionado.</p>
   ) : (
     <div className="space-y-2">
       {combatentes.map((c, idx) => {
@@ -2006,7 +2006,7 @@ useEffect(() => {
                       <span style={{ ...cinzel, borderRadius: '2px' }}
                         className={[
                           'text-xs px-2 py-0.5 border',
-                          c.tipo === 'monstro' ? 'border-red-900 text-red-900' :
+                          c.tipo === 'monstro' ? 'border-red-600 text-red-600' :
                           c.tipo === 'jogador' ? 'border-[#7ab8d430] text-[#7ab8d4]' :
                           'border-[#c8a84b30] text-[#c8a84b60]'
                         ].join(' ')}>
@@ -2025,7 +2025,7 @@ useEffect(() => {
   <div className="flex flex-wrap gap-1 mt-2">
     {c.condicoes.map(cond => (
       <span key={cond} style={cinzel}
-        className="text-xs px-2 py-0.5 border border-[#8a4a8a40] text-[#8a4a8a] bg-[#8a4a8a10]"
+        className="text-xs px-2 py-0.5 border border-[#a86aa840] text-[#a86aa8] bg-[#a86aa810]"
         style2={{ borderRadius: '2px' }}>
         {cond}
       </span>
@@ -2039,20 +2039,20 @@ useEffect(() => {
                   onChange={e => atualizarCombatente(c.id, 'hpAtual', Number(e.target.value))}
                   className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] text-center text-lg w-16 py-1 focus:outline-none focus:border-[#c8a84b50]"
                   style={{ borderRadius: '2px' }} />
-                <span className="text-[#7a6e58] text-sm">/</span>
-                <span style={cinzel} className="text-[#7a6e58] text-sm w-10 text-center">{c.hpMax}</span>
+                <span className="text-[#8a7e68] text-sm">/</span>
+                <span style={cinzel} className="text-[#8a7e68] text-sm w-10 text-center">{c.hpMax}</span>
               </div>
 
               {/* Condições */}
 <button onClick={() => setModalCondicoes(c.id)}
-  className="text-[#8a7e68] hover:text-[#8a4a8a] text-xs transition-colors px-1"
+  className="text-[#8a7e68] hover:text-[#a86aa8] text-xs transition-colors px-1"
   title="Gerenciar condições">
   ⚕
 </button>
 
               {/* Remover */}
               <button onClick={() => removerCombatente(c.id)}
-                className="text-red-900 hover:text-red-600 text-lg transition-colors px-1">×</button>
+                className="text-red-600 hover:text-red-600 text-lg transition-colors px-1">×</button>
             </div>
           </div>
         );
@@ -2072,7 +2072,7 @@ useEffect(() => {
 {/* GERADOR DE LOOT */}
 <div className="mt-12">
   <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
-  <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">FERRAMENTAS</p>
+  <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 opacity-70">FERRAMENTAS</p>
   <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Gerador de Loot</h2>
 
   {/* Config */}
@@ -2102,7 +2102,7 @@ useEffect(() => {
       <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">CONTEXTO</label>
       <input value={lootConfig.contexto}
         onChange={e => setLootConfig(p => ({ ...p, contexto: e.target.value }))}
-        placeholder="Ex: covil de orcs, dragão jovem..."
+        placeholder="Ex: covil de orcs, dragão jovem..." aria-label="Ex: covil de orcs, dragão jovem..."
         className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
         style={{ borderRadius: '2px' }} />
     </div>
@@ -2187,13 +2187,13 @@ useEffect(() => {
 {/* ALMANAQUE DE ITENS MÁGICOS */}
 <div className="mt-12">
   <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
-  <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">BIBLIOTECA</p>
+  <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 opacity-70">BIBLIOTECA</p>
   <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Itens Mágicos</h2>
 
   {/* Criar homebrew */}
   <div className="flex flex-col sm:flex-row gap-2 mb-6">
   <input value={novoItemNome} onChange={e => setNovoItemNome(e.target.value)}
-    placeholder="Nome do item para criar com IA..."
+    placeholder="Nome do item para criar com IA..." aria-label="Nome do item para criar com IA..."
     className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 flex-1 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
     style={{ borderRadius: '2px' }} />
   <select value={novoItemRaridade} onChange={e => setNovoItemRaridade(e.target.value)}
@@ -2206,20 +2206,20 @@ useEffect(() => {
   </select>
   <div className="flex items-center gap-3 mt-2">
   <button onClick={() => setNovoItemIdentificado(p => !p)}
-    className={`px-3 py-1 text-xs border transition-colors ${novoItemIdentificado ? 'border-[#c8a84b30] text-[#8a7e68]' : 'border-[#8a5030] text-[#8a5030] bg-[#8a503010]'}`}
+    className={`px-3 py-1 text-xs border transition-colors ${novoItemIdentificado ? 'border-[#c8a84b30] text-[#8a7e68]' : 'border-[#b07050] text-[#b07050] bg-[#b0705010]'}`}
     style={{ ...cinzel, borderRadius: '2px' }}>
     {novoItemIdentificado ? '✓ IDENTIFICADO' : '? NÃO IDENTIFICADO'}
   </button>
   {!novoItemIdentificado && (
     <input value={novoItemNomeMisterioso}
       onChange={e => setNovoItemNomeMisterioso(e.target.value)}
-      placeholder="Nome misterioso (ex: Cajado Estranho)..."
-      className="bg-[#161410] border border-[#8a503040] text-[#e8e0d0] px-3 py-1 flex-1 text-sm focus:outline-none placeholder-[#3a3020]"
+      placeholder="Nome misterioso (ex: Cajado Estranho)..." aria-label="Nome misterioso (ex: Cajado Estranho)..."
+      className="bg-[#161410] border border-[#b0705040] text-[#e8e0d0] px-3 py-1 flex-1 text-sm focus:outline-none placeholder-[#3a3020]"
       style={{ borderRadius: '2px' }} />
   )}
 </div>
 <textarea value={novoItemContexto} onChange={e => setNovoItemContexto(e.target.value)}
-    placeholder="Contexto opcional... Ex: Pertenceu a um paladino caído, feito de escamas de dragão..."
+    placeholder="Contexto opcional... Ex: Pertenceu a um paladino caído, feito de escamas de dragão..." aria-label="Contexto opcional... Ex: Pertenceu a um paladino caído, feito de escamas de dragão..."
     rows={2}
     className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020] resize-none"
     style={{ borderRadius: '2px' }} />
@@ -2275,7 +2275,7 @@ useEffect(() => {
                 <span style={{ ...cinzel, color: rarCor }} className="text-xs w-20 shrink-0">{item.rarity}</span>
                 <span style={cinzel} className="text-[#e8e0d0] text-sm">{item.name}</span>
                 {item.is_homebrew && (
-                  <span style={cinzel} className="text-xs border border-[#8a5030] text-[#8a5030] px-1.5 py-0.5"
+                  <span style={cinzel} className="text-xs border border-[#b07050] text-[#b07050] px-1.5 py-0.5"
                     style2={{ borderRadius: '2px' }}>HOMEBREW</span>
                 )}
                 {item.requires_attunement && (
@@ -2316,7 +2316,7 @@ useEffect(() => {
     
                       setMagicItems(prev => prev.map(i => i.id === item.id ? { ...i, identificado: true } : i));
                     }}
-                      className="text-xs border border-[#8a5030] text-[#8a5030] px-2 py-0.5 hover:bg-[#8a503020] transition-colors"
+                      className="text-xs border border-[#b07050] text-[#b07050] px-2 py-0.5 hover:bg-[#b0705020] transition-colors"
                       style={{ ...cinzel, borderRadius: '2px' }}>
                       REVELAR
                     </button>
@@ -2331,7 +2331,7 @@ useEffect(() => {
                 <img src={item.art_url} alt={item.name} className="w-full max-h-48 object-cover" style={{ borderRadius: '2px' }} />
               )}
               {!item.identificado && (
-                <p style={cinzel} className="text-[#8a5030] text-xs tracking-[2px] mb-2">? NÃO IDENTIFICADO PELO JOGADOR</p>
+                <p style={cinzel} className="text-[#b07050] text-xs tracking-[2px] mb-2">? NÃO IDENTIFICADO PELO JOGADOR</p>
               )}
                 {item.description && (
                 <p className="text-[#9a8e78] text-sm font-light leading-relaxed">{limparMarkdown(item.description)}</p>
@@ -2349,7 +2349,7 @@ useEffect(() => {
               setMagicItems(prev => prev.filter(i => i.id !== item.id));
               setItemDetalhes(null);
             }}
-              className="text-xs border border-red-900 text-red-900 px-2 py-0.5 hover:bg-red-900 hover:text-white transition-colors mt-2"
+              className="text-xs border border-red-600 text-red-600 px-2 py-0.5 hover:bg-red-600 hover:text-white transition-colors mt-2"
               style={{ ...cinzel, borderRadius: '2px' }}>
               🗑 DELETAR ITEM
             </button>
@@ -2378,7 +2378,7 @@ useEffect(() => {
 {/* RESUMO DE REGRAS */}
 <div className="mt-12">
   <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
-  <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">CONSULTA RÁPIDA</p>
+  <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 opacity-70">CONSULTA RÁPIDA</p>
   <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Resumo de Regras</h2>
 
   <div className="flex flex-col sm:flex-row gap-2 mb-6">
@@ -2428,7 +2428,7 @@ useEffect(() => {
 {/* RELÓGIO DE PRESSÃO */}
 <div className="mt-12">
   <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
-  <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">TENSÃO</p>
+  <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 opacity-70">TENSÃO</p>
   <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Relógio de Pressão</h2>
 
   <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center mb-6">
@@ -2449,7 +2449,7 @@ useEffect(() => {
         </button>
       ) : (
         <button onClick={pararCountdown}
-          className="border border-red-900 text-red-900 px-5 py-2 text-xs font-bold hover:border-red-600 hover:text-red-600 transition-colors"
+          className="border border-red-600 text-red-600 px-5 py-2 text-xs font-bold hover:border-red-600 hover:text-red-600 transition-colors"
           style={{ ...cinzel, borderRadius: '2px' }}>
           ✕ PARAR
         </button>
@@ -2471,7 +2471,7 @@ useEffect(() => {
 {/* HISTÓRICO DE SESSÕES */}
 <div className="mt-12">
   <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
-  <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">CRÔNICAS</p>
+  <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 opacity-70">CRÔNICAS</p>
   <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Histórico de Sessões</h2>
 
   {/* Nova sessão */}
@@ -2482,16 +2482,16 @@ useEffect(() => {
         onChange={e => setNovaSessao(p => ({ ...p, session_number: Number(e.target.value) }))}
         className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] px-3 py-2 w-20 text-sm text-center focus:outline-none focus:border-[#c8a84b50]"
         style={{ borderRadius: '2px' }}
-        placeholder="Nº" />
+        placeholder="Nº" aria-label="Nº" />
       <input value={novaSessao.title}
         onChange={e => setNovaSessao(p => ({ ...p, title: e.target.value }))}
-        placeholder="Título da sessão..."
+        placeholder="Título da sessão..." aria-label="Título da sessão..."
         className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 flex-1 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
         style={{ borderRadius: '2px' }} />
     </div>
     <textarea value={novaSessao.summary}
       onChange={e => setNovaSessao(p => ({ ...p, summary: e.target.value }))}
-      placeholder="Resumo do que aconteceu na sessão..."
+      placeholder="Resumo do que aconteceu na sessão..." aria-label="Resumo do que aconteceu na sessão..."
       rows={4}
       className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020] resize-none mb-3"
       style={{ borderRadius: '2px' }} />
@@ -2504,7 +2504,7 @@ useEffect(() => {
 
   {/* Lista de sessões */}
   {sessoes.length === 0 ? (
-    <p className="text-[#7a6e58] text-sm text-center py-8">Nenhuma sessão registrada.</p>
+    <p className="text-[#8a7e68] text-sm text-center py-8">Nenhuma sessão registrada.</p>
   ) : (
     <div className="space-y-2">
       {sessoes.map(s => (
@@ -2521,7 +2521,7 @@ useEffect(() => {
                 {new Date(s.created_at).toLocaleDateString('pt-BR')}
               </span>
               <button onClick={e => { e.stopPropagation(); deletarSessao(s.id); }}
-                className="text-red-900 hover:text-red-600 text-sm transition-colors">×</button>
+                className="text-red-600 hover:text-red-600 text-sm transition-colors">×</button>
               <span className="text-[#8a7e68] text-xs">{sessaoExpandida === s.id ? '▲' : '▼'}</span>
             </div>
           </div>
@@ -2539,7 +2539,7 @@ useEffect(() => {
 {/* CALCULADORA DE XP */}
 <div className="mt-12">
   <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
-  <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">RECOMPENSAS</p>
+  <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 opacity-70">RECOMPENSAS</p>
   <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Calculadora de XP</h2>
 
   <div className="border border-[#c8a84b20] bg-[#161410] p-6 mb-4">
@@ -2553,7 +2553,7 @@ useEffect(() => {
               novos[idx].nome = e.target.value;
               setMonstros(novos);
             }}
-            placeholder="Nome do monstro..."
+            placeholder="Nome do monstro..." aria-label="Nome do monstro..."
             className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 flex-1 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
             style={{ borderRadius: '2px' }} />
           <input type="number" min={0} value={m.xp}
@@ -2562,11 +2562,11 @@ useEffect(() => {
               novos[idx].xp = e.target.value;
               setMonstros(novos);
             }}
-            placeholder="XP"
+            placeholder="XP" aria-label="XP"
             className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] px-3 py-2 w-24 text-sm text-center focus:outline-none focus:border-[#c8a84b50]"
             style={{ borderRadius: '2px' }} />
           <button onClick={() => setMonstros(prev => prev.filter((_, i) => i !== idx))}
-            className="text-red-900 hover:text-red-600 text-sm transition-colors px-2">×</button>
+            className="text-red-600 hover:text-red-600 text-sm transition-colors px-2">×</button>
         </div>
       ))}
     </div>
@@ -2595,7 +2595,7 @@ useEffect(() => {
         <p style={cinzel} className="text-[#c8a84b] text-3xl font-bold">{xpCalculado.porPersonagem} XP</p>
       </div>
       <button onClick={distribuirXp}
-        className="bg-[#8a5030] text-[#f0e8d8] px-5 py-2 text-xs font-bold hover:bg-[#a06040] transition-colors w-full"
+        className="bg-[#b07050] text-[#f0e8d8] px-5 py-2 text-xs font-bold hover:bg-[#c08060] transition-colors w-full"
         style={{ ...cinzel, borderRadius: '2px' }}>
         ✦ DISTRIBUIR PARA TODOS OS PERSONAGENS
       </button>
@@ -2606,7 +2606,7 @@ useEffect(() => {
 {/* ENCONTRO ALEATÓRIO */}
 <div className="mt-12">
   <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
-  <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">IMPROVISO</p>
+  <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 opacity-70">IMPROVISO</p>
   <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Encontro Aleatório</h2>
 
   <div className="flex flex-col sm:flex-row gap-2 mb-4">
@@ -2631,7 +2631,7 @@ useEffect(() => {
       className="bg-[#161410] border border-[#c8a84b20] text-[#c8a84b] px-3 py-2 w-20 text-sm text-center focus:outline-none focus:border-[#c8a84b50]"
       style={{ borderRadius: '2px' }} />
     <input value={encounterConfig.contexto} onChange={e => setEncounterConfig(p => ({ ...p, contexto: e.target.value }))}
-      placeholder="Contexto extra (opcional)..."
+      placeholder="Contexto extra (opcional)..." aria-label="Contexto extra (opcional)..."
       className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 flex-1 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
       style={{ borderRadius: '2px' }} />
     <button onClick={gerarEncounter} disabled={gerandoEncounter}
@@ -2677,7 +2677,7 @@ useEffect(() => {
 
       {encounter.ligacao_mundo && (
   <div className="border-t border-[#c8a84b10] pt-4">
-    <p style={cinzel} className="text-[#8a4a8a] text-xs tracking-[2px] mb-1">🌎 LIGAÇÃO COM O MUNDO</p>
+    <p style={cinzel} className="text-[#a86aa8] text-xs tracking-[2px] mb-1">🌎 LIGAÇÃO COM O MUNDO</p>
     <p className="text-[#8a8070] text-sm leading-relaxed font-light">{encounter.ligacao_mundo}</p>
   </div>
 )}
@@ -2695,7 +2695,7 @@ useEffect(() => {
 {/* VOZES NA CABEÇA */}
 <div className="mt-12">
   <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
-  <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">SUSSURROS</p>
+  <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 opacity-70">SUSSURROS</p>
   <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Vozes na Cabeça</h2>
 
   <div className="border border-[#c8a84b20] bg-[#161410] p-6">
@@ -2710,12 +2710,12 @@ useEffect(() => {
         ))}
       </select>
       <textarea value={mensagemSecreta} onChange={e => setMensagemSecreta(e.target.value)}
-        placeholder="Ex: Você percebe que o Paladino está com a bolsa aberta..."
+        placeholder="Ex: Você percebe que o Paladino está com a bolsa aberta..." aria-label="Ex: Você percebe que o Paladino está com a bolsa aberta..."
         rows={3}
         className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020] resize-none"
         style={{ borderRadius: '2px' }} />
       <button onClick={enviarMensagemSecreta} disabled={enviandoMensagem || !personagemDestino || !mensagemSecreta.trim()}
-        className="bg-[#8a4a8a] text-[#f0e8d8] px-5 py-2 text-xs font-bold hover:bg-[#aa60aa] transition-colors disabled:opacity-50"
+        className="bg-[#a86aa8] text-[#f0e8d8] px-5 py-2 text-xs font-bold hover:bg-[#aa60aa] transition-colors disabled:opacity-50"
         style={{ ...cinzel, borderRadius: '2px' }}>
         {enviandoMensagem ? '⟳ ENVIANDO...' : '🔮 SUSSURRAR'}
       </button>
@@ -2742,7 +2742,7 @@ useEffect(() => {
       <textarea
         value={novoPresagio}
         onChange={e => setNovoPresagio(e.target.value)}
-        placeholder="Ex: Uma coruja branca pousou no ombro do ferreiro na noite anterior à batalha..."
+        placeholder="Ex: Uma coruja branca pousou no ombro do ferreiro na noite anterior à batalha..." aria-label="Ex: Uma coruja branca pousou no ombro do ferreiro na noite anterior à batalha..."
         rows={3}
         className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b50] resize-none mb-3 text-sm"
         style={{ borderRadius: '2px' }} />
@@ -2772,7 +2772,7 @@ useEffect(() => {
 
   <div className="divide-y divide-[#c8a84b10]">
     {presagios.length === 0 ? (
-      <p className="px-6 py-6 text-[#7a6e58] text-sm text-center" style={cinzel}>
+      <p className="px-6 py-6 text-[#8a7e68] text-sm text-center" style={cinzel}>
         Nenhum presságio registrado.
       </p>
     ) : (
@@ -2803,12 +2803,12 @@ useEffect(() => {
                   setPresagios(prev => prev.filter(x => x.id !== p.id));
                 } catch { alert('Erro ao deletar.'); }
               }}
-              className="text-red-900 border border-red-900 border-opacity-30 px-2 py-1 text-xs hover:border-red-600 hover:text-red-600 transition-colors"
+              className="text-red-600 border border-red-600 border-opacity-30 px-2 py-1 text-xs hover:border-red-600 hover:text-red-600 transition-colors"
               style={{ borderRadius: '2px' }}>
               ×
             </button>
             <button onClick={() => setModalEnviarPresagio(p.id)}
-              className="text-[#4a6a8a] border border-[#4a6a8a30] px-2 py-1 text-xs hover:border-[#4a6a8a] transition-colors"
+              className="text-[#6a8aaa] border border-[#6a8aaa30] px-2 py-1 text-xs hover:border-[#6a8aaa] transition-colors"
               style={{ ...cinzel, borderRadius: '2px' }}
               title="Enviar aos jogadores">
               📨
@@ -2842,7 +2842,7 @@ useEffect(() => {
         className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b50] resize-none text-sm"
         style={{ borderRadius: '2px' }} />
       <input value={novaProfeciaCondicao} onChange={e => setNovaProfeciaCondicao(e.target.value)}
-        placeholder="Condição de cumprimento (só você vê, ex: Grypsi sangra no altar de Kemet-Shur)"
+        placeholder="Condição de cumprimento (só você vê, ex: Grypsi sangra no altar de Kemet-Shur)" aria-label="Condição de cumprimento (só você vê, ex: Grypsi sangra no altar de Kemet-Shur)"
         className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-4 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
         style={{ borderRadius: '2px' }} />
       <div className="flex gap-2">
@@ -2876,12 +2876,12 @@ useEffect(() => {
 
   <div className="divide-y divide-[#c8a84b10]">
     {profecias.length === 0 ? (
-      <p className="px-6 py-6 text-[#7a6e58] text-sm text-center" style={cinzel}>
+      <p className="px-6 py-6 text-[#8a7e68] text-sm text-center" style={cinzel}>
         Nenhuma profecia registrada.
       </p>
     ) : (
       profecias.map(p => {
-        const STATUS_COR = { pendente: '#8a4a8a', parcial: '#8a7020', cumprida: '#4a8a4a' };
+        const STATUS_COR = { pendente: '#a86aa8', parcial: '#8a7020', cumprida: '#4a8a4a' };
         return (
           <div key={p.id} className="px-6 py-4">
             <div className="flex items-start justify-between gap-4">
@@ -2894,7 +2894,7 @@ useEffect(() => {
                     setProfecias(prev => prev.filter(x => x.id !== p.id));
                   } catch { alert('Erro ao deletar.'); }
                 }}
-                className="text-red-900 border border-red-900 border-opacity-30 px-2 py-1 text-xs hover:border-red-600 hover:text-red-600 transition-colors flex-shrink-0"
+                className="text-red-600 border border-red-600 border-opacity-30 px-2 py-1 text-xs hover:border-red-600 hover:text-red-600 transition-colors flex-shrink-0"
                 style={{ borderRadius: '2px' }}>
                 ×
               </button>
@@ -2918,7 +2918,7 @@ useEffect(() => {
                   {status.toUpperCase()}
                 </button>
               ))}
-              <span className="text-[#7a6e58] text-xs ml-2" title="Só você vê">🔒 {p.condicao}</span>
+              <span className="text-[#8a7e68] text-xs ml-2" title="Só você vê">🔒 {p.condicao}</span>
             </div>
           </div>
         );
@@ -3075,7 +3075,7 @@ useEffect(() => {
           <input
             value={nomeItemEntregar}
             onChange={e => setNomeItemEntregar(e.target.value)}
-            placeholder="Nome do item..."
+            placeholder="Nome do item..." aria-label="Nome do item..."
             className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-4 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50] mb-4"
             style={{ borderRadius: '2px' }}
             onKeyDown={e => e.key === 'Enter' && entregarItemModal()}
@@ -3207,7 +3207,7 @@ useEffect(() => {
         <textarea
           value={descricaoArteCustom}
           onChange={e => setDescricaoArteCustom(e.target.value)}
-          placeholder="ex: um velho anão de barba prateada, cicatriz no olho esquerdo, armadura enferrujada..."
+          placeholder="ex: um velho anão de barba prateada, cicatriz no olho esquerdo, armadura enferrujada..." aria-label="ex: um velho anão de barba prateada, cicatriz no olho esquerdo, armadura enferrujada..."
           rows={4}
           className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm resize-none"
           style={{ borderRadius: '2px' }} />
@@ -3240,7 +3240,7 @@ useEffect(() => {
       </button>
       <button onClick={() => deletarArte(imagemVisualizando.tipo, imagemVisualizando.id)}
         disabled={deletandoArte}
-        className="border border-red-900 text-red-900 px-5 py-2 text-xs tracking-widest hover:bg-red-900 hover:text-white transition-colors disabled:opacity-50"
+        className="border border-red-600 text-red-600 px-5 py-2 text-xs tracking-widest hover:bg-red-600 hover:text-white transition-colors disabled:opacity-50"
         style={{ ...cinzel, borderRadius: '2px' }}>
         {deletandoArte ? 'Deletando...' : '🗑 Deletar'}
       </button>
@@ -3319,15 +3319,15 @@ useEffect(() => {
 )}
 
 <div className="mt-12">
-  <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-2 opacity-70">GANCHOS DE LONGO PRAZO</p>
+  <p style={cinzel} className="text-[#6a8aaa] text-xs tracking-[4px] mb-2 opacity-70">GANCHOS DE LONGO PRAZO</p>
   <h2 style={cinzel} className="text-xl text-[#c8a84b] font-semibold mb-6">🧩 Consequências Ocultas</h2>
 
   {consequenciasProntas.length > 0 && (
     <div className="mb-6">
-      <p style={cinzel} className="text-[#8a5030] text-xs tracking-[2px] mb-2">⚡ PRONTAS PARA REVELAR</p>
+      <p style={cinzel} className="text-[#b07050] text-xs tracking-[2px] mb-2">⚡ PRONTAS PARA REVELAR</p>
       <div className="flex flex-col gap-2">
         {consequenciasProntas.map(c => (
-          <div key={c.id} className="border border-[#8a5030] bg-[#8a503010] p-4" style={{ borderRadius: '2px' }}>
+          <div key={c.id} className="border border-[#b07050] bg-[#b0705010] p-4" style={{ borderRadius: '2px' }}>
             <p className="text-[#8a7e68] text-xs italic mb-1">Gatilho: {c.gatilho}</p>
             <p className="text-[#e8e0d0] text-sm mb-3">{c.consequencia}</p>
             <div className="flex gap-2">
@@ -3351,20 +3351,20 @@ useEffect(() => {
   <div className="border border-[#c8a84b20] bg-[#161410] p-6 mb-6 flex flex-col gap-3">
     <input value={novaConsequencia.gatilho}
       onChange={e => setNovaConsequencia(p => ({ ...p, gatilho: e.target.value }))}
-      placeholder="O que os jogadores fizeram? (ex: mataram o Capitão)"
+      placeholder="O que os jogadores fizeram? (ex: mataram o Capitão)" aria-label="O que os jogadores fizeram? (ex: mataram o Capitão)"
       className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
       style={{ borderRadius: '2px' }} />
 
     <div className="flex gap-2">
   <textarea value={novaConsequencia.consequencia}
     onChange={e => setNovaConsequencia(p => ({ ...p, consequencia: e.target.value }))}
-    placeholder="Qual a consequência oculta?"
+    placeholder="Qual a consequência oculta?" aria-label="Qual a consequência oculta?"
     rows={2}
     className="flex-1 bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
     style={{ borderRadius: '2px' }} />
   <div className="flex flex-col gap-2">
     <button onClick={gerarConsequenciaIA} disabled={!novaConsequencia.gatilho.trim() || gerandoConsequencia}
-      className="border border-[#8a4a8a50] text-[#8a4a8a] px-3 py-1 text-xs hover:bg-[#8a4a8a10] disabled:opacity-30"
+      className="border border-[#a86aa850] text-[#a86aa8] px-3 py-1 text-xs hover:bg-[#a86aa810] disabled:opacity-30"
       style={{ ...cinzel, borderRadius: '2px' }}>
       {gerandoConsequencia ? '...' : '✨ IA'}
     </button>
@@ -3405,7 +3405,7 @@ useEffect(() => {
       {novaConsequencia.condicao_tipo === 'sessao' && (
         <input type="number" min="1" value={novaConsequencia.condicao_valor}
           onChange={e => setNovaConsequencia(p => ({ ...p, condicao_valor: e.target.value }))}
-          placeholder="Nº da sessão"
+          placeholder="Nº da sessão" aria-label="Nº da sessão"
           className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm w-32 focus:outline-none"
           style={{ borderRadius: '2px' }} />
       )}
@@ -3421,7 +3421,7 @@ useEffect(() => {
     </div>
 
     <button onClick={criarConsequencia} disabled={criandoConsequencia}
-      className="bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] disabled:opacity-30"
+      className="bg-[#6a8aaa] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#7a9aaa] disabled:opacity-30"
       style={{ ...cinzel, borderRadius: '2px' }}>
       {criandoConsequencia ? 'Salvando...' : '+ Registrar Consequência'}
     </button>
@@ -3459,7 +3459,7 @@ useEffect(() => {
   </div>
 )}
           <button onClick={() => deletarConsequencia(c.id)}
-            className="text-red-900 hover:text-red-600 text-xs">×</button>
+            className="text-red-600 hover:text-red-600 text-xs">×</button>
         </div>
       </div>
     ))}
@@ -3467,13 +3467,13 @@ useEffect(() => {
 </div>
 
 <div className="mt-12">
-  <p style={cinzel} className="text-[#4a6a8a] text-xs tracking-[4px] mb-2 opacity-70">PERSPECTIVAS DO MUNDO</p>
+  <p style={cinzel} className="text-[#6a8aaa] text-xs tracking-[4px] mb-2 opacity-70">PERSPECTIVAS DO MUNDO</p>
   <h2 style={cinzel} className="text-xl text-[#c8a84b] font-semibold mb-6">🧠 Memória Individual</h2>
 
   <div className="border border-[#c8a84b20] bg-[#161410] p-6 mb-6 flex flex-col gap-3">
     <textarea value={novoFato.texto}
       onChange={e => setNovoFato(p => ({ ...p, texto: e.target.value }))}
-      placeholder="Qual é o fato? (ex: O Sábio possui ligação com a Estigma)"
+      placeholder="Qual é o fato? (ex: O Sábio possui ligação com a Estigma)" aria-label="Qual é o fato? (ex: O Sábio possui ligação com a Estigma)"
       rows={2}
       className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
       style={{ borderRadius: '2px' }} />
@@ -3509,7 +3509,7 @@ useEffect(() => {
           <button key={n.id} type="button"
             onClick={() => setNovoFato(prev => ({ ...prev, npcs_que_sabem: toggleSabedor(prev.npcs_que_sabem, n.id) }))}
             className={`border px-3 py-1 text-xs transition-colors ${
-              novoFato.npcs_que_sabem.includes(n.id) ? 'border-[#8a4a8a] text-[#8a4a8a] bg-[#8a4a8a10]' : 'border-[#c8a84b20] text-[#9a8e78]'
+              novoFato.npcs_que_sabem.includes(n.id) ? 'border-[#a86aa8] text-[#a86aa8] bg-[#a86aa810]' : 'border-[#c8a84b20] text-[#9a8e78]'
             }`}
             style={{ borderRadius: '2px' }}>
             {n.name}
@@ -3519,7 +3519,7 @@ useEffect(() => {
     </div>
 
     <button onClick={criarFatoMundo} disabled={!novoFato.texto.trim() || criandoFato}
-      className="bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] transition-colors disabled:opacity-30"
+      className="bg-[#6a8aaa] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#7a9aaa] transition-colors disabled:opacity-30"
       style={{ ...cinzel, borderRadius: '2px' }}>
       {criandoFato ? 'Salvando...' : '+ Registrar Fato'}
     </button>
@@ -3542,7 +3542,7 @@ useEffect(() => {
 
   <div className="flex flex-col gap-2">
     {fatosMundo.filter(fatoVisivelNaPerspectiva).length === 0 ? (
-      <p className="text-[#7a6e58] text-sm text-center py-6">
+      <p className="text-[#8a7e68] text-sm text-center py-6">
         {perspectivaFiltro === 'todos' ? 'Nenhum fato registrado.' : 'Ninguém aqui sabe de nada ainda.'}
       </p>
     ) : (
@@ -3560,7 +3560,7 @@ useEffect(() => {
             </p>
           </div>
           <button onClick={() => deletarFatoMundo(f.id)}
-            className="text-red-900 hover:text-red-600 text-xs">×</button>
+            className="text-red-600 hover:text-red-600 text-xs">×</button>
         </div>
       ))
     )}
@@ -3570,7 +3570,7 @@ useEffect(() => {
 {/* DADOS SECRETOS */}
         <div className="mt-12">
           <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
-          <p style={cinzel} className="text-[#8a5030] text-xs tracking-[4px] mb-2 opacity-70">EXCLUSIVO DO MESTRE</p>
+          <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 opacity-70">EXCLUSIVO DO MESTRE</p>
           <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-2">Rolagens Secretas</h2>
           <p className="text-[#7a7060] mb-6 font-light text-sm">Resultados visíveis apenas para você.</p>
           <Dados secreto={true} />

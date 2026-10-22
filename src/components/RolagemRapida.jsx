@@ -92,7 +92,7 @@ export default function RolagemRapida() {
       <div className="flex gap-2">
         <input value={novo} onChange={e => setNovo(e.target.value)} maxLength={14}
           onKeyDown={e => { if (e.key === 'Enter') adicionar(); }}
-          placeholder="Novo botão: ex 4d8+2"
+          placeholder="Novo botão: ex 4d8+2" aria-label="Novo botão: ex 4d8+2"
           className="w-48 bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-1.5 text-sm focus:outline-none focus:border-[#c8a84b50]"
           style={{ borderRadius: '2px' }} />
         <button onClick={adicionar} disabled={!novo.trim()} style={{ ...cinzel, borderRadius: '2px' }}

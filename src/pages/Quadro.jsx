@@ -8,7 +8,7 @@ const CATEGORIAS = [
   { label: 'NPC', cor: '#c8a84b', borda: '#c8a84b40', bg: '#c8a84b08' },
   { label: 'Local', cor: '#7ab8d4', borda: '#7ab8d440', bg: '#7ab8d408' },
   { label: 'Pista', cor: '#a07840', borda: '#a0784040', bg: '#a0784008' },
-  { label: 'Missão', cor: '#8a5030', borda: '#8a503040', bg: '#8a503008' },
+  { label: 'Missão', cor: '#b07050', borda: '#b0705040', bg: '#b0705008' },
   { label: 'Outro', cor: '#6a6050', borda: '#6a605040', bg: '#6a605008' },
 ];
 
@@ -114,7 +114,7 @@ useEffect(() => {
             </select>
             <input value={novoTexto} onChange={e => setNovoTexto(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && adicionarPostit()}
-              placeholder="Ex: Ferreiro Goran, Taverna do Cervo, Chave misteriosa..."
+              placeholder="Ex: Ferreiro Goran, Taverna do Cervo, Chave misteriosa..." aria-label="Ex: Ferreiro Goran, Taverna do Cervo, Chave misteriosa..."
               className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 flex-1 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
               style={{ borderRadius: '2px' }} />
             <button onClick={adicionarPostit}
@@ -136,7 +136,7 @@ useEffect(() => {
         {/* Post-its por categoria */}
         {postits.length === 0 ? (
           <div className="text-center py-20">
-            <p style={cinzel} className="text-[#7a6e58] text-sm tracking-widest">NENHUMA INFORMAÇÃO REGISTRADA</p>
+            <p style={cinzel} className="text-[#8a7e68] text-sm tracking-widest">NENHUMA INFORMAÇÃO REGISTRADA</p>
             {!modoMestre && (
               <p className="text-[#2a2018] text-xs mt-2">Aguarde o mestre adicionar informações da sessão.</p>
             )}
@@ -164,7 +164,7 @@ useEffect(() => {
                       <p className="leading-relaxed">{postit.texto}</p>
                       {modoMestre && (
                         <button onClick={() => removerPostit(postit.id)}
-                          className="absolute top-1 right-2 text-red-900 hover:text-red-600 text-sm transition-colors">
+                          className="absolute top-1 right-2 text-red-600 hover:text-red-600 text-sm transition-colors">
                           ×
                         </button>
                       )}

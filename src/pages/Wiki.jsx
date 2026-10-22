@@ -82,7 +82,7 @@ export default function Wiki() {
           <button onClick={nova}
             className="w-full bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs tracking-widest font-bold mb-3"
             style={{ ...cinzel, borderRadius: '2px' }}>+ Nova página</button>
-          <input value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar..." className={`${campo} mb-4`}
+          <input value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar..." aria-label="Buscar..." className={`${campo} mb-4`}
             style={{ borderRadius: '2px' }} />
           {CATEGORIAS.map(cat => {
             const lista = filtradas.filter(p => p.categoria === cat);
@@ -104,7 +104,7 @@ export default function Wiki() {
         <div className="border border-[#c8a84b20] bg-[#161410] p-6 flex flex-col gap-3">
           <div className="flex gap-2">
             <input value={form.titulo} onChange={e => setForm(f => ({ ...f, titulo: e.target.value }))}
-              placeholder="Título da página" className={campo} style={{ borderRadius: '2px' }} />
+              placeholder="Título da página" aria-label="Título da página" className={campo} style={{ borderRadius: '2px' }} />
             <select value={form.categoria} onChange={e => setForm(f => ({ ...f, categoria: e.target.value }))}
               className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm" style={{ borderRadius: '2px' }}>
               {CATEGORIAS.map(c => <option key={c} value={c}>{c}</option>)}
@@ -130,7 +130,7 @@ export default function Wiki() {
               className={campo} style={{ borderRadius: '2px' }} />
           )}
 
-          <p style={cinzel} className="text-[#8a4a8a] text-xs tracking-[2px]">🔒 NOTAS DO MESTRE (nunca aparecem pros jogadores)</p>
+          <p style={cinzel} className="text-[#a86aa8] text-xs tracking-[2px]">🔒 NOTAS DO MESTRE (nunca aparecem pros jogadores)</p>
           <textarea value={form.notas_mestre} rows={4}
             onChange={e => setForm(f => ({ ...f, notas_mestre: e.target.value }))}
             className={campo} style={{ borderRadius: '2px' }} />
@@ -143,13 +143,13 @@ export default function Wiki() {
 
           <div className="flex gap-2 justify-between">
             <button onClick={salvar} disabled={!form.titulo.trim() || salvando}
-              className="bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold disabled:opacity-30"
+              className="bg-[#6a8aaa] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold disabled:opacity-30"
               style={{ ...cinzel, borderRadius: '2px' }}>
               {salvando ? 'Salvando...' : 'Salvar'}
             </button>
             {atualId && (
               <button onClick={apagar}
-                className="text-red-900 hover:text-red-600 text-xs border border-red-900 px-3 py-1.5"
+                className="text-red-600 hover:text-red-600 text-xs border border-red-600 px-3 py-1.5"
                 style={{ ...cinzel, borderRadius: '2px' }}>Apagar</button>
             )}
           </div>

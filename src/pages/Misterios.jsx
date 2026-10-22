@@ -90,11 +90,11 @@ const visiveis = lista.filter(m =>
 
         <div className="border border-[#c8a84b20] bg-[#161410] p-4 flex flex-col gap-3 mb-8">
           <input value={titulo} onChange={e => setTitulo(e.target.value)} maxLength={200}
-            placeholder="Ex: Quem matou o rei?"
+            placeholder="Ex: Quem matou o rei?" aria-label="Ex: Quem matou o rei?"
             className="bg-[#0f0e0c] border border-[#c8a84b20] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
             style={{ borderRadius: '2px' }} />
           <textarea value={descricao} onChange={e => setDescricao(e.target.value)} rows={2} maxLength={2000}
-            placeholder="O que os jogadores sabem até agora (opcional)"
+            placeholder="O que os jogadores sabem até agora (opcional)" aria-label="O que os jogadores sabem até agora (opcional)"
             className="bg-[#0f0e0c] border border-[#c8a84b20] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50] resize-none"
             style={{ borderRadius: '2px' }} />
           <div className="flex items-center gap-3">
@@ -140,13 +140,13 @@ const visiveis = lista.filter(m =>
         </div>
 
         {!carregando && lista.length > 0 && visiveis.length === 0 && (
-            <p className="text-[#7a6e58] text-sm text-center py-10 italic">Nenhum mistério com esse filtro.</p>
+            <p className="text-[#8a7e68] text-sm text-center py-10 italic">Nenhum mistério com esse filtro.</p>
         )}
 
         {carregando ? (
           <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest text-center py-10">CARREGANDO...</p>
         ) : lista.length === 0 ? (
-          <p className="text-[#7a6e58] text-sm text-center py-10 italic">Nenhum mistério. O mundo é suspeitosamente tranquilo.</p>
+          <p className="text-[#8a7e68] text-sm text-center py-10 italic">Nenhum mistério. O mundo é suspeitosamente tranquilo.</p>
         ) : (
           <div className="flex flex-col gap-3">
             {visiveis.map(m => {
@@ -167,7 +167,7 @@ const visiveis = lista.filter(m =>
                       </div>
                       {m.description && <p className="text-[#9a8e78] text-sm mt-1 italic">{m.description}</p>}
                     </div>
-                    <button onClick={() => apagar(m)} className="text-red-900 hover:text-red-600 text-lg" title="Apagar">×</button>
+                    <button onClick={() => apagar(m)} className="text-red-600 hover:text-red-600 text-lg" title="Apagar">×</button>
                   </div>
                   <div className="h-1.5 bg-[#0f0e0c] rounded-full overflow-hidden my-3">
                     <div className="h-full" style={{ width: `${pct}%`, backgroundColor: resolvido ? '#2a7a2a' : '#c8a84b' }} />

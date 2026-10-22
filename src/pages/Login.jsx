@@ -47,7 +47,7 @@ async function handleLogin() {
             <input type="text" value={username}
               onChange={e => { setUsername(e.target.value); setPrecisaSenha(false); setSenha(''); setErro(''); }}
               onKeyDown={e => e.key === 'Enter' && handleLogin()}
-              placeholder="Ex: João, Mestre, DM..."
+              placeholder="Ex: João, Mestre, DM..." aria-label="Ex: João, Mestre, DM..."
               className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
               style={{ ...cinzel, borderRadius: '2px' }}
             />
@@ -74,7 +74,7 @@ async function handleLogin() {
           </button>
         </div>
 
-        <p className="text-[#7a6e58] text-xs text-center mt-6">
+        <p className="text-[#8a7e68] text-xs text-center mt-6">
           Seu progresso é salvo automaticamente.
         </p>
       </div>

@@ -32,7 +32,7 @@ export default function CofreHandout({ handout, onMudou }) {
   return (
     <>
       {trancado ? (
-        <button onClick={destrancar} className={`${botao} border-[#8a5030] text-[#8a5030] hover:bg-[#8a503020]`}
+        <button onClick={destrancar} className={`${botao} border-[#b07050] text-[#b07050] hover:bg-[#b07050]`}
           style={{ borderRadius: '2px', ...cinzel }}>🔒 DESTRANCAR</button>
       ) : (
         <button onClick={() => setAberto(true)} className={`${botao} border-[#c8a84b50] text-[#c8a84b] hover:bg-[#c8a84b10]`}
@@ -46,15 +46,15 @@ export default function CofreHandout({ handout, onMudou }) {
             style={{ borderRadius: '2px' }} onClick={e => e.stopPropagation()}>
             <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">🔐 TRANCAR DOCUMENTO</p>
             <input value={resposta} onChange={e => setResposta(e.target.value)}
-              placeholder="Resposta (use | para várias: tempo|o tempo)"
+              placeholder="Resposta (use | para várias: tempo|o tempo)" aria-label="Resposta (use | para várias: tempo|o tempo)"
               className="w-full bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm mb-3 focus:outline-none focus:border-[#c8a84b50]"
               style={{ borderRadius: '2px' }} />
             <input value={dica} onChange={e => setDica(e.target.value)}
-              placeholder="Dica ou enigma que o jogador vê (opcional)"
+              placeholder="Dica ou enigma que o jogador vê (opcional)" aria-label="Dica ou enigma que o jogador vê (opcional)"
               className="w-full bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm mb-4 focus:outline-none focus:border-[#c8a84b50]"
               style={{ borderRadius: '2px' }} />
             <button onClick={trancar} disabled={!resposta.trim()}
-              className="w-full bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold disabled:opacity-30"
+              className="w-full bg-[#6a8aaa] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold disabled:opacity-30"
               style={{ ...cinzel, borderRadius: '2px' }}>TRANCAR</button>
           </div>
         </div>

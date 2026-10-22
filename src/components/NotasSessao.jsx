@@ -95,13 +95,13 @@ export default function NotasSessao() {
           ))}
         </div>
       ) : (
-        <p className="text-[#7a6e58] text-sm italic mb-4">Nada fixado. O mestre confia na memória, o que é corajoso.</p>
+        <p className="text-[#8a7e68] text-sm italic mb-4">Nada fixado. O mestre confia na memória, o que é corajoso.</p>
       )}
 
       <div className="flex flex-wrap items-center gap-2">
         <input value={texto} onChange={e => setTexto(e.target.value)} maxLength={300}
           onKeyDown={e => { if (e.key === 'Enter') fixar(); }}
-          placeholder="Ex: O mercador ainda não foi encontrado"
+          placeholder="Ex: O mercador ainda não foi encontrado" aria-label="Ex: O mercador ainda não foi encontrado"
           className="flex-1 min-w-48 bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
           style={{ borderRadius: '2px' }} />
         <div className="flex gap-1">
@@ -112,7 +112,7 @@ export default function NotasSessao() {
           ))}
         </div>
         <input type="number" min={0} max={99} value={sessoes} onChange={e => setSessoes(e.target.value)}
-          placeholder="Sessões"
+          placeholder="Sessões" aria-label="Sessões"
           title="Prazo em sessões (vazio = sem prazo)"
           className="w-24 bg-[#161410] border border-[#c8a84b20] text-[#c8a84b] px-2 py-2 text-sm text-center focus:outline-none"
           style={{ borderRadius: '2px' }} />

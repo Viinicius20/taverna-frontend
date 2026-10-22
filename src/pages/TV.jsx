@@ -61,7 +61,7 @@ export default function TV() {
         ))}
         </div>
     ) : (
-        <p style={cinzel} className="text-[#7a6e58] text-xl tracking-[4px]">AGUARDANDO O MESTRE...</p>
+        <p style={cinzel} className="text-[#8a7e68] text-xl tracking-[4px]">AGUARDANDO O MESTRE...</p>
     )}
     </div>
 
@@ -72,7 +72,7 @@ export default function TV() {
         <p style={cinzel} className="text-[#c8a84b] text-sm tracking-[4px]">INICIATIVA</p>
 
         {!combate || combate.combatentes.length === 0 ? (
-          <p className="text-[#7a6e58]">Sem combate no momento.</p>
+          <p className="text-[#8a7e68]">Sem combate no momento.</p>
         ) : combate.combatentes.map((c, idx) => {
           const ativo = combate.ativo && idx === combate.turno;
           const cor = COR_TIPO[c.tipo] || '#c8a84b';
@@ -103,7 +103,7 @@ export default function TV() {
                 <div className="flex flex-wrap gap-1 mt-2">
                   {c.condicoes.map(cond => (
                     <span key={cond} style={{ ...cinzel, borderRadius: '2px' }}
-                      className="text-xs px-2 py-0.5 border border-[#8a4a8a40] text-[#8a4a8a] bg-[#8a4a8a10]">
+                      className="text-xs px-2 py-0.5 border border-[#a86aa840] text-[#a86aa8] bg-[#a86aa810]">
                       {cond}
                     </span>
                   ))}

@@ -166,10 +166,10 @@ function getIconeClasse(classe) {
         ) : (
           <>
             <div className="px-6 py-4 flex flex-col gap-3">
-              <input placeholder="Nome do Feat" value={featNome} onChange={e => setFeatNome(e.target.value)}
+              <input placeholder="Nome do Feat" aria-label="Nome do Feat" value={featNome} onChange={e => setFeatNome(e.target.value)}
                 className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
                 style={{ borderRadius: '2px' }} />
-              <textarea placeholder="Descrição" value={featDescricao} onChange={e => setFeatDescricao(e.target.value)}
+              <textarea placeholder="Descrição" aria-label="Descrição" value={featDescricao} onChange={e => setFeatDescricao(e.target.value)}
                 className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50] min-h-20"
                 style={{ borderRadius: '2px' }} />
             </div>
@@ -195,7 +195,7 @@ function getIconeClasse(classe) {
 
 function CartaoMomento({ m, onRemover }) {
   return (
-    <div className={`flex items-start gap-3 bg-[#161410] px-4 py-3 border-l-2 ${m.permanente ? 'border-[#8a5030]' : 'border-[#c8a84b50]'}`}>
+    <div className={`flex items-start gap-3 bg-[#161410] px-4 py-3 border-l-2 ${m.permanente ? 'border-[#b07050]' : 'border-[#c8a84b50]'}`}>
       <span className="text-xl">{m.emoji}</span>
       <div className="flex-1">
         <p className="text-[#e8e0d0] text-sm italic leading-relaxed">{m.texto}</p>
@@ -203,7 +203,7 @@ function CartaoMomento({ m, onRemover }) {
           {m.permanente ? '📌 MARCA PERMANENTE · ' : ''}{m.data}
         </p>
       </div>
-      <button onClick={() => onRemover(m.id)} className="text-red-900 hover:text-red-600 text-lg" title="Apagar">×</button>
+      <button onClick={() => onRemover(m.id)} className="text-red-600 hover:text-red-600 text-lg" title="Apagar">×</button>
     </div>
   );
 }
@@ -234,7 +234,7 @@ function Momentos({ momentos = [], onChange }) {
 
       <div className="border border-[#c8a84b20] bg-[#0f0e0c] p-4 flex flex-col gap-3">
         <textarea value={texto} onChange={e => setTexto(e.target.value)} rows={2}
-          placeholder="Ex: Perdeu 20 kg em três dias e descobriu que está diabético..."
+          placeholder="Ex: Perdeu 20 kg em três dias e descobriu que está diabético..." aria-label="Ex: Perdeu 20 kg em três dias e descobriu que está diabético..."
           className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm w-full focus:outline-none focus:border-[#c8a84b50] resize-none"
           style={{ borderRadius: '2px' }} />
         <div className="flex flex-wrap items-center gap-2">
@@ -257,7 +257,7 @@ function Momentos({ momentos = [], onChange }) {
 
       {fixos.length > 0 && (
         <div className="flex flex-col gap-2">
-          <p style={cinzel} className="text-[#8a5030] text-xs tracking-[3px]">MARCAS PERMANENTES</p>
+          <p style={cinzel} className="text-[#b07050] text-xs tracking-[3px]">MARCAS PERMANENTES</p>
           {fixos.map(m => <CartaoMomento key={m.id} m={m} onRemover={remover} />)}
         </div>
       )}
@@ -268,7 +268,7 @@ function Momentos({ momentos = [], onChange }) {
           {historia.map(m => <CartaoMomento key={m.id} m={m} onRemover={remover} />)}
         </div>
       ) : fixos.length === 0 && (
-        <p className="text-[#7a6e58] text-sm text-center py-6 italic">Nenhuma façanha (ou desgraça) registrada ainda.</p>
+        <p className="text-[#8a7e68] text-sm text-center py-6 italic">Nenhuma façanha (ou desgraça) registrada ainda.</p>
       )}
     </div>
   );
@@ -1390,11 +1390,11 @@ async function abrirCofre(h) {
   await buscarMensagensSecretas();
   setCaixaMensagens(true); 
 }}
-  className="relative border border-[#8a4a8a50] text-[#8a4a8a] px-4 py-2 text-xs tracking-widest hover:bg-[#8a4a8a10] transition-colors"
+  className="relative border border-[#a86aa8] text-[#a86aa8] px-4 py-2 text-xs tracking-widest hover:bg-[#a86aa810] transition-colors"
   style={{ ...cinzel, borderRadius: '2px' }}>
   🔮 Sussurros
   {mensagensSecretas.length > 0 && (
-    <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#8a4a8a] text-white text-xs rounded-full flex items-center justify-center">
+    <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#a86aa8] text-white text-xs rounded-full flex items-center justify-center">
       {mensagensSecretas.length}
     </span>
   )}
@@ -1510,7 +1510,7 @@ async function abrirCofre(h) {
       <div className="h-0.5 bg-[#c8a84b15] w-full">
         <div className="h-full bg-[#c8a84b40] transition-all" style={{ width: `${pct}%` }} />
       </div>
-      <p style={cinzel} className="text-[#7a6e58] text-xs mt-1">{xpAtual} / {xpProxNivel} XP</p>
+      <p style={cinzel} className="text-[#8a7e68] text-xs mt-1">{xpAtual} / {xpProxNivel} XP</p>
     </div>
   ) : null;
 })()}
@@ -1620,20 +1620,20 @@ async function abrirCofre(h) {
     {/* Formulário de novo ataque */}
     {adicionandoAtaque && (
       <div className="border border-[#c8a84b30] bg-[#0f0e0c] p-4 flex flex-col gap-3">
-        <input placeholder="Nome do ataque" value={novoAtaque.nome}
+        <input placeholder="Nome do ataque" aria-label="Nome do ataque" value={novoAtaque.nome}
           onChange={e => setNovoAtaque(prev => ({ ...prev, nome: e.target.value }))}
           className="bg-transparent border-b border-[#c8a84b20] text-[#e8e0d0] text-sm px-1 py-1 focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
           style={cinzel} />
         <div className="grid grid-cols-3 gap-2">
-          <input placeholder="Bônus (ex: 5)" value={novoAtaque.bonus}
+          <input placeholder="Bônus (ex: 5)" aria-label="Bônus (ex: 5)" value={novoAtaque.bonus}
             onChange={e => setNovoAtaque(prev => ({ ...prev, bonus: e.target.value }))}
             className="bg-transparent border-b border-[#c8a84b20] text-[#e8e0d0] text-sm px-1 py-1 focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020] text-center"
             style={cinzel} />
-          <input placeholder="Dano (ex: 1d8+3)" value={novoAtaque.dano}
+          <input placeholder="Dano (ex: 1d8+3)" aria-label="Dano (ex: 1d8+3)" value={novoAtaque.dano}
             onChange={e => setNovoAtaque(prev => ({ ...prev, dano: e.target.value }))}
             className="bg-transparent border-b border-[#c8a84b20] text-[#e8e0d0] text-sm px-1 py-1 focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020] text-center"
             style={cinzel} />
-          <input placeholder="Tipo (ex: Cortante)" value={novoAtaque.tipo}
+          <input placeholder="Tipo (ex: Cortante)" aria-label="Tipo (ex: Cortante)" value={novoAtaque.tipo}
             onChange={e => setNovoAtaque(prev => ({ ...prev, tipo: e.target.value }))}
             className="bg-transparent border-b border-[#c8a84b20] text-[#e8e0d0] text-sm px-1 py-1 focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020] text-center"
             style={cinzel} />
@@ -1692,9 +1692,9 @@ async function abrirCofre(h) {
           { label: 'Caído', cor: '#8a2020' },
           { label: 'Envenenado', cor: '#4a8a20' },
           { label: 'Paralisado', cor: '#8a6020' },
-          { label: 'Enfeitiçado', cor: '#8a4a8a' },
+          { label: 'Enfeitiçado', cor: '#a86aa8' },
           { label: 'Amedrontado', cor: '#6a4020' },
-          { label: 'Atordoado', cor: '#4a6a8a' },
+          { label: 'Atordoado', cor: '#6a8aaa' },
           { label: 'Invisível', cor: '#6a6a6a' },
           { label: 'Surdo', cor: '#4a4030' },
           { label: 'Cego', cor: '#303030' },
@@ -1770,7 +1770,7 @@ async function abrirCofre(h) {
       </div>
       <div className="px-6 py-4 overflow-y-auto flex-1 flex flex-col gap-2">
         {historicoRolagens.length === 0 ? (
-          <p className="text-[#7a6e58] text-sm text-center py-4">Nenhuma rolagem ainda.</p>
+          <p className="text-[#8a7e68] text-sm text-center py-4">Nenhuma rolagem ainda.</p>
         ) : (
           historicoRolagens.map(r => (
             <div key={r.id} className={`border p-3 flex items-center justify-between ${r.critico ? 'border-[#c8a84b40] bg-[#c8a84b08]' : r.falha ? 'border-red-900 bg-red-950 bg-opacity-10' : 'border-[#c8a84b15] bg-[#0f0e0c]'}`}
@@ -1880,7 +1880,7 @@ async function abrirCofre(h) {
                     const novoSpells = ficha.spellcasting.spells.filter((_, i) => i !== idx);
                     setFicha(prev => ({ ...prev, spellcasting: { ...prev.spellcasting, spells: novoSpells } }));
                   }}
-                    className="text-red-900 hover:text-red-600 px-2 py-1 text-xs border border-red-900 transition-colors"
+                    className="text-red-600 hover:text-red-600 px-2 py-1 text-xs border border-red-600 transition-colors"
                     style={{ ...cinzel, borderRadius: '2px' }}>
                     ✕
                   </button>
@@ -2027,7 +2027,7 @@ async function abrirCofre(h) {
       <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">NOME</label>
       <input value={manualSpell.name}
         onChange={e => setManualSpell(prev => ({ ...prev, name: e.target.value }))}
-        placeholder="ex: Beijo do Desespero"
+        placeholder="ex: Beijo do Desespero" aria-label="ex: Beijo do Desespero"
         className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
         style={{ borderRadius: '2px' }} />
     </div>
@@ -2044,7 +2044,7 @@ async function abrirCofre(h) {
         <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">ESCOLA</label>
         <input value={manualSpell.school}
           onChange={e => setManualSpell(prev => ({ ...prev, school: e.target.value }))}
-          placeholder="ex: Enchantment"
+          placeholder="ex: Enchantment" aria-label="ex: Enchantment"
           className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
           style={{ borderRadius: '2px' }} />
       </div>
@@ -2054,7 +2054,7 @@ async function abrirCofre(h) {
       <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">DESCRIÇÃO</label>
       <textarea value={manualSpell.description}
         onChange={e => setManualSpell(prev => ({ ...prev, description: e.target.value }))}
-        placeholder="ex: Usa carisma para enfeitiçar o alvo..."
+        placeholder="ex: Usa carisma para enfeitiçar o alvo..." aria-label="ex: Usa carisma para enfeitiçar o alvo..."
         rows={2}
         className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm resize-none"
         style={{ borderRadius: '2px' }} />
@@ -2064,7 +2064,7 @@ async function abrirCofre(h) {
       <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">MECÂNICA</label>
       <textarea value={manualSpell.mechanics}
         onChange={e => setManualSpell(prev => ({ ...prev, mechanics: e.target.value }))}
-        placeholder="ex: Se falhar num teste de Destreza, fica enfeitiçado por 1 minuto..."
+        placeholder="ex: Se falhar num teste de Destreza, fica enfeitiçado por 1 minuto..." aria-label="ex: Se falhar num teste de Destreza, fica enfeitiçado por 1 minuto..."
         rows={2}
         className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm resize-none"
         style={{ borderRadius: '2px' }} />
@@ -2075,7 +2075,7 @@ async function abrirCofre(h) {
         <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">ALCANCE</label>
         <input value={manualSpell.range}
           onChange={e => setManualSpell(prev => ({ ...prev, range: e.target.value }))}
-          placeholder="60 feet"
+          placeholder="60 feet" aria-label="60 feet"
           className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
           style={{ borderRadius: '2px' }} />
       </div>
@@ -2083,7 +2083,7 @@ async function abrirCofre(h) {
         <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">DURAÇÃO</label>
         <input value={manualSpell.duration}
           onChange={e => setManualSpell(prev => ({ ...prev, duration: e.target.value }))}
-          placeholder="1 minute"
+          placeholder="1 minute" aria-label="1 minute"
           className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
           style={{ borderRadius: '2px' }} />
       </div>
@@ -2091,7 +2091,7 @@ async function abrirCofre(h) {
         <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">COMPONENTES</label>
         <input value={manualSpell.components}
           onChange={e => setManualSpell(prev => ({ ...prev, components: e.target.value }))}
-          placeholder="V, S"
+          placeholder="V, S" aria-label="V, S"
           className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
           style={{ borderRadius: '2px' }} />
       </div>
@@ -2116,7 +2116,7 @@ async function abrirCofre(h) {
                 type="text"
                 value={homebrewInput}
                 onChange={e => setHomebrewInput(e.target.value)}
-                placeholder="ex: Magia Obscura da Perdição"
+                placeholder="ex: Magia Obscura da Perdição" aria-label="ex: Magia Obscura da Perdição"
                 className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
                 style={{ borderRadius: '2px' }}
               />
@@ -2297,7 +2297,7 @@ async function abrirCofre(h) {
 
   <div className="p-6">
     {!ficha.recursos || ficha.recursos.length === 0 ? (
-      <p className="text-[#7a6e58] text-sm text-center py-4">Nenhum recurso adicionado.</p>
+      <p className="text-[#8a7e68] text-sm text-center py-4">Nenhum recurso adicionado.</p>
     ) : (
       <div className="space-y-3">
         {ficha.recursos.map((recurso, idx) => (
@@ -2305,7 +2305,7 @@ async function abrirCofre(h) {
             <div className="flex items-center justify-between mb-2">
               <span style={cinzel} className="text-[#e8e0d0] text-sm">{recurso.nome}</span>
               {recurso.recuperacao && (
-                <span style={{ ...cinzel, borderRadius: '2px', borderColor: recurso.recuperacao === 'curto' ? '#4a6a8a40' : '#8a4a8a40', color: recurso.recuperacao === 'curto' ? '#4a6a8a' : '#8a4a8a' }}
+                <span style={{ ...cinzel, borderRadius: '2px', borderColor: recurso.recuperacao === 'curto' ? '#6a8aaa40' : '#a86aa840', color: recurso.recuperacao === 'curto' ? '#6a8aaa' : '#a86aa8' }}
                   className="text-xs border px-1.5 py-0.5 ml-2">
                   {recurso.recuperacao === 'curto' ? 'CURTO' : 'LONGO'}
                 </span>
@@ -2315,7 +2315,7 @@ async function abrirCofre(h) {
                 <button onClick={() => {
                   const novos = ficha.recursos.filter((_, i) => i !== idx);
                   setFicha(prev => ({ ...prev, recursos: novos }));
-                }} className="text-red-900 hover:text-red-600 text-sm transition-colors">×</button>
+                }} className="text-red-600 hover:text-red-600 text-sm transition-colors">×</button>
               </div>
             </div>
             <div className="flex gap-1 flex-wrap">
@@ -2359,7 +2359,7 @@ async function abrirCofre(h) {
       );
       setFicha(prev => ({ ...prev, recursos: novosRecursos }));
     }}
-      className="flex-1 border border-[#4a6a8a50] text-[#4a6a8a] py-3 text-xs hover:bg-[#4a6a8a10] transition-colors"
+      className="flex-1 border border-[#6a8aaa50] text-[#6a8aaa] py-3 text-xs hover:bg-[#6a8aaa10] transition-colors"
       style={{ ...cinzel, borderRadius: '2px' }}>
       🌙 DESCANSO CURTO
     </button>
@@ -2375,7 +2375,7 @@ async function abrirCofre(h) {
         condicoes: [],
       }));
     }}
-      className="flex-1 border border-[#8a4a8a50] text-[#8a4a8a] py-3 text-xs hover:bg-[#8a4a8a10] transition-colors"
+      className="flex-1 border border-[#a86aa850] text-[#a86aa8] py-3 text-xs hover:bg-[#a86aa810] transition-colors"
       style={{ ...cinzel, borderRadius: '2px' }}>
       ☀ DESCANSO LONGO
     </button>
@@ -2512,7 +2512,7 @@ style={{
       const novos = ficha.inventory.filter((_, idx) => idx !== i);
       setFicha(prev => ({ ...prev, inventory: novos }));
     }}
-    className="text-red-900 hover:text-red-600 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+    className="text-red-600 hover:text-red-600 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
     ×
   </button>
 </div>
@@ -2550,7 +2550,7 @@ style={{
         </>
       ) : (
         <div className="text-center py-4">
-          <p style={cinzel} className="text-[#8a5030] text-xs tracking-[2px] mb-2">? NÃO IDENTIFICADO</p>
+          <p style={cinzel} className="text-[#b07050] text-xs tracking-[2px] mb-2">? NÃO IDENTIFICADO</p>
           <p className="text-[#8a7e68] text-sm">As propriedades deste item são desconhecidas.</p>
         </div>
       )}
@@ -2694,7 +2694,7 @@ style={{
             </div>
             <div className="p-6 flex flex-wrap gap-2">
               {(ficha.languages || []).length === 0 ? (
-                <p className="text-[#7a6e58] text-sm">Nenhum idioma registrado.</p>
+                <p className="text-[#8a7e68] text-sm">Nenhum idioma registrado.</p>
               ) : (
                 ficha.languages.map((idioma, i) => (
                   <span key={i} className="border border-[#c8a84b15] text-[#9a8e78] px-3 py-1 text-sm flex items-center gap-2"
@@ -2704,7 +2704,7 @@ style={{
                       const novos = ficha.languages.filter((_, idx) => idx !== i);
                       editarCampo('languages', novos);
                     }}
-                      className="text-red-900 hover:text-red-600 text-xs">×</button>
+                      className="text-red-600 hover:text-red-600 text-xs">×</button>
                   </span>
                 ))
               )}
@@ -2730,7 +2730,7 @@ style={{
                   setNotas(e.target.value);
                   setFicha(prev => ({ ...prev, notas_privadas: e.target.value }));
                 }}
-                placeholder="Anotações, segredos, objetivos pessoais do personagem..."
+                placeholder="Anotações, segredos, objetivos pessoais do personagem..." aria-label="Anotações, segredos, objetivos pessoais do personagem..."
                 rows={5}
                 className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#a09880] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b50] resize-none placeholder-[#3a3020]"
                 style={{ fontSize: '1rem', borderRadius: '2px', lineHeight: '1.7' }} />
@@ -3139,12 +3139,12 @@ style={{
             ))}
           </div>
           <textarea value={focoDowntime} onChange={e => setFocoDowntime(e.target.value)}
-            placeholder="Algum detalhe? (opcional — ex: 'treinando com espadas', 'investigando o Vazio')"
+            placeholder="Algum detalhe? (opcional — ex: 'treinando com espadas', 'investigando o Vazio')" aria-label="Algum detalhe? (opcional — ex: 'treinando com espadas', 'investigando o Vazio')"
             rows={3}
             className="w-full bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm mb-4 focus:outline-none focus:border-[#c8a84b50]"
             style={{ borderRadius: '2px' }} />
           <button onClick={enviarDowntime} disabled={!atividadeDowntime || enviandoDowntime}
-            className="w-full bg-[#4a6a8a] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#5a7a9a] transition-colors disabled:opacity-30"
+            className="w-full bg-[#6a8aaa] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#7a9aaa] transition-colors disabled:opacity-30"
             style={{ ...cinzel, borderRadius: '2px' }}>
             {enviandoDowntime ? 'Enviando...' : 'Enviar para o Mestre'}
           </button>
@@ -3154,11 +3154,11 @@ style={{
       {caixaMensagens && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 px-4"
           onClick={() => setCaixaMensagens(false)}>
-          <div className="bg-[#0f0e0c] border border-[#8a4a8a50] max-w-md w-full p-6 mb-4 sm:mb-0"
-            style={{ borderRadius: '2px', boxShadow: '0 0 30px #8a4a8a20' }}
+          <div className="bg-[#0f0e0c] border border-[#a86aa850] max-w-md w-full p-6 mb-4 sm:mb-0"
+            style={{ borderRadius: '2px', boxShadow: '0 0 30px #a86aa820' }}
             onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <p style={cinzel} className="text-[#8a4a8a] text-xs tracking-[4px]">🔮 SUSSURROS DO MESTRE</p>
+              <p style={cinzel} className="text-[#a86aa8] text-xs tracking-[4px]">🔮 SUSSURROS DO MESTRE</p>
               <button onClick={() => setCaixaMensagens(false)}
                 className="text-[#8a7e68] hover:text-[#c8a84b] transition-colors">✕</button>
             </div>
@@ -3167,10 +3167,10 @@ style={{
             ) : (
               <div className="flex flex-col gap-3">
                 {mensagensSecretas.map(msg => (
-                  <div key={msg.id} className="border border-[#8a4a8a30] bg-[#161410] p-4">
+                  <div key={msg.id} className="border border-[#a86aa830] bg-[#161410] p-4">
                     <p className="text-[#e8e0d0] text-sm leading-relaxed italic mb-3">"{msg.message}"</p>
                     <button onClick={() => marcarComoLida(msg.id)}
-                      className="border border-[#8a4a8a50] text-[#8a4a8a] px-3 py-1 text-xs hover:bg-[#8a4a8a10] transition-colors w-full"
+                      className="border border-[#a86aa850] text-[#a86aa8] px-3 py-1 text-xs hover:bg-[#a86aa810] transition-colors w-full"
                       style={{ ...cinzel, borderRadius: '2px' }}>
                       ENTENDIDO
                     </button>
@@ -3185,23 +3185,23 @@ style={{
       {modalDowntimeResultado && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 px-4"
           onClick={() => setModalDowntimeResultado(false)}>
-          <div className="bg-[#0f0e0c] border border-[#8a4a8a50] max-w-md w-full p-6 mb-4 sm:mb-0"
-            style={{ borderRadius: '2px', boxShadow: '0 0 30px #8a4a8a20' }}
+          <div className="bg-[#0f0e0c] border border-[#a86aa850] max-w-md w-full p-6 mb-4 sm:mb-0"
+            style={{ borderRadius: '2px', boxShadow: '0 0 30px #a86aa820' }}
             onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <p style={cinzel} className="text-[#8a4a8a] text-xs tracking-[4px]">🌙 RESULTADO DO DOWNTIME</p>
+              <p style={cinzel} className="text-[#a86aa8] text-xs tracking-[4px]">🌙 RESULTADO DO DOWNTIME</p>
               <button onClick={() => setModalDowntimeResultado(false)}
                 className="text-[#8a7e68] hover:text-[#c8a84b] transition-colors">✕</button>
             </div>
             <div className="flex flex-col gap-3">
               {downtimeResolvidos.map(d => (
-                <div key={d.id} className="border border-[#8a4a8a30] bg-[#161410] p-4">
-                  <p style={cinzel} className="text-[#c8a84b] text-xs capitalize mb-1">
+                <div key={d.id} className="border border-[#a86aa830] bg-[#161410] p-4">
+                  <p style={cinzel} className="text-[#a86aa8] text-xs capitalize mb-1">
                     {d.atividade} {d.status === 'rejeitado' && '(não aconteceu)'}
                   </p>
                   <p className="text-[#e8e0d0] text-sm leading-relaxed italic mb-3">"{d.consequencia_final}"</p>
                   <button onClick={() => marcarDowntimeVisto(d.id)}
-                    className="border border-[#8a4a8a50] text-[#8a4a8a] px-3 py-1 text-xs hover:bg-[#8a4a8a10] transition-colors w-full"
+                    className="border border-[#a86aa850] text-[#a86aa8] px-3 py-1 text-xs hover:bg-[#a86aa810] transition-colors w-full"
                     style={{ ...cinzel, borderRadius: '2px' }}>
                     ENTENDIDO
                   </button>
@@ -3293,7 +3293,7 @@ style={{
         <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6">
           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">DOCUMENTOS RECEBIDOS</p>
           {handoutsRecebidos.length === 0 ? (
-            <p className="text-[#7a6e58] text-sm text-center py-6">Nenhum documento recebido ainda.</p>
+            <p className="text-[#8a7e68] text-sm text-center py-6">Nenhum documento recebido ainda.</p>
           ) : (
             <div className="flex flex-col gap-3">
               {handoutsRecebidos.map(h => (
@@ -3301,13 +3301,13 @@ style={{
                   <p style={cinzel} className="text-[#e8e0d0] text-sm mb-2">{h.name}</p>
                   {h.bloqueado ? (
                     <div>
-                      <p style={cinzel} className="text-[#8a5030] text-xs tracking-[2px] mb-2">🔒 DOCUMENTO TRANCADO</p>
+                      <p style={cinzel} className="text-[#b07050] text-xs tracking-[2px] mb-2">🔒 DOCUMENTO TRANCADO</p>
                       {h.cofre_dica && <p className="text-[#9a8e78] text-sm italic mb-3">"{h.cofre_dica}"</p>}
                       <div className="flex gap-2">
                         <input value={respostasCofre[h.id] || ''}
                           onChange={e => setRespostasCofre(prev => ({ ...prev, [h.id]: e.target.value }))}
                           onKeyDown={e => { if (e.key === 'Enter') abrirCofre(h); }}
-                          placeholder="Sua resposta..."
+                          placeholder="Sua resposta..." aria-label="Sua resposta..."
                           className="flex-1 bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
                           style={{ borderRadius: '2px' }} />
                         <button onClick={() => abrirCofre(h)} disabled={abrindoCofre === h.id}
@@ -3337,13 +3337,13 @@ style={{
       {abaAtiva === 'diario' && (
         <div className="flex flex-col gap-6 mb-6">
           {!diario ? (
-            <p className="text-[#7a6e58] text-sm text-center py-6">Carregando...</p>
+            <p className="text-[#8a7e68] text-sm text-center py-6">Carregando...</p>
           ) : (
             <>
               <div className="border border-[#c8a84b20] bg-[#161410] p-6">
                 <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">O QUE EU SEI</p>
                 {diario.fatos.length === 0 ? (
-                  <p className="text-[#7a6e58] text-sm">Nada descoberto ainda.</p>
+                  <p className="text-[#8a7e68] text-sm">Nada descoberto ainda.</p>
                 ) : (
                   <div className="flex flex-col gap-2">
                     {diario.fatos.map(f => (
@@ -3358,7 +3358,7 @@ style={{
               <div className="border border-[#c8a84b20] bg-[#161410] p-6">
                 <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">QUEM EU CONHEÇO</p>
                 {diario.npcs.length === 0 ? (
-                  <p className="text-[#7a6e58] text-sm">Ninguém ainda.</p>
+                  <p className="text-[#8a7e68] text-sm">Ninguém ainda.</p>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {diario.npcs.map(n => (
@@ -3381,7 +3381,7 @@ style={{
                 <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">MINHAS ANOTAÇÕES</p>
                 <div className="flex flex-col gap-2">
                   {diario.sessoes.length === 0 && (
-                    <p className="text-[#7a6e58] text-sm">As sessões aparecem aqui depois que o mestre as encerra.</p>
+                    <p className="text-[#8a7e68] text-sm">As sessões aparecem aqui depois que o mestre as encerra.</p>
                   )}
                   {diario.sessoes.map(s => ({ session_number: s.session_number, title: s.title || `Sessão ${s.session_number}` })).map(s => (
                     <div key={s.session_number} className="border border-[#c8a84b15] bg-[#0f0e0c]" style={{ borderRadius: '2px' }}>
@@ -3399,7 +3399,7 @@ style={{
                         <div className="px-4 pb-4">
                           <textarea value={notasDiario[s.session_number] || ''} rows={5}
                             onChange={e => setNotasDiario(prev => ({ ...prev, [s.session_number]: e.target.value }))}
-                            placeholder="O que aconteceu, o que você suspeita, perguntas pendentes..."
+                            placeholder="O que aconteceu, o que você suspeita, perguntas pendentes..." aria-label="O que aconteceu, o que você suspeita, perguntas pendentes..."
                             className="w-full bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm mb-2 focus:outline-none focus:border-[#c8a84b50]"
                             style={{ borderRadius: '2px' }} />
                           <button onClick={() => salvarNotaDiario(s.session_number)} disabled={salvandoNota}
