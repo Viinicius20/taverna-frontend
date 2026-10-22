@@ -26,6 +26,7 @@ import { instalarAlertGlobal } from './utils/notificar';
 import ConfirmHost from './components/ConfirmHost';
 import Relacoes from "./pages/Relacoes";
 import SessaoZero from "./pages/SessaoZero";
+import LimiteDeErro from './components/LimiteDeErro';
 
 instalarAlertGlobal();
 
@@ -35,6 +36,7 @@ function App() {
       <BrowserRouter>
       <Toasts />
       <ConfirmHost />
+      <LimiteDeErro>
         <Routes>
           <Route path="/login" element={<Login />} /> {/* ← adiciona */}
           <Route path="/" element={<Home />} />
@@ -60,9 +62,13 @@ function App() {
           <Route path="/relacoes" element={<Relacoes />} />
           <Route path="/sessao-zero" element={<SessaoZero />} />
         </Routes>
+        </LimiteDeErro>
       </BrowserRouter>
     </UserProvider>
   );
 }
+
+function Quebra() { throw new Error('Erro de teste'); }
+{process.env.NODE_ENV !== 'production' && <Route path="/erro-teste" element={<Quebra />} />}
 
 export default App;
