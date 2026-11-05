@@ -678,9 +678,19 @@ async function enviarMensagemSecreta() {
   setEnviandoMensagem(false);
 }
 
-async function abrirSkillNpc(skillName, npcData) {
+async function abrirSkillNpc(skill, npcData) {
+  const skillName = typeof skill === 'string' ? skill : skill?.name;
+  const descricaoLocal = typeof skill === 'object' ? skill?.description : null;
+
   setModalSkillNpc(skillName);
   setDescricaoSkillNpc(null);
+
+  if (descricaoLocal) {
+    setDescricaoSkillNpc({ description: descricaoLocal, type: 'ação' });
+    setCarregandoSkillNpc(false);
+    return;
+  }
+
   setCarregandoSkillNpc(true);
   try {
     const context = `${npcData?.race || ''} ${npcData?.class || ''} nível ${npcData?.level || 1}`;
@@ -693,7 +703,6 @@ async function abrirSkillNpc(skillName, npcData) {
   }
   setCarregandoSkillNpc(false);
 }
-
 async function confirmarGerarArte() {
   setGerandoArte(true);
   try {
@@ -1619,24 +1628,20 @@ useEffect(() => {
                         </div>
                       )}
 
-                      {d.features && d.features.length > 0 && (
-                    <div>
-                      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">HABILIDADES</p>
-                      <div className="flex flex-wrap gap-2">
-                        {d.features.map((f, i) => (
-                        <button key={i}
-                        onClick={e => {
-                          e.stopPropagation();
-                          abrirSkillNpc(f, d);
-                        }}
-                        className="border border-[#c8a84b20] text-[#9a8e78] px-2 py-0.5 text-xs hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors"
-                        style={{ borderRadius: '2px' }}>
-                        {f} ↗
-                      </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                      {d.features.map((f, i) => {
+                        const nome = typeof f === 'string' ? f : f?.name;
+                        return (
+                          <button key={i}
+                            onClick={e => {
+                              e.stopPropagation();
+                              abrirSkillNpc(f, d);
+                            }}
+                            className="border border-[#c8a84b20] text-[#9a8e78] px-2 py-0.5 text-xs hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors"
+                            style={{ borderRadius: '2px' }}>
+                            {nome} ↗
+                          </button>
+                        );
+                      })}
 
                       {d.background_story && (
                         <div>
