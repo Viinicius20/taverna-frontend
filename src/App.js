@@ -32,6 +32,16 @@ import { useEffect } from 'react';
 instalarAlertGlobal();
 
 function App() {
+  useEffect(() => {
+    const aoTeclar = e => {
+      if (e.key !== 'Escape') return;
+      const fundo = [...document.querySelectorAll('.fixed.inset-0')].pop();
+      if (fundo) fundo.click();
+    };
+    document.addEventListener('keydown', aoTeclar);
+    return () => document.removeEventListener('keydown', aoTeclar);
+  }, []);
+
   return (
     <UserProvider> {/* ← wrappa tudo */}
       <BrowserRouter>
@@ -71,17 +81,5 @@ function App() {
 }
 
 function Quebra() { throw new Error('Erro de teste'); }
-
-  useEffect(() => {
-    const aoTeclar = e => {
-      if (e.key !== 'Escape') return;
-      const fundo = [...document.querySelectorAll('.fixed.inset-0')].pop();
-      if (fundo) fundo.click();
-    };
-    document.addEventListener('keydown', aoTeclar);
-    return () => document.removeEventListener('keydown', aoTeclar);
-  }, []);
-
-
 
 export default App;
