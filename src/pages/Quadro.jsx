@@ -62,7 +62,7 @@ useEffect(() => {
     ativo = false;
     clearInterval(interval);
   };
-}, []);
+}, [CAMPANHA_ID]);;
 
 // Countdown: roda independente
 useEffect(() => {
