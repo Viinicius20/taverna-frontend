@@ -33,41 +33,38 @@ export default function Quadro() {
     setNovoTexto('');
   }
 
-  function removerPostit(id) {
-    setPostits(prev => prev.filter(p => p.id !== id));
-  }
-
-  useEffect(() => {
-  buscarCountdown();
-  const interval = setInterval(buscarCountdown, 5000);
-  return () => clearInterval(interval);
-}, []);
-
-async function buscarCountdown() {
-  try {
-    const res = await fetch(`https://taverna-backend-eq3b.onrender.com/session-state/${CAMPANHA_ID}`);
-    const json = await res.json();
-    if (json.data?.countdown_active && json.data?.countdown_end) {
-  const diff = Math.floor((new Date(json.data.countdown_end) - new Date()) / 1000);
-  if (diff > 0) {
-    setCountdown(json.data);
-  } else {
-    setCountdown(null);
-  }
-} else {
-  setCountdown(null);
-  setCountdownDisplay('');
+function removerPostit(id) {
+  setPostits(prev => prev.filter(p => p.id !== id));
 }
-  } catch {}
-}
-// Polling — só busca estado, não interfere no countdown
+
+// Polling: busca o estado da sessão a cada 3s
 useEffect(() => {
+  let ativo = true;
+
+  async function buscarCountdown() {
+    try {
+      const res = await fetch(`https://taverna-backend-eq3b.onrender.com/session-state/${CAMPANHA_ID}`);
+      const json = await res.json();
+      if (!ativo) return;
+      if (json.data?.countdown_active && json.data?.countdown_end) {
+        const diff = Math.floor((new Date(json.data.countdown_end) - new Date()) / 1000);
+        setCountdown(diff > 0 ? json.data : null);
+      } else {
+        setCountdown(null);
+        setCountdownDisplay('');
+      }
+    } catch {}
+  }
+
   buscarCountdown();
   const interval = setInterval(buscarCountdown, 3000);
-  return () => clearInterval(interval);
+  return () => {
+    ativo = false;
+    clearInterval(interval);
+  };
 }, []);
 
-// Countdown — roda independente
+// Countdown: roda independente
 useEffect(() => {
   if (!countdown?.countdown_end) return;
   const interval = setInterval(() => {
@@ -78,7 +75,7 @@ useEffect(() => {
     if (diff === 0) setCountdown(null);
   }, 1000);
   return () => clearInterval(interval);
-}, [countdown?.countdown_end]); // ← depende só do fim, não do objeto inteiro
+}, [countdown?.countdown_end]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
