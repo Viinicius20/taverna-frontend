@@ -1,3 +1,4 @@
+import { getCampanhaId } from '../utils/campanha';
 import { confirmar } from '../utils/notificar';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +10,7 @@ import { notificar } from '../utils/notificar';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
-const CAMPANHA_ID = '00000000-0000-0000-0000-000000000001';
+const CAMPANHA_ID = getCampanhaId();
 
 const STATUS_COR = {
   ativo: '#c8a84b',

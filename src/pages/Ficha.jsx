@@ -1,3 +1,4 @@
+import { getCampanhaId } from '../utils/campanha';
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../services/api';
@@ -13,7 +14,7 @@ import SessaoZeroFicha from "../components/SessaoZeroFicha";
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
-const CAMPANHA_ID = '00000000-0000-0000-0000-000000000001';
+const CAMPANHA_ID = getCampanhaId();
 const attrLabel = { str: 'FOR', dex: 'DES', con: 'CON', int: 'INT', wis: 'SAB', cha: 'CAR' };
 const tipoColor = {
   'magia': '#7ab8d4',

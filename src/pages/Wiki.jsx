@@ -1,3 +1,4 @@
+import { getCampanhaId } from '../utils/campanha';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
@@ -5,7 +6,7 @@ import TextoWiki from '../components/TextoWiki';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
-const CAMPANHA_ID = '00000000-0000-0000-0000-000000000001';
+const CAMPANHA_ID = getCampanhaId();
 const CATEGORIAS = ['Lore', 'Pessoas', 'Lugares', 'Facções', 'Eventos', 'Outros'];
 const VAZIO = { titulo: '', categoria: 'Lore', conteudo: '', notas_mestre: '', revelada: false };
 

@@ -1,3 +1,4 @@
+import { getCampanhaId } from '../utils/campanha';
 import { confirmar } from '../utils/notificar';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -5,7 +6,7 @@ import api from '../services/api';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
-const CAMPANHA_ID = '00000000-0000-0000-0000-000000000001';
+const CAMPANHA_ID = getCampanhaId();
 
 export default function Historico() {
   const navigate = useNavigate();

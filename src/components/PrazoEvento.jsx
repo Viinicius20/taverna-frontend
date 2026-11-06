@@ -1,9 +1,10 @@
+import { getCampanhaId } from '../utils/campanha';
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { notificar } from '../utils/notificar';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
-const CAMPANHA_ID = '00000000-0000-0000-0000-000000000001';
+const CAMPANHA_ID = getCampanhaId();
 
 function textoDia(diaTotal, meses, anoInicial) {
   const anoDias = meses.reduce((a, m) => a + m.dias, 0);

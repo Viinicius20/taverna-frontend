@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import api from '../services/api';
+import { getCampanhaId, setCampanhaAtiva } from '../utils/campanha';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -18,6 +19,7 @@ export default function Campanhas() {
   const [codigo, setCodigo] = useState('');
   const [aba, setAba] = useState('loading');
   const [erro, setErro] = useState('');
+  const ativaId = getCampanhaId();
 
  useEffect(() => {
   if (carregandoUser) return; // espera carregar
@@ -62,18 +64,14 @@ export default function Campanhas() {
     if (!codigo.trim()) return;
     setEntrando(true);
     setErro('');
-    try {
-      await api.post('/campaigns/join', {
-        code: codigo.toUpperCase(),
-        user_id: user.id
-      });
-      setCodigo('');
-      alert('✅ Entrou na campanha com sucesso!');
-    } catch {
-      setErro('Código inválido ou campanha não encontrada.');
-    }
-    setEntrando(false);
-  }
+    const res = await api.post('/campaigns/join', {
+      code: codigo.toUpperCase(),
+      user_id: user.id
+    });
+    setCodigo('');
+    const id = res.data?.data?.id;
+    alert('✅ Entrou na campanha com sucesso!');
+    if (id) setCampanhaAtiva(id);
 
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
@@ -167,6 +165,15 @@ export default function Campanhas() {
                     <div className="text-right">
                       <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-1">CÓDIGO</p>
                       <p style={cinzel} className="text-[#c8a84b] text-2xl font-bold tracking-widest">{c.code}</p>
+                      {c.id === ativaId ? (
+                        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mt-3">● ATIVA</p>
+                      ) : (
+                        <button onClick={() => setCampanhaAtiva(c.id)}
+                          className="mt-3 border border-[#c8a84b30] text-[#9a8e78] px-3 py-1 text-xs tracking-widest hover:border-[#c8a84b60] hover:text-[#c8a84b] transition-colors"
+                          style={{ ...cinzel, borderRadius: '2px' }}>
+                          USAR
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

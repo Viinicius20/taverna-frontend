@@ -1,9 +1,10 @@
+import { getCampanhaId } from '../utils/campanha';
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { notificar } from '../utils/notificar';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
-const CAMPANHA_ID = '00000000-0000-0000-0000-000000000001';
+const CAMPANHA_ID = getCampanhaId();
 const campo = 'bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]';
 const botao = 'border border-[#c8a84b50] text-[#c8a84b] px-3 py-2 text-xs hover:bg-[#c8a84b10] transition-colors';
 

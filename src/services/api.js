@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { getToken, clearToken } from './token';
+import { getCampanhaId } from '../utils/campanha';
 
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL || 'https://taverna-backend-eq3b.onrender.com',
@@ -21,5 +22,10 @@ api.interceptors.response.use(
     return Promise.reject(err);
   }
 );
+
+api.interceptors.request.use(cfg => {
+  cfg.headers['X-Campanha-Id'] = getCampanhaId();
+  return cfg;
+});
 
 export default api;
