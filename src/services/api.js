@@ -15,10 +15,20 @@ api.interceptors.request.use(config => {
 api.interceptors.response.use(
   res => res,
   err => {
-    if (err.response?.status === 401 && getToken()) {   // só quando havia sessão
+    const status = err.response?.status;
+
+    if (status === 401 && getToken()) {   // só quando havia sessão
       clearToken();
       window.dispatchEvent(new Event('taverna:sessao-expirada'));
     }
+
+    const detalhe = String(err.response?.data?.detail || '');
+    if (status === 403 && detalhe.includes('não faz parte desta campanha')) {
+      if (!['/campanhas', '/login'].includes(window.location.pathname)) {
+        window.location.assign('/campanhas');
+      }
+    }
+
     return Promise.reject(err);
   }
 );
