@@ -5,6 +5,7 @@ import { setToken, clearToken } from '../services/token';
 const UserContext = createContext(null);
 
 const detectaSenha = x => JSON.stringify(x ?? '').includes('SENHA_NECESSARIA');
+const detectaDefinir = x => JSON.stringify(x ?? '').includes('DEFINIR_SENHA');
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -24,7 +25,6 @@ export function UserProvider({ children }) {
     try { localStorage.removeItem('taverna_user'); } catch { /* nada a limpar */ }
   }, []);
 
-  // sessão vencida (401 com token): desloga sozinho
   useEffect(() => {
     window.addEventListener('taverna:sessao-expirada', logout);
     return () => window.removeEventListener('taverna:sessao-expirada', logout);
@@ -37,6 +37,9 @@ export function UserProvider({ children }) {
       res = await api.post('/profiles/login', { username, password: senha || undefined });
     } catch (err) {
       if (detectaSenha(err.response?.data)) throw precisa();
+      if (detectaDefinir(err.response?.data)) {
+        throw Object.assign(new Error('Definir senha'), { definirSenha: true });
+      }
       throw err;
     }
     if (detectaSenha(res.data)) throw precisa();
@@ -49,8 +52,18 @@ export function UserProvider({ children }) {
     return userData;
   }
 
+  async function definirSenha(username, senha) {
+  const res = await api.post('/profiles/definir-senha', { username, password: senha });
+  const userData = res.data.data;
+  const token = res.data.token;
+  if (token) setToken(token); else clearToken();
+  setUser(userData);
+  try { localStorage.setItem('taverna_user', JSON.stringify(userData)); } catch { /* segue sem salvar */ }
+  return userData;
+}
+
   return (
-    <UserContext.Provider value={{ user, login, logout, carregandoUser }}>
+    <UserContext.Provider value={{ user, login, definirSenha, logout, carregandoUser }}>
       {children}
     </UserContext.Provider>
   );
