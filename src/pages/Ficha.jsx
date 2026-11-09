@@ -1428,7 +1428,7 @@ async function abrirCofre(h) {
               { id: 'downtime', label: 'DOWNTIME' },
               { id: 'momentos', label: 'CRÔNICA' },
               { id: 'documentos', label: 'DOCUMENTOS' },
-              { id: 'diario', label: '📖 DIÁRIO' },
+              { id: 'diario', label: 'DIÁRIO' },
               { id: 'wiki', label: 'WIKI' },
               { id: 'historico', label: 'HISTÓRICO' },
               { id: 'sessaozero', label: 'SESSÃO ZERO' }
