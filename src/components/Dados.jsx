@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { rolarNoServidor, montarExpressao } from '../services/rolagens';
+import { notificar } from '../utils/notificar';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -13,8 +15,42 @@ const DADOS = [
   { tipo: 'd100', lados: 100, symbol: '◎' },
 ];
 
-function rolar(lados) {
-  return Math.floor(Math.random() * lados) + 1;
+async function rolarDado(dado) {
+  if (rolando) return;
+  tocarSomDado();
+  setRolando(dado.tipo);
+  setUltimoResultado(null);
+
+  try {
+    const mod = Math.max(-999, Math.min(999, Number(modificador) || 0));
+    // a animação de 600ms roda junto com a chamada, então não soma tempo
+    const [linha] = await Promise.all([
+      rolarNoServidor({ expressao: montarExpressao(quantidade, dado.lados, mod), oculta: secreto }),
+      new Promise(r => setTimeout(r, 600)),
+    ]);
+
+    const resultados = linha.dados.rolls;
+    const entrada = {
+      id: linha.id,
+      dado: dado.tipo,
+      lados: dado.lados,
+      quantidade,
+      modificador: mod,
+      resultados,
+      soma: resultados.reduce((a, b) => a + b, 0),
+      total: linha.total,
+      critico: dado.lados === 20 && resultados.includes(20),
+      falha: dado.lados === 20 && resultados.includes(1),
+      hora: new Date(linha.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+      secreto,
+    };
+
+    setUltimoResultado(entrada);
+    setHistorico(prev => [entrada, ...prev].slice(0, 20));
+  } catch {
+    notificar('Não foi possível rolar. Tente de novo.', 'erro');
+  }
+  setRolando(null);
 }
 
 let dadoAudio = null;

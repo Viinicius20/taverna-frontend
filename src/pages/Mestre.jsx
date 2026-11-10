@@ -10,7 +10,7 @@ import RolagemRapida from "../components/RolagemRapida";
 import { MODELOS } from '../utils/modelos';
 import usePolling from '../utils/usePolling';
 import { notificar } from '../utils/notificar';
-
+import MesaFeed from '../components/MesaFeed'
 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
@@ -1819,6 +1819,7 @@ useEffect(() => {
 {aba === 'painel' && (
   <>
   <RolagemRapida />
+  <MesaFeed />
 
         {/* PAINEL DE COMBATE */}
         {aba === 'painel' && (

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import Dados from '../components/Dados';
+import MesaFeed from '../components/MesaFeed'
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -28,6 +29,7 @@ export default function RolarDados() {
         <p className="text-[#7a7060] mb-10 font-light">Clique em um dado para rolar. Use quantidade e modificador para ajustar.</p>
 
         <Dados secreto={false} />
+        <div className="mt-10"><MesaFeed /></div>
       </div>
     </div>
   );

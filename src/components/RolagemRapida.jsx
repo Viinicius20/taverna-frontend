@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { parseRolagem, formatar, rolar } from "../utils/rolagem";
+import { parseRolagem, formatar } from "../utils/rolagem";
+import { rolarNoServidor } from "../services/rolagens";
 
 const cinzel = { fontFamily: "'Cinzel', serif" };   // copie a definição exata das suas páginas
 const CHAVE = 'rolagens_rapidas';
 const PADRAO = ['1d20', '1d20+5', '2d6+3', '1d100'];
+const [oculta, setOculta] = useState(false);
 
 function carregarSalvas() {
   try {
@@ -25,11 +27,20 @@ export default function RolagemRapida() {
 
   function atualizar(lista) { setSalvas(lista); gravar(lista); }
 
-  function executar(expr) {
-    const r = rolar(expr);
-    if (!r) return;
-    setHistorico(h => [{ ...r, id: Date.now() + Math.random() }, ...h].slice(0, 8));
+async function executar(expr) {
+  if (!parseRolagem(expr)) return;
+  setErro('');
+  try {
+    const linha = await rolarNoServidor({ expressao: expr, oculta });
+    const d = linha.dados;
+    setHistorico(h => [{
+      id: linha.id, expr: linha.expressao, dados: d.rolls, mod: linha.modificador,
+      total: linha.total, qtd: d.qtd, lados: d.lados,
+    }, ...h].slice(0, 8));
+  } catch {
+    setErro('Não foi possível rolar (máx. 20 dados, de 2 a 100 lados).');
   }
+}
 
   function adicionar() {
     const p = parseRolagem(novo);
@@ -55,7 +66,10 @@ export default function RolagemRapida() {
 
   return (
     <div className="mb-8">
-      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">ROLAGEM RÁPIDA</p>
+      <label className="flex items-center gap-2 text-xs text-[#8a7e68] mb-3 cursor-pointer">
+        <input type="checkbox" checked={oculta} onChange={e => setOculta(e.target.checked)} />
+        Rolagem oculta (só você vê no feed)
+      </label>
 
       <div className="flex flex-wrap gap-2 mb-3">
         {salvas.map(expr => (

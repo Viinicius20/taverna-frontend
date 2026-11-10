@@ -11,6 +11,8 @@ import { notificar } from '../utils/notificar';
 import DataMundo from '../components/DataMundo';
 import SessaoZeroFicha from "../components/SessaoZeroFicha";
 import HistoricoFicha from '../components/HistoricoFicha';
+import { rolarNoServidor, montarExpressao } from '../services/rolagens';
+import MesaFeed from '../components/MesaFeed';
 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
@@ -1181,57 +1183,73 @@ function calcularPericias() {
   }, {});
 }
 
-function rolarAtaque(ataque) {
-  const bonus = parseInt(ataque.bonus) || 0;
-  const d20 = Math.floor(Math.random() * 20) + 1;
-  const total = d20 + bonus;
-  
-  let dano = null;
-  const danoMatch = ataque.dano.match(/(\d+)d(\d+)([+-]\d+)?/);
-  if (danoMatch) {
-    const qtd = parseInt(danoMatch[1]);
-    const faces = parseInt(danoMatch[2]);
-    const mod = parseInt(danoMatch[3]) || 0;
-    const rolls = Array.from({ length: qtd }, () => Math.floor(Math.random() * faces) + 1);
-    dano = rolls.reduce((a, b) => a + b, 0) + mod;
+async function rolarAtaque(ataque) {
+  const bonus = parseInt(ataque.bonus, 10) || 0;
+  try {
+    const linhaAtaque = await rolarNoServidor({
+      expressao: montarExpressao(1, 20, bonus),
+      rotulo: ataque.nome,
+      characterId: id,
+    });
+    const d20 = linhaAtaque.dados.rolls[0];
+
+    let dano = null;
+    const danoMatch = (ataque.dano || '').match(/(\d+)d(\d+)([+-]\d+)?/);
+    if (danoMatch) {
+      const linhaDano = await rolarNoServidor({
+        expressao: danoMatch[0],
+        rotulo: `${ataque.nome} (dano)`,
+        characterId: id,
+      });
+      dano = linhaDano.total;
+    }
+
+    const resultado = {
+      id: linhaAtaque.id,
+      nome: ataque.nome,
+      d20,
+      bonus,
+      total: linhaAtaque.total,
+      dano,
+      tipoDano: ataque.tipo,
+      critico: d20 === 20,
+      falha: d20 === 1,
+    };
+    setResultadoRolagem(resultado);
+    setHistoricoRolagens(prev => [resultado, ...prev].slice(0, 10));
+    setTimeout(() => setResultadoRolagem(null), 5000);
+  } catch {
+    notificar('Não foi possível rolar. Tente de novo.', 'erro');
   }
-
-  const resultado = {
-    id: Date.now(),
-    nome: ataque.nome,
-    d20,
-    bonus,
-    total,
-    dano,
-    tipoDano: ataque.tipo,
-    critico: d20 === 20,
-    falha: d20 === 1,
-  };
-
-  setResultadoRolagem(resultado);
-  setHistoricoRolagens(prev => [resultado, ...prev].slice(0, 10));
-  setTimeout(() => setResultadoRolagem(null), 5000);
 }
 
-function rolarPericia(nomeSkill, bonus) {
-  const d20 = Math.floor(Math.random() * 20) + 1;
-  const total = d20 + bonus;
-
-  const resultado = {
-    id: Date.now(),
-    nome: nomeSkill.charAt(0).toUpperCase() + nomeSkill.slice(1),
-    d20,
-    bonus,
-    total,
-    dano: null,
-    tipoDano: null,
-    critico: d20 === 20,
-    falha: d20 === 1,
-  };
-
-  setResultadoRolagem(resultado);
-  setHistoricoRolagens(prev => [resultado, ...prev].slice(0, 10));
-  setTimeout(() => setResultadoRolagem(null), 5000);
+async function rolarPericia(nomeSkill, bonus) {
+  const mod = Number(bonus) || 0;
+  const nome = nomeSkill.charAt(0).toUpperCase() + nomeSkill.slice(1);
+  try {
+    const linha = await rolarNoServidor({
+      expressao: montarExpressao(1, 20, mod),
+      rotulo: nome,
+      characterId: id,
+    });
+    const d20 = linha.dados.rolls[0];
+    const resultado = {
+      id: linha.id,
+      nome,
+      d20,
+      bonus: mod,
+      total: linha.total,
+      dano: null,
+      tipoDano: null,
+      critico: d20 === 20,
+      falha: d20 === 1,
+    };
+    setResultadoRolagem(resultado);
+    setHistoricoRolagens(prev => [resultado, ...prev].slice(0, 10));
+    setTimeout(() => setResultadoRolagem(null), 5000);
+  } catch {
+    notificar('Não foi possível rolar. Tente de novo.', 'erro');
+  }
 }
 
 
@@ -3422,7 +3440,7 @@ style={{
       )}
 
       {/* Aba WIki */}
-      {abaAtiva === 'historico' && <HistoricoFicha characterId={id} />}
+      {abaAtiva === 'historico' && <HistoricoFicha characterId={id} />} {!exportandoPDF && <MesaFeed flutuante />}
       {abaAtiva === 'wiki' && (
         <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6">
           {wikiAberta ? (() => {
