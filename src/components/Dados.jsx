@@ -26,44 +26,13 @@ function tocarSomDado() {
   dadoAudio.volume = 0.6;
   dadoAudio.play();
 }
+
 export default function Dados({ secreto = false }) {
   const [historico, setHistorico] = useState([]);
   const [rolando, setRolando] = useState(null);
   const [quantidade, setQuantidade] = useState(1);
   const [modificador, setModificador] = useState(0);
   const [ultimoResultado, setUltimoResultado] = useState(null);
-
-  async function rolarDado(dado) {
-    tocarSomDado();
-    setRolando(dado.tipo);
-    setUltimoResultado(null);
-
-    // Animação de 600ms
-    await new Promise(r => setTimeout(r, 600));
-
-    const resultados = Array.from({ length: quantidade }, () => rolar(dado.lados));
-    const soma = resultados.reduce((a, b) => a + b, 0);
-    const total = soma + modificador;
-
-    const entrada = {
-      id: Date.now(),
-      dado: dado.tipo,
-      lados: dado.lados,
-      quantidade,
-      modificador,
-      resultados,
-      soma,
-      total,
-      critico: dado.lados === 20 && resultados.includes(20),
-      falha: dado.lados === 20 && resultados.includes(1),
-      hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-      secreto,
-    };
-
-    setUltimoResultado(entrada);
-    setHistorico(prev => [entrada, ...prev].slice(0, 20));
-    setRolando(null);
-  }
 
   function limpar() {
     setHistorico([]);

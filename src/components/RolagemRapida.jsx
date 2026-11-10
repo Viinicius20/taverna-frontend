@@ -2,10 +2,9 @@ import { useState } from "react";
 import { parseRolagem, formatar } from "../utils/rolagem";
 import { rolarNoServidor } from "../services/rolagens";
 
-const cinzel = { fontFamily: "'Cinzel', serif" };   // copie a definição exata das suas páginas
+const cinzel = { fontFamily: "'Cinzel', serif" };   
 const CHAVE = 'rolagens_rapidas';
 const PADRAO = ['1d20', '1d20+5', '2d6+3', '1d100'];
-const [oculta, setOculta] = useState(false);
 
 function carregarSalvas() {
   try {
@@ -24,6 +23,7 @@ export default function RolagemRapida() {
   const [historico, setHistorico] = useState([]);
   const [novo, setNovo] = useState('');
   const [erro, setErro] = useState('');
+  const [oculta, setOculta] = useState(false);
 
   function atualizar(lista) { setSalvas(lista); gravar(lista); }
 
@@ -56,8 +56,8 @@ async function executar(expr) {
 
   const corTotal = r => {
     if (r.qtd === 1 && r.lados === 20) {
-      if (r.dados[0] === 20) return '#c8a84b';   // crítico
-      if (r.dados[0] === 1) return '#c84b4b';    // falha crítica
+      if (r.dados[0] === 20) return '#c8a84b';   
+      if (r.dados[0] === 1) return '#c84b4b';    
     }
     return '#e8e0d0';
   };
