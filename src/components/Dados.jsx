@@ -33,6 +33,7 @@ export default function Dados({ secreto = false }) {
   const [quantidade, setQuantidade] = useState(1);
   const [modificador, setModificador] = useState(0);
   const [ultimoResultado, setUltimoResultado] = useState(null);
+  const [oculta, setOculta] = useState(secreto);
 
   function limpar() {
     setHistorico([]);
@@ -49,7 +50,7 @@ export default function Dados({ secreto = false }) {
     const mod = Math.max(-999, Math.min(999, Number(modificador) || 0));
     // a animação de 600ms roda junto com a chamada, então não soma tempo
     const [linha] = await Promise.all([
-      rolarNoServidor({ expressao: montarExpressao(quantidade, dado.lados, mod), oculta: secreto }),
+      rolarNoServidor({ expressao: montarExpressao(quantidade, dado.lados, mod), oculta }),
       new Promise(r => setTimeout(r, 600)),
     ]);
 
@@ -111,10 +112,10 @@ export default function Dados({ secreto = false }) {
         </div>
 
         {secreto && (
-          <div className="border border-[#b0705020] bg-[#b0705010] px-3 py-2">
-            <p style={cinzel} className="text-[#b07050] text-xs tracking-widest">🔒 ROLAGEM SECRETA</p>
-            <p className="text-[#4a3020] text-xs font-light">Só você vê</p>
-          </div>
+          <label className="flex items-center gap-2 text-xs text-[#8a7e68] cursor-pointer">
+            <input type="checkbox" checked={oculta} onChange={e => setOculta(e.target.checked)} />
+            Rolagem oculta (só você vê)
+          </label>
         )}
       </div>
 
