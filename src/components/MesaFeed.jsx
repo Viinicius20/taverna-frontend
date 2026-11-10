@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
+import { useUser } from '../context/UserContext';
+import { notificar } from '../utils/notificar';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 
@@ -41,23 +43,38 @@ function Linha({ l }) {
 }
 
 export default function MesaFeed({ flutuante = false }) {
+  const { user } = useUser();
+  const isMestre = user?.role === 'mestre';
   const [linhas, setLinhas] = useState([]);
   const [aberto, setAberto] = useState(!flutuante);
+  const [confirmando, setConfirmando] = useState(false);
+  const [limpando, setLimpando] = useState(false);
   const ultimo = useRef('');
+  const ciclo = useRef(0);
 
   useEffect(() => {
     if (!aberto) return;
     let ativo = true;
+    ciclo.current = 0;
 
     async function buscar() {
       if (document.visibilityState === 'hidden') return;
+      ciclo.current += 1;
+      // a cada 5 ciclos (ou sem referência) refaz a busca completa e substitui a lista,
+      // assim rolagens apagadas pelo mestre somem para todo mundo
+      const completa = !ultimo.current || ciclo.current % 5 === 0;
       try {
-        const params = ultimo.current ? { depois: ultimo.current } : { limite: 30 };
+        const params = completa ? { limite: 30 } : { depois: ultimo.current };
         const res = await api.get('/rolagens', { params });
+        if (!ativo) return;
         const novas = res.data.data || [];
-        if (!ativo || novas.length === 0) return;
-        ultimo.current = novas[0].created_at;   // a API devolve da mais nova pra mais velha
-        setLinhas(prev => mesclar(prev, novas));
+        if (completa) {
+          setLinhas(novas);
+          ultimo.current = novas[0]?.created_at || '';
+        } else if (novas.length > 0) {
+          ultimo.current = novas[0].created_at;   // a API devolve da mais nova pra mais velha
+          setLinhas(prev => mesclar(prev, novas));
+        }
       } catch { /* tenta de novo no próximo ciclo */ }
     }
 
@@ -75,9 +92,46 @@ export default function MesaFeed({ flutuante = false }) {
     };
   }, [aberto]);
 
+  async function limpar() {
+    setLimpando(true);
+    try {
+      await api.delete('/rolagens');
+      setLinhas([]);
+      ultimo.current = '';
+    } catch {
+      notificar('Não foi possível limpar o log.', 'erro');
+    }
+    setLimpando(false);
+    setConfirmando(false);
+  }
+
   const painel = (
     <div className="border border-[#c8a84b20] bg-[#161410] p-4" style={{ borderRadius: '2px' }}>
-      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-3">MESA</p>
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">MESA</p>
+
+        {isMestre && linhas.length > 0 && (
+          confirmando ? (
+            <span className="flex items-center gap-2 text-xs">
+              <span className="text-[#9a8e78]">Apagar tudo?</span>
+              <button onClick={limpar} disabled={limpando}
+                className="text-red-400 hover:text-red-300 disabled:opacity-40">
+                {limpando ? '...' : 'Sim'}
+              </button>
+              <button onClick={() => setConfirmando(false)} disabled={limpando}
+                className="text-[#8a7e68] hover:text-[#c8a84b]">
+                Não
+              </button>
+            </span>
+          ) : (
+            <button onClick={() => setConfirmando(true)}
+              className="text-xs text-[#8a7e68] hover:text-red-400 transition-colors" style={cinzel}>
+              LIMPAR
+            </button>
+          )
+        )}
+      </div>
+
       {linhas.length === 0 ? (
         <p className="text-[#8a7e68] text-sm">Nenhuma rolagem ainda.</p>
       ) : (
