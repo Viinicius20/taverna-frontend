@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
-import { setToken, clearToken } from '../services/token';
+import { setToken, clearToken, getToken } from '../services/token';
 
 const UserContext = createContext(null);
 
@@ -14,7 +14,8 @@ export function UserProvider({ children }) {
   useEffect(() => {
     try {
       const salvo = localStorage.getItem('taverna_user');
-      if (salvo) setUser(JSON.parse(salvo));
+      if (salvo && getToken()) setUser(JSON.parse(salvo));
+      else if (salvo) localStorage.removeItem('taverna_user');
     } catch { /* dado corrompido: segue deslogado */ }
     setCarregandoUser(false);
   }, []);
