@@ -1,0 +1,14 @@
+:root {
+  --tav-fundo: #0f0e0c;
+  --tav-painel: #161410;
+  --tav-texto: #e8e0d0;
+  --tav-texto-suave: #9a8e78;
+  --tav-ouro: #c8a84b;
+  --tav-borda: #c8a84b30;
+
+  --raridade-comum: #9a9a9a;
+  --raridade-incomum: #4caf50;
+  --raridade-raro: #3b82f6;
+  --raridade-epico: #a855f7;
+  --raridade-lendario: #f59e0b;
+}

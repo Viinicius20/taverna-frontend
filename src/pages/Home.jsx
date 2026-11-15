@@ -4,6 +4,7 @@ import { useUser } from '../context/UserContext';
 import NotasSessao from "../components/NotasSessao";
 import api from "../services/api";
 
+
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
 
@@ -19,7 +20,7 @@ const particles = Array.from({ length: 18 }, (_, i) => {
 
 export default function Home() {
   const navigate = useNavigate();
-  const { user, logout } = useUser();
+  const { user, logout, carregandoUser } = useUser();
   const [boato, setBoato] = useState(null);
   const [gerandoBoato, setGerandoBoato] = useState(false);
   const [drawerAberto, setDrawerAberto] = useState(false);
@@ -28,11 +29,12 @@ export default function Home() {
   const isMestre = user?.role === 'mestre';
   const [proximos, setProximos] = useState([]);
   
+  
 
-  useEffect(() => {
-    buscarMonstroAleatorio();
-    buscarImagemRevelada();
-  }, []);
+useEffect(() => {
+  if (carregandoUser || !user) return;
+  buscarMonstroAleatorio();
+}, [user, carregandoUser]);
 
   async function buscarMonstroAleatorio() {
     try {
