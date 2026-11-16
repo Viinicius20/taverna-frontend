@@ -1827,7 +1827,7 @@ useEffect(() => {
 </>
 )}
 
-{aba === 'painel' && (
+<div style={{ display: aba === 'painel' ? 'block' : 'none' }}>
   <>
   <RolagemRapida />
   <MesaFeed />
@@ -1835,48 +1835,48 @@ useEffect(() => {
         {/* PAINEL DE COMBATE */}
         {aba === 'painel' && (
         <>
-<div>
-  <div className="flex items-center justify-between mb-2">
-    <div>
-      <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 opacity-70">ENCONTRO ATUAL</p>
-      <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold">Painel de Combate</h2>
-    </div>
-    <div className="flex gap-2">
-      {combatentes.length > 0 && (
-        <>
-        <a href="/tv" target="_blank" rel="noreferrer"
-          className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-2 text-xs hover:bg-[#c8a84b10] transition-colors"
-          style={{ ...cinzel, borderRadius: '2px' }}>
-          📺 TV
-        </a>
-          <button onClick={ordenarIniciativa}
-            className="border border-[#c8a84b40] text-[#c8a84b] px-4 py-2 text-xs hover:bg-[#c8a84b10] transition-colors"
-            style={{ ...cinzel, borderRadius: '2px' }}>
-            ↕ ORDENAR
-          </button>
-          {combateAtivo ? (
-            <button onClick={proximoTurno}
-              className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors"
-              style={{ ...cinzel, borderRadius: '2px' }}>
-              PRÓXIMO TURNO →
-              <p className="text-[#8a7e68] text-xs mt-2">Atalho: Espaço ou Enter para avançar turno</p>
-            </button>
-          ) : (
-            <button onClick={() => setCombateAtivo(true)}
-              className="bg-[#b07050] text-[#f0e8d8] px-4 py-2 text-xs font-bold hover:bg-[#c08060] transition-colors"
-              style={{ ...cinzel, borderRadius: '2px' }}>
-              ⚔ INICIAR
-            </button>
-          )}
-          <button onClick={resetarCombate}
-            className="border border-red-600 text-red-600 px-3 py-2 text-xs hover:border-red-600 hover:text-red-600 transition-colors"
-            style={{ ...cinzel, borderRadius: '2px' }}>
-            ✕
-          </button>
-        </>
-      )}
-    </div>
-  </div>
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 opacity-70">ENCONTRO ATUAL</p>
+              <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold">Painel de Combate</h2>
+            </div>
+            <div className="flex gap-2">
+              {combatentes.length > 0 && (
+                <>
+                <a href="/tv" target="_blank" rel="noreferrer"
+                  className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-2 text-xs hover:bg-[#c8a84b10] transition-colors"
+                  style={{ ...cinzel, borderRadius: '2px' }}>
+                  📺 TV
+                </a>
+                  <button onClick={ordenarIniciativa}
+                    className="border border-[#c8a84b40] text-[#c8a84b] px-4 py-2 text-xs hover:bg-[#c8a84b10] transition-colors"
+                    style={{ ...cinzel, borderRadius: '2px' }}>
+                    ↕ ORDENAR
+                  </button>
+                  {combateAtivo ? (
+                    <button onClick={proximoTurno}
+                      className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors"
+                      style={{ ...cinzel, borderRadius: '2px' }}>
+                      PRÓXIMO TURNO →
+                      <p className="text-[#8a7e68] text-xs mt-2">Atalho: Espaço ou Enter para avançar turno</p>
+                    </button>
+                  ) : (
+                    <button onClick={() => setCombateAtivo(true)}
+                      className="bg-[#b07050] text-[#f0e8d8] px-4 py-2 text-xs font-bold hover:bg-[#c08060] transition-colors"
+                      style={{ ...cinzel, borderRadius: '2px' }}>
+                      ⚔ INICIAR
+                    </button>
+                  )}
+                  <button onClick={resetarCombate}
+                    className="border border-red-600 text-red-600 px-3 py-2 text-xs hover:border-red-600 hover:text-red-600 transition-colors"
+                    style={{ ...cinzel, borderRadius: '2px' }}>
+                    ✕
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
 
   {/* Adicionar monstro genérico */}
 <div className="flex flex-col sm:flex-row gap-2 mb-4 mt-6">
@@ -2945,123 +2945,124 @@ useEffect(() => {
   </div>
 </div>
 
-{/* MODAL ENVIAR PRESSÁGIO */}
-{modalEnviarPresagio && createPortal(
-  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
-    onClick={() => setModalEnviarPresagio(null)}>
-    <div className="modal-anim bg-[#161410] border border-[#c8a84b30] max-w-sm w-full p-6" style={{ borderRadius: '2px' }}
-      onClick={e => e.stopPropagation()}>
-      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">ENVIAR PRESSÁGIO</p>
-      <button onClick={() => enviarPresagio(modalEnviarPresagio, null)}
-        className="w-full border border-[#c8a84b30] text-[#c8a84b] py-2 text-xs mb-2 hover:bg-[#c8a84b10] transition-colors"
-        style={{ ...cinzel, borderRadius: '2px' }}>
-        Enviar a Todos
-      </button>
-      {personagens.map(p => (
-        <button key={p.id} onClick={() => enviarPresagio(modalEnviarPresagio, p.id)}
-          className="w-full border border-[#c8a84b15] text-[#9a8e78] py-2 text-xs mb-2 hover:border-[#c8a84b40] hover:text-[#c8a84b] transition-colors"
-          style={{ ...cinzel, borderRadius: '2px' }}>
-          {p.name}
-        </button>
-      ))}
-    </div>
-  </div>,
-  document.body
-)}
-
-        {/* GERADOR DE NOMES — fixo */}
-<div className="fixed bottom-6 right-6 z-50">
-  <div className="bg-[#161410] border border-[#c8a84b30] shadow-lg" style={{ borderRadius: '2px' }}>
-    
-    {/* Header clicável */}
-    <button
-      onClick={() => setNomeAberto(prev => !prev)}
-      className="flex items-center justify-between gap-4 px-4 py-3 w-full hover:bg-[#c8a84b08] transition-colors">
-      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">GERAR NOME</p>
-      <span className="text-[#8a7e68] text-xs transition-transform"
-        style={{ transform: nomeAberto ? 'rotate(180deg)' : 'rotate(0deg)' }}>▲</span>
-    </button>
-
-    {/* Conteúdo colapsável */}
-    {nomeAberto && (
-      <div className="px-4 pb-4 border-t border-[#c8a84b15]">
-        <div className="flex gap-2 mb-2 mt-3">
-          <select value={racaNome} onChange={e => setRacaNome(e.target.value)}
-            className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#8a7e68] px-2 py-1 text-xs focus:outline-none"
-            style={{ borderRadius: '2px' }}>
-            {['Humano','Elfo','Anão','Halfling','Gnomo','Meio-Orc','Tiefling','Draconato'].map(r => (
-              <option key={r} value={r}>{r}</option>
+      {/* MODAL ENVIAR PRESSÁGIO */}
+      {modalEnviarPresagio && createPortal(
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
+          onClick={() => setModalEnviarPresagio(null)}>
+          <div className="modal-anim bg-[#161410] border border-[#c8a84b30] max-w-sm w-full p-6" style={{ borderRadius: '2px' }}
+            onClick={e => e.stopPropagation()}>
+            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">ENVIAR PRESSÁGIO</p>
+            <button onClick={() => enviarPresagio(modalEnviarPresagio, null)}
+              className="w-full border border-[#c8a84b30] text-[#c8a84b] py-2 text-xs mb-2 hover:bg-[#c8a84b10] transition-colors"
+              style={{ ...cinzel, borderRadius: '2px' }}>
+              Enviar a Todos
+            </button>
+            {personagens.map(p => (
+              <button key={p.id} onClick={() => enviarPresagio(modalEnviarPresagio, p.id)}
+                className="w-full border border-[#c8a84b15] text-[#9a8e78] py-2 text-xs mb-2 hover:border-[#c8a84b40] hover:text-[#c8a84b] transition-colors"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                {p.name}
+              </button>
             ))}
-          </select>
-          <button onClick={gerarNome}
-            className="bg-[#c8a84b] text-[#0f0e0c] px-3 py-1 text-xs font-bold hover:bg-[#e0c060] transition-colors"
-            style={{ ...cinzel, borderRadius: '2px' }}>
-            ⚄
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* GERADOR DE NOMES — fixo */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <div className="bg-[#161410] border border-[#c8a84b30] shadow-lg" style={{ borderRadius: '2px' }}>
+          
+          {/* Header clicável */}
+          <button
+            onClick={() => setNomeAberto(prev => !prev)}
+            className="flex items-center justify-between gap-4 px-4 py-3 w-full hover:bg-[#c8a84b08] transition-colors">
+            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">GERAR NOME</p>
+            <span className="text-[#8a7e68] text-xs transition-transform"
+              style={{ transform: nomeAberto ? 'rotate(180deg)' : 'rotate(0deg)' }}>▲</span>
           </button>
+
+          {/* Conteúdo colapsável */}
+          {nomeAberto && (
+            <div className="px-4 pb-4 border-t border-[#c8a84b15]">
+              <div className="flex gap-2 mb-2 mt-3">
+                <select value={racaNome} onChange={e => setRacaNome(e.target.value)}
+                  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#8a7e68] px-2 py-1 text-xs focus:outline-none"
+                  style={{ borderRadius: '2px' }}>
+                  {['Humano','Elfo','Anão','Halfling','Gnomo','Meio-Orc','Tiefling','Draconato'].map(r => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
+                </select>
+                <button onClick={gerarNome}
+                  className="bg-[#c8a84b] text-[#0f0e0c] px-3 py-1 text-xs font-bold hover:bg-[#e0c060] transition-colors"
+                  style={{ ...cinzel, borderRadius: '2px' }}>
+                  ⚄
+                </button>
+              </div>
+              {nomeGerado && (
+                <p style={cinzel} className="text-[#f0e8d8] text-sm text-center tracking-widest">{nomeGerado}</p>
+              )}
+            </div>
+          )}
         </div>
-        {nomeGerado && (
-          <p style={cinzel} className="text-[#f0e8d8] text-sm text-center tracking-widest">{nomeGerado}</p>
-        )}
       </div>
-    )}
-  </div>
-</div>
 
-{modalFalaNpc && (
-  <FalaNpcModal npc={modalFalaNpc} personagens={personagens}
-    campanhaId={CAMPANHA_ID} onClose={() => setModalFalaNpc(null)} />
-)}
+      {modalFalaNpc && (
+        <FalaNpcModal npc={modalFalaNpc} personagens={personagens}
+          campanhaId={CAMPANHA_ID} onClose={() => setModalFalaNpc(null)} />
+      )}
 
-{/* MODAL HABILIDADE NPC */}
-{modalSkillNpc && (
-  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
-    onClick={() => { setModalSkillNpc(null); setDescricaoSkillNpc(null); }}>
-    <div className="bg-[#161410] border border-[#c8a84b30] max-w-lg w-full max-h-[80vh] overflow-y-auto"
-      style={{ borderRadius: '2px' }}
-      onClick={e => e.stopPropagation()}>
-      <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
-        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">HABILIDADE</p>
-        <button onClick={() => { setModalSkillNpc(null); setDescricaoSkillNpc(null); }}
-          className="text-[#8a7e68] hover:text-[#c8a84b] text-xl transition-colors">×</button>
-      </div>
-      <div className="px-6 py-6">
-        {carregandoSkillNpc && (
-          <div className="flex flex-col items-center py-10 gap-4">
-            <div className="w-8 h-8 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-            <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">CONSULTANDO A IA...</p>
+      {/* MODAL HABILIDADE NPC */}
+      {modalSkillNpc && createPortal(
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
+          onClick={() => { setModalSkillNpc(null); setDescricaoSkillNpc(null); }}>
+          <div className="bg-[#161410] border border-[#c8a84b30] max-w-lg w-full max-h-[80vh] overflow-y-auto"
+            style={{ borderRadius: '2px' }}
+            onClick={e => e.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
+              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">HABILIDADE</p>
+              <button onClick={() => { setModalSkillNpc(null); setDescricaoSkillNpc(null); }}
+                className="text-[#8a7e68] hover:text-[#c8a84b] text-xl transition-colors">×</button>
+            </div>
+            <div className="px-6 py-6">
+              {carregandoSkillNpc && (
+                <div className="flex flex-col items-center py-10 gap-4">
+                  <div className="w-8 h-8 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
+                  <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">CONSULTANDO A IA...</p>
+                </div>
+              )}
+              {!carregandoSkillNpc && descricaoSkillNpc && !descricaoSkillNpc.error && (
+                <div className="flex flex-col gap-5">
+                  <h2 style={cinzel} className="text-[#f0e8d8] text-xl font-semibold">{descricaoSkillNpc.name || modalSkillNpc}</h2>
+                  {descricaoSkillNpc.description && (
+                    <div>
+                      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">DESCRIÇÃO</p>
+                      <p className="text-[#a09880] text-base leading-relaxed font-light">{descricaoSkillNpc.description}</p>
+                    </div>
+                  )}
+                  {descricaoSkillNpc.mechanics && (
+                    <div className="border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-4">
+                      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">EM JOGO</p>
+                      <p className="text-[#8a8070] text-sm leading-relaxed font-light">{descricaoSkillNpc.mechanics}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+              {!carregandoSkillNpc && descricaoSkillNpc?.error && (
+                <p className="text-red-400 text-sm text-center py-8">{descricaoSkillNpc.error}</p>
+              )}
+            </div>
+            <div className="px-6 pb-6">
+              <button onClick={() => { setModalSkillNpc(null); setDescricaoSkillNpc(null); }}
+                className="border border-[#c8a84b30] text-[#9a8e78] px-6 py-2 text-xs tracking-widest hover:border-[#c8a84b60] hover:text-[#c8a84b] transition-colors w-full"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                Fechar
+              </button>
+            </div>
           </div>
-        )}
-        {!carregandoSkillNpc && descricaoSkillNpc && !descricaoSkillNpc.error && (
-          <div className="flex flex-col gap-5">
-            <h2 style={cinzel} className="text-[#f0e8d8] text-xl font-semibold">{descricaoSkillNpc.name || modalSkillNpc}</h2>
-            {descricaoSkillNpc.description && (
-              <div>
-                <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">DESCRIÇÃO</p>
-                <p className="text-[#a09880] text-base leading-relaxed font-light">{descricaoSkillNpc.description}</p>
-              </div>
-            )}
-            {descricaoSkillNpc.mechanics && (
-              <div className="border border-[#c8a84b15] bg-[#0f0e0c] px-4 py-4">
-                <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">EM JOGO</p>
-                <p className="text-[#8a8070] text-sm leading-relaxed font-light">{descricaoSkillNpc.mechanics}</p>
-              </div>
-            )}
-          </div>
-        )}
-        {!carregandoSkillNpc && descricaoSkillNpc?.error && (
-          <p className="text-red-400 text-sm text-center py-8">{descricaoSkillNpc.error}</p>
-        )}
-      </div>
-      <div className="px-6 pb-6">
-        <button onClick={() => { setModalSkillNpc(null); setDescricaoSkillNpc(null); }}
-          className="border border-[#c8a84b30] text-[#9a8e78] px-6 py-2 text-xs tracking-widest hover:border-[#c8a84b60] hover:text-[#c8a84b] transition-colors w-full"
-          style={{ ...cinzel, borderRadius: '2px' }}>
-          Fechar
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+        </div>,
+        document.body
+      )}
 
       {modalEntregarItem && (
   <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 px-4"
@@ -3599,7 +3600,7 @@ useEffect(() => {
           <Dados secreto={true} />
         </div>
         </>
-)}
+        </div>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import api from '../services/api';
 import { notificar } from '../utils/notificar';
 import BalaoFala from './BalaoFala';
+import { createPortal } from 'react-dom';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 
@@ -33,7 +34,7 @@ export default function FalaNpcModal({ npc, personagens, campanhaId, onClose }) 
     setEnviando(false);
   }
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4" onClick={onClose}>
       <div className="bg-[#161410] border border-[#c8a84b30] max-w-md w-full max-h-[90vh] overflow-y-auto p-6"
         style={{ borderRadius: '2px' }} onClick={e => e.stopPropagation()}>
@@ -71,6 +72,7 @@ export default function FalaNpcModal({ npc, personagens, campanhaId, onClose }) 
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
