@@ -28,6 +28,7 @@ import Relacoes from "./pages/Relacoes";
 import SessaoZero from "./pages/SessaoZero";
 import LimiteDeErro from './components/LimiteDeErro';
 import { useEffect } from 'react';
+import CardsTeste from './pages/CardsTeste';
 
 instalarAlertGlobal();
 
@@ -73,6 +74,7 @@ function App() {
           <Route path="/relacoes" element={<Relacoes />} />
           <Route path="/sessao-zero" element={<SessaoZero />} />
           {process.env.NODE_ENV !== 'production' && <Route path="/erro-teste" element={<Quebra />} />}
+          {process.env.NODE_ENV !== 'production' && <Route path="/cards-teste" element={<CardsTeste />} />}
         </Routes>
         </LimiteDeErro>
       </BrowserRouter>
