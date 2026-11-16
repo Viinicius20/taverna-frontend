@@ -11,6 +11,8 @@ import { MODELOS } from '../utils/modelos';
 import usePolling from '../utils/usePolling';
 import { notificar } from '../utils/notificar';
 import MesaFeed from '../components/MesaFeed'
+import UploadFotoNpc from "../components/UploadFotoNpc";
+import FalaNpcModal from "../components/FalaNpcModal";
 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
@@ -76,6 +78,7 @@ export default function Mestre() {
   const [personagemDestino, setPersonagemDestino] = useState('');
   const [enviandoMensagem, setEnviandoMensagem] = useState(false);
   const [modalSkillNpc, setModalSkillNpc] = useState(null);
+  const [modalFalaNpc, setModalFalaNpc] = useState(null);
   const [descricaoSkillNpc, setDescricaoSkillNpc] = useState(null);
   const [carregandoSkillNpc, setCarregandoSkillNpc] = useState(false);
   const [novoItemContexto, setNovoItemContexto] = useState('');
@@ -1652,6 +1655,14 @@ useEffect(() => {
                       )}
 
                       <div className="flex justify-end gap-3 pt-2 border-t border-[#c8a84b10]">
+                        <UploadFotoNpc npcId={npc.id}
+                          onEnviado={url => setNpcs(prev => prev.map(n =>
+                            n.id === npc.id ? { ...n, data: { ...n.data, art_url: url } } : n))} />
+                        <button onClick={e => { e.stopPropagation(); setModalFalaNpc(npc); }}
+                          className="text-[#c8a84b] hover:text-[#e0c060] text-xs border border-[#c8a84b30] hover:border-[#c8a84b60] px-4 py-1.5 transition-colors"
+                          style={{ ...cinzel, borderRadius: '2px', letterSpacing: '1px' }}>
+                          💬 Enviar fala
+                        </button>
                         {d.art_url ? (
                           <button onClick={e => { e.stopPropagation(); setImagemVisualizando({ url: d.art_url, tipo: 'npc', id: npc.id }); }}
                             className="text-[#c8a84b] hover:text-[#e0c060] text-xs border border-[#c8a84b30] hover:border-[#c8a84b60] px-4 py-1.5 transition-colors"
@@ -1772,7 +1783,7 @@ useEffect(() => {
                   const segredo = getNota(modalRevelarSegredo.npc.id, 'secret');
                   for (const p of personagens) {
                     await api.post('/secret-messages', {
-                      campaign_id: '00000000-0000-0000-0000-000000000001',
+                      campaign_id: CAMPANHA_ID,
                       character_id: p.id,
                       message: `🔓 Segredo revelado sobre ${modalRevelarSegredo.npc.name}: ${segredo}`
                     });
@@ -1793,7 +1804,7 @@ useEffect(() => {
                   try {
                     const segredo = getNota(modalRevelarSegredo.npc.id, 'secret');
                     await api.post('/secret-messages', {
-                      campaign_id: '00000000-0000-0000-0000-000000000001',
+                      campaign_id: CAMPANHA_ID,
                       character_id: p.id,
                       message: `🔓 Segredo revelado sobre ${modalRevelarSegredo.npc.name}: ${segredo}`
                     });
@@ -2995,6 +3006,11 @@ useEffect(() => {
     )}
   </div>
 </div>
+
+{modalFalaNpc && (
+  <FalaNpcModal npc={modalFalaNpc} personagens={personagens}
+    campanhaId={CAMPANHA_ID} onClose={() => setModalFalaNpc(null)} />
+)}
 
 {/* MODAL HABILIDADE NPC */}
 {modalSkillNpc && (
