@@ -5,7 +5,7 @@ import TelaCarregamento from './TelaCarregamento';
 import { DICAS } from '../utils/dicas';
 
 const ROTA = '/health';
-const MOSTRAR_APOS_MS = 0;
+const MOSTRAR_APOS_MS = 1200;
 const TIMEOUT_MS = 70000;
 const REVALIDAR_APOS_MS = 10 * 60 * 1000;
 
