@@ -29,6 +29,7 @@ import SessaoZero from "./pages/SessaoZero";
 import LimiteDeErro from './components/LimiteDeErro';
 import { useEffect } from 'react';
 import CardsTeste from './pages/CardsTeste';
+import GuardaBackend from './components/GuardaBackend';
 
 instalarAlertGlobal();
 
@@ -43,41 +44,43 @@ function App() {
     return () => document.removeEventListener('keydown', aoTeclar);
   }, []);
 
-  return (
-    <UserProvider> {/* ← wrappa tudo */}
+return (
+  <UserProvider> {/* ← wrappa tudo */}
+    <GuardaBackend>
       <BrowserRouter>
-      <Toasts />
-      <ConfirmHost />
-      <LimiteDeErro>
-        <Routes>
-          <Route path="/login" element={<Login />} /> {/* ← adiciona */}
-          <Route path="/" element={<Home />} />
-          <Route path="/personagens" element={<Personagens />} />
-          <Route path="/personagens/criar" element={<CriarPersonagem />} />
-          <Route path="/mestre" element={<Mestre />} />
-          <Route path="/personagens/:id" element={<Ficha />} />
-          <Route path="/dados" element={<RolarDados />} />
-          <Route path="/quadro" element={<Quadro />} />
-          <Route path="/historico" element={<Historico />} />
-          <Route path="/mestre/bestiario" element={<Bestiario />} />
-          <Route path="/galeria" element={<Galeria />} />
-          <Route path="/personagens/:id/publica" element={<FichaPublica />} />
-          <Route path="/campanhas" element={<Campanhas />} />
-          <Route path="/faccoes" element={<Facoes />} />
-          <Route path="/mestre/descricao" element={<DescricaoContextual />} />
-          <Route path="/locais" element={<Locais />} />
-          <Route path="/mundo-vivo" element={<MundoVivo />} />
-          <Route path="/arquivo-mestre" element={<ArquivoMestre />} />
-          <Route path="/misterios" element={<Misterios />} />
-          <Route path="/tv" element={<TV />} />
-          <Route path="/wiki" element={<Wiki />} />
-          <Route path="/relacoes" element={<Relacoes />} />
-          <Route path="/sessao-zero" element={<SessaoZero />} />
-          {process.env.NODE_ENV !== 'production' && <Route path="/erro-teste" element={<Quebra />} />}
-          {process.env.NODE_ENV !== 'production' && <Route path="/cards-teste" element={<CardsTeste />} />}
-        </Routes>
-        </LimiteDeErro>
-      </BrowserRouter>
+        <Toasts />
+          <ConfirmHost />
+          <LimiteDeErro>
+            <Routes>
+              <Route path="/login" element={<Login />} /> {/* ← adiciona */}
+              <Route path="/" element={<Home />} />
+              <Route path="/personagens" element={<Personagens />} />
+              <Route path="/personagens/criar" element={<CriarPersonagem />} />
+              <Route path="/mestre" element={<Mestre />} />
+              <Route path="/personagens/:id" element={<Ficha />} />
+              <Route path="/dados" element={<RolarDados />} />
+              <Route path="/quadro" element={<Quadro />} />
+              <Route path="/historico" element={<Historico />} />
+              <Route path="/mestre/bestiario" element={<Bestiario />} />
+              <Route path="/galeria" element={<Galeria />} />
+              <Route path="/personagens/:id/publica" element={<FichaPublica />} />
+              <Route path="/campanhas" element={<Campanhas />} />
+              <Route path="/faccoes" element={<Facoes />} />
+              <Route path="/mestre/descricao" element={<DescricaoContextual />} />
+              <Route path="/locais" element={<Locais />} />
+              <Route path="/mundo-vivo" element={<MundoVivo />} />
+              <Route path="/arquivo-mestre" element={<ArquivoMestre />} />
+              <Route path="/misterios" element={<Misterios />} />
+              <Route path="/tv" element={<TV />} />
+              <Route path="/wiki" element={<Wiki />} />
+              <Route path="/relacoes" element={<Relacoes />} />
+              <Route path="/sessao-zero" element={<SessaoZero />} />
+              {process.env.NODE_ENV !== 'production' && <Route path="/erro-teste" element={<Quebra />} />}
+              {process.env.NODE_ENV !== 'production' && <Route path="/cards-teste" element={<CardsTeste />} />}
+            </Routes>
+          </LimiteDeErro>
+        </BrowserRouter>
+      </GuardaBackend>
     </UserProvider>
   );
 }
