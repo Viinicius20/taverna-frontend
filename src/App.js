@@ -30,6 +30,7 @@ import LimiteDeErro from './components/LimiteDeErro';
 import { useEffect } from 'react';
 import CardsTeste from './pages/CardsTeste';
 import GuardaBackend from './components/GuardaBackend';
+import Tesouro from './pages/Tesouro';
 
 instalarAlertGlobal();
 
@@ -75,6 +76,7 @@ return (
               <Route path="/wiki" element={<Wiki />} />
               <Route path="/relacoes" element={<Relacoes />} />
               <Route path="/sessao-zero" element={<SessaoZero />} />
+              <Route path="/tesouro" element={<Tesouro />} />
               {process.env.NODE_ENV !== 'production' && <Route path="/erro-teste" element={<Quebra />} />}
               {process.env.NODE_ENV !== 'production' && <Route path="/cards-teste" element={<CardsTeste />} />}
             </Routes>
