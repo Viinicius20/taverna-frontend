@@ -1,5 +1,5 @@
 import { cinzel } from '../../estilos';
-import api from '../services/api';
+import api from '../../services/api';
 
 const radius = { borderRadius: '2px' };
 
