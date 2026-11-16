@@ -14,6 +14,7 @@ import HistoricoFicha from '../components/HistoricoFicha';
 import { rolarNoServidor, montarExpressao } from '../services/rolagens';
 import MesaFeed from '../components/MesaFeed';
 import Retrato from '../components/Retrato';
+import PopupMensagem from '../components/PopupMensagem';
 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
@@ -334,7 +335,6 @@ export default function Ficha() {
   const [adicionandoAtaque, setAdicionandoAtaque] = useState(false);
   const [resultadoRolagem, setResultadoRolagem] = useState(null);
 
-  const [caixaMensagens, setCaixaMensagens] = useState(false);
 
   const [notas, setNotas] = useState(ficha?.notas_privadas || '');
 
@@ -1339,42 +1339,42 @@ async function abrirCofre(h) {
       <div id="ficha-conteudo" className="max-w-3xl mx-auto px-8 py-12">
 
         <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
-  <div className="flex items-start gap-4">
+          <div className="flex items-start gap-4">
 
     
-    {/* Retrato */}
-    <div className="relative flex-shrink-0">
-      <Retrato src={personagem?.avatar_url} nome={ficha?.name} tamanho="md" />
-      <label className="absolute -bottom-2 -right-2 w-6 h-6 bg-[#c8a84b] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#e0c060] transition-colors"
-        title="Trocar foto">
-        <span className="text-[#0f0e0c] text-xs">+</span>
-        <input type="file" accept="image/jpeg,image/png,image/webp"
-          onChange={uploadAvatar} className="hidden" />
-      </label>
-      {uploadandoAvatar && (
-        <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
-          <div className="w-4 h-4 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-        </div>
-      )}
-    </div>
+            {/* Retrato */}
+            <div className="relative flex-shrink-0">
+              <Retrato src={personagem?.avatar_url} nome={ficha?.name} tamanho="md" />
+              <label className="absolute -bottom-2 -right-2 w-6 h-6 bg-[#c8a84b] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#e0c060] transition-colors"
+                title="Trocar foto">
+                <span className="text-[#0f0e0c] text-xs">+</span>
+                <input type="file" accept="image/jpeg,image/png,image/webp"
+                  onChange={uploadAvatar} className="hidden" />
+              </label>
+              {uploadandoAvatar && (
+                <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
+                  <div className="w-4 h-4 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
+                </div>
+              )}
+            </div>
 
-    {/* Nome e classe */}
-    <div>
-      <DataMundo campanhaId={CAMPANHA_ID} />
-      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">FICHA DO PERSONAGEM</p>
-      <h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold">
-        <span style={{ color: 'var(--cor-classe, #c8a84b)' }} className="mr-2">{getIconeClasse(classeParaTema)}</span>
-        {ficha.name}
-      </h1>
-      <p className="text-[#9a8e78] mt-1">{[
-  ficha.race,
-  ficha.classes?.length
-    ? ficha.classes.map(c => `${c.name} ${c.level}`).join(' / ')
-    : ficha.class,
-  ficha.background
-].filter(Boolean).join(' · ')}</p>
-    </div>
-  </div>
+            {/* Nome e classe */}
+            <div>
+              <DataMundo campanhaId={CAMPANHA_ID} />
+              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">FICHA DO PERSONAGEM</p>
+              <h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold">
+                <span style={{ color: 'var(--cor-classe, #c8a84b)' }} className="mr-2">{getIconeClasse(classeParaTema)}</span>
+                {ficha.name}
+              </h1>
+              <p className="text-[#9a8e78] mt-1">{[
+          ficha.race,
+          ficha.classes?.length
+            ? ficha.classes.map(c => `${c.name} ${c.level}`).join(' / ')
+            : ficha.class,
+          ficha.background
+        ].filter(Boolean).join(' · ')}</p>
+            </div>
+          </div>
           <div className="flex gap-3 flex-wrap">
             <button onClick={handleLevelUp}
               className="border border-[#c8a84b40] text-[#c8a84b] px-5 py-2 text-xs tracking-widest hover:bg-[#c8a84b10] transition-colors"
@@ -1399,19 +1399,6 @@ async function abrirCofre(h) {
               className="border border-[#c8a84b20] text-[#8a7e68] px-4 py-2 text-xs tracking-widest hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors"
               style={{ ...cinzel, borderRadius: '2px' }}>
               ↓ PDF
-            </button>
-            <button onClick={async () => { 
-              await buscarMensagensSecretas();
-              setCaixaMensagens(true); 
-            }}
-              className="relative border border-[#a86aa8] text-[#a86aa8] px-4 py-2 text-xs tracking-widest hover:bg-[#a86aa810] transition-colors"
-              style={{ ...cinzel, borderRadius: '2px' }}>
-              🔮 Sussurros
-              {mensagensSecretas.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#a86aa8] text-white text-xs rounded-full flex items-center justify-center">
-                  {mensagensSecretas.length}
-                </span>
-              )}
             </button>
           </div>
         </div>
@@ -1457,8 +1444,8 @@ async function abrirCofre(h) {
             ))}
           </div>
 
-{(abaAtiva === 'principal' || exportandoPDF) && (
-<>
+        {(abaAtiva === 'principal' || exportandoPDF) && (
+        <>
 
         {/* INFOS BÁSICAS */}
         <div className="border border-[#c8a84b20] bg-[#161410] mb-6">
@@ -3166,37 +3153,6 @@ style={{
         </div>
       )}
 
-      {caixaMensagens && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 px-4"
-          onClick={() => setCaixaMensagens(false)}>
-          <div className="bg-[#0f0e0c] border border-[#a86aa850] max-w-md w-full p-6 mb-4 sm:mb-0"
-            style={{ borderRadius: '2px', boxShadow: '0 0 30px #a86aa820' }}
-            onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <p style={cinzel} className="text-[#a86aa8] text-xs tracking-[4px]">🔮 SUSSURROS DO MESTRE</p>
-              <button onClick={() => setCaixaMensagens(false)}
-                className="text-[#8a7e68] hover:text-[#c8a84b] transition-colors">✕</button>
-            </div>
-            {mensagensSecretas.length === 0 ? (
-              <p className="text-[#8a7e68] text-sm text-center py-4">Nenhum sussurro novo.</p>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {mensagensSecretas.map(msg => (
-                  <div key={msg.id} className="border border-[#a86aa830] bg-[#161410] p-4">
-                    <p className="text-[#e8e0d0] text-sm leading-relaxed italic mb-3">"{msg.message}"</p>
-                    <button onClick={() => marcarComoLida(msg.id)}
-                      className="border border-[#a86aa850] text-[#a86aa8] px-3 py-1 text-xs hover:bg-[#a86aa810] transition-colors w-full"
-                      style={{ ...cinzel, borderRadius: '2px' }}>
-                      ENTENDIDO
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
       {modalDowntimeResultado && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 px-4"
           onClick={() => setModalDowntimeResultado(false)}>
@@ -3435,6 +3391,7 @@ style={{
 
       {/* Aba WIki */}
       {abaAtiva === 'historico' && <HistoricoFicha characterId={id} />} {!exportandoPDF && <MesaFeed flutuante />}
+      <PopupMensagem mensagens={mensagensSecretas} onLida={marcarComoLida} />
       {abaAtiva === 'wiki' && (
         <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6">
           {wikiAberta ? (() => {
