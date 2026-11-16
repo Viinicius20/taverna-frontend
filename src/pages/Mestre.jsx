@@ -129,10 +129,11 @@ export default function Mestre() {
   const [perspectivaFiltro, setPerspectivaFiltro] = useState('todos'); 
   const [params, setParams] = useSearchParams();
   const processado = useRef(false);
-  const [aba, setAba] = useState('painel');
+  const [aba, setAba] = useState(params.get('aba') || 'painel');
   const [opcoesEse, setOpcoesEse] = useState([]);
   const [gerandoEse, setGerandoEse] = useState(false);
   const changelogsJaMostrados = useRef(new Set());
+  
 
   const combate = useCombate({
   atalhos: aba === 'painel' || aba === 'sessao',
@@ -149,6 +150,11 @@ const {
 useEffect(() => {
   api.get(`/fatos-mundo/${CAMPANHA_ID}`).then(res => setFatosMundo(res.data.data || [])).catch(() => setFatosMundo([]));
 }, []);
+
+useEffect(() => {
+  const abaUrl = params.get('aba');
+  if (abaUrl) setAba(abaUrl);
+}, [params]);
 
 useEffect(() => {
   const t = setTimeout(() => {
@@ -251,7 +257,6 @@ async function enviarPresagio(presagioId, characterId) {
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
 
-      // Monta objeto NPC com id para exibição
       const novoNpc = {
         id: res.data.saved_id,
         name: res.data.data?.name || 'NPC importado',
@@ -860,18 +865,19 @@ const LISTA_CONDICOES = [
 ];
 
 const menuItemsMestre = [
-  { label: '🐉 Bestiário', rota: '/mestre/bestiario' },
-  { label: '🗺 Galeria', rota: '/galeria' },
-  { label: '⚔ Campanhas', rota: '/campanhas' },
-  { label: '🏛 Facções', rota: '/faccoes' },
-  { label: '📜 Narração', rota: '/mestre/descricao' },
-  { label: '🗺 Locais', rota: '/locais' },
-  { label: '🌎 Mundo Vivo', rota: '/mundo-vivo' },
-  { label: '📚 Wiki', rota: '/wiki' },
-  { label: '📂 Arquivo Secreto', rota: '/arquivo-mestre' },
-  { label: '❓ Mistérios', rota: '/misterios' },
-  { label: '🔗Vínculos', rota: '/relacoes' },
-  { label: 'Sessão zero', rota: '/sessao-zero' }
+  { label: 'Bestiário', rota: '/mestre/bestiario' },
+  { label: 'Galeria', rota: '/galeria' },
+  { label: 'Campanhas', rota: '/campanhas' },
+  { label: 'Facções', rota: '/faccoes' },
+  { label: 'Narração', rota: '/mestre/descricao' },
+  { label: 'Locais', rota: '/locais' },
+  { label: 'Mundo Vivo', rota: '/mundo-vivo' },
+  { label: 'Wiki', rota: '/wiki' },
+  { label: 'Arquivo Secreto', rota: '/arquivo-mestre' },
+  { label: 'Mistérios', rota: '/misterios' },
+  { label: 'Vínculos', rota: '/relacoes' },
+  { label: 'Sessão zero', rota: '/sessao-zero' },
+  { label: 'Modo Sessão', rota: '/mestre?aba=sessao' },
 ];
 
 const HUMORES = [
