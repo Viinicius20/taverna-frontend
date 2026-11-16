@@ -1,8 +1,8 @@
+import { cinzel } from '../estilos';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
 const campo = "bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b50]";
 const rotulo = "text-[#8a7e68] text-xs tracking-[2px] block mb-2";
 

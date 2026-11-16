@@ -1,10 +1,9 @@
+import { cinzel, crimson } from '../estilos';
 import { getCampanhaId } from '../utils/campanha';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
-const crimson = { fontFamily: "'Crimson Pro', serif" };
 
 const CATEGORIAS = [
   { label: 'NPC', cor: '#c8a84b', borda: '#c8a84b40', bg: '#c8a84b08' },

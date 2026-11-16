@@ -1,6 +1,6 @@
+import { cinzel } from '../estilos';
 import { Component } from 'react';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
 const botao = 'px-4 py-2 text-xs tracking-widest transition-colors focus:outline-none focus:ring-2 focus:ring-[#c8a84b]';
 
 export default class ErrorBoundary extends Component {

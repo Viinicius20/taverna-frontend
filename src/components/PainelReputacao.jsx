@@ -1,7 +1,7 @@
+import { cinzel } from '../estilos';
 import { useState, useEffect, useCallback } from "react";
 import api from "../services/api";
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
 const MAXIMO = 100;
 const FAIXAS = {
   faction: [

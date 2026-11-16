@@ -1,9 +1,9 @@
+import { cinzel } from '../estilos';
 import { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import { useUser } from '../context/UserContext';
 import { notificar } from '../utils/notificar';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
 
 function mesclar(atuais, novas) {
   const ids = new Set(atuais.map(l => l.id));

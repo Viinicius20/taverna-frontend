@@ -1,6 +1,6 @@
+import { cinzel } from '../estilos';
 import { normalizarRaridade, ROTULO_RARIDADE } from '../utils/raridade';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
 
 export default function CardRaridade({ nome = '', raridade, imagem, subtitulo, descricao, onClick }) {
   const nivel = normalizarRaridade(raridade);

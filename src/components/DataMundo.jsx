@@ -1,8 +1,8 @@
+import { cinzel } from '../estilos';
 import { useState } from 'react';
 import api from '../services/api';
 import usePolling from '../utils/usePolling';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
 
 export default function DataMundo({ campanhaId, className }) {
   const [texto, setTexto] = useState('');

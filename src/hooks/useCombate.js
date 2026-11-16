@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 
-export default function useCombate({ atalhos = true } = {}) {
+export default function useCombate({ atalhos = true, campanhaId } = {}) {
   const [combatentes, setCombatentes] = useState([]);
   const [turnoAtual, setTurnoAtual] = useState(0);
   const [combateAtivo, setCombateAtivo] = useState(false);

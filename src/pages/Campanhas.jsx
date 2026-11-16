@@ -1,11 +1,10 @@
+import { cinzel, crimson } from '../estilos';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import api from '../services/api';
 import { getCampanhaId, setCampanhaAtiva } from '../utils/campanha';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
-const crimson = { fontFamily: "'Crimson Pro', serif" };
 
 export default function Campanhas() {
   const navigate = useNavigate();

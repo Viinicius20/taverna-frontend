@@ -1,6 +1,6 @@
+import { cinzel } from '../estilos';
 import { useState, useEffect, useRef } from 'react';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
 
 export default function ConfirmHost() {
   const [pedido, setPedido] = useState(null);

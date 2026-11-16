@@ -1,10 +1,10 @@
+import { cinzel } from '../estilos';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import api from '../services/api';
 import { notificar } from '../utils/notificar';
 import BalaoFala from './BalaoFala';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
 
 const texto = x => (typeof x === 'string' ? x : x?.name ?? '');
 

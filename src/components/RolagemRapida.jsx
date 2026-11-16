@@ -1,8 +1,8 @@
+import { cinzel } from '../estilos';
 import { useState } from "react";
 import { parseRolagem, formatar } from "../utils/rolagem";
 import { rolarNoServidor } from "../services/rolagens";
 
-const cinzel = { fontFamily: "'Cinzel', serif" };   
 const CHAVE = 'rolagens_rapidas';
 const PADRAO = ['1d20', '1d20+5', '2d6+3', '1d100'];
 

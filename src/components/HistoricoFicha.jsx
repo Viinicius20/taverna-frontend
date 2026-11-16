@@ -1,7 +1,7 @@
+import { cinzel } from '../estilos';
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
 
 function rotuloCampo(campo) {
   return campo.split('.').map(p => p.replace(/_/g, ' ')).join(' › ');

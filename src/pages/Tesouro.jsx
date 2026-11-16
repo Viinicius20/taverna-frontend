@@ -1,11 +1,10 @@
+import { cinzel, crimson } from '../estilos';
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import api from '../services/api';
 import { notificar } from '../utils/notificar';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
-const crimson = { fontFamily: "'Crimson Pro', serif" };
 
 const MOEDAS = [
   { chave: 'cobre', rotulo: 'COBRE', cor: '#b87333' },

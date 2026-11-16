@@ -1,6 +1,6 @@
+import { cinzel } from '../estilos';
 import Retrato from './Retrato';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
 
 export default function BalaoFala({ nome, avatar, fala }) {
   return (

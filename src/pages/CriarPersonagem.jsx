@@ -1,9 +1,8 @@
+import { cinzel, crimson } from '../estilos';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
-const crimson = { fontFamily: "'Crimson Pro', serif" };
 
 export default function CriarPersonagem() {
   const navigate = useNavigate();

@@ -1,3 +1,4 @@
+import { cinzel, crimson } from '../estilos';
 import { confirmar } from '../utils/notificar';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -5,8 +6,6 @@ import api from '../services/api';
 import { useUser } from '../context/UserContext';
 import usePolling from '../utils/usePolling';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
-const crimson = { fontFamily: "'Crimson Pro', serif" };
 
 export default function Personagens() {
   const navigate = useNavigate();

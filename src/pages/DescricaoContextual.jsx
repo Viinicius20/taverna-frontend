@@ -1,10 +1,9 @@
+import { cinzel, crimson } from '../estilos';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
-const crimson = { fontFamily: "'Crimson Pro', serif" };
 
 export default function DescricaoContextual() {
   const navigate = useNavigate();

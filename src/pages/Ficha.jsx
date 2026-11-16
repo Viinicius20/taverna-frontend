@@ -1,3 +1,4 @@
+import { cinzel, crimson } from '../estilos';
 import { getCampanhaId } from '../utils/campanha';
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -17,8 +18,6 @@ import Retrato from '../components/Retrato';
 import PopupMensagem from '../components/PopupMensagem';
 
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
-const crimson = { fontFamily: "'Crimson Pro', serif" };
 const CAMPANHA_ID = getCampanhaId();
 const attrLabel = { str: 'FOR', dex: 'DES', con: 'CON', int: 'INT', wis: 'SAB', cha: 'CAR' };
 const tipoColor = {

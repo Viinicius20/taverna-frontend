@@ -1,9 +1,8 @@
+import { cinzel, crimson } from '../estilos';
 import { useState } from 'react';
 import { rolarNoServidor, montarExpressao } from '../services/rolagens';
 import { notificar } from '../utils/notificar';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
-const crimson = { fontFamily: "'Crimson Pro', serif" };
 
 const DADOS = [
   { tipo: 'd4', lados: 4, symbol: '⬦' },

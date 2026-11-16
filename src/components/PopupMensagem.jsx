@@ -1,7 +1,7 @@
+import { cinzel } from '../estilos';
 import { createPortal } from 'react-dom';
 import Retrato from './Retrato';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
 
 export default function PopupMensagem({ mensagens = [], onLida }) {
   const pendentes = [...mensagens].sort((a, b) =>

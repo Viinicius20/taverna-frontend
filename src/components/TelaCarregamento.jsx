@@ -1,4 +1,4 @@
-const cinzel = { fontFamily: "'Cinzel', serif" };
+import { cinzel } from '../estilos';
 
 export default function TelaCarregamento({ dica, falhou, onTentar, onContinuar }) {
   return (

@@ -1,8 +1,8 @@
+import { cinzel } from '../estilos';
 import { useState } from 'react';
 import api from '../services/api';
 import { notificar } from '../utils/notificar';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
 
 export default function CofreHandout({ handout, onMudou }) {
   const [aberto, setAberto] = useState(false);

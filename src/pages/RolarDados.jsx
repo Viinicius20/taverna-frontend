@@ -1,9 +1,8 @@
+import { cinzel, crimson } from '../estilos';
 import { useNavigate } from 'react-router-dom';
 import Dados from '../components/Dados';
 import MesaFeed from '../components/MesaFeed'
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
-const crimson = { fontFamily: "'Crimson Pro', serif" };
 
 export default function RolarDados() {
   const navigate = useNavigate();

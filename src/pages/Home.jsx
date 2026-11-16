@@ -1,3 +1,4 @@
+import { cinzel, crimson } from '../estilos';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useUser } from '../context/UserContext';
@@ -6,8 +7,6 @@ import api from "../services/api";
 import { getCampanhaId } from '../utils/campanha';
 
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
-const crimson = { fontFamily: "'Crimson Pro', serif" };
 
 const particles = Array.from({ length: 18 }, (_, i) => {
   const faixa = 100 / 18;

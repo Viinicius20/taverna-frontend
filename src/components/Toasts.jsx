@@ -1,6 +1,6 @@
+import { cinzel } from '../estilos';
 import { useState, useEffect } from 'react';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
 const COR = { sucesso: '#4a8a4a', erro: '#c84b4b', info: '#c8a84b' };
 
 export default function Toasts() {

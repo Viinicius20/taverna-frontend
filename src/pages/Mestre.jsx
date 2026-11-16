@@ -1,3 +1,4 @@
+import { cinzel, crimson } from '../estilos';
 import { getCampanhaId } from '../utils/campanha';
 import { confirmar } from '../utils/notificar';
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -17,9 +18,13 @@ import CardRaridade from "../components/CardRaridade";
 import CombatenteCard from '../components/combate/CombatenteCard';
 import useCombate from '../hooks/useCombate';
 import { limparMarkdown } from '../utils/texto';
+import ControlesCombate from '../components/combate/ControlesCombate';
+import AdicionarMonstro from '../components/combate/AdicionarMonstro';
+import AdicionarPersonagens from '../components/combate/AdicionarPersonagens';
+import ModalCondicoes from '../components/combate/ModalCondicoes';
+import SessaoMestre from '../components/sessao/SessaoMestre';
+import { cinzel, crimson } from '../estilos';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
-const crimson = { fontFamily: "'Crimson Pro', serif" };
 
 const CAMPANHA_ID = getCampanhaId();
 const attrLabel = { str: 'FOR', dex: 'DES', con: 'CON', int: 'INT', wis: 'SAB', cha: 'CAR' };
@@ -3022,7 +3027,7 @@ useEffect(() => {
   document.body
 )}
 
-<modalCondicoes
+<ModalCondicoes
   combatente={combatentes.find(c => c.id === modalCondicoes)}
   lista={LISTA_CONDICOES}
   onToggle={cond => toggleCondicao(modalCondicoes, cond)}

@@ -1,9 +1,9 @@
+import { cinzel } from '../estilos';
 import { getCampanhaId } from '../utils/campanha';
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { notificar } from '../utils/notificar';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
 const CAMPANHA_ID = getCampanhaId();
 
 function textoDia(diaTotal, meses, anoInicial) {

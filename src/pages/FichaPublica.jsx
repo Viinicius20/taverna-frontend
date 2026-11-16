@@ -1,9 +1,8 @@
+import { cinzel, crimson } from '../estilos';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
-const crimson = { fontFamily: "'Crimson Pro', serif" };
 const IGNORAR = /^(core .* traits|creature type|languages|ability score (improvement|increases?))$/i;
 
 const attrLabel = { str: 'FOR', dex: 'DES', con: 'CON', int: 'INT', wis: 'SAB', cha: 'CAR' };

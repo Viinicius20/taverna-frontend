@@ -1,3 +1,4 @@
+import { cinzel } from '../estilos';
 import { getCampanhaId } from '../utils/campanha';
 import { confirmar } from '../utils/notificar';
 import { useState, useEffect, useRef } from 'react';
@@ -9,7 +10,6 @@ import EnviarHandout from "../components/EnviarHandout";
 import CofreHandout from '../components/CofreHandout';
 
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
 const CAMPANHA_ID = getCampanhaId();
 const tipoDoc = cat => TIPOS_DOC[cat] || { label: cat, cor: '#c8a84b' };
 const limparTexto = t => (t || '').replace(/\\n/g, '\n').replace(/\*\*/g, '').replace(/^"|"$/g, '').trim();

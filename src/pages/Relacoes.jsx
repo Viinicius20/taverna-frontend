@@ -1,3 +1,4 @@
+import { cinzel, crimson } from '../estilos';
 import { getCampanhaId } from '../utils/campanha';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -7,8 +8,6 @@ import MapaRelacoes from '../components/MapaRelacoes';
 import { VINCULOS } from '../constants/vinculos';
 
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
-const crimson = { fontFamily: "'Crimson Pro', serif" };
 const CAMPANHA_ID = getCampanhaId();
 
 const CAMINHO_LOCAIS = `/locations/${CAMPANHA_ID}`;   // copie o caminho real da página Mistérios

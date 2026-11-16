@@ -1,7 +1,7 @@
+import { cinzel } from '../estilos';
 import { useState, useEffect, useCallback } from "react";
 import api from "../services/api";
 
-const cinzel = { fontFamily: "'Cinzel', serif" };  
 
 const CORES = { amarelo: '#e8d27a', rosa: '#e8a0a8', azul: '#8ec5e0', verde: '#a6d48a' };
 

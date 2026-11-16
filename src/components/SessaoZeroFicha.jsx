@@ -1,7 +1,7 @@
+import { cinzel } from '../estilos';
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 
-const cinzel = { fontFamily: "'Cinzel', serif" };
 const COR = 'var(--cor-classe, #c8a84b)';
 const LIMITE = 400;
 
