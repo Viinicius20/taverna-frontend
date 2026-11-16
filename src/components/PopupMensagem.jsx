@@ -18,7 +18,7 @@ export default function PopupMensagem({ mensagens = [], onLida }) {
     <>
       <style>{`
         @keyframes tav-pop-in {
-          from { opacity: 0; transform: translateX(-24px); }
+          from { opacity: 0; transform: translateX(24px); }
           to { opacity: 1; transform: translateX(0); }
         }
         .tav-pop { animation: tav-pop-in .35s ease-out both; }
@@ -26,7 +26,7 @@ export default function PopupMensagem({ mensagens = [], onLida }) {
       `}</style>
 
       <div key={msg.id} role="status" aria-live="polite"
-        className="tav-pop fixed bottom-4 left-4 z-50 w-96 max-w-[calc(100vw-2rem)] flex items-end gap-3">
+        className="tav-pop fixed top-20 right-4 z-50 w-96 max-w-[calc(100vw-2rem)] flex flex-row-reverse items-start gap-3">
 
         <Retrato src={avatar} nome={remetente} tamanho="sm" />
 
@@ -59,9 +59,9 @@ export default function PopupMensagem({ mensagens = [], onLida }) {
           </div>
 
           <span aria-hidden="true" style={{
-            position: 'absolute', left: -7, bottom: 14, width: 12, height: 12,
+            position: 'absolute', right: -7, top: 18, width: 12, height: 12,
             background: 'var(--tav-painel)',
-            borderLeft: '1px solid var(--tav-borda)', borderBottom: '1px solid var(--tav-borda)',
+            borderTop: '1px solid var(--tav-borda)', borderRight: '1px solid var(--tav-borda)',
             transform: 'rotate(45deg)',
           }} />
         </div>
