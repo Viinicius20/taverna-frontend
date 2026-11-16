@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useUser } from '../context/UserContext';
 import NotasSessao from "../components/NotasSessao";
 import api from "../services/api";
+import { getCampanhaId } from '../utils/campanha';
 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
@@ -39,8 +40,8 @@ useEffect(() => {
 
   async function buscarMonstroAleatorio() {
     try {
-      const res = await fetch('https://taverna-backend-eq3b.onrender.com/bestiary/random-description');
-      const json = await res.json();
+      const res = await api.get('/bestiary/random-description');
+      const json = res.data;
       setMonstro(json.data);
     } catch {
       setMonstro(null);
@@ -54,27 +55,25 @@ useEffect(() => {
     .catch(() => setProximos([]));
 }, [isMestre]);
 
-  async function buscarImagemRevelada() {
-    try {
-      const res = await fetch('https://taverna-backend-eq3b.onrender.com/gallery?campaign_id=00000000-0000-0000-0000-000000000001');
-      const json = await res.json();
-      const revelada = (json.data || []).find(i => i.revealed);
-      setImagemRevelada(revelada || null);
-    } catch {
-      setImagemRevelada(null);
-    }
+async function buscarImagemRevelada() {
+  try {
+    const res = await api.get('/gallery', { params: { campaign_id: getCampanhaId() } });
+    const revelada = (res.data.data || []).find(i => i.revealed);
+    setImagemRevelada(revelada || null);
+  } catch {
+    setImagemRevelada(null);
   }
+}
 
   async function gerarBoato() {
-    setGerandoBoato(true);
+  setGerandoBoato(true);
+  setBoato(null);
+  try {
+    const res = await api.get('/boato');
+    setBoato(res.data.data);
+  } catch {
     setBoato(null);
-    try {
-      const res = await fetch('https://taverna-backend-eq3b.onrender.com/boato');
-      const json = await res.json();
-      setBoato(json.data);
-    } catch {
-      setBoato(null);
-    }
+  }
     setGerandoBoato(false);
   }
 
