@@ -1,9 +1,9 @@
 import { cinzel, crimson } from '../estilos';
-import { getCampanhaId } from './src/utils/campanha';
-import { confirmar } from './src/utils/notificar';
+import { getCampanhaId } from '../utils/campanha';
+import { confirmar } from '../utils/notificar';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from './src/services/api';
+import api from '../services/api';
 
 const CAMPANHA_ID = getCampanhaId();
 
