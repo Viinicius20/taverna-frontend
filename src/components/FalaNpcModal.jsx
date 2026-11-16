@@ -1,18 +1,21 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import api from '../services/api';
 import { notificar } from '../utils/notificar';
 import BalaoFala from './BalaoFala';
-import { createPortal } from 'react-dom';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 
-export default function FalaNpcModal({ npc, personagens, campanhaId, onClose }) {
+const texto = x => (typeof x === 'string' ? x : x?.name ?? '');
+
+export default function FalaNpcModal({ npc, personagens = [], campanhaId, onClose }) {
   const [fala, setFala] = useState('');
   const [destino, setDestino] = useState('todos');
   const [enviando, setEnviando] = useState(false);
 
-  const nome = npc.name || npc.data?.name || 'NPC';
-  const avatar = npc.data?.art_url || null;
+  const nome = texto(npc?.name) || texto(npc?.data?.name) || 'NPC';
+  const avatar = typeof npc?.data?.art_url === 'string' ? npc.data.art_url : null;
+  const nomeDe = p => texto(p?.data?.name) || texto(p?.name) || 'Personagem';
 
   async function enviar() {
     if (!fala.trim() || enviando) return;
@@ -50,7 +53,7 @@ export default function FalaNpcModal({ npc, personagens, campanhaId, onClose }) 
           style={{ borderRadius: '2px' }}>
           <option value="todos">Todos os jogadores</option>
           {personagens.map(p => (
-            <option key={p.id} value={p.id}>{p.data?.name || p.name}</option>
+            <option key={p.id} value={p.id}>{nomeDe(p)}</option>
           ))}
         </select>
 
