@@ -85,6 +85,7 @@ async function buscarImagemRevelada() {
     { label: 'Histórico', rota: '/historico' },
     { label: 'Rolar Dados', rota: '/dados' },
     { label: 'Campanhas', rota: '/campanhas' },
+    { label: '💰 Tesouro', rota: '/tesouro'},
     ...(isMestre ? [
       { label: 'Mestre', rota: '/mestre', destaque: true },
       { label: 'Bestiário', rota: '/mestre/bestiario', destaque: true },
