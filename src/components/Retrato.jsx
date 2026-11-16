@@ -1,5 +1,3 @@
-import useState from 'react';
-
 const cinzel = { fontFamily: "'Cinzel', serif" };
 
 const TAMANHOS = {
@@ -9,44 +7,53 @@ const TAMANHOS = {
 };
 
 function iniciais(nome = '') {
-    return nome.trim().split(/\s+/).slice(0, 2).map(p => (p[0] || '').toUpperCase()).join('');
+  return String(nome).trim().split(/\s+/).slice(0, 2).map(p => (p[0] || '').toUpperCase()).join('');
 }
 
-export default function Retrato({ src, nome = '', tamanho = 'md', raridade, onClick}) {
-    const [quebrou, setQuebrou] = useState(false);
-    const t = TAMANHOS[tamanho] || TAMANHOS.md;
-    const cor = raridade ? `var(--raridade-${raridade})` : 'var(--tav-ouro)';
-    const Tag = onClick ? 'button' : 'div';
+export default function Retrato({ src, nome = '', tamanho = 'md', raridade, onClick }) {
+  const t = TAMANHOS[tamanho] || TAMANHOS.md;
+  const cor = raridade ? `var(--raridade-${raridade})` : 'var(--tav-ouro)';
+  const Tag = onClick ? 'button' : 'div';
+  const url = typeof src === 'string' && src ? src : null;
+  const nomeTxt = typeof nome === 'string' ? nome : (nome?.name ?? '');
 
-    return (
-        <Tag
-        type={onClick ? 'button' : undefined}
-        onClick={onClick}
-        style={{
-            width: t.w,
-            height: Math.round(t.w * 1.25),
-            padding: 3,
-            flexShrink: 0,
-            display: 'block',
-            background: 'var(--tav-painel)',
-            border: `1px solid ${cor}`,
-            boxShadow: `0 0 0 2px var (--tav-fundo), 0 0 0 3px ${cor}55`,
-            borderRadius: 2,
-            cursor: onClick ? 'pointer' : 'default',
+  return (
+    <Tag
+      type={onClick ? 'button' : undefined}
+      onClick={onClick}
+      style={{
+        width: t.w,
+        height: Math.round(t.w * 1.25),
+        padding: 3,
+        flexShrink: 0,
+        display: 'block',
+        background: 'var(--tav-painel)',
+        border: `1px solid ${cor}`,
+        boxShadow: `0 0 0 2px var(--tav-fundo), 0 0 0 3px ${cor}55`,
+        borderRadius: 2,
+        cursor: onClick ? 'pointer' : 'default',
+      }}>
+      <div style={{
+        position: 'relative', width: '100%', height: '100%', overflow: 'hidden',
+        background: 'var(--tav-fundo)', border: `1px solid ${cor}40`,
+      }}>
+        {/* as iniciais ficam atrás; a foto cobre quando carrega */}
+        <span style={{
+          ...cinzel, position: 'absolute', inset: 0, display: 'flex',
+          alignItems: 'center', justifyContent: 'center',
+          fontSize: t.fonte, color: cor, opacity: 0.6,
         }}>
-            <div style={{
-                width: '100%', height: '100%', overflow: 'hidden', background: 'var(--tav-fundo)',
-                border: `1px solid ${cor}40`, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-                {src && !quebrou ? (
-                    <img src={src} alt={nome} loading='lazy' onError={() => setQuebrou(true)}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                    <span style={{ ...cinzel, fontSize: t.fonte, color: cor, opacity: 0.6 }}>
-                        {iniciais(nome) || '?'}
-                    </span>
-                )}
-            </div>
-        </Tag>
-    );
+          {iniciais(nomeTxt) || '?'}
+        </span>
+        {url && (
+          <img src={url} alt={nomeTxt} loading="lazy"
+            onError={e => { e.currentTarget.style.display = 'none'; }}
+            style={{
+              position: 'absolute', inset: 0, width: '100%', height: '100%',
+              objectFit: 'cover', background: 'var(--tav-fundo)',
+            }} />
+        )}
+      </div>
+    </Tag>
+  );
 }
