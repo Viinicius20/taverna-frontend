@@ -1760,10 +1760,13 @@ useEffect(() => {
 </>
 )}
 
-<div style={{ display: aba === 'painel' ? 'block' : 'none' }}>
+{aba !== 'sessao' && (
   <>
-  <RolagemRapida />
-  <MesaFeed />
+
+    <div style={{ display: aba === 'painel' ? 'block' : 'none' }}>
+        <>
+        <RolagemRapida />
+        <MesaFeed />
 
         {/* PAINEL DE COMBATE */}
         {aba === 'painel' && (
@@ -1795,32 +1798,32 @@ useEffect(() => {
             onEntregarItem={p => setModalEntregarItem({ personagem: p })}
           />
 
-{/* Lista de combatentes */}
-{combatentes.length === 0 ? (
-  <p className="text-[#8a7e68] text-sm text-center py-8">Nenhum combatente adicionado.</p>
-) : (
-  <div className="space-y-2">
-    {combatentes.map((c, idx) => (
-    <CombatenteCard
-      key={c.id}
-      c={c}
-      isAtivo={combateAtivo && idx === turnoAtual}
-      onAtualizar={atualizarCombatente}
-      onRemover={removerCombatente}
-      onCondicoes={setModalCondicoes}
-    />
-    ))}
-  </div>
-)}
+          {/* Lista de combatentes */}
+          {combatentes.length === 0 ? (
+            <p className="text-[#8a7e68] text-sm text-center py-8">Nenhum combatente adicionado.</p>
+          ) : (
+            <div className="space-y-2">
+              {combatentes.map((c, idx) => (
+              <CombatenteCard
+                key={c.id}
+                c={c}
+                isAtivo={combateAtivo && idx === turnoAtual}
+                onAtualizar={atualizarCombatente}
+                onRemover={removerCombatente}
+                onCondicoes={setModalCondicoes}
+              />
+              ))}
+            </div>
+          )}
 
-  {combateAtivo && combatentes.length > 0 && (
-    <p style={cinzel} className="text-[#c8a84b60] text-xs tracking-widest text-center mt-4">
-      TURNO DO: {combatentes[turnoAtual]?.nome}
-    </p>
-  )}
-</div>
-</>
-)}
+          {combateAtivo && combatentes.length > 0 && (
+            <p style={cinzel} className="text-[#c8a84b60] text-xs tracking-widest text-center mt-4">
+              TURNO DO: {combatentes[turnoAtual]?.nome}
+            </p>
+          )}
+        </div>
+        </>
+        )}
 
 
 
@@ -3032,6 +3035,15 @@ useEffect(() => {
   document.body
 )}
 
+    </>
+  </div>
+</>
+)}
+
+{aba === 'sessao' && (
+  <SessaoMestre combate={combate} onCondicoes={setModalCondicoes} />
+)}
+
 <ModalCondicoes
   combatente={combatentes.find(c => c.id === modalCondicoes)}
   lista={LISTA_CONDICOES}
@@ -3070,6 +3082,8 @@ useEffect(() => {
   </div>
 )}
 
+{aba !== 'sessao' && (
+<>
 <div className="mt-12">
   <p style={cinzel} className="text-[#6a8aaa] text-xs tracking-[4px] mb-2 opacity-70">GANCHOS DE LONGO PRAZO</p>
   <h2 style={cinzel} className="text-xl text-[#c8a84b] font-semibold mb-6">🧩 Consequências Ocultas</h2>
@@ -3127,10 +3141,6 @@ useEffect(() => {
     </button>
   </div>
 </div>
-
-{aba === 'sessao' && (
-  <SessaoMestre combate={combate} onCondicoes={setModalCondicoes} />
-)}
 
 {opcoesEse.length > 0 && (
   <div className="flex flex-col gap-2">
@@ -3330,10 +3340,10 @@ useEffect(() => {
           <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-2">Rolagens Secretas</h2>
           <p className="text-[#7a7060] mb-6 font-light text-sm">Resultados visíveis apenas para você.</p>
           <Dados secreto={true} />
-        </div>
-        </>
-        </div>
-      </div>
-    </div>
-  );
+        </div>      
+      </>
+    )}
+  </div>
+</div>
+);
 }
