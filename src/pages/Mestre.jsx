@@ -14,7 +14,9 @@ import MesaFeed from '../components/MesaFeed'
 import UploadFotoNpc from "../components/UploadFotoNpc";
 import FalaNpcModal from "../components/FalaNpcModal";
 import CardRaridade from "../components/CardRaridade";
-
+import CombatenteCard from '../components/combate/CombatenteCard';
+import useCombate from '../hooks/useCombate';
+import { limparMarkdown } from '../utils/texto';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -39,9 +41,6 @@ export default function Mestre() {
   const sistemas = ['D&D 5e', 'Tormenta20', 'Pathfinder 2e', 'Call of Cthulhu', 'Outro'];
   const [notasLocais, setNotasLocais] = useState({});
   const [attrsLocais, setAttrsLocais] = useState({});
-  const [combatentes, setCombatentes] = useState([]);
-  const [turnoAtual, setTurnoAtual] = useState(0);
-  const [combateAtivo, setCombateAtivo] = useState(false);
   const [novoMonstro, setNovoMonstro] = useState({ nome: '', hp: '', qtd: 1 });
   const [loot, setLoot] = useState(null);
   const [gerandoLoot, setGerandoLoot] = useState(false);
@@ -131,8 +130,18 @@ export default function Mestre() {
   const [gerandoEse, setGerandoEse] = useState(false);
   const changelogsJaMostrados = useRef(new Set());
 
-  
+  const combate = useCombate({
+  atalhos: aba === 'painel' || aba === 'sessao',
+  campanhaId: CAMPANHA_ID,
+});
+const {
+  combatentes, turnoAtual, combateAtivo, setCombateAtivo,
+  proximoTurno, adicionarPersonagem, ordenarIniciativa,
+  atualizarCombatente, removerCombatente, resetarCombate,
+  toggleCondicao, adicionarMonstros,
+} = combate;
 
+  
 useEffect(() => {
   api.get(`/fatos-mundo/${CAMPANHA_ID}`).then(res => setFatosMundo(res.data.data || [])).catch(() => setFatosMundo([]));
 }, []);
@@ -513,17 +522,13 @@ useEffect(() => {
     return attrsLocais[`${npcId}_${attr}`] !== undefined ? attrsLocais[`${npcId}_${attr}`] : fallback;
   }
 
-  function adicionarMonstro() {
+function adicionarMonstro() {
   if (!novoMonstro.nome.trim() || !novoMonstro.hp) return;
-  const novos = Array.from({ length: novoMonstro.qtd }, (_, i) => ({
-    id: Date.now() + i,
-    nome: novoMonstro.qtd > 1 ? `${novoMonstro.nome} ${i + 1}` : novoMonstro.nome,
-    tipo: 'monstro',
-    hpMax: Number(novoMonstro.hp),
-    hpAtual: Number(novoMonstro.hp),
-    iniciativa: 0,
-  }));
-  setCombatentes(prev => [...prev, ...novos]);
+  adicionarMonstros({
+    nome: novoMonstro.nome.trim(),
+    hp: novoMonstro.hp,
+    qtd: novoMonstro.qtd,
+  });
   setNovoMonstro({ nome: '', hp: '', qtd: 1 });
 }
 
@@ -569,31 +574,6 @@ async function pararCountdown() {
 useEffect(() => {
   buscarSessoes();
 }, []);
-
-useEffect(() => {
-  function handleKeyDown(e) {
-    const tag = document.activeElement.tagName;
-    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-
-    if (e.key === 'Enter' && combateAtivo) {
-      e.preventDefault();
-      proximoTurno();
-    }
-
-    if (e.code === 'Space' && combatentes.length > 0) {
-      e.preventDefault();
-      if (combateAtivo) {
-        proximoTurno();
-      } else {
-        setCombateAtivo(true);
-      }
-    }
-  }
-
-  window.addEventListener('keydown', handleKeyDown);
-  return () => window.removeEventListener('keydown', handleKeyDown);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [combateAtivo, combatentes]);
 
 async function buscarSessoes() {
   try {
@@ -754,57 +734,6 @@ async function deletarArte(tipo, id) {
     alert('Erro ao deletar imagem.');
   }
   setDeletandoArte(false);
-}
-
-function adicionarPersonagem(npc) {
-  const d = npc.data || {};
-  const hp = d.combat?.hp_max || d.combat?.hp || 10;
-  const isJogador = !!npc.user_id;
-  setCombatentes(prev => [...prev, {
-    id: npc.id,
-    nome: npc.name,
-    tipo: isJogador ? 'jogador' : 'npc',
-    hpMax: hp,
-    hpAtual: hp,
-    iniciativa: d.combat?.initiative || 0,
-    avatar_url: npc.avatar_url || null, 
-  }]);
-}
-
-function ordenarIniciativa() {
-  setCombatentes(prev => [...prev].sort((a, b) => b.iniciativa - a.iniciativa));
-  setTurnoAtual(0);
-}
-
-function atualizarCombatente(id, campo, valor) {
-  setCombatentes(prev => prev.map(c => c.id === id ? { ...c, [campo]: valor } : c));
-}
-
-function removerCombatente(id) {
-  setCombatentes(prev => prev.filter(c => c.id !== id));
-}
-
-function proximoTurno() {
-  setTurnoAtual(prev => (prev + 1) % combatentes.length);
-}
-
-function resetarCombate() {
-  if (!window.confirm('Resetar o combate?')) return;
-  setCombatentes([]);
-  setTurnoAtual(0);
-  setCombateAtivo(false);
-}
-
-function limparMarkdown(texto) {
-  if (!texto) return '';
-  return texto.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
-}
-
-function toggleCondicao(combatenteId, condicao) {
-  const combatente = combatentes.find(c => c.id === combatenteId);
-  const atual = combatente?.condicoes || [];
-  const novo = atual.includes(condicao) ? atual.filter(x => x !== condicao) : [...atual, condicao];
-  atualizarCombatente(combatenteId, 'condicoes', novo);
 }
 
 function gerarNome() {
@@ -1077,28 +1006,21 @@ async function revelarConsequenciaIndividual(id, personagemId) {
 
 useEffect(() => {
   const nome = params.get("addMonster");
-  if (!nome) { processado.current = false; return; }   
+  if (!nome) { processado.current = false; return; }
   if (processado.current) return;
   processado.current = true;
 
-  const num = (k, padrao, min, max) => Math.min(max, Math.max(min, Number(params.get(k)) || padrao));
-  const hp = num("hp", 1, 1, 9999);
-  const dex = num("dex", 10, 1, 30);
-  const qtd = num("qtd", 1, 1, 20);
+  const num = (k, padrao, min, max) =>
+    Math.min(max, Math.max(min, Number(params.get(k)) || padrao));
 
-  const base = Date.now();
-  const novos = Array.from({ length: qtd }, (_, i) => ({
-    id: base + i,
-    nome: qtd > 1 ? `${nome} ${i + 1}` : nome,
-    tipo: 'monstro',
-    hpMax: hp,
-    hpAtual: hp,
-    iniciativa: Math.floor(Math.random() * 20) + 1 + Math.floor((dex - 10) / 2),
-  }));
-
-  setCombatentes(prev => [...prev, ...novos]);
+  adicionarMonstros({
+    nome,
+    hp: num("hp", 1, 1, 9999),
+    dex: num("dex", 10, 1, 30),
+    qtd: num("qtd", 1, 1, 20),
+  });
   setParams({}, { replace: true });
-}, [params, setParams]);
+}, [params, setParams, adicionarMonstros]);
 
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
@@ -1837,247 +1759,49 @@ useEffect(() => {
         {aba === 'painel' && (
         <>
         <div>
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 opacity-70">ENCONTRO ATUAL</p>
-              <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold">Painel de Combate</h2>
-            </div>
-            <div className="flex gap-2">
-              {combatentes.length > 0 && (
-                <>
-                <a href="/tv" target="_blank" rel="noreferrer"
-                  className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-2 text-xs hover:bg-[#c8a84b10] transition-colors"
-                  style={{ ...cinzel, borderRadius: '2px' }}>
-                  📺 TV
-                </a>
-                  <button onClick={ordenarIniciativa}
-                    className="border border-[#c8a84b40] text-[#c8a84b] px-4 py-2 text-xs hover:bg-[#c8a84b10] transition-colors"
-                    style={{ ...cinzel, borderRadius: '2px' }}>
-                    ↕ ORDENAR
-                  </button>
-                  {combateAtivo ? (
-                    <button onClick={proximoTurno}
-                      className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors"
-                      style={{ ...cinzel, borderRadius: '2px' }}>
-                      PRÓXIMO TURNO →
-                      <p className="text-[#8a7e68] text-xs mt-2">Atalho: Espaço ou Enter para avançar turno</p>
-                    </button>
-                  ) : (
-                    <button onClick={() => setCombateAtivo(true)}
-                      className="bg-[#b07050] text-[#f0e8d8] px-4 py-2 text-xs font-bold hover:bg-[#c08060] transition-colors"
-                      style={{ ...cinzel, borderRadius: '2px' }}>
-                      ⚔ INICIAR
-                    </button>
-                  )}
-                  <button onClick={resetarCombate}
-                    className="border border-red-600 text-red-600 px-3 py-2 text-xs hover:border-red-600 hover:text-red-600 transition-colors"
-                    style={{ ...cinzel, borderRadius: '2px' }}>
-                    ✕
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
+          <ControlesCombate
+            temCombatentes={combatentes.length > 0}
+            combateAtivo={combateAtivo}
+            onOrdenar={ordenarIniciativa}
+            onIniciar={() => setCombateAtivo(true)}
+            onProximo={proximoTurno}
+            onResetar={resetarCombate}
+          />
 
-  {/* Adicionar monstro genérico */}
-<div className="flex flex-col sm:flex-row gap-2 mb-4 mt-6">
-  <div className="relative w-full">
-    <input value={novoMonstro.nome}
-      onChange={async e => {
-        const val = e.target.value;
-        setNovoMonstro(p => ({ ...p, nome: val }));
-        if (val.length >= 2) {
-          try {
-            const res = await api.get(`/bestiary?name=${encodeURIComponent(val)}`);
-            setSugestoesMonstro((res.data.data || []).slice(0, 5));
-          } catch {
-            setSugestoesMonstro([]);
-          }
-        } else {
-          setSugestoesMonstro([]);
-        }
-      }}
-      placeholder="Nome do monstro..." aria-label="Nome do monstro..."
-      className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
-      style={{ borderRadius: '2px' }} />
-    {sugestoesMonstro.length > 0 && (
-      <div className="absolute top-full left-0 right-0 bg-[#161410] border border-[#c8a84b20] z-10"
-        style={{ borderRadius: '2px' }}>
-        {sugestoesMonstro.map(m => (
-          <button key={m.id}
-            onClick={() => {
-              setNovoMonstro(p => ({ ...p, nome: m.name, hp: m.hp }));
-              setSugestoesMonstro([]);
-            }}
-            className="w-full text-left px-3 py-2 text-sm hover:bg-[#c8a84b10] transition-colors flex items-center justify-between"
-            style={cinzel}>
-            <span className="text-[#e8e0d0]">{m.name}</span>
-            <span className="text-[#8a7e68] text-xs">CR {m.cr} · HP {m.hp}</span>
-          </button>
-        ))}
-      </div>
-    )}
-  </div>
-  <div className="flex gap-2">
-    <input value={novoMonstro.hp} onChange={e => setNovoMonstro(p => ({ ...p, hp: e.target.value }))}
-      placeholder="HP" aria-label="HP" type="number" min={1}
-      className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-20 text-sm text-center focus:outline-none focus:border-[#c8a84b50]"
-      style={{ borderRadius: '2px' }} />
-    <input value={novoMonstro.qtd} onChange={e => setNovoMonstro(p => ({ ...p, qtd: Math.max(1, Number(e.target.value)) }))}
-      type="number" min={1} max={20}
-      className="bg-[#161410] border border-[#c8a84b20] text-[#c8a84b] px-3 py-2 w-16 text-sm text-center focus:outline-none focus:border-[#c8a84b50]"
-      style={{ borderRadius: '2px' }} />
-    <button onClick={adicionarMonstro}
-      className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors"
-      style={{ ...cinzel, borderRadius: '2px' }}>
-      + MONSTRO
-    </button>
-  </div>
-</div>
+          <AdicionarMonstro
+            novoMonstro={novoMonstro}
+            setNovoMonstro={setNovoMonstro}
+            sugestoes={sugestoesMonstro}
+            setSugestoes={setSugestoesMonstro}
+            onAdicionar={adicionarMonstro}
+          />
 
-  {/* Adicionar NPCs e Personagens */}
-<div className="mb-6 space-y-2">
-  {npcs.length > 0 && (
-    <div>
-      <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-2">NPCS</p>
-      <div className="flex flex-wrap gap-2">
-        {npcs.map(npc => (
-          <button key={npc.id} onClick={() => adicionarPersonagem(npc)}
-            disabled={combatentes.some(c => c.id === npc.id)}
-            className="border border-[#c8a84b20] text-[#9a8e78] px-3 py-1 text-xs hover:border-[#c8a84b50] hover:text-[#c8a84b] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-            style={{ ...cinzel, borderRadius: '2px' }}>
-            + {npc.name}
-          </button>
-        ))}
-      </div>
-    </div>
-  )}
-  {personagens.length > 0 && (
-  <div>
-    <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-2">JOGADORES</p>
-    <div className="flex flex-wrap gap-2">
-      {personagens.map(p => (
-        <div key={p.id} className="flex items-center gap-1">
-          <button onClick={() => adicionarPersonagem(p)}
-            disabled={combatentes.some(c => c.id === p.id)}
-            className="border border-[#7ab8d420] text-[#9a8e78] px-3 py-1 text-xs hover:border-[#7ab8d450] hover:text-[#7ab8d4] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-            style={{ ...cinzel, borderRadius: '2px' }}>
-            + {p.name}
-          </button>
-          <button onClick={() => window.open(`/personagens/${p.id}`, '_blank')}
-            className="text-[#8a7e68] hover:text-[#c8a84b] text-xs transition-colors px-1"
-            title="Ver ficha">
-            👁
-          </button>
-          <button onClick={() => setModalEntregarItem({ personagem: p })}
-            className="text-[#8a7e68] hover:text-[#c8a84b] text-xs transition-colors px-1"
-            title="Entregar item">
-            📦
-          </button>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
-</div>
+          <AdicionarPersonagens
+            npcs={npcs}
+            personagens={personagens}
+            idsEmCombate={new Set(combatentes.map(c => c.id))}
+            onAdicionar={adicionarPersonagem}
+            onVerFicha={p => window.open(`/personagens/${p.id}`, '_blank')}
+            onEntregarItem={p => setModalEntregarItem({ personagem: p })}
+          />
 
-  {/* Lista de combatentes */}
-  {combatentes.length === 0 ? (
-    <p className="text-[#8a7e68] text-sm text-center py-8">Nenhum combatente adicionado.</p>
-  ) : (
-    <div className="space-y-2">
-      {combatentes.map((c, idx) => {
-        const isAtivo = combateAtivo && idx === turnoAtual;
-        const hpPct = Math.max(0, (c.hpAtual / c.hpMax) * 100);
-        const hpCor = hpPct > 50 ? '#2a7a2a' : hpPct > 25 ? '#8a7020' : '#8a2020';
-        return (
-          <div key={c.id}
-            className="border p-3 transition-all"
-            style={{
-              borderRadius: '2px',
-              borderColor: isAtivo ? '#c8a84b' : '#c8a84b15',
-              backgroundColor: isAtivo ? '#c8a84b08' : '#161410',
-              boxShadow: isAtivo ? '0 0 12px #c8a84b20' : 'none',
-            }}>
-            <div className="flex items-center gap-3">
-
-              {/* Iniciativa */}
-              <div className="flex flex-col items-center">
-                <span style={cinzel} className="text-[#c8a84b] text-xs opacity-50 mb-1">INIT</span>
-                <input type="number" value={c.iniciativa}
-                  onChange={e => atualizarCombatente(c.id, 'iniciativa', Number(e.target.value))}
-                  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#c8a84b] text-center text-lg w-14 py-1 focus:outline-none focus:border-[#c8a84b50]"
-                  style={{ borderRadius: '2px' }} />
-              </div>
-
-              {/* Nome e tipo */}
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    {isAtivo && <span className="text-[#c8a84b] text-xs">▶</span>}
-
-                    {/* Avatar do jogador */}
-                      {c.tipo === 'jogador' && c.avatar_url && (
-                        <img src={c.avatar_url} alt={c.nome}
-                        className="w-6 h-6 rounded object-cover border border-[#c8a84b20]"
-                        style={{ borderRadius: '2px' }} />
-                      )}
-                      <span style={cinzel} className="text-[#e8e0d0] text-sm">{c.nome}</span>
-                      <span style={{ ...cinzel, borderRadius: '2px' }}
-                        className={[
-                          'text-xs px-2 py-0.5 border',
-                          c.tipo === 'monstro' ? 'border-red-600 text-red-600' :
-                          c.tipo === 'jogador' ? 'border-[#7ab8d430] text-[#7ab8d4]' :
-                          'border-[#c8a84b30] text-[#c8a84b60]'
-                        ].join(' ')}>
-                        {c.tipo === 'monstro' ? 'MONSTRO' : c.tipo === 'jogador' ? 'JOGADOR' : 'NPC'}
-                      </span>
-                    </div>
-
-                      {/* Barra de HP */}
-                      <div className="h-1.5 bg-[#0f0e0c] rounded-full overflow-hidden">
-                    <div className="h-full transition-all" style={{ width: `${hpPct}%`, backgroundColor: hpCor }} />
-                  </div>
-                </div>
-
-                {/* Condições ativas */}
-{c.condicoes && c.condicoes.length > 0 && (
-  <div className="flex flex-wrap gap-1 mt-2">
-    {c.condicoes.map(cond => (
-      <span key={cond} style={cinzel}
-        className="text-xs px-2 py-0.5 border border-[#a86aa840] text-[#a86aa8] bg-[#a86aa810]"
-        style2={{ borderRadius: '2px' }}>
-        {cond}
-      </span>
+{/* Lista de combatentes */}
+{combatentes.length === 0 ? (
+  <p className="text-[#8a7e68] text-sm text-center py-8">Nenhum combatente adicionado.</p>
+) : (
+  <div className="space-y-2">
+    {combatentes.map((c, idx) => (
+    <CombatenteCard
+      key={c.id}
+      c={c}
+      isAtivo={combateAtivo && idx === turnoAtual}
+      onAtualizar={atualizarCombatente}
+      onRemover={removerCombatente}
+      onCondicoes={setModalCondicoes}
+    />
     ))}
   </div>
 )}
-
-              {/* HP */}
-              <div className="flex items-center gap-1">
-                <input type="number" value={c.hpAtual}
-                  onChange={e => atualizarCombatente(c.id, 'hpAtual', Number(e.target.value))}
-                  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] text-center text-lg w-16 py-1 focus:outline-none focus:border-[#c8a84b50]"
-                  style={{ borderRadius: '2px' }} />
-                <span className="text-[#8a7e68] text-sm">/</span>
-                <span style={cinzel} className="text-[#8a7e68] text-sm w-10 text-center">{c.hpMax}</span>
-              </div>
-
-              {/* Condições */}
-<button onClick={() => setModalCondicoes(c.id)}
-  className="text-[#8a7e68] hover:text-[#a86aa8] text-xs transition-colors px-1"
-  title="Gerenciar condições">
-  ⚕
-</button>
-
-              {/* Remover */}
-              <button onClick={() => removerCombatente(c.id)}
-                className="text-red-600 hover:text-red-600 text-lg transition-colors px-1">×</button>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  )}
 
   {combateAtivo && combatentes.length > 0 && (
     <p style={cinzel} className="text-[#c8a84b60] text-xs tracking-widest text-center mt-4">
@@ -2087,6 +1811,8 @@ useEffect(() => {
 </div>
 </>
 )}
+
+
 
 {/* GERADOR DE LOOT */}
 <div className="mt-12">
@@ -3296,38 +3022,12 @@ useEffect(() => {
   document.body
 )}
 
-{modalCondicoes && createPortal(
-  <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 px-4"
-    onClick={() => setModalCondicoes(null)}>
-    <div className="modal-anim bg-[#161410] border border-[#c8a84b30] max-w-sm w-full" style={{ borderRadius: '2px' }}
-      onClick={e => e.stopPropagation()}>
-      <div className="px-6 py-4 border-b border-[#c8a84b15]">
-        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">CONDIÇÕES</p>
-      </div>
-      <div className="p-6 flex flex-wrap gap-2">
-        {LISTA_CONDICOES.map(({ label, cor }) => {
-          const combatente = combatentes.find(c => c.id === modalCondicoes);
-          const ativo = (combatente?.condicoes || []).includes(label);
-          return (
-            <button key={label} onClick={() => toggleCondicao(modalCondicoes, label)}
-              className="px-3 py-1 text-xs border transition-all"
-              style={{ ...cinzel, borderRadius: '2px', borderColor: ativo ? cor : '#c8a84b15', backgroundColor: ativo ? `${cor}25` : 'transparent', color: ativo ? cor : '#4a4030' }}>
-              {label}
-            </button>
-          );
-        })}
-      </div>
-      <div className="px-6 pb-6">
-        <button onClick={() => setModalCondicoes(null)}
-          className="w-full border border-[#c8a84b20] text-[#8a7e68] py-2 text-xs hover:border-[#c8a84b40] transition-colors"
-          style={{ ...cinzel, borderRadius: '2px' }}>
-          Fechar
-        </button>
-      </div>
-    </div>
-  </div>,
-  document.body
-)}
+<modalCondicoes
+  combatente={combatentes.find(c => c.id === modalCondicoes)}
+  lista={LISTA_CONDICOES}
+  onToggle={cond => toggleCondicao(modalCondicoes, cond)}
+  onFechar={() => setModalCondicoes(null)}
+/>
 
 {caixaMundoMudou && (
   <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 px-4"
@@ -3417,6 +3117,10 @@ useEffect(() => {
     </button>
   </div>
 </div>
+
+{aba === 'sessao' && (
+  <SessaoMestre combate={combate} onCondicoes={setModalCondicoes} />
+)}
 
 {opcoesEse.length > 0 && (
   <div className="flex flex-col gap-2">
