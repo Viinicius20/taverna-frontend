@@ -13,6 +13,7 @@ import { notificar } from '../utils/notificar';
 import MesaFeed from '../components/MesaFeed'
 import UploadFotoNpc from "../components/UploadFotoNpc";
 import FalaNpcModal from "../components/FalaNpcModal";
+import CardRaridade from "../components/CardRaridade";
 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
@@ -2270,127 +2271,144 @@ useEffect(() => {
 
   {/* Lista */}
   {loadingItems ? (
-  <div className="flex items-center gap-3 justify-center py-8">
-    <div className="w-6 h-6 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-    <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">CARREGANDO...</p>
-  </div>
-) : (
-  <div className="space-y-2">
-    {magicItems
-      .filter(i => !filtroRaridade || i.rarity === filtroRaridade)
-      .filter(i => !filtroTipo || i.type === filtroTipo)
-      .map((item, idx) => {
-        const rarCor = {
-          'Comum': '#a09880', 'Incomum': '#4a8a4a', 'Raro': '#4a6aaa',
-          'Muito Raro': '#8a4aaa', 'Lendário': '#c8a84b'
-        }[item.rarity] || '#c8a84b';
-        return (
-          <div key={idx} className="border border-[#c8a84b15] bg-[#161410] p-3 cursor-pointer hover:border-[#c8a84b30] transition-all"
-            style={{ borderRadius: '2px' }}
-            onClick={() => setItemDetalhes(itemDetalhes?.id === item.id ? null : item)}>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div className="flex flex-wrap items-center gap-2">
-                <span style={{ ...cinzel, color: rarCor }} className="text-xs w-20 shrink-0">{item.rarity}</span>
-                <span style={cinzel} className="text-[#e8e0d0] text-sm">{item.name}</span>
-                {item.is_homebrew && (
-                  <span style={cinzel} className="text-xs border border-[#b07050] text-[#b07050] px-1.5 py-0.5"
-                    style2={{ borderRadius: '2px' }}>HOMEBREW</span>
-                )}
-                {item.requires_attunement && (
-                  <span style={cinzel} className="text-xs text-[#8a7e68]">sintonização</span>
-                )}
+    <div className="flex items-center gap-3 justify-center py-8">
+      <div className="w-6 h-6 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
+      <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">CARREGANDO...</p>
+    </div>
+  ) : (
+    (() => {
+      const lista = magicItems
+        .filter(i => !filtroRaridade || i.rarity === filtroRaridade)
+        .filter(i => !filtroTipo || i.type === filtroTipo);
+      const sel = lista.find(i => i.id === itemDetalhes?.id) || null;
+
+      async function revelarItem(item) {
+        try {
+          await api.patch(`/magic-items/${item.id}/revelar`);
+          for (const p of personagens) {
+            const res = await api.get(`/characters/${p.id}`);
+            const char = res.data.data;
+            const inv = char.data?.inventory || [];
+            const temItem = inv.some(i => typeof i === 'object' && i.name === item.name);
+            if (temItem) {
+              const novoInv = inv.map(i =>
+                typeof i === 'object' && i.name === item.name
+                  ? { ...i, identificado: true, description: item.description, mechanics: item.mechanics }
+                  : i
+              );
+              await api.put(`/characters/${p.id}`, { data: { ...char.data, inventory: novoInv } });
+            }
+          }
+          setMagicItems(prev => prev.map(i => i.id === item.id ? { ...i, identificado: true } : i));
+        } catch {
+          alert('Erro ao revelar.');
+        }
+      }
+
+      return (
+        <>
+          {lista.length === 0 && (
+            <p className="text-[#8a7e68] text-sm text-center py-8">Nenhum item encontrado.</p>
+          )}
+
+          <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))' }}>
+            {lista.map(item => {
+              const extras = [
+                item.type,
+                item.requires_attunement ? 'sintonização' : null,
+                item.is_homebrew ? 'homebrew' : null,
+                !item.identificado ? '? não identificado' : null,
+              ].filter(Boolean).join(' · ');
+              return (
+                <div key={item.id}
+                  style={{ outline: sel?.id === item.id ? '2px solid var(--tav-ouro)' : 'none', outlineOffset: 2 }}>
+                  <CardRaridade
+                    nome={item.name}
+                    raridade={item.rarity}
+                    imagem={item.art_url}
+                    subtitulo={extras}
+                    descricao={limparMarkdown(item.description || '')}
+                    onClick={() => setItemDetalhes(sel?.id === item.id ? null : item)} />
+                </div>
+              );
+            })}
+          </div>
+
+          {sel && (
+            <div className="mt-4 border border-[#c8a84b30] bg-[#161410] p-4 space-y-3" style={{ borderRadius: '2px' }}>
+              <div className="flex items-start justify-between gap-3">
+                <p style={cinzel} className="text-[#f0e8d8] text-base font-semibold">{sel.name}</p>
+                <button onClick={() => setItemDetalhes(null)} aria-label="Fechar detalhes"
+                  className="text-[#8a7e68] hover:text-[#c8a84b] text-lg leading-none">×</button>
               </div>
-              <div onClick={e => e.stopPropagation()}>
-                <select onChange={e => e.target.value && entregarItemMagico(item, e.target.value)}
+
+              {!sel.identificado && (
+                <p style={cinzel} className="text-[#b07050] text-xs tracking-[2px]">
+                  ? NÃO IDENTIFICADO PELO JOGADOR
+                </p>
+              )}
+
+              {sel.description && (
+                <p className="text-[#9a8e78] text-sm font-light leading-relaxed">{limparMarkdown(sel.description)}</p>
+              )}
+
+              {sel.mechanics && (
+                <div className="bg-[#0f0e0c] border border-[#c8a84b10] px-3 py-2">
+                  <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">MECÂNICA</p>
+                  <p className="text-[#9a8e78] text-sm leading-relaxed">{limparMarkdown(sel.mechanics)}</p>
+                </div>
+              )}
+
+              <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-[#c8a84b10]">
+                <select onChange={e => e.target.value && entregarItemMagico(sel, e.target.value)}
                   defaultValue=""
-                  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#9a8e78] px-2 py-1 text-xs focus:outline-none w-full sm:w-auto"
+                  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#9a8e78] px-2 py-1 text-xs focus:outline-none"
                   style={{ borderRadius: '2px' }}>
                   <option value="">Entregar...</option>
                   {personagens.map(p => (
                     <option key={p.id} value={p.id}>{p.name}</option>
                   ))}
                 </select>
-                {!item.identificado && (
-                  <button onClick={async e => {
-                  e.stopPropagation();
-                  await api.patch(`/magic-items/${item.id}/revelar`);
-    
-                  for (const p of personagens) {
-                    const res = await api.get(`/characters/${p.id}`);
-                    const char = res.data.data;
-                    const inv = char.data?.inventory || [];
-                    const temItem = inv.some(i => typeof i === 'object' && i.name === item.name);
-                  if (temItem) {
-                    const novoInv = inv.map(i => 
-                    typeof i === 'object' && i.name === item.name
-                      ? { ...i, identificado: true, description: item.description, mechanics: item.mechanics }
-                      : i
-                    );
-                  await api.put(`/characters/${p.id}`, {
-                    data: { ...char.data, inventory: novoInv }
-                  });
-                }
-              }
-    
-                      setMagicItems(prev => prev.map(i => i.id === item.id ? { ...i, identificado: true } : i));
-                    }}
-                      className="text-xs border border-[#b07050] text-[#b07050] px-2 py-0.5 hover:bg-[#b0705020] transition-colors"
-                      style={{ ...cinzel, borderRadius: '2px' }}>
-                      REVELAR
-                    </button>
+
+                {!sel.identificado && (
+                  <button onClick={() => revelarItem(sel)}
+                    className="text-xs border border-[#b07050] text-[#b07050] px-2 py-1 hover:bg-[#b0705020] transition-colors"
+                    style={{ ...cinzel, borderRadius: '2px' }}>
+                    REVELAR
+                  </button>
                 )}
+
+                {sel.art_url ? (
+                  <button onClick={() => setImagemVisualizando({ url: sel.art_url, tipo: 'item', id: sel.id })}
+                    className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 hover:bg-[#c8a84b10] transition-colors"
+                    style={{ ...cinzel, borderRadius: '2px' }}>
+                    🖼 Ver Imagem
+                  </button>
+                ) : (
+                  <button onClick={() => setModalGerarArte({ tipo: 'item', id: sel.id })}
+                    className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 hover:bg-[#c8a84b10] transition-colors"
+                    style={{ ...cinzel, borderRadius: '2px' }}>
+                    🎨 Gerar Arte
+                  </button>
+                )}
+
+                <button onClick={async () => {
+                  if (!window.confirm('Tem certeza que deseja deletar este item?')) return;
+                  await api.delete(`/magic-items/${sel.id}`);
+                  setMagicItems(prev => prev.filter(i => i.id !== sel.id));
+                  setItemDetalhes(null);
+                }}
+                  className="text-xs border border-red-600 text-red-600 px-2 py-1 hover:bg-red-600 hover:text-white transition-colors ml-auto"
+                  style={{ ...cinzel, borderRadius: '2px' }}>
+                  🗑 DELETAR ITEM
+                </button>
               </div>
             </div>
-
-              {/* Expandido */}
-              {itemDetalhes?.id === item.id && (
-                <div className="mt-3 pt-3 border-t border-[#c8a84b10] space-y-2">
-              {item.art_url && (
-                <img src={item.art_url} alt={item.name} className="w-full max-h-48 object-cover" style={{ borderRadius: '2px' }} />
-              )}
-              {!item.identificado && (
-                <p style={cinzel} className="text-[#b07050] text-xs tracking-[2px] mb-2">? NÃO IDENTIFICADO PELO JOGADOR</p>
-              )}
-                {item.description && (
-                <p className="text-[#9a8e78] text-sm font-light leading-relaxed">{limparMarkdown(item.description)}</p>
-              )}
-              {item.mechanics && (
-                <div className="bg-[#0f0e0c] border border-[#c8a84b10] px-3 py-2">
-                <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">MECÂNICA</p>
-                <p className="text-[#9a8e78] text-sm leading-relaxed">{limparMarkdown(item.mechanics)}</p>
-                </div>
-                )}
-            <button onClick={async e => {
-              e.stopPropagation();
-              if (!window.confirm('Tem certeza que deseja deletar este item?')) return;
-              await api.delete(`/magic-items/${item.id}`);
-              setMagicItems(prev => prev.filter(i => i.id !== item.id));
-              setItemDetalhes(null);
-            }}
-              className="text-xs border border-red-600 text-red-600 px-2 py-0.5 hover:bg-red-600 hover:text-white transition-colors mt-2"
-              style={{ ...cinzel, borderRadius: '2px' }}>
-              🗑 DELETAR ITEM
-            </button>
-              {item.art_url ? (
-              <button onClick={e => { e.stopPropagation(); setImagemVisualizando({ url: item.art_url, tipo: 'item', id: item.id }); }}
-                className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 hover:bg-[#c8a84b10] transition-colors mt-2"
-                style={{ ...cinzel, borderRadius: '2px' }}>
-                🖼 Ver Imagem
-              </button>
-            ) : (
-              <button onClick={e => { e.stopPropagation(); setModalGerarArte({ tipo: 'item', id: item.id }); }}
-              className="text-[10px] border border-[#c8a84b30] text-[#c8a84b] px-2 py-0.5 hover:bg-[#c8a84b10] transition-colors mt-2"
-              style={{ ...cinzel, borderRadius: '2px' }}>
-              🎨 Gerar Arte
-            </button>
-            )}
-          </div>
           )}
-        </div>
+        </>
       );
-    })}
-  </div>
-)}
+    })()
+  )}
 </div>
 
 {/* RESUMO DE REGRAS */}
