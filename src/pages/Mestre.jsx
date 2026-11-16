@@ -23,7 +23,6 @@ import AdicionarMonstro from '../components/combate/AdicionarMonstro';
 import AdicionarPersonagens from '../components/combate/AdicionarPersonagens';
 import ModalCondicoes from '../components/combate/ModalCondicoes';
 import SessaoMestre from '../components/sessao/SessaoMestre';
-import { cinzel, crimson } from '../estilos';
 
 
 const CAMPANHA_ID = getCampanhaId();

@@ -4,7 +4,6 @@ import { confirmar } from './src/utils/notificar';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from './src/services/api';
-import { cinzel, crimson } from '../estilos';
 
 const CAMPANHA_ID = getCampanhaId();
 
