@@ -13,6 +13,7 @@ import SessaoZeroFicha from "../components/SessaoZeroFicha";
 import HistoricoFicha from '../components/HistoricoFicha';
 import { rolarNoServidor, montarExpressao } from '../services/rolagens';
 import MesaFeed from '../components/MesaFeed';
+import Retrato from '../components/Retrato';
 
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
@@ -1341,24 +1342,17 @@ async function abrirCofre(h) {
   <div className="flex items-start gap-4">
 
     
-    {/* Avatar */}
+    {/* Retrato */}
     <div className="relative flex-shrink-0">
-      <div className="w-20 h-20 rounded border border-[#c8a84b20] overflow-hidden bg-[#161410] flex items-center justify-center">
-        {personagem?.avatar_url ? (
-          <img src={personagem.avatar_url} alt="avatar"
-            className="w-full h-full object-cover" />
-        ) : (
-          <span className="text-2xl opacity-20">⚔</span>
-        )}
-      </div>
-      <label className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#c8a84b] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#e0c060] transition-colors"
+      <Retrato src={personagem?.avatar_url} nome={ficha?.name} tamanho="md" />
+      <label className="absolute -bottom-2 -right-2 w-6 h-6 bg-[#c8a84b] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#e0c060] transition-colors"
         title="Trocar foto">
         <span className="text-[#0f0e0c] text-xs">+</span>
         <input type="file" accept="image/jpeg,image/png,image/webp"
           onChange={uploadAvatar} className="hidden" />
       </label>
       {uploadandoAvatar && (
-        <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center rounded">
+        <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
           <div className="w-4 h-4 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
         </div>
       )}

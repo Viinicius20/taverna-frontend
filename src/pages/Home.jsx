@@ -34,7 +34,8 @@ export default function Home() {
 useEffect(() => {
   if (carregandoUser || !user) return;
   buscarMonstroAleatorio();
-}, [user, carregandoUser]);
+  buscarImagemRevelada();
+}, [user, carregandoUser]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function buscarMonstroAleatorio() {
     try {
