@@ -1,6 +1,7 @@
 import { getCampanhaId } from '../utils/campanha';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 
 const cinzel = { fontFamily: "'Cinzel', serif" };
 const crimson = { fontFamily: "'Crimson Pro', serif" };
@@ -43,8 +44,8 @@ useEffect(() => {
 
   async function buscarCountdown() {
     try {
-      const res = await fetch(`https://taverna-backend-eq3b.onrender.com/session-state/${CAMPANHA_ID}`);
-      const json = await res.json();
+      const res = await api.get(`/session-state/${CAMPANHA_ID}`);
+      const json = res.data;
       if (!ativo) return;
       if (json.data?.countdown_active && json.data?.countdown_end) {
         const diff = Math.floor((new Date(json.data.countdown_end) - new Date()) / 1000);

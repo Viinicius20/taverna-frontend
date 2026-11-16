@@ -38,15 +38,16 @@ useEffect(() => {
   buscarImagemRevelada();
 }, [user, carregandoUser]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  async function buscarMonstroAleatorio() {
-    try {
-      const res = await api.get('/bestiary/random-description');
-      const json = res.data;
-      setMonstro(json.data);
-    } catch {
-      setMonstro(null);
-    }
+async function buscarMonstroAleatorio(novo = false) {
+  try {
+    const res = await api.get('/bestiary/random-description', {
+      params: novo ? { novo: true } : {},
+    });
+    setMonstro(res.data.data);
+  } catch {
+    if (!novo) setMonstro(null);   
   }
+}
 
   useEffect(() => {
   if (!isMestre) return;
@@ -252,7 +253,7 @@ async function buscarImagemRevelada() {
               <p style={cinzel} className="text-[#8a7e68] text-xs">INVOCANDO...</p>
             </div>
           )}
-          <button onClick={buscarMonstroAleatorio}
+          <button onClick={() => buscarMonstroAleatorio(true)}
             className="mt-6 text-xs text-[#8a7e68] hover:text-[#c8a84b] transition-colors"
             style={cinzel}>
             ↻ Outro monstro
