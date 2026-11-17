@@ -26,6 +26,11 @@ export default function Atlas() {
   const [localAberto, setLocalAberto] = useState(null);
   const [regiaoAberta, setRegiaoAberta] = useState(null);
   const [descEdit, setDescEdit] = useState('');
+  const [inclinado, setInclinado] = useState(true); 
+  const [hoverId, setHoverId] = useState(null);
+  const [dim, setDim] = useState({ w: 100, h: 60 });
+  const [imgEdit, setImgEdit] = useState('');
+  const INCLINACAO = 35;
 
   function carregarDescobertas() {
     if (!isMestre) return;
@@ -109,11 +114,20 @@ export default function Atlas() {
   setGerando(false);
 }
 
-  function abrirRegiao(g) {
-    setRegiaoAberta(g.id);
-    setLocalAberto(null);
-    setDescEdit(g.descricao || '');
-  }
+function abrirRegiao(g) {
+  setRegiaoAberta(g.id);
+  setLocalAberto(null);
+  setDescEdit(g.descricao || '');
+  setImgEdit(g.imagem_url || '');
+}
+
+async function salvarImagem() {
+  const url = imgEdit.trim();
+  try {
+    await api.patch(`/regioes/${regiaoAberta}`, { imagem_url: url });
+    setRegioes(rs => rs.map(g => (g.id === regiaoAberta ? { ...g, imagem_url: url } : g)));
+  } catch { alert('Erro ao salvar a imagem.'); }
+}
 
   function abrirLocal(id) {
     setLocalAberto(id);
@@ -183,6 +197,15 @@ export default function Atlas() {
                 ＋ Nova região
               </button>
             )}
+
+            {mapaUrl && (
+              <button onClick={() => setInclinado(v => !v)}
+                className={`${btn} mb-4 ${inclinado ? 'border-[#c8a84b] text-[#c8a84b]' : 'border-[#c8a84b30] text-[#9a8e78]'}`}
+                style={{ ...cinzel, ...radius }}>
+                🧊 {inclinado ? 'Mapa plano' : 'Inclinar mapa'}
+              </button>
+            )}
+
             {desenhando && (
               <>
                 <button onClick={() => setDesenhando(d => d.slice(0, -1))} disabled={desenhando.length === 0}
@@ -199,61 +222,129 @@ export default function Atlas() {
         {carregado && !mapaUrl && (
           <p className="text-[#8a7e68] text-sm text-center py-12">O mapa ainda não foi revelado.</p>
         )}
+        {mapaUrl && (() => {
+          const tilt = inclinado && !modoClique;      
+          const k = dim.h / dim.w;                    
+          const H = 100 * k;
+          const PROF = 1.8;                           
+          const CAMADAS = 8;
 
-        {mapaUrl && (
-          <div className="relative w-full border border-[#c8a84b30] overflow-hidden"
-            style={{ ...radius, cursor: modoClique ? 'crosshair' : 'default' }}
-            onClick={aoClicarNoMapa}>
-            <img src={mapaUrl} alt="Mapa" className="block w-full select-none" draggable={false} />
+          const pts = g => (g.pontos || []).map(([x, y]) => `${x},${y * k}`).join(' ');
+          const caixa = g => {
+            const xs = (g.pontos || []).map(p => p[0]);
+            const ys = (g.pontos || []).map(p => p[1] * k);
+            return { x0: Math.min(...xs), y0: Math.min(...ys), x1: Math.max(...xs), y1: Math.max(...ys) };
+          };
+          const centroY = g => {
+            const ys = (g.pontos || []).map(p => p[1]);
+            return ys.length ? ys.reduce((a, b) => a + b, 0) / ys.length : 0;
+          };
+          const prioridade = g => (regiaoAberta === g.id ? 2 : hoverId === g.id ? 1 : 0);
+          const ordem = [...regioes].sort((a, b) => prioridade(a) - prioridade(b) || centroY(a) - centroY(b));
 
-            {/* regiões */}
-            <svg viewBox="0 0 100 100" preserveAspectRatio="none"
-              className="absolute inset-0 w-full h-full"
-              style={{ pointerEvents: modoClique ? 'none' : 'auto' }}>
-              {regioes.map(g => (
-                <polygon key={g.id}
-                  points={(g.pontos || []).map(p => p.join(',')).join(' ')}
-                  vectorEffect="non-scaling-stroke"
-                  onClick={e => { e.stopPropagation(); abrirRegiao(g); }}
-                  style={{
-                    cursor: 'pointer',
-                    fill: regiaoAberta === g.id ? 'rgba(200,168,75,0.28)' : 'rgba(200,168,75,0.10)',
-                    stroke: '#c8a84b',
-                    strokeWidth: regiaoAberta === g.id ? 2 : 1,
-                  }} />
-              ))}
-              {desenhando?.length > 1 && (
-                <polyline points={desenhando.map(p => p.join(',')).join(' ')}
-                  vectorEffect="non-scaling-stroke"
-                  style={{ fill: 'none', stroke: '#f0e8d8', strokeWidth: 2, strokeDasharray: '4 3' }} />
-              )}
-            </svg>
+          return (
+            <div style={{ perspective: '1400px', padding: tilt ? '2rem 0 3rem' : 0, transition: 'padding 0.6s ease' }}>
+              <div className="relative w-full border border-[#c8a84b30]"
+                style={{
+                  ...radius,
+                  cursor: modoClique ? 'crosshair' : 'default',
+                  transformStyle: 'preserve-3d',
+                  transform: tilt ? `rotateX(${INCLINACAO}deg)` : 'none',
+                  transformOrigin: '50% 100%',
+                  transition: 'transform 0.6s ease, box-shadow 0.6s ease',
+                  boxShadow: tilt ? '0 50px 60px -20px rgba(0,0,0,0.8)' : 'none',
+                }}
+                onClick={aoClicarNoMapa}>
+                <img src={mapaUrl} alt="Mapa" className="block w-full select-none" draggable={false}
+                  onLoad={e => setDim({ w: e.target.naturalWidth, h: e.target.naturalHeight })} />
 
-            {/* pontos do desenho */}
-            {desenhando?.map(([x, y], i) => (
-              <span key={i} className="absolute w-2 h-2 rounded-full bg-[#f0e8d8] pointer-events-none"
-                style={{ left: `${x}%`, top: `${y}%`, transform: 'translate(-50%, -50%)' }} />
-            ))}
+                {/* regiões em relevo */}
+                <svg viewBox={`0 0 100 ${H}`} className="absolute inset-0 w-full h-full"
+                  style={{ pointerEvents: modoClique ? 'none' : 'auto' }}>
+                  {ordem.map(g => {
+                    const aberta = regiaoAberta === g.id;
+                    const lift = aberta ? 1.6 : hoverId === g.id ? 0.8 : 0;
+                    const b = caixa(g);
+                    const p = pts(g);
+                    return (
+                      <g key={g.id}>
+                        {/* lados da peça: camadas empilhadas, a base fica fixa e o topo sobe */}
+                        {Array.from({ length: CAMADAS + 1 }, (_, i) => (
+                          <polygon key={i} points={p}
+                            style={{
+                              fill: i === CAMADAS ? '#14100a' : '#4a3b1e',
+                              transform: `translateY(${-lift + (i * (PROF + lift)) / CAMADAS}px)`,
+                              transition: 'transform 0.25s ease',
+                              pointerEvents: 'none',
+                            }} />
+                        ))}
 
-            {/* pins dos locais */}
-            {noMapa.map(p => (
-              <button key={p.id} title={p.nome}
-                onClick={e => { e.stopPropagation(); if (!modoClique) abrirLocal(p.id); }}
-                className="absolute text-2xl leading-none"
-                style={{ left: `${p.x}%`, top: `${p.y}%`, transform: 'translate(-50%, -100%)',
-                         filter: localAberto === p.id ? 'drop-shadow(0 0 6px #c8a84b)' : 'drop-shadow(0 1px 2px #000)' }}>
-                📍
-              </button>
-            ))}
+                        {/* topo da peça */}
+                        <g style={{ transform: `translateY(${-lift}px)`, transition: 'transform 0.25s ease' }}>
+                          <clipPath id={`clip-${g.id}`}><polygon points={p} /></clipPath>
+                          <g clipPath={`url(#clip-${g.id})`}>
+                            {g.imagem_url ? (
+                              <image href={g.imagem_url} x={b.x0} y={b.y0}
+                                width={b.x1 - b.x0} height={b.y1 - b.y0} preserveAspectRatio="xMidYMid slice" />
+                            ) : (
+                              <image href={mapaUrl} x="0" y="0" width="100" height={H} preserveAspectRatio="none" />
+                            )}
+                          </g>
+                          <polygon points={p} vectorEffect="non-scaling-stroke"
+                            onClick={e => { e.stopPropagation(); abrirRegiao(g); }}
+                            onMouseEnter={() => setHoverId(g.id)}
+                            onMouseLeave={() => setHoverId(null)}
+                            style={{
+                              cursor: 'pointer',
+                              fill: aberta ? 'rgba(200,168,75,0.22)' : hoverId === g.id ? 'rgba(200,168,75,0.14)' : 'rgba(0,0,0,0)',
+                              stroke: '#c8a84b',
+                              strokeWidth: aberta ? 2 : 1,
+                              pointerEvents: modoClique ? 'none' : 'all',
+                            }} />
+                        </g>
+                      </g>
+                    );
+                  })}
 
-            {modoClique && (
-              <p style={cinzel}
-                className="absolute top-2 left-1/2 -translate-x-1/2 bg-[#0f0e0c] border border-[#c8a84b] text-[#c8a84b] text-xs px-3 py-1 pointer-events-none whitespace-nowrap">
-                {desenhando ? `CLIQUE PARA MARCAR OS PONTOS (${desenhando.length})` : 'CLIQUE NO MAPA PARA POSICIONAR'}
-              </p>
-            )}
-          </div>
-        )}
+                  {desenhando?.length > 1 && (
+                    <polyline points={desenhando.map(([x, y]) => `${x},${y * k}`).join(' ')}
+                      vectorEffect="non-scaling-stroke"
+                      style={{ fill: 'none', stroke: '#f0e8d8', strokeWidth: 2, strokeDasharray: '4 3' }} />
+                  )}
+                </svg>
+
+                {/* pontos do desenho */}
+                {desenhando?.map(([x, y], i) => (
+                  <span key={i} className="absolute w-2 h-2 rounded-full bg-[#f0e8d8] pointer-events-none"
+                    style={{ left: `${x}%`, top: `${y}%`, transform: 'translate(-50%, -50%)' }} />
+                ))}
+
+                {/* pins: em pé mesmo com o mapa inclinado */}
+                {noMapa.map(p => (
+                  <button key={p.id} title={p.nome}
+                    onClick={e => { e.stopPropagation(); if (!modoClique) abrirLocal(p.id); }}
+                    className="absolute text-2xl leading-none"
+                    style={{
+                      left: `${p.x}%`, top: `${p.y}%`,
+                      transform: `translate(-50%, -100%) rotateX(${tilt ? -INCLINACAO : 0}deg)`,
+                      transformOrigin: '50% 100%',
+                      transition: 'transform 0.6s ease',
+                      filter: localAberto === p.id ? 'drop-shadow(0 0 6px #c8a84b)' : 'drop-shadow(0 1px 2px #000)',
+                    }}>
+                    📍
+                  </button>
+                ))}
+
+                {modoClique && (
+                  <p style={cinzel}
+                    className="absolute top-2 left-1/2 -translate-x-1/2 bg-[#0f0e0c] border border-[#c8a84b] text-[#c8a84b] text-xs px-3 py-1 pointer-events-none whitespace-nowrap">
+                    {desenhando ? `CLIQUE PARA MARCAR OS PONTOS (${desenhando.length})` : 'CLIQUE NO MAPA PARA POSICIONAR'}
+                  </p>
+                )}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* card da região */}
         {regiao && (
@@ -283,6 +374,25 @@ export default function Atlas() {
               </div>
             ) : (
               regiao.descricao && <p className="text-[#9a8e78] text-sm leading-relaxed font-light">{regiao.descricao}</p>
+            )}
+
+            {regiao.imagem_url && (
+              <img src={regiao.imagem_url} alt={regiao.nome}
+                className="w-full max-h-80 object-cover border border-[#c8a84b20]" style={radius} />
+            )}
+
+            {isMestre && (
+              <div className="flex gap-2">
+                <input value={imgEdit} onChange={e => setImgEdit(e.target.value)}
+                  placeholder="Endereço de uma imagem da Galeria (aparência da região)"
+                  aria-label="Imagem da região"
+                  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-1 flex-1 text-xs focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
+                  style={radius} />
+                <button onClick={salvarImagem} disabled={imgEdit.trim() === (regiao.imagem_url || '')}
+                  className={`${btn} border-[#c8a84b30] text-[#c8a84b]`} style={{ ...cinzel, ...radius }}>
+                  Salvar
+                </button>
+              </div>
             )}
 
             <div>
