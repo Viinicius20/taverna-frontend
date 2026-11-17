@@ -11,13 +11,13 @@ const radius = { borderRadius: '2px' };
 export default function Atlas() {
   const navigate = useNavigate();
   const campanha = getCampanhaId();
-  const isMestre = user?.role === 'mestre';
   const [mapaUrl, setMapaUrl] = useState(null);
   const [pins, setPins] = useState([]);
   const [carregado, setCarregado] = useState(false);
   const [editando, setEditando] = useState(null);   
   const [aberto, setAberto] = useState(null);
   const { user } = useUser();
+  const isMestre = user?.role === 'mestre';
 
 useEffect(() => {
   if (!user) return;
