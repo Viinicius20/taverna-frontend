@@ -1365,6 +1365,10 @@ async function abrirCofre(h) {
                 <span style={{ color: 'var(--cor-classe, #c8a84b)' }} className="mr-2">{getIconeClasse(classeParaTema)}</span>
                 {ficha.name}
               </h1>
+              <button onClick={() => navigate(`/personagens/${id}/perfil`)} style={cinzel}
+                className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors">
+                🖼 Ver perfil
+              </button>
               <p className="text-[#9a8e78] mt-1">{[
           ficha.race,
           ficha.classes?.length
