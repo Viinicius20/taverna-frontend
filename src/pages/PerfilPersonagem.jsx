@@ -118,6 +118,19 @@ export default function PerfilPersonagem() {
     'História',
   ].filter(Boolean);
 
+  async function enviarRetrato(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  const form = new FormData();
+  form.append('file', file);
+  try {
+    const res = await api.post(`/characters/${id}/retrato`, form);
+    setChar(p => ({ ...p, retrato_url: res.data.url }));
+  } catch {
+    alert('Não foi possível enviar o retrato.');
+  }
+}
+
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
       <nav className="flex items-center justify-between px-6 py-4 border-b border-[#c8a84b20]">
@@ -130,7 +143,7 @@ export default function PerfilPersonagem() {
 
         {/* Coluna do retrato */}
         <div className="space-y-3">
-          <RetratoCanvas src={char.avatar_url} nome={char.name} subtitulo={subtitulo} />
+          <RetratoCanvas src={char.retrato_url || char.avatar_url} nome={char.name} subtitulo={subtitulo} />
           {d.condicoes?.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {d.condicoes.map(cond => (
@@ -139,6 +152,10 @@ export default function PerfilPersonagem() {
                   {cond}
                 </span>
               ))}
+              <label className="block text-center border border-[#c8a84b30] text-[#8a7e68] py-1 text-xs cursor-pointer hover:text-[#c8a84b] transition-colors">
+                🖼 {char.retrato_url ? 'Trocar retrato' : 'Adicionar retrato'}
+                <input type="file" accept="image/*" className="hidden" onChange={enviarRetrato} />
+              </label>
             </div>
           )}
         </div>
