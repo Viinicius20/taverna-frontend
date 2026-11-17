@@ -78,6 +78,7 @@ return (
               <Route path="/relacoes" element={<Relacoes />} />
               <Route path="/sessao-zero" element={<SessaoZero />} />
               <Route path="/tesouro" element={<Tesouro />} />
+              <Route path="/atlas" element={<Atlas />} />
               <Route path="/personagens/:id/perfil" element={<PerfilPersonagem />} />
               {process.env.NODE_ENV !== 'production' && <Route path="/erro-teste" element={<Quebra />} />}
               {process.env.NODE_ENV !== 'production' && <Route path="/cards-teste" element={<CardsTeste />} />}
