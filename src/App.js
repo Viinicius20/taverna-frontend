@@ -32,6 +32,7 @@ import CardsTeste from './pages/CardsTeste';
 import GuardaBackend from './components/GuardaBackend';
 import Tesouro from './pages/Tesouro';
 import PerfilPersonagem from './pages/PerfilPersonagem';
+import Atlas from './pages/Atlas';
 
 instalarAlertGlobal();
 

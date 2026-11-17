@@ -15,7 +15,7 @@ export default function Atlas() {
   const [mapaUrl, setMapaUrl] = useState(null);
   const [pins, setPins] = useState([]);
   const [carregado, setCarregado] = useState(false);
-  const [editando, setEditando] = useState(null);   // id do local que o mestre está posicionando
+  const [editando, setEditando] = useState(null);   
   const [aberto, setAberto] = useState(null);
   const { user } = useUser();
 
