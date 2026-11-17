@@ -6,6 +6,7 @@ import api from '../services/api';
 import { notificar, confirmar } from '../utils/notificar';
 import MapaRelacoes from '../components/MapaRelacoes';
 import { VINCULOS } from '../constants/vinculos';
+import LogoTaverna from '../components/LogoTaverna';
 
 
 const CAMPANHA_ID = getCampanhaId();
@@ -92,7 +93,7 @@ useEffect(() => { carregarGrafo(); }, [carregarGrafo]);
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
       <nav className="flex items-center justify-between px-8 py-4 border-b border-[#c8a84b20]">
-        <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold">⚔ TAVERNA</span>
+        <LogoTaverna />
         <button onClick={() => navigate('/mestre')} style={cinzel}
           className="text-[#6a6050] text-sm hover:text-[#c8a84b] transition-colors">← Mestre</button>
       </nav>
