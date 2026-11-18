@@ -6,6 +6,7 @@ import { getCampanhaId } from '../utils/campanha';
 import { useUser } from '../context/UserContext';
 import LogoTaverna from '../components/LogoTaverna';
 import BotaoRevelar from '../components/BotaoRevelar';
+import SeletorGaleria from '../components/SeletorGaleria';
 
 const radius = { borderRadius: '2px' };
 const btn = 'text-xs border px-3 py-1 transition-colors disabled:opacity-40';
@@ -31,6 +32,7 @@ export default function Atlas() {
   const [dim, setDim] = useState({ w: 100, h: 60 });
   const [imgEdit, setImgEdit] = useState('');
   const INCLINACAO = 35;
+  const [galeria, setGaleria] = useState(null);
 
   function carregarDescobertas() {
     if (!isMestre) return;
@@ -151,6 +153,23 @@ async function salvarImagem() {
     } catch { alert('Erro ao apagar a região.'); }
   }
 
+  async function usarMapaDaGaleria(url) {
+  try {
+    await api.put(`/mapa/${campanha}/url`, { url });
+    setMapaUrl(url);
+  } catch { alert('Não foi possível usar essa imagem como mapa.'); }
+  setGaleria(null);
+}
+
+async function usarImagemNaRegiao(url) {
+  try {
+    await api.patch(`/regioes/${regiaoAberta}`, { imagem_url: url });
+    setRegioes(rs => rs.map(g => (g.id === regiaoAberta ? { ...g, imagem_url: url } : g)));
+    setImgEdit(url);
+  } catch { alert('Não foi possível usar essa imagem na região.'); }
+  setGaleria(null);
+}
+
   async function vincular(localId, regiaoId) {
     if (!regiaoId) return;
     try {
@@ -185,9 +204,9 @@ async function salvarImagem() {
               🗺 {mapaUrl ? 'Trocar mapa' : 'Enviar mapa'}
               <input type="file" accept="image/*" className="hidden" onChange={enviarMapa} />
             </label>
-            <button onClick={gerarComIA} disabled={gerando}
-                className={`${btn} border-[#a86aa850] text-[#a86aa8]`} style={{ ...cinzel, ...radius }}>
-                {gerando ? '⟳ Gerando...' : '✨ Gerar com IA'}
+            <button onClick={() => setGaleria('mapa')}
+              className={`${btn} border-[#c8a84b30] text-[#c8a84b] hover:bg-[#c8a84b10]`} style={{ ...cinzel, ...radius }}>
+              🖼 Mapa da Galeria
             </button>
 
             {mapaUrl && !desenhando && (
@@ -195,14 +214,6 @@ async function salvarImagem() {
                 className={`${btn} border-[#c8a84b30] text-[#c8a84b] hover:bg-[#c8a84b10]`}
                 style={{ ...cinzel, ...radius }}>
                 ＋ Nova região
-              </button>
-            )}
-
-            {mapaUrl && (
-              <button onClick={() => setInclinado(v => !v)}
-                className={`${btn} mb-4 ${inclinado ? 'border-[#c8a84b] text-[#c8a84b]' : 'border-[#c8a84b30] text-[#9a8e78]'}`}
-                style={{ ...cinzel, ...radius }}>
-                🧊 {inclinado ? 'Mapa plano' : 'Inclinar mapa'}
               </button>
             )}
 
@@ -219,8 +230,18 @@ async function salvarImagem() {
           </div>
         )}
 
+        {mapaUrl && (
+          <button onClick={() => setInclinado(v => !v)}
+            className={`${btn} mb-4 ${inclinado ? 'border-[#c8a84b] text-[#c8a84b]' : 'border-[#c8a84b30] text-[#9a8e78]'}`}
+            style={{ ...cinzel, ...radius }}>
+            🧊 {inclinado ? 'Mapa plano' : 'Inclinar mapa'}
+          </button>
+        )}
+
         {carregado && !mapaUrl && (
-          <p className="text-[#8a7e68] text-sm text-center py-12">O mapa ainda não foi revelado.</p>
+          <p className="text-[#8a7e68] text-sm text-center py-12">
+            {isMestre ? 'Nenhum mapa ainda. Envie uma imagem ou escolha da Galeria.' : 'O mapa ainda não foi revelado.'}
+          </p>
         )}
         {mapaUrl && (() => {
           const tilt = inclinado && !modoClique;      
@@ -355,6 +376,10 @@ async function salvarImagem() {
                 <div className="flex gap-2 items-center">
                   <BotaoRevelar tipo="regiao" entidadeId={regiao.id} campanhaId={campanha}
                     descoberta={descDe('regiao', regiao.id)} onMudou={carregarDescobertas} />
+                  <button onClick={gerarComIA} disabled={gerando}
+                    className={`${btn} border-[#a86aa850] text-[#a86aa8]`} style={{ ...cinzel, ...radius }}>
+                    {gerando ? '⟳ Gerando...' : '✨ Gerar com IA'}
+                  </button>
                   <button onClick={() => apagarRegiao(regiao.id)}
                     className={`${btn} border-red-600 text-red-600`} style={{ ...cinzel, ...radius }}>🗑</button>
                 </div>
@@ -391,6 +416,10 @@ async function salvarImagem() {
                 <button onClick={salvarImagem} disabled={imgEdit.trim() === (regiao.imagem_url || '')}
                   className={`${btn} border-[#c8a84b30] text-[#c8a84b]`} style={{ ...cinzel, ...radius }}>
                   Salvar
+                </button>
+                <button onClick={() => setGaleria('regiao')}
+                  className={`${btn} border-[#c8a84b30] text-[#c8a84b]`} style={{ ...cinzel, ...radius }}>
+                  🖼 Galeria
                 </button>
               </div>
             )}
@@ -436,19 +465,19 @@ async function salvarImagem() {
             </div>
             {local.descricao && <p className="text-[#9a8e78] text-sm leading-relaxed font-light mt-3">{local.descricao}</p>}
 
-            {isMestre && regioes.length > 0 && (
-              <div className="mt-3 pt-3 border-t border-[#c8a84b10]">
-                <label style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mr-2">REGIÃO</label>
-                <select value={local.regiao_id || ''} onChange={e => vincular(local.id, e.target.value)}
-                  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#9a8e78] px-2 py-1 text-xs focus:outline-none"
-                  style={radius}>
-                  <option value="">— escolher —</option>
-                  {regioes.map(g => <option key={g.id} value={g.id}>{g.nome}</option>)}
-                </select>
-              </div>
-            )}
-          </div>
-        )}
+                    {isMestre && regioes.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-[#c8a84b10]">
+                        <label style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mr-2">REGIÃO</label>
+                        <select value={local.regiao_id || ''} onChange={e => vincular(local.id, e.target.value)}
+                          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#9a8e78] px-2 py-1 text-xs focus:outline-none"
+                          style={radius}>
+                          <option value="">— escolher —</option>
+                          {regioes.map(g => <option key={g.id} value={g.id}>{g.nome}</option>)}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                )}
 
         {/* locais sem posição (mestre) */}
         {isMestre && mapaUrl && semPosicao.length > 0 && (
@@ -466,6 +495,11 @@ async function salvarImagem() {
           </div>
         )}
       </div>
+      {galeria && (
+        <SeletorGaleria campanhaId={campanha}
+          onEscolher={galeria === 'mapa' ? usarMapaDaGaleria : usarImagemNaRegiao}
+          onFechar={() => setGaleria(null)} />
+      )}
     </div>
   );
 }
