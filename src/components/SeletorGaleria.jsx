@@ -24,7 +24,8 @@ export default function SeletorGaleria({ campanhaId, onEscolher, onFechar }) {
     api.get(`/gallery?campaign_id=${campanhaId}`)
       .then(r => {
         const lista = Array.isArray(r.data?.data) ? r.data.data : [];
-        if (lista[0] && !urlDe(lista[0])) console.warn('Galeria: não achei o campo da imagem em', lista[0]);
+        if (lista.length && !lista.some(urlDe)) console.warn('Galeria: nenhum item com imagem', lista[0]);
+        console.info('Tipos da Galeria:', [...new Set(lista.map(i => i.type))]);
         setItens(lista);
       })
       .catch(() => setItens([]));
