@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { cinzel, crimson } from '../estilos';
 import { getCampanhaId } from '../utils/campanha';
+import { confirmar } from '../utils/notificar';
 import { useUser } from '../context/UserContext';
 import LogoTaverna from '../components/LogoTaverna';
 import BotaoRevelar from '../components/BotaoRevelar';
@@ -15,6 +16,57 @@ const ALT = 56.25;        // o mundo é 16:9
 const INCLINACAO = 35;
 const PROF = 1.6;         // espessura das terras
 const CAMADAS = 8;
+
+// ---------- ambientes: cada um muda cor, textura, relevo e lados da terra ----------
+// r/g/b = degradê do ruído (do claro ao escuro); freq = tamanho da textura;
+// espessura = quanto a terra "sobe" do mar (oceano é quase plano)
+
+const AMBIENTES = {
+  floresta: {
+    label: 'Floresta', emoji: '🌲',
+    r: '0.80 0.68 0.42 0.20', g: '0.66 0.62 0.52 0.38', b: '0.42 0.30 0.20 0.14',
+    freq: 0.3, oitavas: 4, relevo: 5, espessura: 1,
+    lado: '#a8834a', base: '#2e2312', borda: '#c8a84b',
+  },
+  deserto: {
+    label: 'Deserto', emoji: '🏜️',
+    r: '0.97 0.91 0.80 0.68', g: '0.87 0.75 0.61 0.46', b: '0.64 0.47 0.33 0.22',
+    freq: 0.16, oitavas: 4, relevo: 4, espessura: 1,
+    lado: '#c79a55', base: '#5a4220', borda: '#e0b860',
+  },
+  neve: {
+    label: 'Neve', emoji: '❄️',
+    r: '0.98 0.90 0.78 0.64', g: '0.99 0.94 0.87 0.77', b: '1 0.98 0.95 0.90',
+    freq: 0.22, oitavas: 4, relevo: 5, espessura: 1,
+    lado: '#b8c8d8', base: '#4a5a6a', borda: '#dff1ff',
+  },
+  fogo: {
+    label: 'Fogo', emoji: '🔥',
+    r: '0.16 0.38 0.82 1', g: '0.10 0.12 0.30 0.62', b: '0.10 0.08 0.08 0.10',
+    freq: 0.25, oitavas: 5, relevo: 6, espessura: 1.2,
+    lado: '#3a2218', base: '#150c08', borda: '#ff7a3c',
+  },
+  pantano: {
+    label: 'Pântano', emoji: '🐊',
+    r: '0.34 0.26 0.19 0.12', g: '0.42 0.37 0.30 0.22', b: '0.24 0.17 0.12 0.10',
+    freq: 0.35, oitavas: 4, relevo: 3, espessura: 0.7,
+    lado: '#4c4a2c', base: '#1c1a0e', borda: '#8aa05a',
+  },
+  montanha: {
+    label: 'Montanha', emoji: '⛰️',
+    r: '0.84 0.62 0.44 0.28', g: '0.82 0.60 0.43 0.27', b: '0.80 0.60 0.44 0.30',
+    freq: 0.4, oitavas: 5, relevo: 9, espessura: 1.8,
+    lado: '#7a7468', base: '#26231e', borda: '#c9c2b2',
+  },
+  oceano: {
+    label: 'Oceano', emoji: '🌊',
+    r: '0.12 0.14 0.18 0.24', g: '0.32 0.40 0.50 0.62', b: '0.52 0.60 0.70 0.82',
+    freq: 0.08, oitavas: 3, relevo: 1.5, espessura: 0.25,
+    lado: '#1d4a66', base: '#0b2233', borda: '#6fb7d6',
+  },
+};
+
+const ambienteDe = chave => AMBIENTES[chave] || AMBIENTES.floresta;
 
 // ---------- forma das terras: sempre a mesma para a mesma semente ----------
 
@@ -57,11 +109,23 @@ function geometria(g) {
   };
 }
 
-// textura de terreno: ruído -> degradê areia/verde -> iluminação para dar relevo
-function FiltroTerreno({ id, semente }) {
+// o ponto (x, y) está dentro do polígono? (usado para saber em qual terra o clique caiu)
+function dentro([x, y], poly) {
+  let d = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i];
+    const [xj, yj] = poly[j];
+    if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) d = !d;
+  }
+  return d;
+}
+
+// textura de terreno: ruído -> degradê do ambiente -> iluminação para dar relevo
+function FiltroTerreno({ id, semente, ambiente }) {
+  const a = ambienteDe(ambiente);
   return (
     <filter id={id} x="0%" y="0%" width="100%" height="100%" colorInterpolationFilters="sRGB">
-      <feTurbulence type="fractalNoise" baseFrequency="0.3" numOctaves="4" seed={(semente || 1) % 997} result="ruido" />
+      <feTurbulence type="fractalNoise" baseFrequency={a.freq} numOctaves={a.oitavas} seed={(semente || 1) % 997} result="ruido" />
       <feColorMatrix in="ruido" type="matrix" result="cinza"
         values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 0 1" />
       <feComponentTransfer in="cinza" result="contraste">
@@ -70,13 +134,13 @@ function FiltroTerreno({ id, semente }) {
         <feFuncB type="linear" slope="2.6" intercept="-0.8" />
       </feComponentTransfer>
       <feComponentTransfer in="contraste" result="cor">
-        <feFuncR type="table" tableValues="0.80 0.68 0.42 0.20" />
-        <feFuncG type="table" tableValues="0.66 0.62 0.52 0.38" />
-        <feFuncB type="table" tableValues="0.42 0.30 0.20 0.14" />
+        <feFuncR type="table" tableValues={a.r} />
+        <feFuncG type="table" tableValues={a.g} />
+        <feFuncB type="table" tableValues={a.b} />
       </feComponentTransfer>
       <feColorMatrix in="contraste" type="matrix" result="altura"
         values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1 0 0 0 0" />
-      <feDiffuseLighting in="altura" surfaceScale="5" diffuseConstant="1.4" lightingColor="#ffffff" result="luz">
+      <feDiffuseLighting in="altura" surfaceScale={a.relevo} diffuseConstant="1.4" lightingColor="#ffffff" result="luz">
         <feDistantLight azimuth="225" elevation="55" />
       </feDiffuseLighting>
       <feBlend in="cor" in2="luz" mode="multiply" />
@@ -98,12 +162,14 @@ export default function Atlas() {
   const [hoverId, setHoverId] = useState(null);
   const [regiaoAberta, setRegiaoAberta] = useState(null);
   const [localAberto, setLocalAberto] = useState(null);
-  const [movendo, setMovendo] = useState(null);     // terra sendo movida
-  const [editando, setEditando] = useState(null);   // local sendo posicionado
+  const [movendo, setMovendo] = useState(null);       // terra sendo arrastada
+  const [editando, setEditando] = useState(null);     // local sendo posicionado
+  const [escolhendo, setEscolhendo] = useState(null); // terra esperando um 📍 que a descreva
   const [nomeEdit, setNomeEdit] = useState('');
   const [descEdit, setDescEdit] = useState('');
   const [gerando, setGerando] = useState(false);
   const [galeria, setGaleria] = useState(false);
+  const arrasto = useRef(null);
 
   function carregarDescobertas() {
     if (!isMestre) return;
@@ -129,6 +195,13 @@ export default function Atlas() {
   const descDe = (tipo, id) =>
     descobertas.find(d => d.tipo === tipo && String(d.entidade_id) === String(id) && !d.personagem_id);
 
+  function cancelarModos() {
+    arrasto.current = null;
+    setMovendo(null);
+    setEditando(null);
+    setEscolhendo(null);
+  }
+
   // ---------- terras ----------
 
   function ajustarLocal(id, campos) {
@@ -146,7 +219,7 @@ export default function Atlas() {
     const raio = +(5 + Math.random() * 8).toFixed(1);
     let cx = LARG / 2;
     let cy = ALT / 2;
-    for (let t = 0; t < 40; t++) {   // procura um canto livre, sem encostar nas outras
+    for (let t = 0; t < 60; t++) {   // procura um canto livre, sem encostar nas outras
       const x = raio * 1.6 + Math.random() * (LARG - raio * 3.2);
       const y = raio * 1.2 + Math.random() * (ALT - raio * 2.4);
       if (regioes.every(g => g.cx == null || Math.hypot(g.cx - x, g.cy - y) > (g.raio + raio) * 1.5)) {
@@ -158,8 +231,9 @@ export default function Atlas() {
         campaign_id: campanha, nome: nome.trim(),
         cx: +cx.toFixed(2), cy: +cy.toFixed(2), raio,
         semente: Math.floor(Math.random() * 1000000),
+        ambiente: 'floresta',
       });
-      const nova = { ...res.data.data, descoberta: true, descricao: '', subtitulo: '' };
+      const nova = { ambiente: 'floresta', ...res.data.data, descoberta: true, descricao: '', subtitulo: '' };
       setRegioes(rs => [...rs, nova]);
       abrirRegiao(nova);
     } catch { alert('Erro ao criar a terra.'); }
@@ -195,11 +269,17 @@ export default function Atlas() {
     await salvarCampos(regiaoAberta, { semente });
   }
 
-  async function vincularLocal(localId) {
-    if (!localId) return;
+  async function trocarAmbiente(ambiente) {
+    ajustarLocal(regiaoAberta, { ambiente });
+    await salvarCampos(regiaoAberta, { ambiente });
+  }
+
+  // liga um local à terra e importa descrição e subtítulo dele
+  async function vincularLocal(regiaoId, localId) {
+    if (!regiaoId || !localId) return;
     const l = pins.find(p => p.id === localId);
-    ajustarLocal(regiaoAberta, { local_id: localId, descricao: l?.descricao || '', subtitulo: l?.subtitulo || '' });
-    await salvarCampos(regiaoAberta, { local_id: localId });
+    ajustarLocal(regiaoId, { local_id: localId, descricao: l?.descricao || '', subtitulo: l?.subtitulo || '' });
+    await salvarCampos(regiaoId, { local_id: localId });
   }
 
   async function escolherFoto(url) {
@@ -214,7 +294,7 @@ export default function Atlas() {
   }
 
   async function apagarRegiao(id) {
-    if (!window.confirm('Apagar esta terra? Os locais continuam existindo.')) return;
+    if (!(await confirmar('Apagar esta terra? Os locais continuam existindo.'))) return;
     try {
       await api.delete(`/regioes/${id}`);
       setRegioes(rs => rs.filter(g => g.id !== id));
@@ -248,30 +328,87 @@ export default function Atlas() {
     } catch { alert('Erro ao vincular o local.'); }
   }
 
-  async function aoClicarNoMundo(e) {
-    if (!movendo && !editando) return;
+  // ---------- cliques e arrasto no mapa ----------
+
+  function pontoNoMundo(e) {
     const r = e.currentTarget.getBoundingClientRect();
     const px = ((e.clientX - r.left) / r.width) * 100;    // % da largura
     const py = ((e.clientY - r.top) / r.height) * 100;    // % da altura
+    return { px, py, x: px, y: (py / 100) * ALT };        // x/y em unidades do SVG
+  }
 
-    if (movendo) {
-      const campos = { cx: +px.toFixed(2), cy: +((py / 100) * ALT).toFixed(2) };
-      const t = regioes.find(g => g.id === movendo);
-      const dx = campos.cx - t.cx;
-      const dy = ((campos.cy - t.cy) / ALT) * 100;
-      const filhos = pins.filter(p => p.regiao_id === movendo && p.x != null);
-      const novos = Object.fromEntries(filhos.map(p => [p.id, {
-        x: +(p.x + dx).toFixed(2), y: +(p.y + dy).toFixed(2),
-      }]));
+  function iniciarArrasto(e) {
+    if (!movendo) return;
+    const t = regioes.find(g => g.id === movendo);
+    if (!t) return;
+    const { x, y } = pontoNoMundo(e);
+    const sobreATerra = dentro([x, y], formaDe(t));
+    arrasto.current = {
+      id: t.id, cx0: t.cx, cy0: t.cy,
+      ox: sobreATerra ? t.cx - x : 0,      // pegou na terra: mantém o ponto de agarre
+      oy: sobreATerra ? t.cy - y : 0,      // clicou fora: o centro pula pro cursor
+      pins0: pins.filter(p => p.regiao_id === t.id && p.x != null).map(p => ({ id: p.id, x: p.x, y: p.y })),
+      moveu: false, cx: t.cx, cy: t.cy,
+    };
+    e.currentTarget.setPointerCapture(e.pointerId);
+    moverArrasto(e);
+  }
 
-      ajustarLocal(movendo, campos);
-      setPins(ps => ps.map(p => (novos[p.id] ? { ...p, ...novos[p.id] } : p)));
-      await salvarCampos(movendo, campos);
-      await Promise.all(filhos.map(p =>
-        api.patch(`/locations/${p.id}`, { pin_x: novos[p.id].x, pin_y: novos[p.id].y })
-      ));
-      setMovendo(null);
-      return;
+  function moverArrasto(e) {
+    const a = arrasto.current;
+    if (!a) return;
+    const { x, y } = pontoNoMundo(e);
+    const cx = +Math.min(LARG - 1, Math.max(1, x + a.ox)).toFixed(2);
+    const cy = +Math.min(ALT - 1, Math.max(1, y + a.oy)).toFixed(2);
+    a.moveu = true; a.cx = cx; a.cy = cy;
+    const dx = cx - a.cx0;
+    const dy = ((cy - a.cy0) / ALT) * 100;
+    ajustarLocal(a.id, { cx, cy });
+    setPins(ps => ps.map(p => {
+      const o = a.pins0.find(q => q.id === p.id);
+      return o ? { ...p, x: +(o.x + dx).toFixed(2), y: +(o.y + dy).toFixed(2) } : p;
+    }));
+  }
+
+  async function soltarArrasto() {
+    const a = arrasto.current;
+    arrasto.current = null;
+    if (!a) return;
+    setMovendo(null);
+    if (!a.moveu) return;
+    const dx = a.cx - a.cx0;
+    const dy = ((a.cy - a.cy0) / ALT) * 100;
+    await salvarCampos(a.id, { cx: a.cx, cy: a.cy });
+    await Promise.all(a.pins0.map(o =>
+      api.patch(`/locations/${o.id}`, {
+        pin_x: +(o.x + dx).toFixed(2), pin_y: +(o.y + dy).toFixed(2),
+      }).catch(() => {})
+    ));
+  }
+
+  async function aoClicarNoMundo(e) {
+    if (!editando) return;
+    const { px, py, x: sx, y: sy } = pontoNoMundo(e);
+    const id = editando;
+    const alvo = [...ordem].reverse().find(g => dentro([sx, sy], formaDe(g)));  // terra de cima primeiro
+    const campos = { pin_x: +px.toFixed(2), pin_y: +py.toFixed(2) };
+    if (alvo) campos.regiao_id = alvo.id;
+    try {
+      await api.patch(`/locations/${id}`, campos);
+      setPins(ps => ps.map(l => (l.id === id
+        ? { ...l, x: campos.pin_x, y: campos.pin_y, ...(alvo ? { regiao_id: alvo.id } : {}) }
+        : l)));
+      setLocalAberto(id);
+      setRegiaoAberta(null);
+      setEditando(null);
+    } catch { alert('Erro ao salvar a posição.'); return; }
+
+    // caiu numa terra que ainda não tem local: oferece importar as informações dele
+    if (alvo && !alvo.local_id) {
+      const l = pins.find(p => p.id === id);
+      if (await confirmar(`Usar "${l?.nome}" como descrição da terra "${alvo.nome}"?`)) {
+        await vincularLocal(alvo.id, id);
+      }
     }
   }
 
@@ -284,10 +421,15 @@ export default function Atlas() {
   const regiao = regioes.find(g => g.id === regiaoAberta);
   const locaisDaRegiao = regiao ? pins.filter(p => p.regiao_id === regiao.id) : [];
   const modoClique = !!(movendo || editando);
+  const emModo = !!(movendo || editando || escolhendo);
   const tilt = inclinado && !modoClique;
+  const painelAberto = !!(regiao || local);
   const prioridade = g => (regiaoAberta === g.id ? 2 : hoverId === g.id ? 1 : 0);
   // quem está atrás é desenhado primeiro, e a terra levantada fica por cima
   const ordem = [...terras].sort((a, b) => prioridade(a) - prioridade(b) || a.cy - b.cy);
+  const aviso = movendo ? 'ARRASTE A TERRA PARA O NOVO LUGAR'
+    : editando ? 'CLIQUE NO MAPA PARA POSICIONAR'
+    : escolhendo ? 'CLIQUE NO 📍 QUE DESCREVE ESTA TERRA' : null;
 
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
@@ -297,8 +439,8 @@ export default function Atlas() {
           className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors">← Voltar</button>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 opacity-70">O MUNDO CONHECIDO</p>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 opacity-70">O IMPÉRIO</p>
         <h1 style={cinzel} className="text-2xl text-[#f0e8d8] font-semibold mb-6">Atlas</h1>
 
         <div className="flex flex-wrap gap-2 mb-4">
@@ -316,274 +458,323 @@ export default function Atlas() {
               🧊 {inclinado ? 'Mapa plano' : 'Inclinar mapa'}
             </button>
           )}
+          {emModo && (
+            <button onClick={cancelarModos}
+              className={`${btn} border-red-600 text-red-600`} style={{ ...cinzel, ...radius }}>
+              ✕ Cancelar
+            </button>
+          )}
         </div>
 
-        {carregado && terras.length === 0 && (
-          <p className="text-[#8a7e68] text-sm text-center py-12">
-            {isMestre ? 'Nenhuma terra ainda. Clique em "Nova terra".' : 'O mundo ainda é um mistério.'}
-          </p>
-        )}
+        <div className={painelAberto ? 'grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px] items-start' : ''}>
+          {/* ---------- mapa ---------- */}
+          <div className="min-w-0">
+            {carregado && terras.length === 0 && (
+              <p className="text-[#8a7e68] text-sm text-center py-12">
+                {isMestre ? 'Nenhuma terra ainda. Clique em "Nova terra".' : 'O mundo ainda é um mistério.'}
+              </p>
+            )}
 
-        {terras.length > 0 && (
-          <div style={{ perspective: '1400px', padding: tilt ? '2rem 0 3rem' : 0, transition: 'padding 0.6s ease' }}>
-            <div className="relative w-full border border-[#c8a84b30]"
-              style={{
-                ...radius,
-                aspectRatio: '16 / 9',
-                background: 'radial-gradient(ellipse at 50% 40%, #12262c 0%, #0b161a 70%, #080d10 100%)',
-                cursor: modoClique ? 'crosshair' : 'default',
-                transformStyle: 'preserve-3d',
-                transform: tilt ? `rotateX(${INCLINACAO}deg)` : 'none',
-                transformOrigin: '50% 100%',
-                transition: 'transform 0.6s ease, box-shadow 0.6s ease',
-                boxShadow: tilt ? '0 50px 60px -20px rgba(0,0,0,0.8)' : 'none',
-              }}
-              onClick={aoClicarNoMundo}>
-
-              <svg viewBox={`0 0 ${LARG} ${ALT}`} className="absolute inset-0 w-full h-full"
-                style={{ pointerEvents: modoClique ? 'none' : 'auto' }}>
-                <defs>
-                  {ordem.filter(g => isMestre || g.descoberta).map(g => (
-                    <FiltroTerreno key={g.id} id={`terra-${g.id}`} semente={g.semente} />
-                  ))}
-                </defs>
-
-                {ordem.map(g => {
-                  const { p, x0, y0, w, h } = geometria(g);
-                  const oculta = isMestre ? !descDe('regiao', g.id) : !g.descoberta;
-                  const escura = oculta && !isMestre;           // o jogador só vê a silhueta
-                  const clicavel = isMestre || g.descoberta;
-                  const aberta = regiaoAberta === g.id;
-                  const lift = aberta ? 1.4 : hoverId === g.id && clicavel ? 0.7 : 0;
-
-                  return (
-                    <g key={g.id}>
-                      {/* lados da terra: camadas empilhadas, a base fica fixa e o topo sobe */}
-                      {Array.from({ length: CAMADAS + 1 }, (_, i) => (
-                        <polygon key={i} points={p}
-                          style={{
-                            fill: i === CAMADAS ? (escura ? '#0b0906' : '#2e2312') : (escura ? '#1d1810' : '#a8834a'),
-                            transform: `translateY(${-lift + (i * (PROF + lift)) / CAMADAS}px)`,
-                            transition: 'transform 0.25s ease',
-                            pointerEvents: 'none',
-                          }} />
-                      ))}
-
-                      {/* topo da terra */}
-                      <g style={{ transform: `translateY(${-lift}px)`, transition: 'transform 0.25s ease' }}>
-                        <clipPath id={`clip-${g.id}`}><polygon points={p} /></clipPath>
-                        <g clipPath={`url(#clip-${g.id})`}>
-                          {escura
-                            ? <rect x={x0} y={y0} width={w} height={h} fill="#1b1710" />
-                            : <rect x={x0} y={y0} width={w} height={h} filter={`url(#terra-${g.id})`} />}
-                        </g>
-                        <polygon points={p} vectorEffect="non-scaling-stroke"
-                          onClick={clicavel ? e => { e.stopPropagation(); abrirRegiao(g); } : undefined}
-                          onMouseEnter={clicavel ? () => setHoverId(g.id) : undefined}
-                          onMouseLeave={clicavel ? () => setHoverId(null) : undefined}
-                          style={{
-                            cursor: clicavel ? 'pointer' : 'default',
-                            fill: oculta
-                              ? (isMestre ? 'rgba(8,10,12,0.45)' : 'rgba(8,10,12,0.78)')
-                              : aberta ? 'rgba(200,168,75,0.18)' : hoverId === g.id ? 'rgba(200,168,75,0.10)' : 'rgba(0,0,0,0)',
-                            stroke: oculta ? 'rgba(200,168,75,0.25)' : '#c8a84b',
-                            strokeWidth: aberta ? 2 : 1,
-                            strokeDasharray: oculta && isMestre ? '2 1.5' : 'none',
-                            pointerEvents: modoClique || !clicavel ? 'none' : 'all',
-                          }} />
-                        {g.nome && (!oculta || isMestre) && (
-                          <text x={g.cx} y={g.cy} textAnchor="middle" dominantBaseline="middle"
-                            style={{ fontFamily: "'Cinzel', serif", fontSize: 2.2, fill: '#f0e8d8',
-                                     stroke: '#0f0e0c', strokeWidth: 0.5, paintOrder: 'stroke',
-                                     pointerEvents: 'none', opacity: oculta ? 0.6 : 1 }}>
-                            {g.nome}
-                          </text>
-                        )}
-                      </g>
-                    </g>
-                  );
-                })}
-              </svg>
-
-              {/* pins dos locais: em pé mesmo com o mapa inclinado */}
-              {noMapa.map(p => (
-                <button key={p.id} title={p.nome}
-                  onClick={e => { e.stopPropagation(); if (!modoClique) abrirLocal(p.id); }}
-                  className="absolute text-2xl leading-none"
+            {terras.length > 0 && (
+              <div style={{ perspective: '1400px', padding: tilt ? '2rem 0 3rem' : 0, transition: 'padding 0.6s ease' }}>
+                <div className="relative w-full border border-[#c8a84b30]"
                   style={{
-                    left: `${p.x}%`, top: `${p.y}%`,
-                    transform: `translate(-50%, -100%) rotateX(${tilt ? -INCLINACAO : 0}deg)`,
+                    ...radius,
+                    aspectRatio: '16 / 9',
+                    background: 'radial-gradient(ellipse at 50% 40%, #12262c 0%, #0b161a 70%, #080d10 100%)',
+                    cursor: movendo ? 'grab' : editando ? 'crosshair' : 'default',
+                    touchAction: movendo ? 'none' : 'auto',
+                    transformStyle: 'preserve-3d',
+                    transform: tilt ? `rotateX(${INCLINACAO}deg)` : 'none',
                     transformOrigin: '50% 100%',
-                    transition: 'transform 0.6s ease',
-                    filter: localAberto === p.id ? 'drop-shadow(0 0 6px #c8a84b)' : 'drop-shadow(0 1px 2px #000)',
-                  }}>
-                  📍
-                </button>
-              ))}
+                    transition: 'transform 0.6s ease, box-shadow 0.6s ease',
+                    boxShadow: tilt ? '0 50px 60px -20px rgba(0,0,0,0.8)' : 'none',
+                  }}
+                  onClick={aoClicarNoMundo}
+                  onPointerDown={iniciarArrasto}
+                  onPointerMove={moverArrasto}
+                  onPointerUp={soltarArrasto}
+                  onPointerCancel={soltarArrasto}>
 
-              {modoClique && (
-                <p style={cinzel}
-                  className="absolute top-2 left-1/2 -translate-x-1/2 bg-[#0f0e0c] border border-[#c8a84b] text-[#c8a84b] text-xs px-3 py-1 pointer-events-none whitespace-nowrap">
-                  {movendo ? 'CLIQUE ONDE A TERRA DEVE FICAR' : 'CLIQUE NO MAPA PARA POSICIONAR'}
-                </p>
-              )}
-            </div>
-          </div>
-        )}
+                  <svg viewBox={`0 0 ${LARG} ${ALT}`} className="absolute inset-0 w-full h-full"
+                    style={{ pointerEvents: modoClique ? 'none' : 'auto' }}>
+                    <defs>
+                      {ordem.filter(g => isMestre || g.descoberta).map(g => (
+                        <FiltroTerreno key={g.id} id={`terra-${g.id}`} semente={g.semente} ambiente={g.ambiente} />
+                      ))}
+                    </defs>
 
-        {/* card da terra */}
-        {regiao && (
-          <div className="mt-4 border border-[#c8a84b30] bg-[#161410] p-4 space-y-4" style={radius}>
-            <div className="flex items-start justify-between gap-3 flex-wrap">
-              <div>
-                <p style={cinzel} className="text-[#f0e8d8] text-lg">{regiao.nome}</p>
-                {regiao.subtitulo && <p className="text-[#8a7e68] text-xs mt-1">{regiao.subtitulo}</p>}
-              </div>
-              {isMestre && (
-                <div className="flex gap-2 items-center flex-wrap">
-                  <BotaoRevelar tipo="regiao" entidadeId={regiao.id} campanhaId={campanha}
-                    descoberta={descDe('regiao', regiao.id)} onMudou={carregarDescobertas} />
-                  <button onClick={gerarComIA} disabled={gerando}
-                    className={`${btn} border-[#a86aa850] text-[#a86aa8]`} style={{ ...cinzel, ...radius }}>
-                    {gerando ? '⟳ Gerando...' : '✨ Gerar com IA'}
-                  </button>
-                  <button onClick={() => apagarRegiao(regiao.id)}
-                    className={`${btn} border-red-600 text-red-600`} style={{ ...cinzel, ...radius }}>🗑</button>
-                </div>
-              )}
-            </div>
+                    {ordem.map(g => {
+                      const { p, x0, y0, w, h } = geometria(g);
+                      const amb = ambienteDe(g.ambiente);
+                      const prof = PROF * amb.espessura;
+                      const oculta = isMestre ? !descDe('regiao', g.id) : !g.descoberta;
+                      const escura = oculta && !isMestre;           // o jogador só vê a silhueta
+                      const clicavel = isMestre || g.descoberta;
+                      const aberta = regiaoAberta === g.id;
+                      const lift = aberta ? 1.4 : hoverId === g.id && clicavel ? 0.7 : 0;
 
-            {regiao.imagem_url && (
-              <img src={regiao.imagem_url} alt={regiao.nome}
-                className="w-full max-h-80 object-cover border border-[#c8a84b20]" style={radius} />
-            )}
+                      return (
+                        <g key={g.id}>
+                          {/* lados da terra: camadas empilhadas, a base fica fixa e o topo sobe */}
+                          {Array.from({ length: CAMADAS + 1 }, (_, i) => (
+                            <polygon key={i} points={p}
+                              style={{
+                                fill: i === CAMADAS ? (escura ? '#0b0906' : amb.base) : (escura ? '#1d1810' : amb.lado),
+                                transform: `translateY(${-lift + (i * (prof + lift)) / CAMADAS}px)`,
+                                transition: 'transform 0.25s ease',
+                                pointerEvents: 'none',
+                              }} />
+                          ))}
 
-            {regiao.local_id ? (
-              <div>
-                <p className="text-[#9a8e78] text-sm leading-relaxed font-light">{regiao.descricao}</p>
-                {isMestre && <p className="text-[#6a6050] text-xs mt-2">Texto vindo do local ligado a esta terra. Para mudar, edite em Locais.</p>}
-              </div>
-            ) : isMestre ? (
-              <div>
-                <textarea value={descEdit} onChange={e => setDescEdit(e.target.value)} rows={4}
-                  placeholder="Descreva a terra ou ligue um local abaixo..." aria-label="Descrição da terra"
-                  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020] resize-none"
-                  style={radius} />
-                <button onClick={salvarDescricao} disabled={descEdit === (regiao.descricao || '')}
-                  className={`${btn} mt-2 border-[#c8a84b30] text-[#c8a84b]`} style={{ ...cinzel, ...radius }}>
-                  Salvar descrição
-                </button>
-              </div>
-            ) : (
-              regiao.descricao && <p className="text-[#9a8e78] text-sm leading-relaxed font-light">{regiao.descricao}</p>
-            )}
+                          {/* topo da terra */}
+                          <g style={{ transform: `translateY(${-lift}px)`, transition: 'transform 0.25s ease' }}>
+                            <clipPath id={`clip-${g.id}`}><polygon points={p} /></clipPath>
+                            <g clipPath={`url(#clip-${g.id})`}>
+                              {escura
+                                ? <rect x={x0} y={y0} width={w} height={h} fill="#1b1710" />
+                                : <rect x={x0} y={y0} width={w} height={h} filter={`url(#terra-${g.id})`} />}
+                            </g>
+                            <polygon points={p} vectorEffect="non-scaling-stroke"
+                              onClick={clicavel ? e => { e.stopPropagation(); abrirRegiao(g); } : undefined}
+                              onMouseEnter={clicavel ? () => setHoverId(g.id) : undefined}
+                              onMouseLeave={clicavel ? () => setHoverId(null) : undefined}
+                              style={{
+                                cursor: clicavel ? 'pointer' : 'default',
+                                fill: oculta
+                                  ? (isMestre ? 'rgba(8,10,12,0.45)' : 'rgba(8,10,12,0.78)')
+                                  : aberta ? 'rgba(200,168,75,0.18)' : hoverId === g.id ? 'rgba(200,168,75,0.10)' : 'rgba(0,0,0,0)',
+                                stroke: oculta ? 'rgba(200,168,75,0.25)' : amb.borda,
+                                strokeWidth: aberta ? 2 : 1,
+                                strokeDasharray: oculta && isMestre ? '2 1.5' : 'none',
+                                pointerEvents: modoClique || !clicavel ? 'none' : 'all',
+                              }} />
+                            {g.nome && (!oculta || isMestre) && (
+                              <text x={g.cx} y={g.cy} textAnchor="middle" dominantBaseline="middle"
+                                style={{ fontFamily: "'Cinzel', serif", fontSize: 2.2, fill: '#f0e8d8',
+                                         stroke: '#0f0e0c', strokeWidth: 0.5, paintOrder: 'stroke',
+                                         pointerEvents: 'none', opacity: oculta ? 0.6 : 1 }}>
+                                {g.nome}
+                              </text>
+                            )}
+                          </g>
+                        </g>
+                      );
+                    })}
+                  </svg>
 
-            {isMestre && (
-              <div className="border-t border-[#c8a84b10] pt-3 space-y-3">
-                <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px]">AJUSTES DA TERRA</p>
-
-                <div className="flex gap-2 flex-wrap">
-                  <button onClick={() => setGaleria(true)}
-                    className={`${btn} border-[#c8a84b30] text-[#c8a84b]`} style={{ ...cinzel, ...radius }}>
-                    🖼 {regiao.imagem_url ? 'Trocar foto' : 'Foto da Galeria'}
-                  </button>
-                  {regiao.imagem_url && (
-                    <button onClick={removerFoto}
-                      className={`${btn} border-[#c8a84b20] text-[#9a8e78]`} style={{ ...cinzel, ...radius }}>
-                      Remover foto
+                  {/* pins dos locais: em pé mesmo com o mapa inclinado */}
+                  {noMapa.map(p => (
+                    <button key={p.id} title={p.nome}
+                      onClick={e => {
+                        e.stopPropagation();
+                        if (escolhendo) { vincularLocal(escolhendo, p.id); setEscolhendo(null); return; }
+                        if (!modoClique) abrirLocal(p.id);
+                      }}
+                      className="absolute text-2xl leading-none"
+                      style={{
+                        left: `${p.x}%`, top: `${p.y}%`,
+                        transform: `translate(-50%, -100%) rotateX(${tilt ? -INCLINACAO : 0}deg)`,
+                        transformOrigin: '50% 100%',
+                        transition: movendo ? 'none' : 'transform 0.6s ease',
+                        filter: localAberto === p.id ? 'drop-shadow(0 0 6px #c8a84b)' : 'drop-shadow(0 1px 2px #000)',
+                      }}>
+                      📍
                     </button>
+                  ))}
+
+                  {aviso && (
+                    <p style={cinzel}
+                      className="absolute top-2 left-1/2 -translate-x-1/2 bg-[#0f0e0c] border border-[#c8a84b] text-[#c8a84b] text-xs px-3 py-1 pointer-events-none whitespace-nowrap">
+                      {aviso}
+                    </p>
                   )}
                 </div>
-
-                <div className="flex gap-2">
-                  <input value={nomeEdit} onChange={e => setNomeEdit(e.target.value)} aria-label="Nome da terra"
-                    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-1 flex-1 text-sm focus:outline-none focus:border-[#c8a84b50]"
-                    style={radius} />
-                  <button onClick={salvarNome} disabled={!nomeEdit.trim() || nomeEdit.trim() === regiao.nome}
-                    className={`${btn} border-[#c8a84b30] text-[#c8a84b]`} style={{ ...cinzel, ...radius }}>
-                    Salvar nome
-                  </button>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-3">
-                  <label style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px]">TAMANHO</label>
-                  <input type="range" min="3" max="22" step="0.5" value={regiao.raio || 8}
-                    onChange={e => ajustarLocal(regiao.id, { raio: Number(e.target.value) })}
-                    onPointerUp={e => salvarCampos(regiao.id, { raio: Number(e.target.value) })}
-                    onKeyUp={e => salvarCampos(regiao.id, { raio: Number(e.target.value) })}
-                    aria-label="Tamanho da terra" />
-                  <button onClick={() => { setMovendo(regiao.id); setEditando(null); }}
-                    className={`${btn} border-[#c8a84b30] text-[#c8a84b]`} style={{ ...cinzel, ...radius }}>↔ Mover</button>
-                  <button onClick={embaralhar}
-                    className={`${btn} border-[#c8a84b30] text-[#c8a84b]`} style={{ ...cinzel, ...radius }}>🎲 Nova forma</button>
-                </div>
-
-                <div className="flex items-center gap-2 flex-wrap">
-                  <label style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px]">LOCAL QUE DESCREVE ESTA TERRA</label>
-                  <select value={regiao.local_id || ''} onChange={e => vincularLocal(e.target.value)}
-                    className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#9a8e78] px-2 py-1 text-xs focus:outline-none"
-                    style={radius}>
-                    <option value="">— escolher —</option>
-                    {pins.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
-                  </select>
-                </div>
-              </div>
-            )}
-
-            <div>
-              <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">CIDADES E LOCAIS</p>
-              {locaisDaRegiao.length === 0 ? (
-                <p className="text-[#8a7e68] text-sm">Nada conhecido por aqui ainda.</p>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {locaisDaRegiao.map(p => (
-                    <button key={p.id} onClick={() => abrirLocal(p.id)}
-                      className={`${btn} border-[#c8a84b20] text-[#9a8e78] hover:text-[#c8a84b]`}
-                      style={{ ...cinzel, ...radius }}>
-                      📍 {p.nome}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* card do local */}
-        {local && (
-          <div className="mt-4 border border-[#c8a84b30] bg-[#161410] p-4" style={radius}>
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p style={cinzel} className="text-[#f0e8d8] text-lg">{local.nome}</p>
-                <p className="text-[#8a7e68] text-xs mt-1">
-                  {[local.subtitulo, regioes.find(g => g.id === local.regiao_id)?.nome].filter(Boolean).join(' · ')}
-                </p>
-              </div>
-              {isMestre && (
-                <div className="flex flex-wrap gap-2 justify-end">
-                  <BotaoRevelar tipo="local" entidadeId={local.id} campanhaId={campanha}
-                    descoberta={descDe('local', local.id)} onMudou={carregarDescobertas} />
-                  <button onClick={() => { setEditando(local.id); setMovendo(null); }}
-                    className={`${btn} border-[#c8a84b30] text-[#c8a84b] hover:bg-[#c8a84b10]`}
-                    style={{ ...cinzel, ...radius }}>📍 Posicionar</button>
-                </div>
-              )}
-            </div>
-            {local.descricao && <p className="text-[#9a8e78] text-sm leading-relaxed font-light mt-3">{local.descricao}</p>}
-
-            {isMestre && terras.length > 0 && (
-              <div className="mt-3 pt-3 border-t border-[#c8a84b10]">
-                <label style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mr-2">TERRA</label>
-                <select value={local.regiao_id || ''} onChange={e => vincularRegiaoAoLocal(local.id, e.target.value)}
-                  className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#9a8e78] px-2 py-1 text-xs focus:outline-none"
-                  style={radius}>
-                  <option value="">— escolher —</option>
-                  {terras.map(g => <option key={g.id} value={g.id}>{g.nome}</option>)}
-                </select>
               </div>
             )}
           </div>
-        )}
+
+          {/* ---------- painel lateral ---------- */}
+          {painelAberto && (
+            <aside className="space-y-4 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:pr-1">
+              {/* card da terra */}
+              {regiao && (
+                <div className="border border-[#c8a84b30] bg-[#161410] p-4 space-y-4" style={radius}>
+                  <div className="flex items-start justify-between gap-3 flex-wrap">
+                    <div>
+                      <p style={cinzel} className="text-[#f0e8d8] text-lg">{regiao.nome}</p>
+                      {regiao.subtitulo && <p className="text-[#8a7e68] text-xs mt-1">{regiao.subtitulo}</p>}
+                      <p className="text-[#6a6050] text-xs mt-1">
+                        {ambienteDe(regiao.ambiente).emoji} {ambienteDe(regiao.ambiente).label}
+                      </p>
+                    </div>
+                    {isMestre && (
+                      <div className="flex gap-2 items-center flex-wrap">
+                        <BotaoRevelar tipo="regiao" entidadeId={regiao.id} campanhaId={campanha}
+                          descoberta={descDe('regiao', regiao.id)} onMudou={carregarDescobertas} />
+                        <button onClick={gerarComIA} disabled={gerando}
+                          className={`${btn} border-[#a86aa850] text-[#a86aa8]`} style={{ ...cinzel, ...radius }}>
+                          {gerando ? '⟳ Gerando...' : '✨ Gerar com IA'}
+                        </button>
+                        <button onClick={() => apagarRegiao(regiao.id)}
+                          className={`${btn} border-red-600 text-red-600`} style={{ ...cinzel, ...radius }}>🗑</button>
+                      </div>
+                    )}
+                  </div>
+
+                  {regiao.imagem_url && (
+                    <img src={regiao.imagem_url} alt={regiao.nome}
+                      className="w-full aspect-video object-cover border border-[#c8a84b20]" style={radius} />
+                  )}
+
+                  {regiao.local_id ? (
+                    <div>
+                      <p className="text-[#9a8e78] text-sm leading-relaxed font-light max-h-44 overflow-y-auto pr-1">{regiao.descricao}</p>
+                      {isMestre && <p className="text-[#6a6050] text-xs mt-2">Texto vindo do local ligado a esta terra. Para mudar, edite em Locais.</p>}
+                    </div>
+                  ) : isMestre ? (
+                    <div>
+                      <textarea value={descEdit} onChange={e => setDescEdit(e.target.value)} rows={4}
+                        placeholder="Descreva a terra ou ligue um local abaixo..." aria-label="Descrição da terra"
+                        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020] resize-none"
+                        style={radius} />
+                      <button onClick={salvarDescricao} disabled={descEdit === (regiao.descricao || '')}
+                        className={`${btn} mt-2 border-[#c8a84b30] text-[#c8a84b]`} style={{ ...cinzel, ...radius }}>
+                        Salvar descrição
+                      </button>
+                    </div>
+                  ) : (
+                    regiao.descricao && <p className="text-[#9a8e78] text-sm leading-relaxed font-light max-h-44 overflow-y-auto pr-1">{regiao.descricao}</p>
+                  )}
+
+                  {isMestre && (
+                    <div className="border-t border-[#c8a84b10] pt-3 space-y-3">
+                      <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px]">AJUSTES DA TERRA</p>
+
+                      <div className="flex flex-wrap items-center gap-2">
+                        <label style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] w-full">AMBIENTE</label>
+                        {Object.entries(AMBIENTES).map(([chave, a]) => (
+                          <button key={chave} onClick={() => trocarAmbiente(chave)} title={a.label}
+                            className={`${btn} ${(regiao.ambiente || 'floresta') === chave
+                              ? 'border-[#c8a84b] text-[#c8a84b] bg-[#c8a84b10]'
+                              : 'border-[#c8a84b20] text-[#9a8e78] hover:text-[#c8a84b]'}`}
+                            style={{ ...cinzel, ...radius }}>
+                            {a.emoji} {a.label}
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="flex gap-2 flex-wrap">
+                        <button onClick={() => setGaleria(true)}
+                          className={`${btn} border-[#c8a84b30] text-[#c8a84b]`} style={{ ...cinzel, ...radius }}>
+                          🖼 {regiao.imagem_url ? 'Trocar foto' : 'Foto da Galeria'}
+                        </button>
+                        {regiao.imagem_url && (
+                          <button onClick={removerFoto}
+                            className={`${btn} border-[#c8a84b20] text-[#9a8e78]`} style={{ ...cinzel, ...radius }}>
+                            Remover foto
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="flex gap-2">
+                        <input value={nomeEdit} onChange={e => setNomeEdit(e.target.value)} aria-label="Nome da terra"
+                          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-1 flex-1 min-w-0 text-sm focus:outline-none focus:border-[#c8a84b50]"
+                          style={radius} />
+                        <button onClick={salvarNome} disabled={!nomeEdit.trim() || nomeEdit.trim() === regiao.nome}
+                          className={`${btn} border-[#c8a84b30] text-[#c8a84b]`} style={{ ...cinzel, ...radius }}>
+                          Salvar nome
+                        </button>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-3">
+                        <label style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px]">TAMANHO</label>
+                        <input type="range" min="3" max="22" step="0.5" value={regiao.raio || 8}
+                          onChange={e => ajustarLocal(regiao.id, { raio: Number(e.target.value) })}
+                          onPointerUp={e => salvarCampos(regiao.id, { raio: Number(e.target.value) })}
+                          onKeyUp={e => salvarCampos(regiao.id, { raio: Number(e.target.value) })}
+                          aria-label="Tamanho da terra" />
+                        <button onClick={() => { setMovendo(regiao.id); setEditando(null); setEscolhendo(null); }}
+                          className={`${btn} border-[#c8a84b30] text-[#c8a84b]`} style={{ ...cinzel, ...radius }}>↔ Mover</button>
+                        <button onClick={embaralhar}
+                          className={`${btn} border-[#c8a84b30] text-[#c8a84b]`} style={{ ...cinzel, ...radius }}>🎲 Nova forma</button>
+                      </div>
+
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <label style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] w-full">LOCAL QUE DESCREVE ESTA TERRA</label>
+                        <select value={regiao.local_id || ''} onChange={e => vincularLocal(regiao.id, e.target.value)}
+                          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#9a8e78] px-2 py-1 text-xs focus:outline-none min-w-0 flex-1"
+                          style={radius}>
+                          <option value="">— escolher —</option>
+                          {pins.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
+                        </select>
+                        <button onClick={() => { setEscolhendo(regiao.id); setMovendo(null); setEditando(null); }}
+                          className={`${btn} border-[#c8a84b30] text-[#c8a84b]`} style={{ ...cinzel, ...radius }}>
+                          📍 Escolher no mapa
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">CIDADES E LOCAIS</p>
+                    {locaisDaRegiao.length === 0 ? (
+                      <p className="text-[#8a7e68] text-sm">Nada conhecido por aqui ainda.</p>
+                    ) : (
+                      <div className="flex flex-wrap gap-2">
+                        {locaisDaRegiao.map(p => (
+                          <button key={p.id} onClick={() => abrirLocal(p.id)}
+                            className={`${btn} border-[#c8a84b20] text-[#9a8e78] hover:text-[#c8a84b]`}
+                            style={{ ...cinzel, ...radius }}>
+                            📍 {p.nome}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* card do local */}
+              {local && (
+                <div className="border border-[#c8a84b30] bg-[#161410] p-4" style={radius}>
+                  <div className="flex items-start justify-between gap-3 flex-wrap">
+                    <div>
+                      <p style={cinzel} className="text-[#f0e8d8] text-lg">{local.nome}</p>
+                      <p className="text-[#8a7e68] text-xs mt-1">
+                        {[local.subtitulo, regioes.find(g => g.id === local.regiao_id)?.nome].filter(Boolean).join(' · ')}
+                      </p>
+                    </div>
+                    {isMestre && (
+                      <div className="flex flex-wrap gap-2 justify-end">
+                        <BotaoRevelar tipo="local" entidadeId={local.id} campanhaId={campanha}
+                          descoberta={descDe('local', local.id)} onMudou={carregarDescobertas} />
+                        <button onClick={() => { setEditando(local.id); setMovendo(null); setEscolhendo(null); }}
+                          className={`${btn} border-[#c8a84b30] text-[#c8a84b] hover:bg-[#c8a84b10]`}
+                          style={{ ...cinzel, ...radius }}>📍 Posicionar</button>
+                      </div>
+                    )}
+                  </div>
+                  {local.descricao && (
+                    <p className="text-[#9a8e78] text-sm leading-relaxed font-light mt-3 max-h-48 overflow-y-auto pr-1">{local.descricao}</p>
+                  )}
+
+                  {isMestre && terras.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-[#c8a84b10]">
+                      <label style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mr-2">TERRA</label>
+                      <select value={local.regiao_id || ''} onChange={e => vincularRegiaoAoLocal(local.id, e.target.value)}
+                        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#9a8e78] px-2 py-1 text-xs focus:outline-none"
+                        style={radius}>
+                        <option value="">— escolher —</option>
+                        {terras.map(g => <option key={g.id} value={g.id}>{g.nome}</option>)}
+                      </select>
+                    </div>
+                  )}
+                </div>
+              )}
+            </aside>
+          )}
+        </div>
 
         {/* locais sem posição (mestre) */}
         {isMestre && terras.length > 0 && semPosicao.length > 0 && (
@@ -591,7 +782,7 @@ export default function Atlas() {
             <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-2">LOCAIS SEM POSIÇÃO NO MAPA</p>
             <div className="flex flex-wrap gap-2">
               {semPosicao.map(p => (
-                <button key={p.id} onClick={() => { setEditando(p.id); setMovendo(null); }}
+                <button key={p.id} onClick={() => { setEditando(p.id); setMovendo(null); setEscolhendo(null); }}
                   className={`${btn} ${editando === p.id ? 'border-[#c8a84b] text-[#c8a84b]' : 'border-[#c8a84b20] text-[#9a8e78]'}`}
                   style={{ ...cinzel, ...radius }}>
                   📍 {p.nome}
