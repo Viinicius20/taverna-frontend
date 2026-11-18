@@ -68,6 +68,18 @@ const AMBIENTES = {
 
 const ambienteDe = chave => AMBIENTES[chave] || AMBIENTES.floresta;
 
+// campos do local ligado à terra (os mesmos da página Locais)
+const CAMPOS_LOCAL = [
+  { chave: 'region_info', label: 'REGIÃO' },
+  { chave: 'commerce', label: 'COMÉRCIO' },
+  { chave: 'monsters', label: 'MONSTROS/PERIGOS' },
+  { chave: 'quests', label: 'IDEIAS DE QUEST' },
+  { chave: 'boss', label: 'AMEAÇA PRINCIPAL' },
+];
+const CHAVES_LOCAL = ['description', ...CAMPOS_LOCAL.map(c => c.chave), 'language', 'avg_level', 'faction_id'];
+const formDe = l => Object.fromEntries(CHAVES_LOCAL.map(k => [k, l?.[k] ?? '']));
+const campo = 'bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020] resize-y';
+
 // ---------- forma das terras: sempre a mesma para a mesma semente ----------
 
 function sorteador(seed) {
@@ -170,6 +182,16 @@ export default function Atlas() {
   const [gerando, setGerando] = useState(false);
   const [galeria, setGaleria] = useState(false);
   const arrasto = useRef(null);
+  const [locaisFull, setLocaisFull] = useState(null);   // locais completos (só mestre)
+  const [faccoes, setFaccoes] = useState([]);
+  const [form, setForm] = useState(null);               // edição do local ligado à terra aberta
+  const [salvandoLocal, setSalvandoLocal] = useState(false);
+
+  useEffect(() => {
+    if (!isMestre) return;
+    api.get(`/locations/${campanha}`).then(r => setLocaisFull(r.data.data || [])).catch(() => setLocaisFull([]));
+    api.get(`/factions/${campanha}`).then(r => setFaccoes(r.data.data || [])).catch(() => setFaccoes([]));
+  }, [campanha, isMestre]);
 
   function carregarDescobertas() {
     if (!isMestre) return;
@@ -320,6 +342,19 @@ export default function Atlas() {
 
   // ---------- locais (pins) ----------
 
+  async function salvarLocalDaTerra() {
+    if (!localDaTerra || !form) return;
+    setSalvandoLocal(true);
+    const campos = { ...form, faction_id: form.faction_id || null };
+    try {
+      await api.patch(`/locations/${localDaTerra.id}`, campos);
+      setLocaisFull(ls => ls.map(l => (l.id === localDaTerra.id ? { ...l, ...campos } : l)));
+      setPins(ps => ps.map(p => (p.id === localDaTerra.id ? { ...p, descricao: form.description } : p)));
+      ajustarLocal(regiao.id, { descricao: form.description });
+    } catch { alert('Erro ao salvar as alterações.'); }
+    setSalvandoLocal(false);
+  }
+
   async function vincularRegiaoAoLocal(localId, regiaoId) {
     if (!regiaoId) return;
     try {
@@ -419,7 +454,8 @@ export default function Atlas() {
   const semPosicao = pins.filter(p => p.x == null || p.y == null);
   const local = pins.find(p => p.id === localAberto);
   const regiao = regioes.find(g => g.id === regiaoAberta);
-  const locaisDaRegiao = regiao ? pins.filter(p => p.regiao_id === regiao.id) : [];
+  const localDaTerra = regiao?.local_id ? locaisFull?.find(l => l.id === regiao.local_id) : null;
+  const mudou = !!(form && localDaTerra && CHAVES_LOCAL.some(k => (form[k] ?? '') !== (localDaTerra[k] ?? '')));
   const modoClique = !!(movendo || editando);
   const emModo = !!(movendo || editando || escolhendo);
   const tilt = inclinado && !modoClique;
@@ -430,6 +466,11 @@ export default function Atlas() {
   const aviso = movendo ? 'ARRASTE A TERRA PARA O NOVO LUGAR'
     : editando ? 'CLIQUE NO MAPA PARA POSICIONAR'
     : escolhendo ? 'CLIQUE NO 📍 QUE DESCREVE ESTA TERRA' : null;
+
+  useEffect(() => {
+    setForm(localDaTerra ? formDe(localDaTerra) : null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localDaTerra?.id, locaisFull]);
 
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] page-fade" style={crimson}>
@@ -627,10 +668,60 @@ export default function Atlas() {
                       className="w-full aspect-video object-cover border border-[#c8a84b20]" style={radius} />
                   )}
 
-                  {regiao.local_id ? (
+                  {regiao.local_id && isMestre && form ? (
+                    <div className="space-y-3">
+                      <div>
+                        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">DESCRIÇÃO</p>
+                        <textarea value={form.description} rows={5} aria-label="Descrição"
+                          onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                          className={campo} style={radius} />
+                      </div>
+                      {CAMPOS_LOCAL.map(({ chave, label }) => (
+                        <div key={chave}>
+                          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">{label}</p>
+                          <textarea value={form[chave]} rows={chave === 'quests' ? 6 : 4} aria-label={label}
+                            onChange={e => setForm(f => ({ ...f, [chave]: e.target.value }))}
+                            className={campo} style={radius} />
+                        </div>
+                      ))}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">IDIOMA</p>
+                          <input value={form.language} aria-label="Idioma"
+                            onChange={e => setForm(f => ({ ...f, language: e.target.value }))}
+                            className={campo} style={radius} />
+                        </div>
+                        <div>
+                          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">NÍVEL MÉDIO</p>
+                          <input value={form.avg_level} aria-label="Nível médio"
+                            onChange={e => setForm(f => ({ ...f, avg_level: e.target.value }))}
+                            className={campo} style={radius} />
+                        </div>
+                      </div>
+                      <div>
+                        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">FACÇÃO CONTROLADORA</p>
+                        <select value={form.faction_id} aria-label="Facção controladora"
+                          onChange={e => setForm(f => ({ ...f, faction_id: e.target.value }))}
+                          className={campo} style={radius}>
+                          <option value="">Nenhuma</option>
+                          {faccoes.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
+                        </select>
+                      </div>
+                      <div className="flex items-center gap-3 sticky bottom-0 bg-[#161410] py-2">
+                        <button onClick={salvarLocalDaTerra} disabled={!mudou || salvandoLocal}
+                          className={`${btn} border-[#c8a84b] text-[#c8a84b] hover:bg-[#c8a84b10]`}
+                          style={{ ...cinzel, ...radius }}>
+                          {salvandoLocal ? 'Salvando...' : 'Salvar alterações'}
+                        </button>
+                        {mudou && <span className="text-[#8a7e68] text-xs">Alterações não salvas</span>}
+                      </div>
+                    </div>
+                  ) : regiao.local_id ? (
                     <div>
                       <p className="text-[#9a8e78] text-sm leading-relaxed font-light max-h-44 overflow-y-auto pr-1">{regiao.descricao}</p>
-                      {isMestre && <p className="text-[#6a6050] text-xs mt-2">Texto vindo do local ligado a esta terra. Para mudar, edite em Locais.</p>}
+                      {isMestre && <p className="text-[#6a6050] text-xs mt-2">
+                        {locaisFull === null ? 'Carregando informações do local...' : 'Não achei o local ligado a esta terra.'}
+                      </p>}
                     </div>
                   ) : isMestre ? (
                     <div>
@@ -716,22 +807,6 @@ export default function Atlas() {
                     </div>
                   )}
 
-                  <div>
-                    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">CIDADES E LOCAIS</p>
-                    {locaisDaRegiao.length === 0 ? (
-                      <p className="text-[#8a7e68] text-sm">Nada conhecido por aqui ainda.</p>
-                    ) : (
-                      <div className="flex flex-wrap gap-2">
-                        {locaisDaRegiao.map(p => (
-                          <button key={p.id} onClick={() => abrirLocal(p.id)}
-                            className={`${btn} border-[#c8a84b20] text-[#9a8e78] hover:text-[#c8a84b]`}
-                            style={{ ...cinzel, ...radius }}>
-                            📍 {p.nome}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
                 </div>
               )}
 
