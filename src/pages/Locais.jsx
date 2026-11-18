@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { MODELOS } from '../utils/modelos';
 
+const CAMPANHA_ID = getCampanhaId();
 
 export default function Locais() {
   const navigate = useNavigate();
@@ -17,7 +18,6 @@ export default function Locais() {
   const [gerando, setGerando] = useState(false);
   const [expandido, setExpandido] = useState(null);
   const [erro, setErro] = useState('');
-  const CAMPANHA_ID = getCampanhaId();
 
   useEffect(() => {
     buscarLocais();
