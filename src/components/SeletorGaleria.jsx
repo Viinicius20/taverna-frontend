@@ -14,7 +14,7 @@ const ehMapa = it => /\bmapas?\b|\bmaps?\b/i.test(
 const POR_PAGINA = 24;
 const radius = { borderRadius: '2px' };
 
-export default function SeletorGaleria({ campanhaId, onEscolher, onFechar }) {
+export default function SeletorGaleria({ campanhaId, onEscolher, onFechar, soMapasInicial = true }) {
   const [itens, setItens] = useState(null);
   const [busca, setBusca] = useState('');
   const [soMapas, setSoMapas] = useState(true);
