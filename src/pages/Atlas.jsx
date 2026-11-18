@@ -256,21 +256,23 @@ export default function Atlas() {
 
     if (movendo) {
       const campos = { cx: +px.toFixed(2), cy: +((py / 100) * ALT).toFixed(2) };
+      const t = regioes.find(g => g.id === movendo);
+      const dx = campos.cx - t.cx;
+      const dy = ((campos.cy - t.cy) / ALT) * 100;
+      const filhos = pins.filter(p => p.regiao_id === movendo && p.x != null);
+      const novos = Object.fromEntries(filhos.map(p => [p.id, {
+        x: +(p.x + dx).toFixed(2), y: +(p.y + dy).toFixed(2),
+      }]));
+
       ajustarLocal(movendo, campos);
+      setPins(ps => ps.map(p => (novos[p.id] ? { ...p, ...novos[p.id] } : p)));
       await salvarCampos(movendo, campos);
+      await Promise.all(filhos.map(p =>
+        api.patch(`/locations/${p.id}`, { pin_x: novos[p.id].x, pin_y: novos[p.id].y })
+      ));
       setMovendo(null);
       return;
     }
-
-    const x = +px.toFixed(2);
-    const y = +py.toFixed(2);
-    try {
-      await api.patch(`/locations/${editando}`, { pin_x: x, pin_y: y });
-      setPins(p => p.map(l => (l.id === editando ? { ...l, x, y } : l)));
-      setLocalAberto(editando);
-      setRegiaoAberta(null);
-      setEditando(null);
-    } catch { alert('Erro ao salvar a posição.'); }
   }
 
   // ---------- derivados ----------
