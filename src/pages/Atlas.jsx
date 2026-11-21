@@ -174,17 +174,17 @@ export default function Atlas() {
   const [hoverId, setHoverId] = useState(null);
   const [regiaoAberta, setRegiaoAberta] = useState(null);
   const [localAberto, setLocalAberto] = useState(null);
-  const [movendo, setMovendo] = useState(null);       // terra sendo arrastada
-  const [editando, setEditando] = useState(null);     // local sendo posicionado
-  const [escolhendo, setEscolhendo] = useState(null); // terra esperando um 📍 que a descreva
+  const [movendo, setMovendo] = useState(null);      
+  const [editando, setEditando] = useState(null);     
+  const [escolhendo, setEscolhendo] = useState(null); 
   const [nomeEdit, setNomeEdit] = useState('');
   const [descEdit, setDescEdit] = useState('');
   const [gerando, setGerando] = useState(false);
   const [galeria, setGaleria] = useState(false);
   const arrasto = useRef(null);
-  const [locaisFull, setLocaisFull] = useState(null);   // locais completos (só mestre)
+  const [locaisFull, setLocaisFull] = useState(null);   
   const [faccoes, setFaccoes] = useState([]);
-  const [form, setForm] = useState(null);               // edição do local ligado à terra aberta
+  const [form, setForm] = useState(null);              
   const [salvandoLocal, setSalvandoLocal] = useState(false);
 
   useEffect(() => {
@@ -606,7 +606,8 @@ export default function Atlas() {
 
                   {/* pins dos locais: em pé mesmo com o mapa inclinado */}
                   {noMapa.map(p => (
-                    <button key={p.id} title={p.nome}
+                    <button key={p.id}
+                      title={p.npcs?.length ? `${p.nome}: ${p.npcs.map(n => n.nome).join(', ')}` : p.nome}
                       onClick={e => {
                         e.stopPropagation();
                         if (escolhendo) { vincularLocal(escolhendo, p.id); setEscolhendo(null); return; }
@@ -832,6 +833,25 @@ export default function Atlas() {
                   </div>
                   {local.descricao && (
                     <p className="text-[#9a8e78] text-sm leading-relaxed font-light mt-3 max-h-48 overflow-y-auto pr-1">{local.descricao}</p>
+                  )}
+
+                  {local.npcs?.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-[#c8a84b10]">
+                      <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-2">QUEM ESTÁ AQUI</p>
+                      {isMestre ? (
+                        <div className="space-y-2">
+                          {local.npcs.map(n => (
+                            <div key={n.id} className="flex items-center justify-between gap-3">
+                              <span className="text-[#9a8e78] text-sm">{n.nome}</span>
+                              <BotaoRevelar tipo="npc" entidadeId={n.id} campanhaId={campanha}
+                                descoberta={descDe('npc', n.id)} onMudou={carregarDescobertas} />
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-[#9a8e78] text-sm">{local.npcs.map(n => n.nome).join(', ')}</p>
+                      )}
+                    </div>
                   )}
 
                   {isMestre && terras.length > 0 && (
