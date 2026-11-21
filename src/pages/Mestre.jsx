@@ -23,6 +23,7 @@ import AdicionarMonstro from '../components/combate/AdicionarMonstro';
 import AdicionarPersonagens from '../components/combate/AdicionarPersonagens';
 import ModalCondicoes from '../components/combate/ModalCondicoes';
 import SessaoMestre from '../components/sessao/SessaoMestre';
+import CampoLocal from '../components/CampoLocal';
 
 
 const CAMPANHA_ID = getCampanhaId();
@@ -878,6 +879,7 @@ const menuItemsMestre = [
   { label: 'Vínculos', rota: '/relacoes' },
   { label: 'Sessão zero', rota: '/sessao-zero' },
   { label: 'Modo Sessão', rota: '/mestre?aba=sessao' },
+  { label: 'Lendas e Boatos', rota: '/lendas' },
 ];
 
 const HUMORES = [
@@ -1462,15 +1464,11 @@ useEffect(() => {
                       ))}
 
                       {/* LOCAL ATUAL */}
-                      <div>
+                      <div onClick={e => e.stopPropagation()}>
                         <label style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] block mb-1">📍 LOCAL ATUAL</label>
-                        <input
+                        <CampoLocal
                           value={getNota(npc.id, 'location')}
-                          onChange={e => editarNotaLocal(npc.id, 'location', e.target.value)}
-                          onClick={e => e.stopPropagation()}
-                          placeholder="Ex: Porto de Valdris" aria-label="Ex: Porto de Valdris"
-                          className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm w-full focus:outline-none focus:border-[#c8a84b50]"
-                          style={{ borderRadius: '2px' }} />
+                          onChange={valor => editarNotaLocal(npc.id, 'location', valor)} />
                       </div>
 
                       {/* HUMOR */}

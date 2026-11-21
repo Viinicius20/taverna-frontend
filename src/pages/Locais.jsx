@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { MODELOS } from '../utils/modelos';
+import IdeiasQuest from '../components/IdeiasQuest';
 
 const CAMPANHA_ID = getCampanhaId();
 
@@ -154,18 +155,20 @@ export default function Locais() {
                     <div className="px-6 pb-5 border-t border-[#c8a84b10] pt-4 flex flex-col gap-3">
                       {l.description && <p className="text-[#8a8070] text-sm leading-relaxed">{l.description}</p>}
 
-                      {[
-                        { label: 'REGIÃO', val: l.region_info },
-                        { label: 'COMÉRCIO', val: l.commerce },
-                        { label: 'MONSTROS/PERIGOS', val: l.monsters },
-                        { label: 'IDEIAS DE QUEST', val: l.quests },
-                        { label: 'AMEAÇA PRINCIPAL', val: l.boss },
-                      ].filter(({ val }) => val).map(({ label, val }) => (
-                        <div key={label}>
-                          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">{label}</p>
-                          <p className="text-[#9a8e78] text-sm">{val}</p>
-                        </div>
-                      ))}
+                    {[
+                      { label: 'REGIÃO', val: l.region_info },
+                      { label: 'COMÉRCIO', val: l.commerce },
+                      { label: 'MONSTROS/PERIGOS', val: l.monsters },
+                      { label: 'IDEIAS DE QUEST', val: l.quests },
+                      { label: 'AMEAÇA PRINCIPAL', val: l.boss },
+                    ].filter(({ val }) => val && !(Array.isArray(val) && val.length === 0)).map(({ label, val }) => (
+                      <div key={label}>
+                        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">{label}</p>
+                        {label === 'IDEIAS DE QUEST'
+                          ? <IdeiasQuest valor={val} />
+                          : <p className="text-[#9a8e78] text-sm">{val}</p>}
+                      </div>
+                    ))}
 
                       <div className="grid grid-cols-2 gap-3 text-xs">
                         {l.language && <div><span style={cinzel} className="text-[#8a7e68]">IDIOMA </span><span className="text-[#a09880]">{l.language}</span></div>}
