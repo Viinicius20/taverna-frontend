@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import PainelReputacao from "../components/PainelReputacao";
+import NotasFaccao from '../components/NotasFaccao';
 
 const CAMPANHA_ID = getCampanhaId();
 
@@ -153,6 +154,7 @@ async function recarregarFaccoesSilencioso() {
                       style={{ ...cinzel, borderRadius: '2px' }}>
                       Deletar
                     </button>
+                    <NotasFaccao faccaoId={f.id} />
                   </div>
                 )}
               </div>

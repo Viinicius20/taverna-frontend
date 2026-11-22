@@ -3039,7 +3039,7 @@ useEffect(() => {
 )}
 
 {aba === 'sessao' && (
-  <SessaoMestre combate={combate} onCondicoes={setModalCondicoes} />
+  <SessaoMestre combate={combate} onCondicoes={setModalCondicoes} personagens={personagens} />
 )}
 
 <ModalCondicoes

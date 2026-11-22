@@ -6,7 +6,7 @@ import { cinzel } from '../../estilos';
 
 const radius = { borderRadius: '2px' };
 
-export default function SessaoMestre({ combate, onCondicoes }) {
+export default function SessaoMestre({ combate, onCondicoes, personagens }) {
   const {
     combatentes, turnoAtual, combateAtivo, setCombateAtivo,
     proximoTurno, atualizarCombatente, removerCombatente,
@@ -63,6 +63,7 @@ export default function SessaoMestre({ combate, onCondicoes }) {
       <div className="space-y-4">
         <RolagemRapida />
         <MesaFeed />
+        <GanchosPessoais personagens={personagens} />
         <NotasSessao />
       </div>
     </div>
