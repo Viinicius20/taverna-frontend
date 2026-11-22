@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import PainelReputacao from "../components/PainelReputacao";
 import NotasFaccao from '../components/NotasFaccao';
+import SegredosFaccao from '../components/SegredosFaccao';
 
 const CAMPANHA_ID = getCampanhaId();
 
@@ -155,6 +156,7 @@ async function recarregarFaccoesSilencioso() {
                       Deletar
                     </button>
                     <NotasFaccao faccaoId={f.id} />
+                    <SegredosFaccao faccaoId={f.id} />
                   </div>
                 )}
               </div>

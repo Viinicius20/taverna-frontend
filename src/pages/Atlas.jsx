@@ -184,6 +184,7 @@ export default function Atlas() {
   const arrasto = useRef(null);
   const [locaisFull, setLocaisFull] = useState(null);   
   const [faccoes, setFaccoes] = useState([]);
+  const [faccaoAberta, setFaccaoAberta] = useState(null); 
   const [form, setForm] = useState(null);              
   const [salvandoLocal, setSalvandoLocal] = useState(false);
 
@@ -207,6 +208,7 @@ export default function Atlas() {
       .then(r => {
         setPins(r.data.data.pins || []);
         setRegioes(r.data.data.regioes || []);
+        setFaccoes(r.data.data.faccoes || []);
       })
       .catch(() => {})
       .finally(() => setCarregado(true));
@@ -266,11 +268,13 @@ export default function Atlas() {
     setLocalAberto(null);
     setNomeEdit(g.nome || '');
     setDescEdit(g.descricao || '');
+    setFaccaoAberta(null);
   }
 
   function abrirLocal(id) {
     setLocalAberto(id);
     setRegiaoAberta(null);
+    setFaccaoAberta(null);
   }
 
   async function salvarNome() {
@@ -447,6 +451,27 @@ export default function Atlas() {
     }
   }
 
+  function ajustarFaccao(id, campos) {
+  setFaccoes(fs => fs.map(f => (f.id === id ? { ...f, ...campos } : f)));
+}
+
+async function adicionarPresenca(faccaoId) {
+  if (!faccaoId || !regiao) return;
+  try {
+    await api.post('/faccoes-atlas/presenca', { faccao_id: String(faccaoId), regiao_id: regiao.id });
+    const f = faccoes.find(x => x.id === faccaoId);
+    ajustarFaccao(faccaoId, { regioes: [...(f?.regioes || []), regiao.id] });
+  } catch { alert('Erro ao adicionar a facção.'); }
+}
+
+async function removerPresenca(faccaoId) {
+  try {
+    await api.delete(`/faccoes-atlas/presenca/${regiao.id}/${faccaoId}`);
+    const f = faccoes.find(x => x.id === faccaoId);
+    ajustarFaccao(faccaoId, { regioes: (f?.regioes || []).filter(r => r !== regiao.id) });
+  } catch { alert('Erro ao remover a facção.'); }
+}
+
   // ---------- derivados ----------
 
   const terras = regioes.filter(g => g.cx != null);
@@ -454,6 +479,10 @@ export default function Atlas() {
   const semPosicao = pins.filter(p => p.x == null || p.y == null);
   const local = pins.find(p => p.id === localAberto);
   const regiao = regioes.find(g => g.id === regiaoAberta);
+  const faccao = faccoes.find(f => f.id === faccaoAberta);
+  const faccoesDaTerra = regiao ? faccoes.filter(f => f.regioes?.includes(regiao.id)) : [];
+  const faccoesLivres = regiao ? faccoes.filter(f => !f.regioes?.includes(regiao.id)) : [];
+  const COR_ESTADO = { aliada: '#4a8a4a', neutra: '#8a8070', hostil: '#c84b4b' };
   const localDaTerra = regiao?.local_id ? locaisFull?.find(l => l.id === regiao.local_id) : null;
   const mudou = !!(form && localDaTerra && CHAVES_LOCAL.some(k => (form[k] ?? '') !== (localDaTerra[k] ?? '')));
   const modoClique = !!(movendo || editando);
@@ -811,6 +840,34 @@ export default function Atlas() {
                 </div>
               )}
 
+              {(faccoesDaTerra.length > 0 || (isMestre && faccoesLivres.length > 0)) && (
+                <div>
+                  <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">FACÇÕES PRESENTES</p>
+                  <div className="flex flex-wrap gap-2 items-center">
+                    {faccoesDaTerra.map(f => (
+                      <span key={f.id} className="inline-flex items-center gap-1">
+                        <button onClick={() => setFaccaoAberta(f.id)}
+                          className={`${btn} border-[#c8a84b20] text-[#9a8e78] hover:text-[#c8a84b]`}
+                          style={{ ...cinzel, ...radius, borderColor: faccaoAberta === f.id ? '#c8a84b' : undefined }}>
+                          ⚑ {f.nome}
+                        </button>
+                        {isMestre && (
+                          <button onClick={() => removerPresenca(f.id)} title="Tirar desta terra"
+                            className="text-[#8a7e68] hover:text-red-600 text-xs">×</button>
+                        )}
+                      </span>
+                    ))}
+                    {isMestre && faccoesLivres.length > 0 && (
+                      <select value="" onChange={e => adicionarPresenca(e.target.value)} aria-label="Adicionar facção"
+                        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#9a8e78] px-2 py-1 text-xs focus:outline-none" style={radius}>
+                        <option value="">＋ facção...</option>
+                        {faccoesLivres.map(f => <option key={f.id} value={f.id}>{f.nome}</option>)}
+                      </select>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* card do local */}
               {local && (
                 <div className="border border-[#c8a84b30] bg-[#161410] p-4" style={radius}>
@@ -833,6 +890,15 @@ export default function Atlas() {
                   </div>
                   {local.descricao && (
                     <p className="text-[#9a8e78] text-sm leading-relaxed font-light mt-3 max-h-48 overflow-y-auto pr-1">{local.descricao}</p>
+                  )}
+
+                  {local.faccao_id && faccoes.find(f => f.id === local.faccao_id) && (
+                    <p className="text-[#8a7e68] text-xs mt-2">
+                      Controlado por{' '}
+                      <button onClick={() => setFaccaoAberta(local.faccao_id)} className="text-[#c8a84b] hover:underline">
+                        ⚑ {faccoes.find(f => f.id === local.faccao_id).nome}
+                      </button>
+                    </p>
                   )}
 
                   {local.npcs?.length > 0 && (
@@ -870,6 +936,56 @@ export default function Atlas() {
             </aside>
           )}
         </div>
+
+        {faccao && (
+          <div className="mt-4 border border-[#c8a84b30] bg-[#161410] p-4 space-y-3" style={radius}>
+            <div className="flex items-start justify-between gap-3 flex-wrap">
+              <div>
+                <p style={cinzel} className="text-[#f0e8d8] text-lg">⚑ {faccao.nome}</p>
+                <p className="text-xs mt-1">
+                  <span className="text-[#8a7e68]">{faccao.tipo}</span>
+                  {faccao.tipo && ' · '}
+                  <span style={{ color: COR_ESTADO[faccao.estado] || '#8a8070' }}>
+                    grupo: {faccao.estado}
+                  </span>
+                </p>
+              </div>
+              {isMestre && (
+                <BotaoRevelar tipo="faccao" entidadeId={faccao.id} campanhaId={campanha}
+                  descoberta={descDe('faccao', faccao.id)} onMudou={carregarDescobertas} />
+              )}
+            </div>
+
+            {faccao.publico && <p className="text-[#9a8e78] text-sm leading-relaxed font-light">{faccao.publico}</p>}
+
+            {faccao.segredos?.length > 0 && (
+              <div>
+                <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">
+                  {isMestre ? '🔒 SEGREDOS' : 'O QUE O GRUPO DESCOBRIU'}
+                </p>
+                <div className="space-y-2">
+                  {faccao.segredos.map(s => (
+                    <div key={s.id} className="border border-[#c8a84b15] bg-[#0f0e0c] px-3 py-2"
+                      style={{ ...radius, opacity: s.liberado ? 1 : 0.6 }}>
+                      <p className="text-[#9a8e78] text-sm">{s.texto}</p>
+                      {isMestre && (
+                        <div className="flex items-center justify-between gap-2 mt-2">
+                          <span className="text-[#8a7e68] text-xs">
+                            {s.liberado ? 'liberado' : `libera ao ser ${s.libera_em}`}
+                          </span>
+                          {!s.liberado && (
+                            <BotaoRevelar tipo="segredo" entidadeId={s.id} campanhaId={campanha}
+                              descoberta={descDe('segredo', s.id)} onMudou={carregarDescobertas} />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* locais sem posição (mestre) */}
         {isMestre && terras.length > 0 && semPosicao.length > 0 && (

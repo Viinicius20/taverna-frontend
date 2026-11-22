@@ -7,6 +7,7 @@ const CAMPOS = [
   { chave: 'segredos', rotulo: '🤫 SEGREDOS', dica: 'O que a facção esconde...' },
   { chave: 'objetivo_oculto', rotulo: 'OBJETIVO OCULTO', dica: 'O que ela realmente quer...' },
   { chave: 'notas_mestre', rotulo: 'ANOTAÇÕES DO MESTRE', dica: 'O que você quiser lembrar...' },
+  { chave: 'publico', rotulo: '📣 O QUE TODOS SABEM', dica: 'O que os jogadores veem quando a facção for revelada...' },
 ];
 
 let promessa = null;   

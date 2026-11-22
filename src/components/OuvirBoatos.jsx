@@ -56,7 +56,7 @@ export default function OuvirBoatos({ personagemId, compacto = false }) {
             </p>
           )}
           <p className="text-[#e8e0d0] text-sm italic">"{resultado.boato}"</p>
-          {resultado.fonte && <p className="text-[#8a7e68] text-xs mt-1">{resultado.fonte}</p>}
+          {resultado.fonte && <p className="text-[#8a7e68] text-xs mt-1">— {resultado.fonte}</p>}
         </div>
       )}
     </div>
