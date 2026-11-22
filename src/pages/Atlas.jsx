@@ -755,6 +755,16 @@ async function removerPresenca(faccaoId) {
                       {isMestre && <p className="text-[#6a6050] text-xs mt-2">
                         {locaisFull === null ? 'Carregando informações do local...' : 'Não achei o local ligado a esta terra.'}
                       </p>}
+                      {!isMestre && [
+                        ['REGIÃO', regiao.info?.regiao],
+                        ['COMÉRCIO', regiao.info?.comercio],
+                        ['IDIOMA', regiao.info?.idioma],
+                      ].filter(([, v]) => v).map(([label, v]) => (
+                        <div key={label} className="mt-3">
+                          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">{label}</p>
+                          <p className="text-[#9a8e78] text-sm leading-relaxed font-light">{v}</p>
+                        </div>
+                      ))}
                     </div>
                   ) : isMestre ? (
                     <div>
