@@ -1214,7 +1214,6 @@ async function rolarAtaque(ataque) {
       falha: d20 === 1,
     };
     setResultadoRolagem(resultado);
-    setHistoricoRolagens(prev => [resultado, ...prev].slice(0, 10));
     setTimeout(() => setResultadoRolagem(null), 5000);
   } catch {
     notificar('Não foi possível rolar. Tente de novo.', 'erro');
@@ -1243,7 +1242,6 @@ async function rolarPericia(nomeSkill, bonus) {
       falha: d20 === 1,
     };
     setResultadoRolagem(resultado);
-    setHistoricoRolagens(prev => [resultado, ...prev].slice(0, 10));
     setTimeout(() => setResultadoRolagem(null), 5000);
   } catch {
     notificar('Não foi possível rolar. Tente de novo.', 'erro');
@@ -1360,17 +1358,17 @@ async function abrirCofre(h) {
               <DataMundo campanhaId={CAMPANHA_ID} />
               <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">FICHA DO PERSONAGEM</p>
               <h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold">
-                <span style={{ color: 'var(--cor-classe, #c8a84b)' }} className="mr-2">{getIconeClasse(classeParaTema)}</span>
-                {ficha.name}
-              </h1>
-              <div className="flex flex-wrap gap-2 mt-2">
-                <button onClick={() => navigate(`/personagens/${id}/perfil`)} style={cinzel}
-                  className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors">
-                  🖼 Ver perfil
-                </button>
-                <OuvirBoatos personagemId={id} compacto />
-              </div>
-              <p className="text-[#9a8e78] mt-1">{[
+              <span style={{ color: 'var(--cor-classe, #c8a84b)' }} className="mr-2">{getIconeClasse(classeParaTema)}</span>
+              {ficha.name}
+            </h1>
+            <div className="flex flex-wrap gap-2 mt-2">
+              <button onClick={() => navigate(`/personagens/${id}/perfil`)} style={cinzel}
+                className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors">
+                🖼 Ver perfil
+              </button>
+              <OuvirBoatos personagemId={id} compacto />
+            </div>
+            <p className="text-[#9a8e78] mt-1">{[
           ficha.race,
           ficha.classes?.length
             ? ficha.classes.map(c => `${c.name} ${c.level}`).join(' / ')
