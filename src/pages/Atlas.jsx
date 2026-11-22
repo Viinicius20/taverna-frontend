@@ -191,7 +191,6 @@ export default function Atlas() {
   useEffect(() => {
     if (!isMestre) return;
     api.get(`/locations/${campanha}`).then(r => setLocaisFull(r.data.data || [])).catch(() => setLocaisFull([]));
-    api.get(`/factions/${campanha}`).then(r => setFaccoes(r.data.data || [])).catch(() => setFaccoes([]));
   }, [campanha, isMestre]);
 
   function carregarDescobertas() {
@@ -734,7 +733,11 @@ async function removerPresenca(faccaoId) {
                           onChange={e => setForm(f => ({ ...f, faction_id: e.target.value }))}
                           className={campo} style={radius}>
                           <option value="">Nenhuma</option>
-                          {faccoes.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
+                          {faccoes.map(f => (
+                            <option key={f.id} value={f.id} style={{ background: '#0f0e0c', color: '#e8e0d0' }}>
+                              {f.nome || f.name}
+                            </option>
+                          ))}
                         </select>
                       </div>
                       <div className="flex items-center gap-3 sticky bottom-0 bg-[#161410] py-2">
