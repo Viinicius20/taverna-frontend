@@ -3,6 +3,7 @@ import RolagemRapida from '../RolagemRapida';
 import MesaFeed from '../MesaFeed';
 import NotasSessao from '../NotasSessao';
 import { cinzel } from '../../estilos';
+import GanchosPessoais from '../GanchosPessoais';
 
 const radius = { borderRadius: '2px' };
 
