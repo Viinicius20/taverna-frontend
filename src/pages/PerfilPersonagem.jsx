@@ -5,6 +5,7 @@ import { cinzel, crimson } from '../estilos';
 import { limparMarkdown } from '../utils/texto';
 import RetratoCanvas from '../components/RetratoCanvas';
 import LogoTaverna from '../components/LogoTaverna';
+import OuvirBoatos from '../components/OuvirBoatos';
 
 const ATRIBUTOS = [['str', 'FOR'], ['dex', 'DES'], ['con', 'CON'], ['int', 'INT'], ['wis', 'SAB'], ['cha', 'CAR']];
 
@@ -160,6 +161,7 @@ async function enviarRetrato(e) {
             ))}
             </div>
         )}
+        <OuvirBoatos personagemId={id} />
         </div>
 
         {/* Coluna principal */}
