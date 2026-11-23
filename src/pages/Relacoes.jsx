@@ -7,7 +7,7 @@ import { notificar, confirmar } from '../utils/notificar';
 import MapaRelacoes from '../components/MapaRelacoes';
 import { VINCULOS } from '../constants/vinculos';
 import LogoTaverna from '../components/LogoTaverna';
-
+import { useUser } from '../context/UserContext';
 
 const CAMPANHA_ID = getCampanhaId();
 
@@ -29,6 +29,8 @@ export default function Relacoes() {
   const [erro, setErro] = useState('');
   const [vista, setVista] = useState('lista');
   const [como, setComo] = useState('');
+  const { user } = useUser();
+  const isMestre = user?.role === 'mestre';
 
   const carregarEntidades = useCallback(async () => {
     const lista = [];

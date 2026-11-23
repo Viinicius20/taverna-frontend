@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import FotoCriatura from '../components/FotoCriatura';
+import { useUser } from '../context/UserContext';
 
 
 const TIPOS = ['Aberração', 'Besta', 'Celestial', 'Construto', 'Dragão', 'Elemental', 'Fada', 'Espectro', 'Gigante', 'Humanoide', 'Monstruosidade', 'Gosma', 'Planta', 'Morto-vivo'];
