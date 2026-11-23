@@ -21,8 +21,8 @@ export default function OuvirBoatos({ personagemId, compacto = false }) {
       setResultado(r.data.data);
     } catch (e) {
       setErro(e.response?.status === 429
-        ? 'A taverna está barulhenta demais. Tente de novo em instantes.'
-        : 'Ninguém quis falar agora.');
+      ? (e.response?.data?.detail || 'A taverna está barulhenta demais. Tente de novo em instantes.')
+      : 'Ninguém quis falar agora.');
     }
     setCarregando(false);
   }
