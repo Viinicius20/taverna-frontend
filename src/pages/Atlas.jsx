@@ -132,6 +132,21 @@ function dentro([x, y], poly) {
   return d;
 }
 
+function abrirCadeia(tipo, ent) {
+  const filhos = tipo === 'regiao'
+    ? pins.filter(p => p.regiao_id === ent.id && !descDe('local', p.id))
+        .map(p => ({ tipo: 'local', entidade_id: p.id, nome: p.nome, subtitulo: p.subtitulo }))
+    : (ent.npcs || []).filter(n => !descDe('npc', n.id))
+        .map(n => ({ tipo: 'npc', entidade_id: n.id, nome: n.nome, subtitulo: n.ocupacao }));
+  if (filhos.length) setCadeia({ titulo: ent.nome, filhos });   // sem filhos ocultos, nem abre
+}
+
+async function confirmarCadeia(itens) {
+  await api.post(`/descobertas-cadeia/${campanha}`, { itens: itens.map(({ tipo, entidade_id }) => ({ tipo, entidade_id })) });
+  await carregarDescobertas();
+  setCadeia(null);
+}
+
 // textura de terreno: ruído -> degradê do ambiente -> iluminação para dar relevo
 function FiltroTerreno({ id, semente, ambiente }) {
   const a = ambienteDe(ambiente);
@@ -157,6 +172,43 @@ function FiltroTerreno({ id, semente, ambiente }) {
       </feDiffuseLighting>
       <feBlend in="cor" in2="luz" mode="multiply" />
     </filter>
+  );
+}
+
+function ModalCadeia({ titulo, filhos, onConfirmar, onFechar }) {
+  const chave = f => `${f.tipo}:${f.entidade_id}`;
+  const [marcados, setMarcados] = useState(() => new Set(filhos.map(chave)));
+  const alternar = f => setMarcados(s => {
+    const n = new Set(s); n.has(chave(f)) ? n.delete(chave(f)) : n.add(chave(f)); return n;
+  });
+  const tipoLabel = filhos[0]?.tipo === 'npc' ? 'NPCs' : 'locais';
+  return (
+    <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onClick={onFechar}>
+      <div className="bg-[#161410] border border-[#c8a84b30] p-5 w-full max-w-md space-y-3"
+           style={radius} onClick={e => e.stopPropagation()}>
+        <p style={cinzel} className="text-[#f0e8d8] text-lg">Revelar junto?</p>
+        <p className="text-[#8a7e68] text-xs">
+          Estes {tipoLabel} de <span className="text-[#c8a84b]">{titulo}</span> ainda estão ocultos:
+        </p>
+        <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+          {filhos.map(f => (
+            <label key={chave(f)} className="flex items-center gap-2 text-sm text-[#9a8e78] cursor-pointer">
+              <input type="checkbox" checked={marcados.has(chave(f))} onChange={() => alternar(f)} />
+              <span>{f.nome}</span>
+              {f.subtitulo && <span className="text-[#6a6050] text-xs">· {f.subtitulo}</span>}
+            </label>
+          ))}
+        </div>
+        <div className="flex gap-2 justify-end pt-2">
+          <button onClick={onFechar} className={`${btn} border-[#c8a84b20] text-[#9a8e78]`}
+                  style={{ ...cinzel, ...radius }}>Agora não</button>
+          <button onClick={() => onConfirmar(filhos.filter(f => marcados.has(chave(f))))}
+                  disabled={marcados.size === 0}
+                  className={`${btn} border-[#c8a84b] text-[#c8a84b] hover:bg-[#c8a84b10]`}
+                  style={{ ...cinzel, ...radius }}>Revelar selecionados</button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -188,6 +240,7 @@ export default function Atlas() {
   const [form, setForm] = useState(null);              
   const [salvandoLocal, setSalvandoLocal] = useState(false);
   const [localGrupo, setLocalGrupo] = useState(null);
+  const [cadeia, setCadeia] = useState(null);
 
   useEffect(() => {
     if (!isMestre) return;
@@ -694,7 +747,12 @@ async function removerPresenca(faccaoId) {
                     {isMestre && (
                       <div className="flex gap-2 items-center flex-wrap">
                         <BotaoRevelar tipo="regiao" entidadeId={regiao.id} campanhaId={campanha}
-                          descoberta={descDe('regiao', regiao.id)} onMudou={carregarDescobertas} />
+                          descoberta={descDe('regiao', regiao.id)}
+                          onMudou={() => {
+                            const eraOculta = !descDe('regiao', regiao.id);   // estado de antes do clique
+                            carregarDescobertas();
+                            if (eraOculta) abrirCadeia('regiao', regiao);
+                        }} />
                         <button onClick={gerarComIA} disabled={gerando}
                           className={`${btn} border-[#a86aa850] text-[#a86aa8]`} style={{ ...cinzel, ...radius }}>
                           {gerando ? '⟳ Gerando...' : '✨ Gerar com IA'}
@@ -907,7 +965,11 @@ async function removerPresenca(faccaoId) {
                     {isMestre && (
                       <div className="flex flex-wrap gap-2 justify-end">
                         <BotaoRevelar tipo="local" entidadeId={local.id} campanhaId={campanha}
-                          descoberta={descDe('local', local.id)} onMudou={carregarDescobertas} />
+                          descoberta={descDe('local', local.id)} onMudou={() => {
+                          const eraOculto = !descDe('local', local.id);
+                          carregarDescobertas();
+                          if (eraOculto) abrirCadeia('local', local);
+                        }} />
                         <button onClick={() => { setEditando(local.id); setMovendo(null); setEscolhendo(null); }}
                           className={`${btn} border-[#c8a84b30] text-[#c8a84b] hover:bg-[#c8a84b10]`}
                           style={{ ...cinzel, ...radius }}>📍 Posicionar</button>
@@ -1034,6 +1096,8 @@ async function removerPresenca(faccaoId) {
           </div>
         )}
       </div>
+
+      {cadeia && <ModalCadeia {...cadeia} onConfirmar={confirmarCadeia} onFechar={() => setCadeia(null)} />}
 
       {galeria && (
         <SeletorGaleria campanhaId={campanha} soMapasInicial={false}
