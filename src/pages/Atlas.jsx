@@ -187,6 +187,7 @@ export default function Atlas() {
   const [faccaoAberta, setFaccaoAberta] = useState(null); 
   const [form, setForm] = useState(null);              
   const [salvandoLocal, setSalvandoLocal] = useState(false);
+  const [localGrupo, setLocalGrupo] = useState(null);
 
   useEffect(() => {
     if (!isMestre) return;
@@ -214,6 +215,18 @@ export default function Atlas() {
     carregarDescobertas();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [campanha, isMestre, user]);
+  
+  useEffect(() => {
+  api.get(`/campanha-local/${campanha}`)          // troque pelo helper de requisição que o Atlas já usa
+    .then(r => setLocalGrupo(r.data?.data || null))
+    .catch(() => {});
+}, [campanha]);
+
+async function definirGrupo(id) {
+  const novo = localGrupo === id ? null : id;     // clicar de novo limpa
+  await api.patch(`/campanha-local/${campanha}`, { local_id: novo });
+  setLocalGrupo(novo);
+}
 
   const descDe = (tipo, id) =>
     descobertas.find(d => d.tipo === tipo && String(d.entidade_id) === String(id) && !d.personagem_id);
@@ -898,6 +911,11 @@ async function removerPresenca(faccaoId) {
                         <button onClick={() => { setEditando(local.id); setMovendo(null); setEscolhendo(null); }}
                           className={`${btn} border-[#c8a84b30] text-[#c8a84b] hover:bg-[#c8a84b10]`}
                           style={{ ...cinzel, ...radius }}>📍 Posicionar</button>
+                          <button onClick={() => definirGrupo(local.id)}
+                            className={`${btn} border-[#c8a84b30] text-[#c8a84b] hover:bg-[#c8a84b10]`}
+                            style={{ ...cinzel, ...radius }}>
+                            {localGrupo === local.id ? '🧭 Grupo está aqui ✓' : '🧭 Grupo está aqui'}
+                          </button>
                       </div>
                     )}
                   </div>
