@@ -2,6 +2,7 @@ import { cinzel, crimson } from '../estilos';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import FotoCriatura from '../components/FotoCriatura';
 
 
 const TIPOS = ['Aberração', 'Besta', 'Celestial', 'Construto', 'Dragão', 'Elemental', 'Fada', 'Espectro', 'Gigante', 'Humanoide', 'Monstruosidade', 'Gosma', 'Planta', 'Morto-vivo'];
@@ -23,6 +24,7 @@ export default function Bestiario() {
   const [novaDescricao, setNovaDescricao] = useState('');
   const [erro, setErro] = useState('');
   const [qtd, setQtd] = useState({});
+    const isMestre = user?.role === 'mestre';
 
   useEffect(() => {
     buscarMonstros();
@@ -179,6 +181,12 @@ async function toggleDescoberto(id, atual) {
                 <div className="border border-[#c8a84b15] bg-[#161410] p-4 cursor-pointer transition-all duration-300 hover:border-[#c8a84b60] hover:shadow-[0_0_16px_#c8a84b30] hover:-translate-y-0.5"
                   style={{ borderRadius: '2px' }}
                   onClick={() => setMonstroDetalhes(monstroDetalhes?.id === m.id ? null : m)}>
+                    {(m.discovered !== false || isMestre) && (
+                      <div onClick={e => e.stopPropagation()}>
+                        <FotoCriatura criatura={m}
+                          onMudou={url => setMonstros(lista => lista.map(x => (x.id === m.id ? { ...x, art_url: url } : x)))} />
+                      </div>
+                    )}
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-3">
                       <span style={cinzel} className="text-[#c8a84b] text-xs w-12">CR {m.cr}</span>
@@ -202,23 +210,23 @@ async function toggleDescoberto(id, atual) {
                 </div>
 
                 {/* Detalhes expandidos */}
-{monstroDetalhes?.id === m.id && (
-  <div className="border border-[#c8a84b15] border-t-0 bg-[#0f0e0c] p-6 space-y-4">
+                  {monstroDetalhes?.id === m.id && (
+                    <div className="border border-[#c8a84b15] border-t-0 bg-[#0f0e0c] p-6 space-y-4">
 
-    {/* Toggle de descoberto */}
-    <div className="flex items-center justify-between border border-[#c8a84b15] bg-[#161410] px-4 py-3">
-      <span style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px]">
-        {m.discovered === false ? '👁️ OS JOGADORES AINDA NÃO CONHECEM ESTA CRIATURA' : '✓ JOGADORES JÁ CONHECEM ESTA CRIATURA'}
-      </span>
-      <button onClick={e => { e.stopPropagation(); toggleDescoberto(m.id, m.discovered); }}
-        className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
-        style={{ ...cinzel, borderRadius: '2px' }}>
-        {m.discovered === false ? 'Marcar como Descoberto' : 'Ocultar Novamente'}
-      </button>
-    </div>
+                      {/* Toggle de descoberto */}
+                      <div className="flex items-center justify-between border border-[#c8a84b15] bg-[#161410] px-4 py-3">
+                        <span style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px]">
+                          {m.discovered === false ? '👁️ OS JOGADORES AINDA NÃO CONHECEM ESTA CRIATURA' : '✓ JOGADORES JÁ CONHECEM ESTA CRIATURA'}
+                        </span>
+                        <button onClick={e => { e.stopPropagation(); toggleDescoberto(m.id, m.discovered); }}
+                          className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
+                          style={{ ...cinzel, borderRadius: '2px' }}>
+                          {m.discovered === false ? 'Marcar como Descoberto' : 'Ocultar Novamente'}
+                        </button>
+                      </div>
 
-    {/* Atributos */}
-    {m.attributes && (
+                    {/* Atributos */}
+                    {m.attributes && (
                       <div className="grid grid-cols-6 gap-2 text-center">
                         {Object.entries(m.attributes).map(([attr, val]) => (
                           <div key={attr} className="border border-[#c8a84b15] py-2">
@@ -289,35 +297,35 @@ async function toggleDescoberto(id, atual) {
                     )}
 
                     <div className="flex items-center gap-2 pt-2 border-t border-[#c8a84b10]">
-  <input type="number" min="1" max="20" title="Quantidade"
-    value={qtd[m.id] ?? 1}
-    onChange={e => setQtd(q => ({ ...q, [m.id]: Math.max(1, Math.min(20, Number(e.target.value) || 1)) }))}
-    className="w-14 bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-2 py-1 text-xs text-center focus:outline-none"
-    style={{ borderRadius: '2px' }} />
+                      <input type="number" min="1" max="20" title="Quantidade"
+                        value={qtd[m.id] ?? 1}
+                        onChange={e => setQtd(q => ({ ...q, [m.id]: Math.max(1, Math.min(20, Number(e.target.value) || 1)) }))}
+                        className="w-14 bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-2 py-1 text-xs text-center focus:outline-none"
+                        style={{ borderRadius: '2px' }} />
 
-  <button onClick={() => {
-      const q = new URLSearchParams({
-        addMonster: m.name,
-        hp: String(m.hp ?? 1),
-        ac: String(m.ac ?? 10),
-        dex: String(m.attributes?.dex ?? 10),
-        qtd: String(qtd[m.id] ?? 1),
-      });
-      navigate(`/mestre?${q}`);
-    }}
-    className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 hover:bg-[#c8a84b10] transition-colors"
-    style={{ ...cinzel, borderRadius: '2px' }}>
-    ⚔ + COMBATE
-  </button>
+                      <button onClick={() => {
+                          const q = new URLSearchParams({
+                            addMonster: m.name,
+                            hp: String(m.hp ?? 1),
+                            ac: String(m.ac ?? 10),
+                            dex: String(m.attributes?.dex ?? 10),
+                            qtd: String(qtd[m.id] ?? 1),
+                          });
+                          navigate(`/mestre?${q}`);
+                        }}
+                        className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 hover:bg-[#c8a84b10] transition-colors"
+                        style={{ ...cinzel, borderRadius: '2px' }}>
+                        ⚔ + COMBATE
+                      </button>
 
-  {m.is_homebrew && (
-    <button onClick={() => { if (window.confirm(`Deletar "${m.name}"?`)) deletarMonstro(m.id); }}
-      className="text-xs border border-red-900 text-red-600 px-3 py-1 hover:bg-red-900 hover:text-white transition-colors"
-      style={{ ...cinzel, borderRadius: '2px' }}>
-      🗑 DELETAR
-    </button>
-  )}
-</div>
+                      {m.is_homebrew && (
+                        <button onClick={() => { if (window.confirm(`Deletar "${m.name}"?`)) deletarMonstro(m.id); }}
+                          className="text-xs border border-red-900 text-red-600 px-3 py-1 hover:bg-red-900 hover:text-white transition-colors"
+                          style={{ ...cinzel, borderRadius: '2px' }}>
+                          🗑 DELETAR
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

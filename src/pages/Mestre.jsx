@@ -24,6 +24,7 @@ import AdicionarPersonagens from '../components/combate/AdicionarPersonagens';
 import ModalCondicoes from '../components/combate/ModalCondicoes';
 import SessaoMestre from '../components/sessao/SessaoMestre';
 import CampoLocal from '../components/CampoLocal';
+import AbasCartao from '../components/AbasCartao';
 
 
 const CAMPANHA_ID = getCampanhaId();
@@ -134,6 +135,8 @@ export default function Mestre() {
   const [opcoesEse, setOpcoesEse] = useState([]);
   const [gerandoEse, setGerandoEse] = useState(false);
   const changelogsJaMostrados = useRef(new Set());
+  const MOSTRAR_CALCULADORA_XP = false;   // o grupo não usa XP
+  const [abaVozes, setAbaVozes] = useState('sussurros');
   
 
   const combate = useCombate({
@@ -2309,7 +2312,8 @@ useEffect(() => {
   )}
 </div>
 
-{/* CALCULADORA DE XP */}
+
+{/* CALCULADORA DE XP 
 <div className="mt-12">
   <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
   <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 opacity-70">RECOMPENSAS</p>
@@ -2375,6 +2379,7 @@ useEffect(() => {
     </div>
   )}
 </div>
+*/} 
 
 {/* ENCONTRO ALEATÓRIO */}
 <div className="mt-12">
@@ -2471,233 +2476,243 @@ useEffect(() => {
   <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 opacity-70">SUSSURROS</p>
   <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Vozes na Cabeça</h2>
 
-  <div className="border border-[#c8a84b20] bg-[#161410] p-6">
-    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">ENVIAR MENSAGEM SECRETA</p>
-    <div className="flex flex-col gap-3">
-      <select value={personagemDestino} onChange={e => setPersonagemDestino(e.target.value)}
-        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
-        style={{ borderRadius: '2px' }}>
-        <option value="">Selecionar personagem...</option>
-        {personagens.map(p => (
-          <option key={p.id} value={p.id}>{p.name}</option>
-        ))}
-      </select>
-      <textarea value={mensagemSecreta} onChange={e => setMensagemSecreta(e.target.value)}
-        placeholder="Ex: Você percebe que o Paladino está com a bolsa aberta..." aria-label="Ex: Você percebe que o Paladino está com a bolsa aberta..."
-        rows={3}
-        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020] resize-none"
-        style={{ borderRadius: '2px' }} />
-      <button onClick={enviarMensagemSecreta} disabled={enviandoMensagem || !personagemDestino || !mensagemSecreta.trim()}
-        className="bg-[#a86aa8] text-[#f0e8d8] px-5 py-2 text-xs font-bold hover:bg-[#aa60aa] transition-colors disabled:opacity-50"
-        style={{ ...cinzel, borderRadius: '2px' }}>
-        {enviandoMensagem ? '⟳ ENVIANDO...' : '🔮 SUSSURRAR'}
-      </button>
-    </div>
-  </div>
-</div>
+  <AbasCartao ativa={abaVozes} onMudar={setAbaVozes} abas={[
+    { id: 'sussurros', rotulo: 'Sussurrar', icone: '🔮' },
+    { id: 'pressagios', rotulo: 'Presságios', icone: '🌒', contador: presagios.filter(p => !p.cumprido).length },
+    { id: 'profecias', rotulo: 'Profecias', icone: '📜', contador: profecias.filter(p => p.status !== 'cumprida').length },
+  ]}>
 
-{/* PRESSÁGIOS */}
-<div className="border border-[#c8a84b20] bg-[#161410] mb-6">
-  <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
-    <div>
-      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">PRESSÁGIOS</p>
-      <p className="text-[#8a7e68] text-xs mt-1">Sinais do destino — revelados quando o tempo chegar</p>
-    </div>
-    <button onClick={() => setAdicionandoPresagio(!adicionandoPresagio)}
-      className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
-      style={{ ...cinzel, borderRadius: '2px' }}>
-      + Adicionar
-    </button>
-  </div>
-
-  {adicionandoPresagio && (
-    <div className="px-6 py-4 border-b border-[#c8a84b15]">
-      <textarea
-        value={novoPresagio}
-        onChange={e => setNovoPresagio(e.target.value)}
-        placeholder="Ex: Uma coruja branca pousou no ombro do ferreiro na noite anterior à batalha..." aria-label="Ex: Uma coruja branca pousou no ombro do ferreiro na noite anterior à batalha..."
-        rows={3}
-        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b50] resize-none mb-3 text-sm"
-        style={{ borderRadius: '2px' }} />
-      <div className="flex gap-2">
-        <button
-          onClick={async () => {
-            if (!novoPresagio.trim()) return;
-            try {
-              const res = await api.post('/presagios', { texto: novoPresagio.trim() });
-              setPresagios(prev => [res.data.data, ...prev]);
-              setNovoPresagio('');
-              setAdicionandoPresagio(false);
-            } catch { alert('Erro ao adicionar presságio.'); }
-          }}
-          className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors btn-shimmer"
-          style={{ ...cinzel, borderRadius: '2px' }}>
-          Salvar
-        </button>
-        <button onClick={() => { setAdicionandoPresagio(false); setNovoPresagio(''); }}
-          className="border border-[#c8a84b20] text-[#8a7e68] px-4 py-2 text-xs hover:text-[#c8a84b] transition-colors"
-          style={{ ...cinzel, borderRadius: '2px' }}>
-          Cancelar
-        </button>
-      </div>
-    </div>
-  )}
-
-  <div className="divide-y divide-[#c8a84b10]">
-    {presagios.length === 0 ? (
-      <p className="px-6 py-6 text-[#8a7e68] text-sm text-center" style={cinzel}>
-        Nenhum presságio registrado.
-      </p>
-    ) : (
-      presagios.map(p => (
-        <div key={p.id} className={`px-6 py-4 flex items-start gap-4 ${p.cumprido ? 'opacity-40' : ''}`}>
-          <span className="text-lg mt-0.5">{p.cumprido ? '✓' : '🔮'}</span>
-          <p className="flex-1 text-[#a09880] text-sm leading-relaxed italic">"{p.texto}"</p>
-          <div className="flex gap-2 flex-shrink-0">
-            {!p.cumprido && (
-              <button
-                onClick={async () => {
-                  try {
-                    await api.patch(`/presagios/${p.id}/cumprir`);
-                    setPresagios(prev => prev.map(x => x.id === p.id ? { ...x, cumprido: true } : x));
-                  } catch { alert('Erro ao cumprir presságio.'); }
-                }}
-                className="text-[#4a8a4a] border border-[#4a8a4a30] px-2 py-1 text-xs hover:border-[#4a8a4a] transition-colors"
-                style={{ ...cinzel, borderRadius: '2px' }}
-                title="Marcar como cumprido">
-                ✓
-              </button>
-            )}
-            <button
-              onClick={async () => {
-                if (!window.confirm('Deletar este presságio?')) return;
-                try {
-                  await api.delete(`/presagios/${p.id}`);
-                  setPresagios(prev => prev.filter(x => x.id !== p.id));
-                } catch { alert('Erro ao deletar.'); }
-              }}
-              className="text-red-600 border border-red-600 border-opacity-30 px-2 py-1 text-xs hover:border-red-600 hover:text-red-600 transition-colors"
-              style={{ borderRadius: '2px' }}>
-              ×
-            </button>
-            <button onClick={() => setModalEnviarPresagio(p.id)}
-              className="text-[#6a8aaa] border border-[#6a8aaa30] px-2 py-1 text-xs hover:border-[#6a8aaa] transition-colors"
-              style={{ ...cinzel, borderRadius: '2px' }}
-              title="Enviar aos jogadores">
-              📨
-            </button>
-          </div>
+    {abaVozes === 'sussurros' && (
+      <div className="p-6">
+        <div className="flex flex-col gap-3">
+          <select value={personagemDestino} onChange={e => setPersonagemDestino(e.target.value)}
+            className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]"
+            style={{ borderRadius: '2px' }}>
+            <option value="">Selecionar personagem...</option>
+            {personagens.map(p => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+          </select>
+          <textarea value={mensagemSecreta} onChange={e => setMensagemSecreta(e.target.value)}
+            placeholder="Ex: Você percebe que o Paladino está com a bolsa aberta..." aria-label="Mensagem secreta"
+            rows={3}
+            className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020] resize-none"
+            style={{ borderRadius: '2px' }} />
+          <button onClick={enviarMensagemSecreta} disabled={enviandoMensagem || !personagemDestino || !mensagemSecreta.trim()}
+            className="bg-[#a86aa8] text-[#f0e8d8] px-5 py-2 text-xs font-bold hover:bg-[#aa60aa] transition-colors disabled:opacity-50"
+            style={{ ...cinzel, borderRadius: '2px' }}>
+            {enviandoMensagem ? '⟳ ENVIANDO...' : '🔮 SUSSURRAR'}
+          </button>
         </div>
-      ))
-    )}
-  </div>
-</div>
-
-{/* PROFECIAS */}
-<div className="border border-[#c8a84b20] bg-[#161410] mb-6">
-  <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
-    <div>
-      <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">PROFECIAS</p>
-      <p className="text-[#8a7e68] text-xs mt-1">Condições que, uma vez cumpridas, revelam seu significado</p>
-    </div>
-    <button onClick={() => setAdicionandoProfecia(!adicionandoProfecia)}
-      className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
-      style={{ ...cinzel, borderRadius: '2px' }}>
-      + Adicionar
-    </button>
-  </div>
-
-  {adicionandoProfecia && (
-    <div className="px-6 py-4 border-b border-[#c8a84b15] flex flex-col gap-3">
-      <textarea value={novaProfeciaTexto} onChange={e => setNovaProfeciaTexto(e.target.value)}
-        placeholder='Ex: "Quando o portador do Ápice derramar sangue no templo..."'
-        rows={2}
-        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b50] resize-none text-sm"
-        style={{ borderRadius: '2px' }} />
-      <input value={novaProfeciaCondicao} onChange={e => setNovaProfeciaCondicao(e.target.value)}
-        placeholder="Condição de cumprimento (só você vê, ex: Grypsi sangra no altar de Kemet-Shur)" aria-label="Condição de cumprimento (só você vê, ex: Grypsi sangra no altar de Kemet-Shur)"
-        className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-4 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
-        style={{ borderRadius: '2px' }} />
-      <div className="flex gap-2">
-        <button
-          onClick={async () => {
-            if (!novaProfeciaTexto.trim() || !novaProfeciaCondicao.trim()) return;
-            try {
-              const res = await api.post('/prophecies', {
-                campaign_id: CAMPANHA_ID,
-                texto: novaProfeciaTexto.trim(),
-                condicao: novaProfeciaCondicao.trim()
-              });
-              setProfecias(prev => [res.data.data, ...prev]);
-              setNovaProfeciaTexto('');
-              setNovaProfeciaCondicao('');
-              setAdicionandoProfecia(false);
-            } catch { alert('Erro ao adicionar profecia.'); }
-          }}
-          className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors"
-          style={{ ...cinzel, borderRadius: '2px' }}>
-          Salvar
-        </button>
-        <button onClick={() => { setAdicionandoProfecia(false); setNovaProfeciaTexto(''); setNovaProfeciaCondicao(''); }}
-          className="border border-[#c8a84b20] text-[#8a7e68] px-4 py-2 text-xs hover:text-[#c8a84b] transition-colors"
-          style={{ ...cinzel, borderRadius: '2px' }}>
-          Cancelar
-        </button>
       </div>
-    </div>
-  )}
+    )}
 
-  <div className="divide-y divide-[#c8a84b10]">
-    {profecias.length === 0 ? (
-      <p className="px-6 py-6 text-[#8a7e68] text-sm text-center" style={cinzel}>
-        Nenhuma profecia registrada.
-      </p>
-    ) : (
-      profecias.map(p => {
-        const STATUS_COR = { pendente: '#a86aa8', parcial: '#8a7020', cumprida: '#4a8a4a' };
-        return (
-          <div key={p.id} className="px-6 py-4">
-            <div className="flex items-start justify-between gap-4">
-              <p className="flex-1 text-[#a09880] text-sm leading-relaxed italic">"{p.texto}"</p>
+    {abaVozes === 'pressagios' && (
+      <div>
+        <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
+          <div>
+            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">PRESSÁGIOS</p>
+            <p className="text-[#8a7e68] text-xs mt-1">Sinais do destino — revelados quando o tempo chegar</p>
+          </div>
+          <button onClick={() => setAdicionandoPresagio(!adicionandoPresagio)}
+            className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
+            style={{ ...cinzel, borderRadius: '2px' }}>
+            + Adicionar
+          </button>
+        </div>
+
+        {adicionandoPresagio && (
+          <div className="px-6 py-4 border-b border-[#c8a84b15]">
+            <textarea
+              value={novoPresagio}
+              onChange={e => setNovoPresagio(e.target.value)}
+              placeholder="Ex: Uma coruja branca pousou no ombro do ferreiro na noite anterior à batalha..." aria-label="Novo presságio"
+              rows={3}
+              className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b50] resize-none mb-3 text-sm"
+              style={{ borderRadius: '2px' }} />
+            <div className="flex gap-2">
               <button
                 onClick={async () => {
-                  if (!window.confirm('Deletar esta profecia?')) return;
+                  if (!novoPresagio.trim()) return;
                   try {
-                    await api.delete(`/prophecies/${p.id}`);
-                    setProfecias(prev => prev.filter(x => x.id !== p.id));
-                  } catch { alert('Erro ao deletar.'); }
+                    const res = await api.post('/presagios', { texto: novoPresagio.trim() });
+                    setPresagios(prev => [res.data.data, ...prev]);
+                    setNovoPresagio('');
+                    setAdicionandoPresagio(false);
+                  } catch { alert('Erro ao adicionar presságio.'); }
                 }}
-                className="text-red-600 border border-red-600 border-opacity-30 px-2 py-1 text-xs hover:border-red-600 hover:text-red-600 transition-colors flex-shrink-0"
-                style={{ borderRadius: '2px' }}>
-                ×
+                className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors btn-shimmer"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                Salvar
+              </button>
+              <button onClick={() => { setAdicionandoPresagio(false); setNovoPresagio(''); }}
+                className="border border-[#c8a84b20] text-[#8a7e68] px-4 py-2 text-xs hover:text-[#c8a84b] transition-colors"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                Cancelar
               </button>
             </div>
-            <div className="flex items-center gap-2 mt-3">
-              {['pendente', 'parcial', 'cumprida'].map(status => (
-                <button key={status}
-                  onClick={async () => {
-                    try {
-                      await api.patch(`/prophecies/${p.id}`, { status });
-                      setProfecias(prev => prev.map(x => x.id === p.id ? { ...x, status } : x));
-                    } catch { alert('Erro ao atualizar.'); }
-                  }}
-                  className="px-2 py-1 text-xs border transition-all"
-                  style={{
-                    borderRadius: '2px', ...cinzel,
-                    borderColor: p.status === status ? STATUS_COR[status] : '#c8a84b15',
-                    backgroundColor: p.status === status ? `${STATUS_COR[status]}20` : 'transparent',
-                    color: p.status === status ? STATUS_COR[status] : '#4a4030',
-                  }}>
-                  {status.toUpperCase()}
-                </button>
-              ))}
-              <span className="text-[#8a7e68] text-xs ml-2" title="Só você vê">🔒 {p.condicao}</span>
+          </div>
+        )}
+
+        <div className="divide-y divide-[#c8a84b10]">
+          {presagios.length === 0 ? (
+            <p className="px-6 py-6 text-[#8a7e68] text-sm text-center" style={cinzel}>
+              Nenhum presságio registrado.
+            </p>
+          ) : (
+            presagios.map(p => (
+              <div key={p.id} className={`px-6 py-4 flex items-start gap-4 ${p.cumprido ? 'opacity-40' : ''}`}>
+                <span className="text-lg mt-0.5">{p.cumprido ? '✓' : '🔮'}</span>
+                <p className="flex-1 text-[#a09880] text-sm leading-relaxed italic">"{p.texto}"</p>
+                <div className="flex gap-2 flex-shrink-0">
+                  {!p.cumprido && (
+                    <button
+                      onClick={async () => {
+                        try {
+                          await api.patch(`/presagios/${p.id}/cumprir`);
+                          setPresagios(prev => prev.map(x => x.id === p.id ? { ...x, cumprido: true } : x));
+                        } catch { alert('Erro ao cumprir presságio.'); }
+                      }}
+                      className="text-[#4a8a4a] border border-[#4a8a4a30] px-2 py-1 text-xs hover:border-[#4a8a4a] transition-colors"
+                      style={{ ...cinzel, borderRadius: '2px' }}
+                      title="Marcar como cumprido">
+                      ✓
+                    </button>
+                  )}
+                  <button
+                    onClick={async () => {
+                      if (!window.confirm('Deletar este presságio?')) return;
+                      try {
+                        await api.delete(`/presagios/${p.id}`);
+                        setPresagios(prev => prev.filter(x => x.id !== p.id));
+                      } catch { alert('Erro ao deletar.'); }
+                    }}
+                    className="text-red-600 border border-red-600 border-opacity-30 px-2 py-1 text-xs hover:border-red-600 hover:text-red-600 transition-colors"
+                    style={{ borderRadius: '2px' }}>
+                    ×
+                  </button>
+                  <button onClick={() => setModalEnviarPresagio(p.id)}
+                    className="text-[#6a8aaa] border border-[#6a8aaa30] px-2 py-1 text-xs hover:border-[#6a8aaa] transition-colors"
+                    style={{ ...cinzel, borderRadius: '2px' }}
+                    title="Enviar aos jogadores">
+                    📨
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    )}
+
+    {abaVozes === 'profecias' && (
+      <div>
+        <div className="px-6 py-4 border-b border-[#c8a84b15] flex items-center justify-between">
+          <div>
+            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px]">PROFECIAS</p>
+            <p className="text-[#8a7e68] text-xs mt-1">Condições que, uma vez cumpridas, revelam seu significado</p>
+          </div>
+          <button onClick={() => setAdicionandoProfecia(!adicionandoProfecia)}
+            className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
+            style={{ ...cinzel, borderRadius: '2px' }}>
+            + Adicionar
+          </button>
+        </div>
+
+        {adicionandoProfecia && (
+          <div className="px-6 py-4 border-b border-[#c8a84b15] flex flex-col gap-3">
+            <textarea value={novaProfeciaTexto} onChange={e => setNovaProfeciaTexto(e.target.value)}
+              placeholder='Ex: "Quando o portador do Ápice derramar sangue no templo..."' aria-label="Texto da profecia"
+              rows={2}
+              className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-4 py-3 w-full focus:outline-none focus:border-[#c8a84b50] resize-none text-sm"
+              style={{ borderRadius: '2px' }} />
+            <input value={novaProfeciaCondicao} onChange={e => setNovaProfeciaCondicao(e.target.value)}
+              placeholder="Condição de cumprimento (só você vê, ex: Grypsi sangra no altar de Kemet-Shur)" aria-label="Condição de cumprimento"
+              className="bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-4 py-2 w-full focus:outline-none focus:border-[#c8a84b50] text-sm"
+              style={{ borderRadius: '2px' }} />
+            <div className="flex gap-2">
+              <button
+                onClick={async () => {
+                  if (!novaProfeciaTexto.trim() || !novaProfeciaCondicao.trim()) return;
+                  try {
+                    const res = await api.post('/prophecies', {
+                      campaign_id: CAMPANHA_ID,
+                      texto: novaProfeciaTexto.trim(),
+                      condicao: novaProfeciaCondicao.trim()
+                    });
+                    setProfecias(prev => [res.data.data, ...prev]);
+                    setNovaProfeciaTexto('');
+                    setNovaProfeciaCondicao('');
+                    setAdicionandoProfecia(false);
+                  } catch { alert('Erro ao adicionar profecia.'); }
+                }}
+                className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                Salvar
+              </button>
+              <button onClick={() => { setAdicionandoProfecia(false); setNovaProfeciaTexto(''); setNovaProfeciaCondicao(''); }}
+                className="border border-[#c8a84b20] text-[#8a7e68] px-4 py-2 text-xs hover:text-[#c8a84b] transition-colors"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                Cancelar
+              </button>
             </div>
           </div>
-        );
-      })
+        )}
+
+        <div className="divide-y divide-[#c8a84b10]">
+          {profecias.length === 0 ? (
+            <p className="px-6 py-6 text-[#8a7e68] text-sm text-center" style={cinzel}>
+              Nenhuma profecia registrada.
+            </p>
+          ) : (
+            profecias.map(p => {
+              const STATUS_COR = { pendente: '#a86aa8', parcial: '#8a7020', cumprida: '#4a8a4a' };
+              return (
+                <div key={p.id} className="px-6 py-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <p className="flex-1 text-[#a09880] text-sm leading-relaxed italic">"{p.texto}"</p>
+                    <button
+                      onClick={async () => {
+                        if (!window.confirm('Deletar esta profecia?')) return;
+                        try {
+                          await api.delete(`/prophecies/${p.id}`);
+                          setProfecias(prev => prev.filter(x => x.id !== p.id));
+                        } catch { alert('Erro ao deletar.'); }
+                      }}
+                      className="text-red-600 border border-red-600 border-opacity-30 px-2 py-1 text-xs hover:border-red-600 hover:text-red-600 transition-colors flex-shrink-0"
+                      style={{ borderRadius: '2px' }}>
+                      ×
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-2 mt-3">
+                    {['pendente', 'parcial', 'cumprida'].map(status => (
+                      <button key={status}
+                        onClick={async () => {
+                          try {
+                            await api.patch(`/prophecies/${p.id}`, { status });
+                            setProfecias(prev => prev.map(x => x.id === p.id ? { ...x, status } : x));
+                          } catch { alert('Erro ao atualizar.'); }
+                        }}
+                        className="px-2 py-1 text-xs border transition-all"
+                        style={{
+                          borderRadius: '2px', ...cinzel,
+                          borderColor: p.status === status ? STATUS_COR[status] : '#c8a84b15',
+                          backgroundColor: p.status === status ? `${STATUS_COR[status]}20` : 'transparent',
+                          color: p.status === status ? STATUS_COR[status] : '#4a4030',
+                        }}>
+                        {status.toUpperCase()}
+                      </button>
+                    ))}
+                    <span className="text-[#8a7e68] text-xs ml-2" title="Só você vê">🔒 {p.condicao}</span>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
     )}
-  </div>
+  </AbasCartao>
 </div>
 
       {/* MODAL ENVIAR PRESSÁGIO */}

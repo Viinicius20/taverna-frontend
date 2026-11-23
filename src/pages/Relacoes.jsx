@@ -11,8 +11,7 @@ import LogoTaverna from '../components/LogoTaverna';
 
 const CAMPANHA_ID = getCampanhaId();
 
-const CAMINHO_LOCAIS = `/locations/${CAMPANHA_ID}`;   // copie o caminho real da página Mistérios
-
+const CAMINHO_LOCAIS = `/locations/${CAMPANHA_ID}`;   
 const TIPOS = { npc: 'NPCs', faction: 'Facções', location: 'Locais', character: 'Jogadores' };
 const campo = 'bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]';
 
@@ -83,6 +82,15 @@ useEffect(() => { carregarGrafo(); }, [carregarGrafo]);
     catch { notificar('Erro ao apagar o vínculo.', 'erro'); }
   }
 
+  async function mudarVinculo(rel, campos) {
+  try {
+    await api.patch(`/relacoes/${getCampanhaId()}/${rel.id}`, campos);
+    setRelacoes(lista => lista.map(x => (x.id === rel.id ? { ...x, ...campos } : x)));
+  } catch (e) {
+    setErro(e.response?.data?.detail || 'Erro ao editar o vínculo.');
+  }
+}
+
   const opcoes = Object.keys(TIPOS).map(t => (
     <optgroup key={t} label={TIPOS[t]}>
       {entidades.filter(e => e.tipo === t).sort((a, b) => a.nome.localeCompare(b.nome))
@@ -126,6 +134,10 @@ useEffect(() => { carregarGrafo(); }, [carregarGrafo]);
               style={{ ...cinzel, borderRadius: '2px' }}>
               + Criar vínculo
             </button>
+            <select value={rel.kind} onChange={e => mudarVinculo(rel, { kind: e.target.value })}
+              className={campo} style={{ borderRadius: '2px' }}>
+              {Object.entries(VINCULOS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+            </select>
           </div>
           {erro && <p className="text-red-400 text-sm">{erro}</p>}
         </div>
