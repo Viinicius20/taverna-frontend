@@ -4,6 +4,7 @@ import MesaFeed from '../MesaFeed';
 import NotasSessao from '../NotasSessao';
 import { cinzel } from '../../estilos';
 import GanchosPessoais from '../GanchosPessoais';
+import PainelDescobertas from '../PainelDescobertas';
 
 const radius = { borderRadius: '2px' };
 
@@ -64,6 +65,7 @@ export default function SessaoMestre({ combate, onCondicoes, personagens }) {
       <div className="space-y-4">
         <RolagemRapida />
         <MesaFeed />
+        <PainelDescobertas />
         <GanchosPessoais personagens={personagens} />
         <NotasSessao />
       </div>
