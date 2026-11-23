@@ -57,6 +57,21 @@ const carregarGrafo = useCallback(async () => {
   } catch { setErro('Erro ao carregar os vínculos.'); }
 }, [como]);
 
+  async function apagar(id) {
+    if (!(await confirmar('Apagar este vínculo?'))) return;
+    try { await api.delete(`/relacoes/${CAMPANHA_ID}/${id}`); carregarGrafo(); }
+    catch { notificar('Erro ao apagar o vínculo.', 'erro'); }
+  }
+
+  async function mudarVinculo(rel, campos) {
+  try {
+    await api.patch(`/relacoes/${CAMPANHA_ID}/${rel.id}`, campos);
+    carregarGrafo();
+  } catch (e) {
+    setErro(e.response?.data?.detail || 'Erro ao editar o vínculo.');
+  }
+}
+
 useEffect(() => { carregarEntidades(); }, [carregarEntidades]);
 useEffect(() => { carregarGrafo(); }, [carregarGrafo]);
 
@@ -75,21 +90,6 @@ useEffect(() => { carregarGrafo(); }, [carregarGrafo]);
       carregarGrafo();
     } catch (e) { setErro(mensagem(e, 'Erro ao criar o vínculo.')); }
   }
-
-  async function apagar(id) {
-    if (!(await confirmar('Apagar este vínculo?'))) return;
-    try { await api.delete(`/relacoes/${CAMPANHA_ID}/${id}`); carregarGrafo(); }
-    catch { notificar('Erro ao apagar o vínculo.', 'erro'); }
-  }
-
-  async function mudarVinculo(rel, campos) {
-  try {
-    await api.patch(`/relacoes/${getCampanhaId()}/${rel.id}`, campos);
-    setRelacoes(lista => lista.map(x => (x.id === rel.id ? { ...x, ...campos } : x)));
-  } catch (e) {
-    setErro(e.response?.data?.detail || 'Erro ao editar o vínculo.');
-  }
-}
 
   const opcoes = Object.keys(TIPOS).map(t => (
     <optgroup key={t} label={TIPOS[t]}>
@@ -134,10 +134,6 @@ useEffect(() => { carregarGrafo(); }, [carregarGrafo]);
               style={{ ...cinzel, borderRadius: '2px' }}>
               + Criar vínculo
             </button>
-            <select value={rel.kind} onChange={e => mudarVinculo(rel, { kind: e.target.value })}
-              className={campo} style={{ borderRadius: '2px' }}>
-              {Object.entries(VINCULOS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-            </select>
           </div>
           {erro && <p className="text-red-400 text-sm">{erro}</p>}
         </div>
@@ -185,7 +181,14 @@ useEffect(() => { carregarGrafo(); }, [carregarGrafo]);
                 <div>
                 <p className="text-sm">
                     <span className="text-[#f0e8d8]">{nomes[a.source]}</span>
-                    <span className="text-[#6a6050]"> {VINCULOS[a.kind] || a.kind} </span>
+                    {isMestre ? (
+                      <select value={a.kind} onChange={e => mudarVinculo(a, { kind: e.target.value })}
+                        aria-label="Tipo do vínculo" className={campo} style={{ borderRadius: '2px' }}>
+                        {Object.entries(VINCULOS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                      </select>
+                    ) : (
+                      <span className="text-[#6a6050]"> {VINCULOS[a.kind] || a.kind} </span>
+                    )}
                     <span className="text-[#f0e8d8]">{nomes[a.target]}</span>
                     {a.secret && <span title="Secreto"> 🔒</span>}
                 </p>

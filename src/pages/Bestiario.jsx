@@ -24,7 +24,8 @@ export default function Bestiario() {
   const [novaDescricao, setNovaDescricao] = useState('');
   const [erro, setErro] = useState('');
   const [qtd, setQtd] = useState({});
-    const isMestre = user?.role === 'mestre';
+  const { user } = useUser();
+  const isMestre = user?.role === 'mestre';
 
   useEffect(() => {
     buscarMonstros();
