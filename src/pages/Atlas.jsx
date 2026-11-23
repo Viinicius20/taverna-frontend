@@ -132,21 +132,6 @@ function dentro([x, y], poly) {
   return d;
 }
 
-function abrirCadeia(tipo, ent) {
-  const filhos = tipo === 'regiao'
-    ? pins.filter(p => p.regiao_id === ent.id && !descDe('local', p.id))
-        .map(p => ({ tipo: 'local', entidade_id: p.id, nome: p.nome, subtitulo: p.subtitulo }))
-    : (ent.npcs || []).filter(n => !descDe('npc', n.id))
-        .map(n => ({ tipo: 'npc', entidade_id: n.id, nome: n.nome, subtitulo: n.ocupacao }));
-  if (filhos.length) setCadeia({ titulo: ent.nome, filhos });   // sem filhos ocultos, nem abre
-}
-
-async function confirmarCadeia(itens) {
-  await api.post(`/descobertas-cadeia/${campanha}`, { itens: itens.map(({ tipo, entidade_id }) => ({ tipo, entidade_id })) });
-  await carregarDescobertas();
-  setCadeia(null);
-}
-
 // textura de terreno: ruído -> degradê do ambiente -> iluminação para dar relevo
 function FiltroTerreno({ id, semente, ambiente }) {
   const a = ambienteDe(ambiente);
@@ -290,6 +275,23 @@ async function definirGrupo(id) {
     setEditando(null);
     setEscolhendo(null);
   }
+
+  function abrirCadeia(tipo, ent) {
+  const filhos = tipo === 'regiao'
+    ? pins.filter(p => p.regiao_id === ent.id && !descDe('local', p.id))
+        .map(p => ({ tipo: 'local', entidade_id: p.id, nome: p.nome, subtitulo: p.subtitulo }))
+    : (ent.npcs || []).filter(n => !descDe('npc', n.id))
+        .map(n => ({ tipo: 'npc', entidade_id: n.id, nome: n.nome, subtitulo: n.ocupacao }));
+  if (filhos.length) setCadeia({ titulo: ent.nome, filhos });
+}
+
+async function confirmarCadeia(itens) {
+  await api.post(`/descobertas-cadeia/${campanha}`, {
+    itens: itens.map(({ tipo, entidade_id }) => ({ tipo, entidade_id })),
+  });
+  await carregarDescobertas();
+  setCadeia(null);
+}
 
   // ---------- terras ----------
 
