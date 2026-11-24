@@ -222,8 +222,6 @@ export default function Atlas() {
   const [salvandoLocal, setSalvandoLocal] = useState(false);
   const [localGrupo, setLocalGrupo] = useState(null);
   const [cadeia, setCadeia] = useState(null);
-  const [grupoLocalId, setGrupoLocalId] = useState(null);
-
   useEffect(() => {
     if (!isMestre) return;
     api.get(`/locations/${campanha}`).then(r => setLocaisFull(r.data.data || [])).catch(() => setLocaisFull([]));
@@ -258,9 +256,13 @@ export default function Atlas() {
 }, [campanha]);
 
 async function definirGrupo(id) {
-  const novo = localGrupo === id ? null : id;     // clicar de novo limpa
-  await api.patch(`/campanha-local/${campanha}`, { local_id: novo });
-  setLocalGrupo(novo);
+  const novo = localGrupo === id ? null : id;
+  try {
+    await api.patch(`/campanha-local/${campanha}`, { local_id: novo });
+    setLocalGrupo(novo);
+  } catch (e) {
+    alert(e.response?.data?.detail || 'Não foi possível mover o grupo.');
+  }
 }
 
   const descDe = (tipo, id) =>
@@ -394,7 +396,8 @@ async function confirmarCadeia(itens) {
   }
 
   async function gerarComIA() {
-    const contexto = window.prompt('Contexto opcional (clima, cultura, tom):') ?? '';
+    const contexto = window.prompt('Contexto opcional (clima, cultura, tom):');
+    if (contexto === null) return;
     setGerando(true);
     try {
       const res = await api.post(`/regioes/${regiaoAberta}/gerar`, { contexto });
@@ -713,7 +716,7 @@ async function removerPresenca(faccaoId) {
                         transition: movendo ? 'none' : 'transform 0.6s ease',
                         filter: localAberto === p.id ? 'drop-shadow(0 0 6px #c8a84b)' : 'drop-shadow(0 1px 2px #000)',
                       }}>
-                      {grupoLocalId === p.id && (
+                      {localGrupo === p.id && (
                         <span className="absolute animate-pulse pointer-events-none"
                           style={{
                             left: '50%', bottom: 0, width: 34, height: 12,
@@ -756,7 +759,7 @@ async function removerPresenca(faccaoId) {
                         <BotaoRevelar tipo="regiao" entidadeId={regiao.id} campanhaId={campanha}
                           descoberta={descDe('regiao', regiao.id)}
                           onMudou={() => {
-                            const eraOculta = !descDe('regiao', regiao.id);   // estado de antes do clique
+                            const eraOculta = !descDe('regiao', regiao.id);   
                             carregarDescobertas();
                             if (eraOculta) abrirCadeia('regiao', regiao);
                         }} />
