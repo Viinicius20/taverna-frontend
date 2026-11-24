@@ -211,7 +211,7 @@ async function toggleDescoberto(id, atual) {
                     <FichaCriatura key={m.id} m={m}
                       oculto={m.discovered === false && !isMestre}
                       retrato={
-                        <FotoCriatura criatura={m}
+                        <FotoCriatura criatura={m} somenteLeitura={!isMestre}
                           onMudou={url => {
                             setMonstros(lista => lista.map(x => (x.id === m.id ? { ...x, art_url: url } : x)));
                             setMonstroDetalhes(d => (d && d.id === m.id ? { ...d, art_url: url } : d));
