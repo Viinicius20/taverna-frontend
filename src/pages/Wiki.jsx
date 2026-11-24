@@ -35,15 +35,17 @@ export default function Wiki() {
   const [entidades, setEntidades] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erroLista, setErroLista] = useState(false);
-  const [modo, setModo] = useState('inicio'); // inicio | lista | ficha | editor
+  const [modo, setModo] = useState('inicio'); 
   const [tipoLista, setTipoLista] = useState(null);
-  const [ficha, setFicha] = useState(null); // { tipo, id }
+  const [ficha, setFicha] = useState(null); 
   const [atualId, setAtualId] = useState(null);
   const [form, setForm] = useState(VAZIO);
   const [busca, setBusca] = useState('');
   const [previa, setPrevia] = useState(false);
   const [salvando, setSalvando] = useState(false);
   const [abertos, setAbertos] = useState({});
+  const [detalhe, setDetalhe] = useState(null);
+  const [carregandoDetalhe, setCarregandoDetalhe] = useState(false);
 
   useEffect(() => {
     api.get(`/wiki/${CAMPANHA_ID}`)
@@ -259,6 +261,7 @@ export default function Wiki() {
     }
     const e = entidadeAtual;
     const t = TIPOS[e.tipo];
+    const det = detalhe && detalhe.tipo === e.tipo && String(detalhe.id) === String(e.id) ? detalhe : null;
     const doMundo = paginasDaEntidade(e.tipo, e.id);
     const citada = paginas.filter(p => menciona(p.conteudo, e.nome));
     return (
@@ -279,7 +282,24 @@ export default function Wiki() {
           </span>
         </div>
 
-        {e.resumo && <p className="text-[#9a8e78] text-sm leading-relaxed">{e.resumo}</p>}
+        {carregandoDetalhe && !det && <p className="text-[#8a7e68] text-sm">Carregando a história...</p>}
+
+        {det && det.campos.map(c => (
+          <div key={c.chave}>
+            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">{c.rotulo.toUpperCase()}</p>
+            <p className="text-[#9a8e78] text-sm leading-relaxed whitespace-pre-line max-w-prose">{c.texto}</p>
+          </div>
+        ))}
+
+        {det && det.campos.length === 0 && (
+          <p className="text-[#8a7e68] text-sm">
+            Esta entrada ainda não tem história registrada. Use o botão abaixo para escrever uma página sobre ela.
+          </p>
+        )}
+
+        {!det && !carregandoDetalhe && e.resumo && (
+          <p className="text-[#9a8e78] text-sm leading-relaxed">{e.resumo}</p>
+        )}
 
         <div className="flex gap-2 flex-wrap">
           <button onClick={() => novaSobre(e)} className={btnSec} style={{ ...cinzel, ...radius }}>
@@ -387,6 +407,18 @@ export default function Wiki() {
       </div>
     );
   }
+
+  function abrirFicha(ent) {
+  setFicha({ tipo: ent.tipo, id: ent.id });
+  setModo('ficha');
+  setAtualId(null);
+  setDetalhe(null);
+  setCarregandoDetalhe(true);
+  api.get(`/wiki-entidade/${CAMPANHA_ID}/${ent.tipo}/${ent.id}`)
+    .then(r => setDetalhe(r.data.data))
+    .catch(() => setDetalhe(null))
+    .finally(() => setCarregandoDetalhe(false));
+}
 
   /* ---------- barra lateral ---------- */
   const nadaEncontrado = termo
