@@ -73,7 +73,7 @@ export default function Mestre() {
   const [salvandoSessao, setSalvandoSessao] = useState(false);
   const [sessaoExpandida, setSessaoExpandida] = useState(null);
   const [monstros, setMonstros] = useState([{ nome: '', xp: 0 }]);
-  const [xpCalculado, setXpCalculado] = useState(null);
+  {/*const [xpCalculado, setXpCalculado] = useState(null);*/}
   const [nomeGerado, setNomeGerado] = useState('');
   const [racaNome, setRacaNome] = useState('Humano');
   const [novoItemIdentificado, setNovoItemIdentificado] = useState(true);
@@ -135,7 +135,7 @@ export default function Mestre() {
   const [opcoesEse, setOpcoesEse] = useState([]);
   const [gerandoEse, setGerandoEse] = useState(false);
   const changelogsJaMostrados = useRef(new Set());
-  const MOSTRAR_CALCULADORA_XP = false;   // o grupo não usa XP
+  {/*const MOSTRAR_CALCULADORA_XP = false;   // o grupo não usa XP */}
   const [abaVozes, setAbaVozes] = useState('sussurros');
   
 
@@ -627,7 +627,7 @@ function calcularXp() {
   setXpCalculado({ total: totalXp, porPersonagem: xpPorPersonagem });
 }
 
-async function distribuirXp() {
+{/*async function distribuirXp() {
   if (!xpCalculado) return;
   try {
     await Promise.all(personagens.map(async p => {
@@ -644,7 +644,7 @@ async function distribuirXp() {
   } catch {
     setErro('Erro ao distribuir XP.');
   }
-}
+} */}
 
 async function gerarEncounter() {
   setGerandoEncounter(true);
