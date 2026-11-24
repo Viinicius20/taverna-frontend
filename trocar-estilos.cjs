@@ -30,7 +30,6 @@ for (const arq of arquivos(SRC)) {
   for (const [nome, re] of Object.entries(DECLS)) {
     if (!re.test(texto)) continue;
     texto = texto.replace(re, '');
-    // só importa se o nome ainda é usado no arquivo
     if (new RegExp(`\\b${nome}\\b`).test(texto)) importar.push(nome);
   }
 

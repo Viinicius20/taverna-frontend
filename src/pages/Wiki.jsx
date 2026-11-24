@@ -1,9 +1,10 @@
-import { cinzel, crimson } from '../estilos';
+import { cinzel, crimson, COR_ENTIDADE, ICONE_ENTIDADE } from '../estilos';
 import { getCampanhaId } from '../utils/campanha';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import TextoWiki from '../components/TextoWiki';
+import BotaoRevelar from '../components/BotaoRevelar';
 
 const CAMPANHA_ID = getCampanhaId();
 const CATEGORIAS = ['Lore', 'Pessoas', 'Lugares', 'Facções', 'Eventos', 'Outros'];
@@ -12,7 +13,6 @@ const VAZIO = {
   entidade_tipo: null, entidade_id: null,
 };
 
-// AJUSTE: "rota" é a tela onde a entidade pode ser vista (null = sem botão)
 const TIPOS = {
   regiao:   { plural: 'Terras',    singular: 'Terra',    categoria: 'Lugares', rota: '/atlas',     rotaNome: 'Atlas' },
   local:    { plural: 'Locais',    singular: 'Local',    categoria: 'Lugares', rota: '/atlas',     rotaNome: 'Atlas' },
@@ -20,7 +20,6 @@ const TIPOS = {
   faccao:   { plural: 'Facções',   singular: 'Facção',   categoria: 'Facções', rota: null,         rotaNome: '' },
   criatura: { plural: 'Criaturas', singular: 'Criatura', categoria: 'Outros',  rota: '/bestiario', rotaNome: 'Bestiário' },
 };
-const TIPOS_DO_TEXTO = ['npc', 'local', 'faccao']; // os que o TextoWiki já sabe ligar
 
 const campo = 'bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm w-full focus:outline-none focus:border-[#c8a84b50]';
 const btnSec = 'text-xs border border-[#c8a84b30] text-[#c8a84b] px-3 py-1.5 hover:bg-[#c8a84b10]';
@@ -28,6 +27,17 @@ const radius = { borderRadius: '2px' };
 
 const menciona = (texto, nome) =>
   !!nome && (texto || '').toLowerCase().includes(`[[${nome.toLowerCase()}]]`);
+
+function LinhaPagina({ p, abrir }) {
+  return (
+    <button onClick={() => abrir(p.id)}
+      className="block w-full text-left px-3 py-2 text-sm text-[#9a8e78] hover:text-[#c8a84b] border border-[#c8a84b10] hover:border-[#c8a84b30]"
+      style={radius}>
+      {p.revelada ? '👁 ' : '🔒 '}{p.titulo}
+      <span className="text-[#6a6050] text-xs"> · {p.categoria}</span>
+    </button>
+  );
+}
 
 export default function Wiki() {
   const navigate = useNavigate();
@@ -46,6 +56,9 @@ export default function Wiki() {
   const [abertos, setAbertos] = useState({});
   const [detalhe, setDetalhe] = useState(null);
   const [carregandoDetalhe, setCarregandoDetalhe] = useState(false);
+  const areaRef = useRef(null);
+  const [sug, setSug] = useState(null);
+  const [gerando, setGerando] = useState(false);
 
   useEffect(() => {
     api.get(`/wiki/${CAMPANHA_ID}`)
@@ -66,11 +79,6 @@ export default function Wiki() {
     entidades.forEach(e => { if (g[e.tipo]) g[e.tipo].push(e); });
     return g;
   }, [entidades]);
-
-  const entidadesDoTexto = useMemo(
-    () => entidades.filter(e => TIPOS_DO_TEXTO.includes(e.tipo)),
-    [entidades]
-  );
 
   const entidadeAtual = ficha
     ? entidades.find(e => e.tipo === ficha.tipo && String(e.id) === String(ficha.id))
@@ -119,6 +127,34 @@ export default function Wiki() {
     });
   }
 
+  function verSugestoes(valor, cursor) {
+  const m = valor.slice(0, cursor).match(/\[\[([^\]\n]*)$/);
+  if (!m) { setSug(null); return; }
+  const termo = m[1].trim().toLowerCase();
+  const base = [
+    ...paginas.filter(p => p.id !== atualId).map(p => ({ nome: p.titulo, tipo: 'pagina' })),
+    ...entidades.map(e => ({ nome: e.nome, tipo: e.tipo })),
+  ];
+  const itens = base.filter(x => x.nome && x.nome.toLowerCase().includes(termo)).slice(0, 8);
+  setSug(itens.length ? { de: m.index, ate: cursor, itens, sel: 0 } : null);
+}
+
+function escolherSugestao(item) {
+  const el = areaRef.current;
+  const valor = form.conteudo;
+  const depois = valor.slice(sug.ate).replace(/^\]\]/, '');
+  const pos = sug.de + item.nome.length + 4;
+  setForm(f => ({ ...f, conteudo: `${valor.slice(0, sug.de)}[[${item.nome}]]${depois}` }));
+  setSug(null);
+  requestAnimationFrame(() => { el?.focus(); el?.setSelectionRange(pos, pos); });
+}
+
+function recarregarIndice() {
+  api.get(`/wiki-indice/${CAMPANHA_ID}`)
+    .then(r => setEntidades(r.data.data || []))
+    .catch(() => alert('Não foi possível atualizar.'));
+}
+
   /* ---------- salvar / apagar ---------- */
   async function salvar() {
     if (!form.titulo.trim()) return;
@@ -149,6 +185,33 @@ export default function Wiki() {
     }
   }
 
+async function gerarHistoria() {
+  const extra = window.prompt('Contexto opcional (tom, ideias):');
+  if (extra === null) return;
+  const contexto = [extra, entidadeDoForm?.resumo && `Já se sabe: ${entidadeDoForm.resumo}`]
+    .filter(Boolean).join('\n');
+  setGerando(true);
+  try {
+    const res = await api.post('/wiki/gerar-historia', {
+      titulo: form.titulo,
+      tipo: form.entidade_tipo ? (TIPOS[form.entidade_tipo]?.singular || form.entidade_tipo) : '',
+      contexto,
+      texto_atual: form.conteudo || '',
+      titulos_existentes: [
+        ...paginas.filter(p => p.id !== atualId).map(p => p.titulo),
+        ...entidades.map(e => e.nome),
+      ].filter(t => t && t !== form.titulo),
+    });
+    setForm(f => ({
+      ...f,
+      conteudo: f.conteudo?.trim() ? `${f.conteudo}\n\n${res.data.texto}` : res.data.texto,
+    }));
+  } catch (e) {
+    alert(e.response?.data?.detail || 'Erro ao gerar com IA.');
+  }
+  setGerando(false);
+}
+
   /* ---------- peças de tela ---------- */
   const entidadeDoForm = form.entidade_tipo
     ? entidades.find(e => e.tipo === form.entidade_tipo && String(e.id) === String(form.entidade_id))
@@ -156,17 +219,6 @@ export default function Wiki() {
   const citadaEm = atualId
     ? paginas.filter(p => p.id !== atualId && menciona(p.conteudo, form.titulo))
     : [];
-
-  function LinhaPagina({ p }) {
-    return (
-      <button onClick={() => abrir(p.id)}
-        className="block w-full text-left px-3 py-2 text-sm text-[#9a8e78] hover:text-[#c8a84b] border border-[#c8a84b10] hover:border-[#c8a84b30]"
-        style={radius}>
-        {p.revelada ? '👁 ' : '🔒 '}{p.titulo}
-        <span className="text-[#6a6050] text-xs"> · {p.categoria}</span>
-      </button>
-    );
-  }
 
   function renderInicio() {
     return (
@@ -207,7 +259,7 @@ export default function Wiki() {
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {recentes.map(p => <LinhaPagina key={p.id} p={p} />)}
+              {recentes.map(p => <LinhaPagina key={p.id} p={p} abrir={abrir} />)}
             </div>
           )}
         </div>
@@ -274,10 +326,17 @@ export default function Wiki() {
               {[t.singular, e.subtitulo].filter(Boolean).join(' · ')}
             </p>
           </div>
-          <span style={cinzel}
-            className={`text-xs border px-2 py-0.5 ${e.revelado ? 'border-[#c8a84b50] text-[#c8a84b]' : 'border-[#b07050] text-[#b07050]'}`}>
-            {e.revelado ? 'Revelado aos jogadores' : 'Oculto dos jogadores'}
-          </span>
+          <div className="flex flex-col items-end gap-2">
+            <span style={cinzel}
+              className={`text-xs border px-2 py-0.5 ${e.revelado ? 'border-[#c8a84b50] text-[#c8a84b]' : 'border-[#b07050] text-[#b07050]'}`}>
+              {e.revelado ? 'Revelado aos jogadores' : 'Oculto dos jogadores'}
+            </span>
+            {e.tipo !== 'criatura' && (
+              <BotaoRevelar tipo={e.tipo} entidadeId={e.id} campanhaId={CAMPANHA_ID}
+                descoberta={e.descoberta_id ? { id: e.descoberta_id } : null}
+                onMudou={recarregarIndice} />
+            )}
+          </div>
         </div>
 
         {carregandoDetalhe && !det && <p className="text-[#8a7e68] text-sm">Carregando a história...</p>}
@@ -325,7 +384,7 @@ export default function Wiki() {
           <div>
             <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-2">HISTÓRIA</p>
             <div className="flex flex-col gap-2">
-              {doMundo.map(p => <LinhaPagina key={p.id} p={p} />)}
+              {doMundo.map(p => <LinhaPagina key={p.id} p={p} abrir={abrir} />)}
             </div>
           </div>
         )}
@@ -334,7 +393,7 @@ export default function Wiki() {
           <div>
             <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-2">CITADO EM</p>
             <div className="flex flex-col gap-2">
-              {citada.map(p => <LinhaPagina key={p.id} p={p} />)}
+              {citada.map(p => <LinhaPagina key={p.id} p={p} abrir={abrir} />)}
             </div>
           </div>
         )}
@@ -362,23 +421,59 @@ export default function Wiki() {
           </select>
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px]">
             CONTEÚDO <span className="text-[#8a7e68]">· use [[Nome]] para criar links</span>
           </p>
-          <button onClick={() => setPrevia(!previa)} className="text-xs text-[#9a8e78] hover:text-[#c8a84b]">
-            {previa ? 'Editar' : 'Prévia'}
-          </button>
+          <div className="flex items-center gap-3">
+            <button type="button" onClick={gerarHistoria}
+              disabled={!form.titulo.trim() || gerando}
+              className="text-xs border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 disabled:opacity-40"
+              style={{ ...cinzel, ...radius }}>
+              {gerando ? 'Gerando...' : '✨ GERAR HISTÓRIA'}
+            </button>
+            <button onClick={() => setPrevia(!previa)} className="text-xs text-[#9a8e78] hover:text-[#c8a84b]">
+              {previa ? 'Editar' : 'Prévia'}
+            </button>
+          </div>
         </div>
         {previa ? (
           <div className="border border-[#c8a84b15] bg-[#0f0e0c] p-3 min-h-[10rem]">
-            <TextoWiki texto={form.conteudo} paginas={paginas} entidades={entidadesDoTexto} onAbrir={abrir} />
+            <TextoWiki texto={form.conteudo} paginas={paginas} entidades={entidades}
+              onAbrir={abrir} onAbrirEntidade={abrirFicha} />
           </div>
         ) : (
-          <textarea value={form.conteudo} rows={10} aria-label="Conteúdo"
-            placeholder="Conte a história. Ex.: A cidade de [[Nome do local]] foi fundada por..."
-            onChange={e => setForm(f => ({ ...f, conteudo: e.target.value }))}
-            className={campo} style={radius} />
+          <div className="relative">
+            <textarea ref={areaRef} value={form.conteudo} rows={10} aria-label="Conteúdo"
+              placeholder="Conte a história. Digite [[ para ligar a um local, NPC, terra, facção, criatura ou página."
+              onChange={e => {
+                setForm(f => ({ ...f, conteudo: e.target.value }));
+                verSugestoes(e.target.value, e.target.selectionStart);
+              }}
+              onKeyDown={e => {
+                if (!sug) return;
+                if (e.key === 'ArrowDown') { e.preventDefault(); setSug(s => ({ ...s, sel: (s.sel + 1) % s.itens.length })); }
+                else if (e.key === 'ArrowUp') { e.preventDefault(); setSug(s => ({ ...s, sel: (s.sel - 1 + s.itens.length) % s.itens.length })); }
+                else if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); escolherSugestao(sug.itens[sug.sel]); }
+                else if (e.key === 'Escape') { setSug(null); }
+              }}
+              onBlur={() => setTimeout(() => setSug(null), 150)}
+              className={campo} style={radius} />
+            {sug && (
+              <ul role="listbox"
+                className="absolute left-0 right-0 z-20 mt-1 max-h-56 overflow-y-auto bg-[#0f0e0c] border border-[#c8a84b40]">
+                {sug.itens.map((x, i) => (
+                  <li key={`${x.tipo}:${x.nome}:${i}`} role="option" aria-selected={i === sug.sel}
+                    onMouseDown={e => { e.preventDefault(); escolherSugestao(x); }}
+                    className={`px-3 py-1.5 text-sm cursor-pointer flex justify-between gap-3 ${
+                      i === sug.sel ? 'bg-[#c8a84b15] text-[#c8a84b]' : 'text-[#9a8e78]'}`}>
+                    <span style={{ color: COR_ENTIDADE[x.tipo] }}>{ICONE_ENTIDADE[x.tipo] || '📄'} {x.nome}</span>
+                    <span className="text-[#6a6050] text-xs">{x.tipo === 'pagina' ? 'Página' : TIPOS[x.tipo]?.singular}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         )}
 
         <p style={cinzel} className="text-[#a86aa8] text-xs tracking-[2px]">🔒 NOTAS DO MESTRE (nunca aparecem pros jogadores)</p>
@@ -409,7 +504,7 @@ export default function Wiki() {
           <div className="border-t border-[#c8a84b10] pt-3">
             <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-2">CITADA EM</p>
             <div className="flex flex-col gap-2">
-              {citadaEm.map(p => <LinhaPagina key={p.id} p={p} />)}
+              {citadaEm.map(p => <LinhaPagina key={p.id} p={p} abrir={abrir} />)}
             </div>
           </div>
         )}

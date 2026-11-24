@@ -12,14 +12,10 @@ import SeletorGaleria from '../components/SeletorGaleria';
 const radius = { borderRadius: '2px' };
 const btn = 'text-xs border px-3 py-1 transition-colors disabled:opacity-40';
 const LARG = 100;
-const ALT = 56.25;        // o mundo é 16:9
+const ALT = 56.25;        
 const INCLINACAO = 35;
-const PROF = 1.6;         // espessura das terras
+const PROF = 1.6;         
 const CAMADAS = 8;
-
-// ---------- ambientes: cada um muda cor, textura, relevo e lados da terra ----------
-// r/g/b = degradê do ruído (do claro ao escuro); freq = tamanho da textura;
-// espessura = quanto a terra "sobe" do mar (oceano é quase plano)
 
 const AMBIENTES = {
   floresta: {
@@ -438,9 +434,9 @@ async function confirmarCadeia(itens) {
 
   function pontoNoMundo(e) {
     const r = e.currentTarget.getBoundingClientRect();
-    const px = ((e.clientX - r.left) / r.width) * 100;    // % da largura
-    const py = ((e.clientY - r.top) / r.height) * 100;    // % da altura
-    return { px, py, x: px, y: (py / 100) * ALT };        // x/y em unidades do SVG
+    const px = ((e.clientX - r.left) / r.width) * 100;    
+    const py = ((e.clientY - r.top) / r.height) * 100;   
+    return { px, py, x: px, y: (py / 100) * ALT };       
   }
 
   function iniciarArrasto(e) {
@@ -451,8 +447,8 @@ async function confirmarCadeia(itens) {
     const sobreATerra = dentro([x, y], formaDe(t));
     arrasto.current = {
       id: t.id, cx0: t.cx, cy0: t.cy,
-      ox: sobreATerra ? t.cx - x : 0,      // pegou na terra: mantém o ponto de agarre
-      oy: sobreATerra ? t.cy - y : 0,      // clicou fora: o centro pula pro cursor
+      ox: sobreATerra ? t.cx - x : 0,      
+      oy: sobreATerra ? t.cy - y : 0,      
       pins0: pins.filter(p => p.regiao_id === t.id && p.x != null).map(p => ({ id: p.id, x: p.x, y: p.y })),
       moveu: false, cx: t.cx, cy: t.cy,
     };
@@ -701,25 +697,20 @@ async function removerPresenca(faccaoId) {
                   </svg>
 
                   {/* pins dos locais: em pé mesmo com o mapa inclinado */}
-                  {noMapa.map(p => (
-                    <button key={p.id}
-                      title={p.npcs?.length ? `${p.nome}: ${p.npcs.map(n => n.nome).join(', ')}` : p.nome}
-                      onClick={e => {
-                        e.stopPropagation();
-                        if (escolhendo) { vincularLocal(escolhendo, p.id); setEscolhendo(null); return; }
-                        if (!modoClique) abrirLocal(p.id);
-                      }}
-                      className="absolute text-2xl leading-none"
+                  {grupoLocalId === p.id && (
+                    <span
+                      className="absolute animate-pulse pointer-events-none"
                       style={{
-                        left: `${p.x}%`, top: `${p.y}%`,
-                        transform: `translate(-50%, -100%) rotateX(${tilt ? -INCLINACAO : 0}deg)`,
-                        transformOrigin: '50% 100%',
-                        transition: movendo ? 'none' : 'transform 0.6s ease',
-                        filter: localAberto === p.id ? 'drop-shadow(0 0 6px #c8a84b)' : 'drop-shadow(0 1px 2px #000)',
-                      }}>
-                      📍
-                    </button>
-                  ))}
+                        left: '50%', bottom: 0,
+                        width: 34, height: 12,
+                        transform: 'translate(-50%, 50%)',
+                        border: '2px solid #c8a84b',
+                        borderRadius: '50%',
+                        boxShadow: '0 0 8px #c8a84b88, inset 0 0 6px #c8a84b55',
+                      }}
+                    />
+                  )}
+                  📍
 
                   {aviso && (
                     <p style={cinzel}

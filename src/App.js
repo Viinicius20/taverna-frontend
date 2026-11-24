@@ -34,7 +34,7 @@ import Tesouro from './pages/Tesouro';
 import PerfilPersonagem from './pages/PerfilPersonagem';
 import Atlas from './pages/Atlas';
 import Lendas from './pages/Lendas';
-
+import Enciclopedia from './pages/Enciclopedia';
 
 instalarAlertGlobal();
 
@@ -84,6 +84,7 @@ return (
               <Route path="/atlas" element={<Atlas />} />
               <Route path="/personagens/:id/perfil" element={<PerfilPersonagem />} />
               <Route path="/lendas" element={<Lendas />} />
+              <Route path="/enciclopedia" element={<Enciclopedia />} />
               {process.env.NODE_ENV !== 'production' && <Route path="/erro-teste" element={<Quebra />} />}
               {process.env.NODE_ENV !== 'production' && <Route path="/cards-teste" element={<CardsTeste />} />}
             </Routes>
