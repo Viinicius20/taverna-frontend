@@ -620,12 +620,12 @@ async function deletarSessao(id) {
   }
 }
 
-function calcularXp() {
+{/*function calcularXp() {
   const totalXp = monstros.reduce((acc, m) => acc + Number(m.xp || 0), 0);
   const numPersonagens = personagens.length || 1;
   const xpPorPersonagem = Math.floor(totalXp / numPersonagens);
   setXpCalculado({ total: totalXp, porPersonagem: xpPorPersonagem });
-}
+} */}
 
 {/*async function distribuirXp() {
   if (!xpCalculado) return;
