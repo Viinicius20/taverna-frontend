@@ -183,12 +183,6 @@ async function toggleDescoberto(id, atual) {
                 <div className="border border-[#c8a84b15] bg-[#161410] p-4 cursor-pointer transition-all duration-300 hover:border-[#c8a84b60] hover:shadow-[0_0_16px_#c8a84b30] hover:-translate-y-0.5"
                   style={{ borderRadius: '2px' }}
                   onClick={() => setMonstroDetalhes(monstroDetalhes?.id === m.id ? null : m)}>
-                    {(m.discovered !== false || isMestre) && (
-                      <div onClick={e => e.stopPropagation()}>
-                        <FotoCriatura criatura={m}
-                          onMudou={url => setMonstros(lista => lista.map(x => (x.id === m.id ? { ...x, art_url: url } : x)))} />
-                      </div>
-                    )}
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-3">
                       <span style={cinzel} className="text-[#c8a84b] text-xs w-12">CR {m.cr}</span>
@@ -212,8 +206,17 @@ async function toggleDescoberto(id, atual) {
                 </div>
 
                 {/* Detalhes expandidos */}
-                  {monstroDetalhes?.id === m.id && (
-                    <div className="border border-[#c8a84b15] border-t-0 bg-[#0f0e0c] p-6 space-y-4">
+                {monstroDetalhes?.id === m.id && (
+                  <div className="border border-[#c8a84b15] border-t-0 bg-[#0f0e0c] p-6 space-y-4">
+                    {(m.discovered !== false || isMestre) && (
+                      <div className="w-28 h-28 rounded-full overflow-hidden border border-[#c8a84b30]">
+                        <FotoCriatura criatura={m}
+                          onMudou={url => {
+                            setMonstros(lista => lista.map(x => (x.id === m.id ? { ...x, art_url: url } : x)));
+                            setMonstroDetalhes(d => (d && d.id === m.id ? { ...d, art_url: url } : d));
+                          }} />
+                      </div>
+                    )}
 
                       {/* Toggle de descoberto */}
                       <div className="flex items-center justify-between border border-[#c8a84b15] bg-[#161410] px-4 py-3">
