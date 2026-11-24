@@ -88,8 +88,6 @@ export default function Wiki() {
 
   function abrirLista(tipo) { setTipoLista(tipo); setModo('lista'); setFicha(null); setAtualId(null); }
 
-  function abrirFicha(ent) { setFicha({ tipo: ent.tipo, id: ent.id }); setModo('ficha'); setAtualId(null); }
-
   function abrir(id) {
     const p = paginas.find(x => x.id === id);
     if (!p) return;
