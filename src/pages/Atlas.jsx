@@ -222,6 +222,7 @@ export default function Atlas() {
   const [salvandoLocal, setSalvandoLocal] = useState(false);
   const [localGrupo, setLocalGrupo] = useState(null);
   const [cadeia, setCadeia] = useState(null);
+  const [grupoLocalId, setGrupoLocalId] = useState(null);
 
   useEffect(() => {
     if (!isMestre) return;
@@ -553,7 +554,6 @@ async function removerPresenca(faccaoId) {
   const tilt = inclinado && !modoClique;
   const painelAberto = !!(regiao || local);
   const prioridade = g => (regiaoAberta === g.id ? 2 : hoverId === g.id ? 1 : 0);
-  // quem está atrás é desenhado primeiro, e a terra levantada fica por cima
   const ordem = [...terras].sort((a, b) => prioridade(a) - prioridade(b) || a.cy - b.cy);
   const aviso = movendo ? 'ARRASTE A TERRA PARA O NOVO LUGAR'
     : editando ? 'CLIQUE NO MAPA PARA POSICIONAR'
@@ -697,20 +697,34 @@ async function removerPresenca(faccaoId) {
                   </svg>
 
                   {/* pins dos locais: em pé mesmo com o mapa inclinado */}
-                  {grupoLocalId === p.id && (
-                    <span
-                      className="absolute animate-pulse pointer-events-none"
-                      style={{
-                        left: '50%', bottom: 0,
-                        width: 34, height: 12,
-                        transform: 'translate(-50%, 50%)',
-                        border: '2px solid #c8a84b',
-                        borderRadius: '50%',
-                        boxShadow: '0 0 8px #c8a84b88, inset 0 0 6px #c8a84b55',
+                  {noMapa.map(p => (
+                    <button key={p.id}
+                      title={p.npcs?.length ? `${p.nome}: ${p.npcs.map(n => n.nome).join(', ')}` : p.nome}
+                      onClick={e => {
+                        e.stopPropagation();
+                        if (escolhendo) { vincularLocal(escolhendo, p.id); setEscolhendo(null); return; }
+                        if (!modoClique) abrirLocal(p.id);
                       }}
-                    />
-                  )}
-                  📍
+                      className="absolute text-2xl leading-none"
+                      style={{
+                        left: `${p.x}%`, top: `${p.y}%`,
+                        transform: `translate(-50%, -100%) rotateX(${tilt ? -INCLINACAO : 0}deg)`,
+                        transformOrigin: '50% 100%',
+                        transition: movendo ? 'none' : 'transform 0.6s ease',
+                        filter: localAberto === p.id ? 'drop-shadow(0 0 6px #c8a84b)' : 'drop-shadow(0 1px 2px #000)',
+                      }}>
+                      {grupoLocalId === p.id && (
+                        <span className="absolute animate-pulse pointer-events-none"
+                          style={{
+                            left: '50%', bottom: 0, width: 34, height: 12,
+                            transform: 'translate(-50%, 50%)',
+                            border: '2px solid #c8a84b', borderRadius: '50%',
+                            boxShadow: '0 0 8px #c8a84b88, inset 0 0 6px #c8a84b55',
+                          }} />
+                      )}
+                      📍
+                    </button>
+                  ))}
 
                   {aviso && (
                     <p style={cinzel}
