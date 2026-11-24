@@ -72,8 +72,6 @@ export default function Mestre() {
   const [novaSessao, setNovaSessao] = useState({ title: '', summary: '', session_number: 1 });
   const [salvandoSessao, setSalvandoSessao] = useState(false);
   const [sessaoExpandida, setSessaoExpandida] = useState(null);
-  const [monstros, setMonstros] = useState([{ nome: '', xp: 0 }]);
-  {/*const [xpCalculado, setXpCalculado] = useState(null);*/}
   const [nomeGerado, setNomeGerado] = useState('');
   const [racaNome, setRacaNome] = useState('Humano');
   const [novoItemIdentificado, setNovoItemIdentificado] = useState(true);
@@ -135,7 +133,6 @@ export default function Mestre() {
   const [opcoesEse, setOpcoesEse] = useState([]);
   const [gerandoEse, setGerandoEse] = useState(false);
   const changelogsJaMostrados = useRef(new Set());
-  {/*const MOSTRAR_CALCULADORA_XP = false;   // o grupo não usa XP */}
   const [abaVozes, setAbaVozes] = useState('sussurros');
   
 
@@ -619,32 +616,6 @@ async function deletarSessao(id) {
     setErro('Erro ao deletar sessão.');
   }
 }
-
-{/*function calcularXp() {
-  const totalXp = monstros.reduce((acc, m) => acc + Number(m.xp || 0), 0);
-  const numPersonagens = personagens.length || 1;
-  const xpPorPersonagem = Math.floor(totalXp / numPersonagens);
-  setXpCalculado({ total: totalXp, porPersonagem: xpPorPersonagem });
-} */}
-
-{/*async function distribuirXp() {
-  if (!xpCalculado) return;
-  try {
-    await Promise.all(personagens.map(async p => {
-      const xpAtual = p.data?.xp || 0;
-      const novoXp = xpAtual + xpCalculado.porPersonagem;
-      await api.put(`/characters/${p.id}`, {
-        data: { ...p.data, xp: novoXp }
-      });
-    }));
-    alert(`✅ ${xpCalculado.porPersonagem} XP distribuído para ${personagens.length} personagens!`);
-    setXpCalculado(null);
-    setMonstros([{ nome: '', xp: 0 }]);
-    buscarPersonagens();
-  } catch {
-    setErro('Erro ao distribuir XP.');
-  }
-} */}
 
 async function gerarEncounter() {
   setGerandoEncounter(true);
