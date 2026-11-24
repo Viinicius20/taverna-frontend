@@ -285,7 +285,18 @@ export default function Wiki() {
         {det && det.campos.map(c => (
           <div key={c.chave}>
             <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">{c.rotulo.toUpperCase()}</p>
-            <p className="text-[#9a8e78] text-sm leading-relaxed whitespace-pre-line max-w-prose">{c.texto}</p>
+            {c.itens ? (
+              <div className="flex flex-col gap-2">
+                {c.itens.map((x, i) => (
+                  <div key={i} className="border border-[#c8a84b15] bg-[#161410] px-4 py-3" style={radius}>
+                    {x.titulo && <p style={cinzel} className="text-[#e8e0d0] text-sm font-bold">{x.titulo}</p>}
+                    {x.texto && <p className="text-[#9a8e78] text-sm leading-relaxed mt-1">{x.texto}</p>}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[#9a8e78] text-sm leading-relaxed whitespace-pre-line max-w-prose">{c.texto}</p>
+            )}
           </div>
         ))}
 
