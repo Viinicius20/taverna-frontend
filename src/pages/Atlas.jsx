@@ -253,6 +253,15 @@ export default function Atlas() {
     .catch(() => {});
 }, [campanha]);
 
+useEffect(() => {
+  const aoTeclar = e => {
+    if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;  // não fecha enquanto digita
+    if (e.key === 'Escape') { setRegiaoAberta(null); setLocalAberto(null); }
+  };
+  window.addEventListener('keydown', aoTeclar);
+  return () => window.removeEventListener('keydown', aoTeclar);
+}, []);
+
 async function definirGrupo(id) {
   const novo = localGrupo === id ? null : id;
   try {
@@ -439,6 +448,14 @@ async function confirmarCadeia(itens) {
     const py = ((e.clientY - r.top) / r.height) * 100;   
     return { px, py, x: px, y: (py / 100) * ALT };       
   }
+
+function fecharPainel() {
+  setRegiaoAberta(null);
+  setLocalAberto(null);
+  setEditando(null);
+  setMovendo(null);
+  setEscolhendo(null);
+}
 
   function iniciarArrasto(e) {
     if (!movendo) return;
@@ -735,13 +752,26 @@ async function removerPresenca(faccaoId) {
                         if (!modoClique) abrirLocal(p.id);
                       }}
                       className="absolute text-2xl leading-none"
-                      style={{
+                                            style={{
                         left: `${p.x}%`, top: `${p.y}%`,
                         transform: `translate(-50%, -100%) rotateX(${tilt ? -INCLINACAO : 0}deg)`,
                         transformOrigin: '50% 100%',
                         transition: movendo ? 'none' : 'transform 0.6s ease',
                         filter: localAberto === p.id ? 'drop-shadow(0 0 6px #c8a84b)' : 'drop-shadow(0 1px 2px #000)',
                       }}>
+                      {localGrupo === p.id && (
+                        <>
+                          <span aria-hidden
+                            className="absolute left-1/2 bottom-0 -translate-x-1/2 translate-y-1/2 w-7 h-7 pointer-events-none">
+                            <span className="absolute inset-0 rounded-full border-2 border-[#c8a84b] opacity-80" />
+                            <span className="absolute inset-0 rounded-full border-2 border-[#c8a84b] animate-ping" />
+                          </span>
+                          <span style={cinzel} aria-hidden
+                            className="absolute left-1/2 -top-3 -translate-x-1/2 whitespace-nowrap text-[10px] tracking-[2px] text-[#c8a84b] pointer-events-none">
+                            GRUPO
+                          </span>
+                        </>
+                      )}
                       📍
                     </button>
                   ))}
@@ -761,6 +791,13 @@ async function removerPresenca(faccaoId) {
           {/* ---------- painel lateral ---------- */}
           {painelAberto && (
             <aside className="space-y-4 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:pr-1">
+              <div className="flex justify-end">
+                <button onClick={fecharPainel} aria-label="Fechar painel"
+                  className={`${btn} border-[#c8a84b30] text-[#9a8e78] hover:text-[#c8a84b]`}
+                  style={{ ...cinzel, ...radius }}>
+                  ✕ Fechar
+                </button>
+              </div>
               {/* card da terra */}
               {regiao && (
                 <div className="border border-[#c8a84b30] bg-[#161410] p-4 space-y-4" style={radius}>
