@@ -19,6 +19,7 @@ const TIPOS = {
   npc:      { plural: 'NPCs',      singular: 'NPC',      categoria: 'Pessoas', rota: null,         rotaNome: '' },
   faccao:   { plural: 'Facções',   singular: 'Facção',   categoria: 'Facções', rota: null,         rotaNome: '' },
   criatura: { plural: 'Criaturas', singular: 'Criatura', categoria: 'Outros',  rota: '/bestiario', rotaNome: 'Bestiário' },
+  item:     { plural: 'Itens', singular: 'Item', categoria: 'Outros', rota: null, rotaNome: '' },
 };
 
 const campo = 'bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm w-full focus:outline-none focus:border-[#c8a84b50]';
@@ -332,7 +333,9 @@ async function gerarHistoria() {
               {e.revelado ? 'Revelado aos jogadores' : 'Oculto dos jogadores'}
             </span>
             {e.tipo !== 'criatura' && (
-              <BotaoRevelar tipo={e.tipo} entidadeId={e.id} campanhaId={CAMPANHA_ID}
+              <BotaoRevelar
+                tipo={e.tipo === 'criatura' ? 'monstro' : e.tipo}
+                entidadeId={e.id} campanhaId={CAMPANHA_ID}
                 descoberta={e.descoberta_id ? { id: e.descoberta_id } : null}
                 onMudou={recarregarIndice} />
             )}
@@ -532,10 +535,10 @@ async function gerarHistoria() {
   return (
     <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0]" style={crimson}>
       <nav className="flex items-center justify-between px-6 py-4 border-b border-[#c8a84b20]">
-        <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
-          onClick={() => navigate('/')}>⚔ TAVERNA</span>
-        <button onClick={() => navigate('/mestre')} className="text-[#9a8e78] text-sm hover:text-[#c8a84b]" style={cinzel}>
-          ← Voltar
+        <button onClick={() => navigate('/')} style={cinzel}
+          className="text-[#c8a84b] text-lg tracking-widest font-bold">⚔ ENCICLOPÉDIA</button>
+        <button onClick={() => navigate('/')} className="text-[#9a8e78] text-sm hover:text-[#c8a84b]"
+         style={cinzel}>← Voltar
         </button>
       </nav>
 
