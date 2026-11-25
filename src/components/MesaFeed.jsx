@@ -60,8 +60,6 @@ export default function MesaFeed({ flutuante = false }) {
     async function buscar() {
       if (document.visibilityState === 'hidden') return;
       ciclo.current += 1;
-      // a cada 5 ciclos (ou sem referência) refaz a busca completa e substitui a lista,
-      // assim rolagens apagadas pelo mestre somem para todo mundo
       const completa = !ultimo.current || ciclo.current % 5 === 0;
       try {
         const params = completa ? { limite: 30 } : { depois: ultimo.current };
@@ -72,7 +70,7 @@ export default function MesaFeed({ flutuante = false }) {
           setLinhas(novas);
           ultimo.current = novas[0]?.created_at || '';
         } else if (novas.length > 0) {
-          ultimo.current = novas[0].created_at;   // a API devolve da mais nova pra mais velha
+          ultimo.current = novas[0].created_at;   
           setLinhas(prev => mesclar(prev, novas));
         }
       } catch { /* tenta de novo no próximo ciclo */ }

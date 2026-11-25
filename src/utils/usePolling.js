@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 
 export default function usePolling(fn, ms, ativo = true) {
   const ref = useRef(fn);
-  useEffect(() => { ref.current = fn; });   // sempre a versão mais recente da função
+  useEffect(() => { ref.current = fn; });   
 
   useEffect(() => {
     if (!ativo) return;

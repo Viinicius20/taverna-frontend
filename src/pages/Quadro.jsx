@@ -37,7 +37,6 @@ function removerPostit(id) {
   setPostits(prev => prev.filter(p => p.id !== id));
 }
 
-// Polling: busca o estado da sessão a cada 3s
 useEffect(() => {
   let ativo = true;
 

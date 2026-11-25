@@ -5,7 +5,7 @@ function normalizar(valor) {
   let dados = valor;
   if (typeof valor === 'string') {
     const limpo = valor.replace(/```json|```/g, '').trim();
-    try { dados = JSON.parse(limpo); } catch { return null; }   // texto comum
+    try { dados = JSON.parse(limpo); } catch { return null; }   
   }
   if (dados === null || typeof dados !== 'object') return null;
   if (!Array.isArray(dados)) dados = [dados];

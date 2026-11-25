@@ -47,7 +47,6 @@ export default function Dados({ secreto = false }) {
 
   try {
     const mod = Math.max(-999, Math.min(999, Number(modificador) || 0));
-    // a animação de 600ms roda junto com a chamada, então não soma tempo
     const [linha] = await Promise.all([
       rolarNoServidor({ expressao: montarExpressao(quantidade, dado.lados, mod), oculta }),
       new Promise(r => setTimeout(r, 600)),

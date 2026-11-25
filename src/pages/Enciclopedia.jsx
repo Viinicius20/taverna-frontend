@@ -30,7 +30,6 @@ export default function Enciclopedia() {
       .catch(() => setErro(true));
   }, []);
 
-  // pro TextoWiki: só o que o jogador já descobriu vira link
   const paginas = dados?.paginas || [];
   const entidades = useMemo(() => {
     if (!dados) return [];

@@ -11,7 +11,7 @@ export default function FotoCriatura({ criatura, onMudou, somenteLeitura = false
 
   async function escolher(e) {
     const arquivo = e.target.files?.[0];
-    e.target.value = '';                      // permite escolher o mesmo arquivo de novo
+    e.target.value = '';                    
     if (!arquivo) return;
     if (arquivo.size > MAX_MB * 1024 * 1024) {
       setErro(`A imagem passa de ${MAX_MB} MB.`);

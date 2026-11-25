@@ -251,7 +251,6 @@ async function enviarPresagio(presagioId, characterId) {
       const formData = new FormData();
       formData.append('file', pdfFile);
 
-      // Usa o endpoint dedicado que salva direto como NPC
       const res = await api.post(
         `/upload-pdf-npc?system=${encodeURIComponent(sistema)}&campaign_id=${CAMPANHA_ID}`,
         formData,
@@ -467,12 +466,12 @@ const enviarNotas = useCallback(async () => {
       timerNotas.current = setTimeout(enviarNotas, 5000);
     }
   }
-}, []); // se notificar ou api mudarem, coloca aqui
+}, []); 
 
 function editarNotaLocal(id, campo, valor) {
   setNotasLocais(prev => {
     const novas = { ...prev, [`${id}_${campo}`]: valor };
-    localStorage.setItem('taverna-notas-npcs', JSON.stringify(novas));   // segunda cópia, por enquanto
+    localStorage.setItem('taverna-notas-npcs', JSON.stringify(novas));   
     return novas;
   });
   filaNotas.current[id] = { ...(filaNotas.current[id] || {}), [campo]: valor };
@@ -2911,19 +2910,16 @@ useEffect(() => {
                       const item = itemSelecionado.item;
                       const nome = typeof item === 'object' ? item.name : item;
 
-                      // Adiciona no destinatário
                       const invDest = [...(destinatario.data?.inventory || []), item];
                       await api.put(`/characters/${destinatario.id}`, {
                         data: { ...destinatario.data, inventory: invDest }
                       });
 
-                      // Remove do jogador de origem
                       const invOrigem = (jogadorOrigem.data?.inventory || []).filter((_, i) => i !== itemSelecionado.index);
                       await api.put(`/characters/${jogadorOrigem.id}`, {
                         data: { ...jogadorOrigem.data, inventory: invOrigem }
                       });
 
-                      // Notifica destinatário
                       await api.post('/notify/item', {
                         character_id: destinatario.id,
                         item_nome: nome

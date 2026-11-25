@@ -8,7 +8,7 @@ export default function ConfirmHost() {
 
   useEffect(() => {
     const aoReceber = e => {
-      if (atual.current) atual.current.resolve(false);   // se já havia um aberto, cancela ele
+      if (atual.current) atual.current.resolve(false);   
       atual.current = e.detail;
       setPedido(e.detail);
     };

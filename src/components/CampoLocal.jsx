@@ -17,7 +17,7 @@ export default function CampoLocal({ value, onChange, onEscolher, placeholder = 
       .catch(() => {});
   }, []);
 
-  useEffect(() => {   // fecha a lista ao clicar fora
+  useEffect(() => {   
     function fora(e) {
       if (caixa.current && !caixa.current.contains(e.target)) setAberto(false);
     }

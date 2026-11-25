@@ -56,7 +56,6 @@ export default function useCombate({ atalhos = true, campanhaId } = {}) {
     if (idx === -1) return;
     const restantes = combatentes.length - 1;
     setCombatentes(prev => prev.filter(c => c.id !== id));
-    // quem sai antes do turno atual desloca o índice; se saiu o último, volta pro fim da lista
     setTurnoAtual(t => (idx < t ? t - 1 : Math.min(t, Math.max(restantes - 1, 0))));
   }
 

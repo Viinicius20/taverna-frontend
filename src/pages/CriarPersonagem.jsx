@@ -6,8 +6,8 @@ import api from '../services/api';
 
 export default function CriarPersonagem() {
   const navigate = useNavigate();
-  const [aba, setAba] = useState('ia'); // ia | pdf
-  const [step, setStep] = useState('form'); // form | gerando | ficha
+  const [aba, setAba] = useState('ia'); 
+  const [step, setStep] = useState('form'); 
   const [descricao, setDescricao] = useState('');
   const [sistema, setSistema] = useState('D&D 5e');
   const [ficha, setFicha] = useState(null);

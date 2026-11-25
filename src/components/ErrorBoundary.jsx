@@ -15,7 +15,6 @@ export default class ErrorBoundary extends Component {
   }
 
   componentDidUpdate(anterior) {
-    // trocar de página limpa o erro
     if (this.state.erro && anterior.resetKey !== this.props.resetKey) this.setState({ erro: null });
   }
 

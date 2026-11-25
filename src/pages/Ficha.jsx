@@ -514,7 +514,6 @@ usePolling(async () => {
       const classLevel = classeObj.level;
       if (!className || !classLevel) continue;
 
-      // checa arquétipo
       try {
   const { data: arquInfo } = await api.get(`/arquetipos/${encodeURIComponent(className)}`);
   const jaTemArquetipo = arquetiposExistentes[className] ??
@@ -532,7 +531,6 @@ usePolling(async () => {
   }
 } catch {}
 
-      // checa ASI
       const niveisResolvidos = asiHistorico[className] || [];
       const asiPendente = ASI_LEVELS.find(lvl => lvl <= classLevel && !niveisResolvidos.includes(lvl));
       if (asiPendente) {
@@ -785,8 +783,6 @@ async function salvarNotaDiario(sessionNumber) {
 function exportarPDF() {
   const abaAnterior = abaAtiva;
   setExportandoPDF(true);
-
-  // Espera o React renderizar todas as abas antes de continuar
   setTimeout(() => {
     console.log('Elementos no ficha-conteudo:', document.getElementById('ficha-conteudo').innerText.length);
     const inputs = document.querySelectorAll('#ficha-conteudo input, #ficha-conteudo textarea, #ficha-conteudo select');
@@ -885,7 +881,6 @@ async function marcarDowntimeVisto(reqId) {
       return;
     }
 
-    // Se tem só 1 classe, verifica arquétipo antes
     const proximoNivel = totalLevelAtual + 1;
     const className = ficha.classes?.[0]?.name || ficha.class;
     console.log("className no handleLevelUp:", className);
@@ -1022,7 +1017,6 @@ await fazerLevelUpComClasse(proximoNivel, null);
   const proximoNivelClasse = (classeObj?.level || 1) + 1;
   const proximoNivelTotal = (ficha.level || ficha.total_level || 1) + 1;
 
-  // checa arquétipo pendente pra essa classe específica (antes do level up)
   try {
     const { data: arquInfo } = await api.get(`/arquetipos/${encodeURIComponent(classeName)}`);
     const jaTemArquetipo = ficha.arquetipos?.[classeName] || ficha.arquetipo;
@@ -1037,7 +1031,6 @@ await fazerLevelUpComClasse(proximoNivel, null);
     console.warn("Arquétipos não encontrados para:", classeName);
   }
 
-  // ASI é verificado depois, quando a ficha recarregar (buscarPersonagem já cobre isso)
   await fazerLevelUpComClasse(proximoNivelTotal, classeName);
 }
 
@@ -1129,7 +1122,6 @@ async function enviarItemParaPersonagem(destinatario) {
     const item = modalEnviarItem.item;
     const inventarioDestinatario = [...(destinatario.data?.inventory || []), item];
 
-    // Atualiza inventário do destinatário
     await api.put(`/characters/${destinatario.id}`, {
       data: { ...destinatario.data, inventory: inventarioDestinatario }
     });
@@ -1138,7 +1130,6 @@ async function enviarItemParaPersonagem(destinatario) {
   item_nome: typeof item === 'object' ? item.name : item
 });
 
-    // Se não for cópia, remove do inventário atual
     if (!enviarCopia && modalEnviarItem.index !== null) {
       const novosItens = ficha.inventory.filter((_, idx) => idx !== modalEnviarItem.index);
       setFicha(prev => ({ ...prev, inventory: novosItens }));
@@ -2309,7 +2300,6 @@ async function abrirCofre(h) {
   </div>
   <div className="p-6 flex gap-3">
     <button onClick={() => {
-      // Reseta recursos de descanso curto
       const novosRecursos = (ficha.recursos || []).map(r =>
         r.recuperacao === 'curto' ? { ...r, atual: r.max } : r
       );
@@ -2320,7 +2310,6 @@ async function abrirCofre(h) {
       🌙 DESCANSO CURTO
     </button>
     <button onClick={() => {
-      // Reseta tudo — HP, recursos, slots
       const novosRecursos = (ficha.recursos || []).map(r => ({ ...r, atual: r.max }));
       const novosSpells = (ficha.spellcasting?.spells || []).map(s => ({ ...s, slots_used: 0 }));
       setFicha(prev => ({
@@ -2804,7 +2793,6 @@ style={{
                       type="number"
                       defaultValue={m.para}
                       onChange={e => {
-                        // atualiza fichaPreview em tempo real pelo campo
                         const val = Number(e.target.value);
                         setFichaPreview(prev => {
                           const copia = structuredClone(prev);

@@ -17,7 +17,6 @@ export async function rolarNoServidor({ expressao, rotulo, characterId, oculta =
     modo,
   });
   const linha = res.data.data;
-  // atualiza o feed na hora, sem esperar o próximo ciclo de polling
   window.dispatchEvent(new CustomEvent('taverna:rolagem', { detail: linha }));
   return linha;
 }

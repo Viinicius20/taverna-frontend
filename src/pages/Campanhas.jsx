@@ -21,7 +21,7 @@ export default function Campanhas() {
   const ativaId = getCampanhaId();
 
  useEffect(() => {
-  if (carregandoUser) return; // espera carregar
+  if (carregandoUser) return; 
   if (!user) { navigate('/login'); return; }
   if (isMestre) setAba('criar');
   else setAba('entrar');

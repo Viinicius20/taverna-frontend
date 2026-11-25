@@ -31,7 +31,7 @@ export default function Galeria() {
   const [uploading, setUploading] = useState(false);
   const [imagemRevelada, setImagemRevelada] = useState(null);
   const [imagemAberta, setImagemAberta] = useState(null);
-  const [aba, setAba] = useState('mapas'); // 'mapas' | 'tokens'
+  const [aba, setAba] = useState('mapas'); 
   const [categoriaAtiva, setCategoriaAtiva] = useState('');
   const [uploadCategoria, setUploadCategoria] = useState('Outro');
   const fileRef = useRef();
@@ -261,7 +261,6 @@ const handleRotationEnd = async () => {
     console.error("Erro ao salvar rotação:", error);
   }
 
-  // Limpeza
   rotatingTokenIdRef.current = null;
   initialAngleRef.current = 0;
   initialMouseAngleRef.current = 0;
@@ -309,7 +308,7 @@ const handleResizeMove = (e) => {
   const currentDistance = Math.hypot(e.clientX - centerX, e.clientY - centerY);
   
   let newScale = initialScaleRef.current * (currentDistance / initialDistanceRef.current);
-  newScale = Math.max(0.3, Math.min(newScale, 5)); // limites
+  newScale = Math.max(0.3, Math.min(newScale, 5)); 
 
   const token = tokensNoMapa.find(t => t.id === tokenId);
   const currentRotation = token?.rotation || 0;
@@ -343,7 +342,6 @@ const handleResizeEnd = async () => {
     console.error("Erro ao salvar escala:", error);
   }
 
-  // Limpeza
   resizingTokenIdRef.current = null;
   initialScaleRef.current = 1;
   initialDistanceRef.current = 0;
@@ -353,65 +351,65 @@ const handleResizeEnd = async () => {
 };
 
   // VISÃO DO JOGADOR
-if (!isMestre) {
-  return (
-    <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] flex flex-col page-fade">
-      <nav className="flex items-center justify-between px-8 py-4 border-b border-[#c8a84b20]">
-        <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
-          onClick={() => navigate('/')}>⚔ TAVERNA</span>
-          <a href="/tv" target="_blank" rel="noreferrer"
-            className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-2 text-xs hover:bg-[#c8a84b10] transition-colors"
-            style={{ ...cinzel, borderRadius: '2px' }}>
-            📺 TV
-          </a>
-        <button onClick={() => navigate(-1)} style={cinzel}
-          className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors">← Voltar</button>
-      </nav>
+    if (!isMestre) {
+      return (
+        <div className="min-h-screen bg-[#0f0e0c] text-[#e8e0d0] flex flex-col page-fade">
+          <nav className="flex items-center justify-between px-8 py-4 border-b border-[#c8a84b20]">
+            <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
+              onClick={() => navigate('/')}>⚔ TAVERNA</span>
+              <a href="/tv" target="_blank" rel="noreferrer"
+                className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-2 text-xs hover:bg-[#c8a84b10] transition-colors"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                📺 TV
+              </a>
+            <button onClick={() => navigate(-1)} style={cinzel}
+              className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors">← Voltar</button>
+          </nav>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-4">
-        {carregando ? (
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-8 h-8 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-            <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">AGUARDANDO...</p>
+          <div className="flex-1 flex flex-col items-center justify-center px-4">
+            {carregando ? (
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-8 h-8 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
+                <p style={cinzel} className="text-[#8a7e68] text-xs tracking-widest">AGUARDANDO...</p>
+              </div>
+            ) : imagemRevelada ? (
+      <div className="w-full max-w-4xl mx-auto px-4">
+        <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4 text-center">O MESTRE REVELOU</p>
+        {imagemRevelada.text_content ? (
+          <div className="border border-[#c8a84b20] bg-[#161410] p-8" style={{ borderRadius: '2px' }}>
+            <p className="text-[#8a7e68] text-xs mb-3 text-center" style={cinzel}>
+              {imagemRevelada.category?.toUpperCase() || 'DOCUMENTO'}
+            </p>
+            <p className="text-[#e8e0d0] text-base leading-relaxed whitespace-pre-wrap text-center italic">
+              {imagemRevelada.text_content}
+            </p>
           </div>
-        ) : imagemRevelada ? (
-  <div className="w-full max-w-4xl mx-auto px-4">
-    <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4 text-center">O MESTRE REVELOU</p>
-    {imagemRevelada.text_content ? (
-      <div className="border border-[#c8a84b20] bg-[#161410] p-8" style={{ borderRadius: '2px' }}>
-        <p className="text-[#8a7e68] text-xs mb-3 text-center" style={cinzel}>
-          {imagemRevelada.category?.toUpperCase() || 'DOCUMENTO'}
-        </p>
-        <p className="text-[#e8e0d0] text-base leading-relaxed whitespace-pre-wrap text-center italic">
-          {imagemRevelada.text_content}
-        </p>
+        ) : (
+          <div className="relative w-full" id="mapa-container">
+            <img 
+              src={imagemRevelada.url} 
+              alt={imagemRevelada.name}
+              className="w-full h-auto block"
+              style={{ borderRadius: '2px' }}
+            />
+            {tokensNoMapa.map(token => (
+              <img key={token.id} src={token.token_url} alt="token"
+                style={{
+                  position: 'absolute',
+                  left: `${token.x}%`,
+                  top: `${token.y}%`,
+                  width: '40px',
+                  height: '40px',
+                  objectFit: 'cover',
+                  borderRadius: '50%',
+                  transform: `translate(-50%, -50%) scale(${token.scale || 1}) rotate(${token.rotation || 0}deg)`,
+                  pointerEvents: 'none',
+                }} 
+              />
+            ))}
+          </div>
+        )}
       </div>
-    ) : (
-      <div className="relative w-full" id="mapa-container">
-        <img 
-          src={imagemRevelada.url} 
-          alt={imagemRevelada.name}
-          className="w-full h-auto block"
-          style={{ borderRadius: '2px' }}
-        />
-        {tokensNoMapa.map(token => (
-          <img key={token.id} src={token.token_url} alt="token"
-            style={{
-              position: 'absolute',
-              left: `${token.x}%`,
-              top: `${token.y}%`,
-              width: '40px',
-              height: '40px',
-              objectFit: 'cover',
-              borderRadius: '50%',
-              transform: `translate(-50%, -50%) scale(${token.scale || 1}) rotate(${token.rotation || 0}deg)`,
-              pointerEvents: 'none',
-            }} 
-          />
-        ))}
-      </div>
-    )}
-  </div>
         ) : (
           <div className="flex flex-col items-center gap-4 text-center">
             <span className="text-4xl opacity-20">🗺</span>

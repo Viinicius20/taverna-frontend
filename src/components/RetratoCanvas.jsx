@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 
-const L = 480, A = 640; // proporção 3:4
+const L = 480, A = 640; 
 
 export default function RetratoCanvas({ src, nome, subtitulo }) {
   const ref = useRef(null);
@@ -10,30 +10,25 @@ export default function RetratoCanvas({ src, nome, subtitulo }) {
     let vivo = true;
 
     function moldura() {
-      // vinheta
       const v = ctx.createRadialGradient(L / 2, A / 2.2, L * 0.25, L / 2, A / 2, A * 0.75);
       v.addColorStop(0, 'rgba(0,0,0,0)');
       v.addColorStop(1, 'rgba(0,0,0,0.75)');
       ctx.fillStyle = v; ctx.fillRect(0, 0, L, A);
 
-      // faixa inferior para o texto
       const f = ctx.createLinearGradient(0, A * 0.68, 0, A);
       f.addColorStop(0, 'rgba(15,14,12,0)');
       f.addColorStop(1, 'rgba(15,14,12,0.95)');
       ctx.fillStyle = f; ctx.fillRect(0, A * 0.68, L, A * 0.32);
 
-      // bordas dupla
       ctx.strokeStyle = '#c8a84b'; ctx.lineWidth = 2; ctx.strokeRect(10, 10, L - 20, A - 20);
       ctx.strokeStyle = 'rgba(200,168,75,0.35)'; ctx.lineWidth = 1; ctx.strokeRect(18, 18, L - 36, A - 36);
 
-      // losangos nos cantos
       ctx.fillStyle = '#c8a84b';
       [[10, 10], [L - 10, 10], [10, A - 10], [L - 10, A - 10]].forEach(([x, y]) => {
         ctx.save(); ctx.translate(x, y); ctx.rotate(Math.PI / 4);
         ctx.fillRect(-6, -6, 12, 12); ctx.restore();
       });
 
-      // texto
       ctx.textAlign = 'center';
       ctx.fillStyle = '#f0e8d8';
       ctx.font = "700 30px 'Cinzel', serif";
@@ -49,7 +44,6 @@ export default function RetratoCanvas({ src, nome, subtitulo }) {
       ctx.fillStyle = '#0f0e0c'; ctx.fillRect(0, 0, L, A);
 
       if (img) {
-        // "cover": preenche o quadro sem distorcer
         const s = Math.max(L / img.width, A / img.height);
         const w = img.width * s, h = img.height * s;
         ctx.drawImage(img, (L - w) / 2, (A - h) / 2.4, w, h);

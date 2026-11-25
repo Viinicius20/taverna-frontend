@@ -14,7 +14,6 @@ root.render(
   </React.StrictMode>
 );
 
-// Pede permissão de notificação e salva assinatura no backend
 async function configurarPush() {
   try {
     const API_URL = process.env.REACT_APP_API_URL || 'https://taverna-backend-eq3b.onrender.com';
@@ -64,7 +63,7 @@ async function configurarPush() {
     console.error('Erro ao configurar push:', e);
   }
 }
-// Roda após o service worker ser registrado
+o
 serviceWorkerRegistration.register({
   onSuccess: () => {
     console.log('Service worker registrado!');
@@ -74,7 +73,6 @@ serviceWorkerRegistration.register({
   }
 });
 
-// Roda sempre que a página carrega, não só na primeira instalação
 window.addEventListener('load', () => {
   configurarPush();
 });

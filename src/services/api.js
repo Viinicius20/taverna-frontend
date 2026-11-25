@@ -17,7 +17,7 @@ api.interceptors.response.use(
   err => {
     const status = err.response?.status;
 
-    if (status === 401 && getToken()) {   // só quando havia sessão
+    if (status === 401 && getToken()) {  
       clearToken();
       window.dispatchEvent(new Event('taverna:sessao-expirada'));
     }

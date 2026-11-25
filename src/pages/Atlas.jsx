@@ -64,7 +64,6 @@ const AMBIENTES = {
 
 const ambienteDe = chave => AMBIENTES[chave] || AMBIENTES.floresta;
 
-// campos do local ligado à terra (os mesmos da página Locais)
 const CAMPOS_LOCAL = [
   { chave: 'region_info', label: 'REGIÃO' },
   { chave: 'commerce', label: 'COMÉRCIO' },
@@ -75,8 +74,7 @@ const CAMPOS_LOCAL = [
 const CHAVES_LOCAL = ['description', ...CAMPOS_LOCAL.map(c => c.chave), 'language', 'avg_level', 'faction_id'];
 const formDe = l => Object.fromEntries(CHAVES_LOCAL.map(k => [k, l?.[k] ?? '']));
 const campo = 'bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020] resize-y';
-
-// ---------- forma das terras: sempre a mesma para a mesma semente ----------
+-
 
 function sorteador(seed) {
   let a = seed >>> 0;
@@ -117,7 +115,6 @@ function geometria(g) {
   };
 }
 
-// o ponto (x, y) está dentro do polígono? (usado para saber em qual terra o clique caiu)
 function dentro([x, y], poly) {
   let d = false;
   for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
@@ -128,7 +125,6 @@ function dentro([x, y], poly) {
   return d;
 }
 
-// textura de terreno: ruído -> degradê do ambiente -> iluminação para dar relevo
 function FiltroTerreno({ id, semente, ambiente }) {
   const a = ambienteDe(ambiente);
   return (
@@ -222,6 +218,9 @@ export default function Atlas() {
   const [salvandoLocal, setSalvandoLocal] = useState(false);
   const [localGrupo, setLocalGrupo] = useState(null);
   const [cadeia, setCadeia] = useState(null);
+  const [zoom, setZoom] = useState(1);
+  const mudarZoom = d => setZoom(z => Math.min(3, Math.max(1, +(z + d).toFixed(2))));
+
   useEffect(() => {
     if (!isMestre) return;
     api.get(`/locations/${campanha}`).then(r => setLocaisFull(r.data.data || [])).catch(() => setLocaisFull([]));
@@ -250,7 +249,7 @@ export default function Atlas() {
   }, [campanha, isMestre, user]);
   
   useEffect(() => {
-  api.get(`/campanha-local/${campanha}`)          // troque pelo helper de requisição que o Atlas já usa
+  api.get(`/campanha-local/${campanha}`)          
     .then(r => setLocalGrupo(r.data?.data || null))
     .catch(() => {});
 }, [campanha]);
@@ -309,7 +308,7 @@ async function confirmarCadeia(itens) {
     const raio = +(5 + Math.random() * 8).toFixed(1);
     let cx = LARG / 2;
     let cy = ALT / 2;
-    for (let t = 0; t < 60; t++) {   // procura um canto livre, sem encostar nas outras
+    for (let t = 0; t < 60; t++) {  
       const x = raio * 1.6 + Math.random() * (LARG - raio * 3.2);
       const y = raio * 1.2 + Math.random() * (ALT - raio * 2.4);
       if (regioes.every(g => g.cx == null || Math.hypot(g.cx - x, g.cy - y) > (g.raio + raio) * 1.5)) {
@@ -366,7 +365,6 @@ async function confirmarCadeia(itens) {
     await salvarCampos(regiaoAberta, { ambiente });
   }
 
-  // liga um local à terra e importa descrição e subtítulo dele
   async function vincularLocal(regiaoId, localId) {
     if (!regiaoId || !localId) return;
     const l = pins.find(p => p.id === localId);
@@ -496,7 +494,7 @@ async function confirmarCadeia(itens) {
     if (!editando) return;
     const { px, py, x: sx, y: sy } = pontoNoMundo(e);
     const id = editando;
-    const alvo = [...ordem].reverse().find(g => dentro([sx, sy], formaDe(g)));  // terra de cima primeiro
+    const alvo = [...ordem].reverse().find(g => dentro([sx, sy], formaDe(g)));  
     const campos = { pin_x: +px.toFixed(2), pin_y: +py.toFixed(2) };
     if (alvo) campos.regiao_id = alvo.id;
     try {
@@ -509,7 +507,6 @@ async function confirmarCadeia(itens) {
       setEditando(null);
     } catch { alert('Erro ao salvar a posição.'); return; }
 
-    // caiu numa terra que ainda não tem local: oferece importar as informações dele
     if (alvo && !alvo.local_id) {
       const l = pins.find(p => p.id === id);
       if (await confirmar(`Usar "${l?.nome}" como descrição da terra "${alvo.nome}"?`)) {
@@ -594,6 +591,18 @@ async function removerPresenca(faccaoId) {
               🧊 {inclinado ? 'Mapa plano' : 'Inclinar mapa'}
             </button>
           )}
+          {terras.length > 0 && (
+            <div className="flex gap-1">
+              <button onClick={() => mudarZoom(-0.5)} disabled={zoom <= 1}
+                className={`${btn} border-[#c8a84b30] text-[#c8a84b]`} style={{ ...cinzel, ...radius }}>－</button>
+              <button onClick={() => setZoom(1)}
+                className={`${btn} border-[#c8a84b30] text-[#9a8e78]`} style={{ ...cinzel, ...radius }}>
+                🔍 {Math.round(zoom * 100)}%
+              </button>
+              <button onClick={() => mudarZoom(0.5)} disabled={zoom >= 3}
+                className={`${btn} border-[#c8a84b30] text-[#c8a84b]`} style={{ ...cinzel, ...radius }}>＋</button>
+            </div>
+          )}
           {emModo && (
             <button onClick={cancelarModos}
               className={`${btn} border-red-600 text-red-600`} style={{ ...cinzel, ...radius }}>
@@ -612,7 +621,9 @@ async function removerPresenca(faccaoId) {
             )}
 
             {terras.length > 0 && (
-              <div style={{ perspective: '1400px', padding: tilt ? '2rem 0 3rem' : 0, transition: 'padding 0.6s ease' }}>
+                <div className="overflow-auto" style={{ maxHeight: '80vh' }}>
+                  <div style={{ width: `${zoom * 100}%`, perspective: '1400px',
+                                padding: tilt ? '2rem 0 3rem' : 0, transition: 'padding 0.6s ease' }}>
                 <div className="relative w-full border border-[#c8a84b30]"
                   style={{
                     ...radius,
@@ -645,7 +656,7 @@ async function removerPresenca(faccaoId) {
                       const amb = ambienteDe(g.ambiente);
                       const prof = PROF * amb.espessura;
                       const oculta = isMestre ? !descDe('regiao', g.id) : !g.descoberta;
-                      const escura = oculta && !isMestre;           // o jogador só vê a silhueta
+                      const escura = oculta && !isMestre;          
                       const clicavel = isMestre || g.descoberta;
                       const aberta = regiaoAberta === g.id;
                       const lift = aberta ? 1.4 : hoverId === g.id && clicavel ? 0.7 : 0;
@@ -699,6 +710,22 @@ async function removerPresenca(faccaoId) {
                     })}
                   </svg>
 
+                  {/* anel do grupo: no chão do mapa, abaixo dos pins */}
+                  {noMapa.filter(p => p.id === localGrupo).map(p => (
+                    <div key={`anel-${p.id}`} className="absolute pointer-events-none"
+                      style={{ left: `${p.x}%`, top: `${p.y}%`, width: '9%', aspectRatio: '1',
+                              transform: 'translate(-50%, -50%)' }}>
+                      <span className="absolute inset-0 rounded-full animate-ping"
+                        style={{ border: '3px solid #f0d060', opacity: 0.6 }} />
+                      <span className="absolute inset-0 rounded-full animate-pulse"
+                        style={{
+                          border: '4px solid #f0d060',
+                          background: 'radial-gradient(circle, rgba(240,208,96,0.35) 0%, rgba(240,208,96,0.05) 70%)',
+                          boxShadow: '0 0 14px #f0d060, inset 0 0 12px #f0d06088',
+                        }} />
+                    </div>
+                  ))}
+
                   {/* pins dos locais: em pé mesmo com o mapa inclinado */}
                   {noMapa.map(p => (
                     <button key={p.id}
@@ -716,15 +743,6 @@ async function removerPresenca(faccaoId) {
                         transition: movendo ? 'none' : 'transform 0.6s ease',
                         filter: localAberto === p.id ? 'drop-shadow(0 0 6px #c8a84b)' : 'drop-shadow(0 1px 2px #000)',
                       }}>
-                      {localGrupo === p.id && (
-                        <span className="absolute animate-pulse pointer-events-none"
-                          style={{
-                            left: '50%', bottom: 0, width: 34, height: 12,
-                            transform: 'translate(-50%, 50%)',
-                            border: '2px solid #c8a84b', borderRadius: '50%',
-                            boxShadow: '0 0 8px #c8a84b88, inset 0 0 6px #c8a84b55',
-                          }} />
-                      )}
                       📍
                     </button>
                   ))}
@@ -737,6 +755,7 @@ async function removerPresenca(faccaoId) {
                   )}
                 </div>
               </div>
+            </div>
             )}
           </div>
 

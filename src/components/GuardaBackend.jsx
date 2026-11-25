@@ -24,8 +24,6 @@ export default function GuardaBackend({ children }) {
     const ctrl = new AbortController();
     const desistir = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
     try {
-      // no-cors: qualquer resposta do servidor (até 404) significa "acordou";
-      // só erro de rede ou timeout cai no catch
       await fetch(`${api.defaults.baseURL}${ROTA}`, { mode: 'no-cors', cache: 'no-store', signal: ctrl.signal });
       ultimoOk.current = Date.now();
       setEsperando(false);
