@@ -63,7 +63,7 @@ async function configurarPush() {
     console.error('Erro ao configurar push:', e);
   }
 }
-o
+
 serviceWorkerRegistration.register({
   onSuccess: () => {
     console.log('Service worker registrado!');

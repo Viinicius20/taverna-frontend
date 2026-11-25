@@ -74,7 +74,6 @@ const CAMPOS_LOCAL = [
 const CHAVES_LOCAL = ['description', ...CAMPOS_LOCAL.map(c => c.chave), 'language', 'avg_level', 'faction_id'];
 const formDe = l => Object.fromEntries(CHAVES_LOCAL.map(k => [k, l?.[k] ?? '']));
 const campo = 'bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 w-full text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020] resize-y';
--
 
 function sorteador(seed) {
   let a = seed >>> 0;
