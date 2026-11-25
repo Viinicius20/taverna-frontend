@@ -332,10 +332,10 @@ async function gerarHistoria() {
               className={`text-xs border px-2 py-0.5 ${e.revelado ? 'border-[#c8a84b50] text-[#c8a84b]' : 'border-[#b07050] text-[#b07050]'}`}>
               {e.revelado ? 'Revelado aos jogadores' : 'Oculto dos jogadores'}
             </span>
-            {e.tipo !== 'criatura' && (
-              <BotaoRevelar
-                tipo={e.tipo === 'criatura' ? 'monstro' : e.tipo}
-                entidadeId={e.id} campanhaId={CAMPANHA_ID}
+            {e.tipo === 'criatura' ? (
+              <span className="text-[#6a6050] text-xs">Revele no Bestiário</span>
+            ) : (
+              <BotaoRevelar tipo={e.tipo} entidadeId={e.id} campanhaId={CAMPANHA_ID}
                 descoberta={e.descoberta_id ? { id: e.descoberta_id } : null}
                 onMudou={recarregarIndice} />
             )}
