@@ -20,6 +20,13 @@ const mensagem = (e, padrao) => (typeof e.response?.data?.detail === 'string' ? 
 
 export default function Relacoes() {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const gancho = state?.gancho;
+
+  const [ganchoEmUso, setGanchoEmUso] = useState(Boolean(gancho));
+  const [salvando, setSalvando] = useState(false);
+
+
   const [entidades, setEntidades] = useState([]);
   const [grafo, setGrafo] = useState({ nos: [], arestas: [] });
   const [origem, setOrigem] = useState(gancho ? `character:${gancho.personagemId}` : '');
@@ -33,10 +40,6 @@ export default function Relacoes() {
   const { user } = useUser();
   const isMestre = user?.role === 'mestre';
 
-  const { state } = useLocation();
-  const gancho = state?.gancho;
-  const [ganchoEmUso, setGanchoEmUso] = useState(Boolean(gancho));
-  const [salvando, setSalvando] = useState(false);
 
   const carregarEntidades = useCallback(async () => {
     const lista = [];
@@ -136,6 +139,19 @@ async function criar() {
         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">MUNDO</p>
         <h1 style={cinzel} className="text-3xl text-[#f0e8d8] font-bold mb-8">Vínculos</h1>
 
+        {gancho && (
+          <div className="text-sm text-[#9a8e78] break-words">
+            <p>{gancho.nome} · {gancho.rotulo} · {gancho.texto}</p>
+            <Link
+              to="/mestre?aba=sessao#ganchos"
+              state={{ personagemGancho: gancho.personagemId }}
+              className="text-[#c8a84b] underline"
+            >
+              Voltar aos ganchos
+            </Link>
+          </div>
+        )}
+
         <div className="border border-[#c8a84b20] bg-[#161410] p-4 flex flex-col gap-3 mb-8">
           <div className="flex flex-wrap items-center gap-2">
             <select value={origem} onChange={e => setOrigem(e.target.value)} className={`${campo} flex-1 min-w-40`} style={{ borderRadius: '2px' }}>
@@ -203,7 +219,12 @@ async function criar() {
         ) : (
         <div className="flex flex-col gap-2">
             {grafo.arestas.map(a => (
-            <div key={a.id} className="flex items-center justify-between gap-3 border border-[#c8a84b15] bg-[#161410] px-4 py-3">
+            <div
+              key={a.id}
+              id={`vinculo-${a.id}`}
+              ref={focarRegistro}
+              className="flex items-center justify-between gap-3 border border-[#c8a84b15] bg-[#161410] px-4 py-3"
+            >
                 <div>
                 <p className="text-sm">
                     <span className="text-[#f0e8d8]">{nomes[a.source]}</span>
