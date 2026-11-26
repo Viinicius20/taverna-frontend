@@ -5,6 +5,9 @@ import { useUser } from '../context/UserContext';
 import api from '../services/api';
 import { notificar } from '../utils/notificar';
 
+const DIVISIVEIS = MOEDAS.filter(({ chave }) => chave !== 'platina');
+const botaoTesouro = 'rounded-sm border border-[#c8a84b40] px-3 py-2 text-xs ' +
+  'text-[#c8a84b] hover:bg-[#c8a84b15] disabled:opacity-40';
 
 const MOEDAS = [
   { chave: 'cobre', rotulo: 'COBRE', cor: '#b87333' },
@@ -29,11 +32,27 @@ export default function Tesouro() {
   const [novo, setNovo] = useState(NOVO_VAZIO);
   const [ajuste, setAjuste] = useState({});
 
+  const [historico, setHistorico] = useState([]);
+  const [personagens, setPersonagens] = useState([]);
+  const [formMov, setFormMov] = useState(null);
+  const [movendo, setMovendo] = useState(false);
+
+  const valorMov = Number(formMov?.valor);
+  const numPessoas = formMov?.personagens.length ?? 0;
+  const parte = numPessoas && Number.isInteger(valorMov)
+    ? Math.floor(valorMov / numPessoas) : 0;
+  const saldo = moedas[formMov?.moeda] ?? 0;
+  const itemMov = itens.find(item => item.id === formMov?.item);
+  const divisaoValida = parte > 0 && valorMov <= saldo;
+  const entregaValida = formMov?.personagem && itemMov &&
+    Number.isInteger(valorMov) && valorMov > 0 && valorMov <= itemMov.quantidade;
+
   const carregar = useCallback(async () => {
     try {
       const res = await api.get('/tesouro');
       setItens(res.data.data.itens || []);
       setMoedas(res.data.data.moedas || {});
+      setHistorico(res.data.data.historico || []);
       setErro(false);
     } catch {
       setErro(true);
@@ -61,6 +80,7 @@ export default function Tesouro() {
       });
       setItens(prev => [res.data.data, ...prev]);
       setNovo(NOVO_VAZIO);
+      await carregar();
     } catch {
       notificar('Não foi possível adicionar. Confira os campos.', 'erro');
     }
@@ -70,10 +90,19 @@ export default function Tesouro() {
     const quantidade = Math.max(0, item.quantidade + delta);
     if (quantidade === item.quantidade) return;
     try {
-      const res = await api.patch(`/tesouro/${item.id}`, { quantidade });
+      const res = await api.patch(`/tesouro/${item.id}`, { quantidade }, {
+        params: { quantidade_anterior: item.quantidade },
+      });
       setItens(prev => prev.map(i => (i.id === item.id ? res.data.data : i)));
-    } catch {
-      notificar('Não foi possível alterar a quantidade.', 'erro');
+      await carregar();
+    } catch (e) {
+      notificar(
+        e.response?.status === 409
+          ? 'A quantidade mudou. Confira o tesouro atualizado.'
+          : 'Não foi possível alterar a quantidade.',
+        'erro'
+      );
+      await carregar();
     }
   }
 
@@ -82,6 +111,7 @@ export default function Tesouro() {
     try {
       await api.delete(`/tesouro/${item.id}`);
       setItens(prev => prev.filter(i => i.id !== item.id));
+      await carregar();
     } catch {
       notificar('Não foi possível remover o item.', 'erro');
     }
@@ -98,10 +128,72 @@ export default function Tesouro() {
       const res = await api.patch('/tesouro/moedas', delta);
       setMoedas(res.data.data);
       setAjuste({});
+      await carregar();
     } catch {
       notificar('Não foi possível ajustar as moedas.', 'erro');
     }
   }
+
+async function abrirMovimento(item = null) {
+  if (movendo) return;
+  setMovendo(true);
+
+  try {
+    const res = await api.get('/characters');
+    setPersonagens(res.data.data || []);
+    setFormMov({
+      tipo: item ? 'entregar' : 'dividir',
+      item: item?.id,
+      moeda: 'ouro',
+      valor: item ? '1' : '',
+      personagens: [],
+      personagem: '',
+      operacao_id: crypto.randomUUID(),
+    });
+  } catch {
+    notificar('Não foi possível carregar os personagens.', 'erro');
+  } finally {
+    setMovendo(false);
+  }
+}
+
+function marcarPersonagem(id) {
+  setFormMov(prev => ({
+    ...prev,
+    personagens: prev.personagens.includes(id)
+      ? prev.personagens.filter(p => p !== id)
+      : [...prev.personagens, id],
+  }));
+}
+
+async function confirmarMovimento(e) {
+  e.preventDefault();
+  if (!formMov || movendo) return;
+
+  const dividir = formMov.tipo === 'dividir';
+  if (dividir ? !divisaoValida : !entregaValida) return;
+
+  setMovendo(true);
+  const dados = dividir
+    ? { moeda: formMov.moeda, valor: valorMov, personagens: formMov.personagens }
+    : { item: formMov.item, personagem: formMov.personagem, quantidade: valorMov };
+
+  try {
+    await api.post(`/tesouro/${formMov.tipo}`, {
+      ...dados,
+      operacao_id: formMov.operacao_id,
+    });
+    setFormMov(null);
+    notificar(dividir ? 'Moedas divididas.' : 'Item entregue.');
+    await carregar();
+  } catch (e) {
+    const detalhe = e.response?.data?.detail;
+    notificar(typeof detalhe === 'string' ? detalhe : 'Não foi possível concluir a movimentação.', 'erro');
+    await carregar();
+  } finally {
+    setMovendo(false);
+  }
+}
 
   const valorTotal = itens.reduce((s, i) => s + (i.valor_po || 0) * i.quantidade, 0);
 
@@ -156,6 +248,111 @@ export default function Tesouro() {
               </button>
             )}
             {!isMestre && <div className="mb-10" />}
+
+            {isMestre && (
+              <div className="mb-6">
+                <button
+                  type="button"
+                  disabled={movendo}
+                  onClick={() => abrirMovimento()}
+                  className={botaoTesouro}
+                  id="dividir-tesouro"
+                >
+                  Dividir moedas
+                </button>
+
+                {formMov && (
+                  <form onSubmit={confirmarMovimento} className="mt-3 border border-[#c8a84b20] bg-[#161410] p-4">
+                    <fieldset disabled={movendo} className="space-y-3">
+                      <legend className="text-sm text-[#c8a84b]">
+                        {formMov.tipo === 'dividir'
+                          ? 'Dividir moedas'
+                          : `Enviar ao inventário · ${itemMov?.nome || 'Item indisponível'}`}
+                      </legend>
+
+                      {formMov.tipo === 'dividir' ? (
+                        <>
+                          <div className="flex flex-wrap gap-2">
+                            <select
+                              aria-label="Moeda pra dividir"
+                              value={formMov.moeda}
+                              onChange={e => setFormMov(prev => ({ ...prev, moeda: e.target.value }))}
+                              className={campo}
+                            >
+                              {DIVISIVEIS.map(({ chave, rotulo }) => (
+                                <option key={chave} value={chave}>{rotulo}</option>
+                              ))}
+                            </select>
+                            <input
+                              type="number" min={1} max={saldo} step={1}
+                              aria-label="Valor a dividir" placeholder="Valor a dividir"
+                              value={formMov.valor}
+                              onChange={e => setFormMov(prev => ({ ...prev, valor: e.target.value }))}
+                              className={campo}
+                            />
+                          </div>
+                          <div className="flex flex-wrap gap-3 text-sm">
+                            {personagens.map(p => (
+                              <label key={p.id} className="flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={formMov.personagens.includes(p.id)}
+                                  onChange={() => marcarPersonagem(p.id)}
+                                />
+                                {p.data?.name || p.name}
+                              </label>
+                            ))}
+                          </div>
+                          {divisaoValida && (
+                            <p className="text-sm text-[#c8a84b]">
+                              {parte} por personagem · sobra {valorMov % numPessoas} da divisão ·
+                              saldo final {saldo - parte * numPessoas}
+                            </p>
+                          )}
+                        </>
+                      ) : (
+                        <div className="flex flex-wrap gap-2">
+                          <select
+                            aria-label="Personagem que vai receber"
+                            value={formMov.personagem}
+                            onChange={e => setFormMov(prev => ({ ...prev, personagem: e.target.value }))}
+                            className={campo}
+                          >
+                            <option value="">Escolha o personagem</option>
+                            {personagens.map(p => (
+                              <option key={p.id} value={p.id}>{p.data?.name || p.name}</option>
+                            ))}
+                          </select>
+                          <input
+                            type="number" min={1} max={itemMov?.quantidade} step={1}
+                            aria-label="Quantidade a entregar"
+                            value={formMov.valor}
+                            onChange={e => setFormMov(prev => ({ ...prev, valor: e.target.value }))}
+                            className={`${campo} w-24`}
+                          />
+                        </div>
+                      )}
+
+                      {personagens.length === 0 && (
+                        <p className="text-sm text-[#9a8e78]">A campanha ainda não tem personagens.</p>
+                      )}
+                      <div className="flex gap-2">
+                        <button
+                          type="submit"
+                          disabled={movendo || !(formMov.tipo === 'dividir' ? divisaoValida : entregaValida)}
+                          className={botaoTesouro}
+                        >
+                          {formMov.tipo === 'dividir' ? 'Confirmar divisão' : 'Confirmar entrega'}
+                        </button>
+                        <button type="button" onClick={() => setFormMov(null)} className={botaoTesouro}>
+                          Cancelar
+                        </button>
+                      </div>
+                    </fieldset>
+                  </form>
+                )}
+              </div>
+            )}
 
             {/* ITENS */}
             <div className="flex items-baseline justify-between mb-3 gap-3 flex-wrap">
@@ -223,11 +420,41 @@ export default function Tesouro() {
                           </>
                         )}
                       </div>
+                      {isMestre && item.quantidade > 0 && (
+                        <button
+                          type="button"
+                          disabled={movendo}
+                          className={`${botaoTesouro} mt-2`}
+                          onClick={async () => {
+                            await abrirMovimento(item);
+                            document.getElementById('dividir-tesouro')?.scrollIntoView({ block: 'start' });
+                          }}
+                        >
+                          Enviar ao inventário
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
               </div>
             )}
+            <section className="mt-10">
+              <h2 style={cinzel} className="mb-3 text-xs tracking-[3px] text-[#c8a84b]">
+                HISTÓRICO DO TESOURO
+              </h2>
+              {historico.length === 0 ? (
+                <p className="text-sm text-[#9a8e78]">Ainda não há movimentações registradas.</p>
+              ) : (
+                <ul className="divide-y divide-[#c8a84b20]">
+                  {historico.map(mov => (
+                    <li key={mov.id} className="flex flex-wrap gap-x-4 gap-y-1 py-2 text-sm">
+                      <span className="text-[#c8a84b]">Dia {mov.dia_total + 1}</span>
+                      <span className="text-[#e8e0d0]">{mov.descricao}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
           </>
         )}
       </div>

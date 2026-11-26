@@ -662,8 +662,12 @@ async function salvarNotaDiario(sessionNumber) {
       });
       setSucesso('Ficha salva com sucesso!');
       setTimeout(() => setSucesso(''), 3000);
-    } catch {
-      setErro('Erro ao salvar. Tente novamente.');
+    } catch (e) {
+      setErro(
+        e.response?.status === 409
+          ? 'A ficha recebeu moedas ou itens. Suas edições continuam abertas. Confira a ficha atualizada em outra aba antes de fechar esta.'
+          : 'Erro ao salvar. Tente novamente.'
+      );
     }
     setSalvando(false);
   }
@@ -1050,8 +1054,13 @@ await fazerLevelUpComClasse(proximoNivel, null);
   if (ficha?.notas_privadas) setNotas(ficha.notas_privadas);
 }, [ficha]);
 
-  useEffect(() => {
-  if (ficha?.moedas) setMoedas(ficha.moedas);
+useEffect(() => {
+  setMoedas({
+    pc: ficha?.moedas?.pc ?? 0,
+    pp: ficha?.moedas?.pp ?? 0,
+    pe: ficha?.moedas?.pe ?? 0,
+    po: ficha?.moedas?.po ?? 0,
+  });
 }, [ficha?.moedas]);
 
 useEffect(() => {
@@ -1381,7 +1390,7 @@ async function abrirCofre(h) {
             <button onClick={salvarFicha} disabled={salvando}
               className="bg-[#c8a84b] text-[#0f0e0c] px-5 py-2 text-xs tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50"
               style={{ ...cinzel, borderRadius: '2px' }}>
-              {salvando ? 'Salvando...' : 'Salvar'}
+              {salvando ? 'Salvando...' : 'Salvar Ficha'}
             </button>
             <button
               onClick={() => {
@@ -2430,6 +2439,7 @@ async function abrirCofre(h) {
   .map((item, i) => {
     const isObj = typeof item === 'object';
     const nome = isObj ? item.name : item;
+    const quantidadeItem = isObj ? Number(item.quantity ?? 1) : 1;
     const isMagico = isObj ? item.is_magic : ['(comum)','(incomum)','(raro)','(muito raro)','(lendário)'].some(r => item.toLowerCase().includes(r));
     const rarCor = {
       'Comum': '#a09880', 'Incomum': '#4a8a4a', 'Raro': '#4a6aaa',
@@ -2454,7 +2464,7 @@ style={{
   backgroundColor: `${rarCor}10`,
   cursor: 'pointer',
 }}>
-    {nome}
+    {nome}{quantidadeItem > 1 ? ` ×${quantidadeItem}` : ''}
   </span>
   <button
     onClick={() => {
@@ -2688,11 +2698,6 @@ style={{
           )}
 
         <div className="flex gap-4">
-          <button onClick={salvarFicha} disabled={salvando}
-            className="bg-[#c8a84b] text-[#0f0e0c] px-8 py-3 text-sm tracking-widest font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50 btn-shimmer"
-            style={{ ...cinzel, borderRadius: '2px' }}>
-            {salvando ? 'Salvando...' : 'Salvar Ficha'}
-          </button>
           <button onClick={handleLevelUp}
             className="border border-[#c8a84b40] text-[#c8a84b] px-8 py-3 text-sm tracking-widest hover:bg-[#c8a84b10] transition-colors"
             style={{ ...cinzel, borderRadius: '2px' }}>
