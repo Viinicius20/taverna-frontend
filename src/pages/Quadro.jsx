@@ -1,6 +1,6 @@
 import { cinzel, crimson } from '../estilos';
 import { getCampanhaId } from '../utils/campanha';
-import { useState, useEffect, useCallBack } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useUser } from '../context/UserContext';
