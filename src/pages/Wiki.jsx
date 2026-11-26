@@ -363,6 +363,31 @@ async function gerarHistoria() {
 
         {carregandoDetalhe && !det && <p className="text-[#8a7e68] text-sm">Carregando a história...</p>}
 
+        {det && det.vinculos?.length > 0 && (
+          <div>
+            <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">VÍNCULOS</p>
+            <div className="flex flex-col gap-1">
+              {det.vinculos.map(v => {
+                const alvo = v.outro.tipo_wiki
+                  ? entidades.find(x => x.tipo === v.outro.tipo_wiki && String(x.id) === String(v.outro.id))
+                  : null;
+                return (
+                  <div key={v.id} className="text-sm text-[#9a8e78] flex items-baseline gap-2 flex-wrap">
+                    <span className="text-[#6a6050]">{v.direcao === 'saida' ? '→' : '←'}</span>
+                    {v.direcao === 'saida' && <span className="text-[#8a7e68]">{v.kind}</span>}
+                    {alvo
+                      ? <button onClick={() => abrirFicha(alvo)} className="text-[#c8a84b] hover:underline">{v.outro.nome}</button>
+                      : <span>{v.outro.nome}</span>}
+                    {v.direcao === 'entrada' && <span className="text-[#8a7e68]">{v.kind}</span>}
+                    {v.secreto && <span title="Só o mestre vê">🔒</span>}
+                    {v.nota && <span className="text-[#6a6050] text-xs">· {v.nota}</span>}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {det && det.campos.map(c => (
           <div key={c.chave}>
             <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">{c.rotulo.toUpperCase()}</p>
