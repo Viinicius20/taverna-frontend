@@ -5,7 +5,7 @@ import { useUser } from '../context/UserContext';
 import NotasSessao from "../components/NotasSessao";
 import api from "../services/api";
 import { getCampanhaId } from '../utils/campanha';
-
+import AnotarBoato from '../components/AnotarBoato'
 
 
 const particles = Array.from({ length: 18 }, (_, i) => {
@@ -302,6 +302,7 @@ async function buscarImagemRevelada() {
           <div className="border border-[#c8a84b20] bg-[#161410] p-6" style={{ borderRadius: '2px' }}>
             <p className="text-[#a09880] text-base leading-relaxed mb-4 font-light italic">"{boato.boato}"</p>
             <p style={cinzel} className="text-[#8a7e68] text-xs">— {boato.fonte}</p>
+            <AnotarBoato key={boato.fala_id} falaId={boato.fala_id} />
           </div>
         )}
       </div>

@@ -1,41 +1,154 @@
 import { cinzel, crimson } from '../estilos';
 import { getCampanhaId } from '../utils/campanha';
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallBack } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { useUser } from '../context/UserContext';
+import AnotarBoato from '../components/AnotarBoato';
 
-
-const CATEGORIAS = [
-  { label: 'NPC', cor: '#c8a84b', borda: '#c8a84b40', bg: '#c8a84b08' },
-  { label: 'Local', cor: '#7ab8d4', borda: '#7ab8d440', bg: '#7ab8d408' },
-  { label: 'Pista', cor: '#a07840', borda: '#a0784040', bg: '#a0784008' },
-  { label: 'Missão', cor: '#b07050', borda: '#b0705040', bg: '#b0705008' },
-  { label: 'Outro', cor: '#6a6050', borda: '#6a605040', bg: '#6a605008' },
-];
 
 export default function Quadro() {
   const navigate = useNavigate();
-  const [postits, setPostits] = useState([]);
-  const [novoTexto, setNovoTexto] = useState('');
-  const [novaCategoria, setNovaCategoria] = useState('NPC');
-  const [modoMestre, setModoMestre] = useState(false);
   const [countdown, setCountdown] = useState(null);
   const [countdownDisplay, setCountdownDisplay] = useState('');
   const CAMPANHA_ID = getCampanhaId();
+  const { user } = useUser();
+  const isMestre = user?.role === 'mestre';
+  const [mural, setMural] = useState([]);
+  const [mundo, setMundo] = useState([]);
+  const [localId, setLocalId] = useState(null);
+  const [carregado, setCarregado] = useState(false);
+  const [painel, setPainel] = useState('');
+  const [fala, setFala] = useState(null);
+  const [texto, setTexto] = useState('');
+  const [revisado, setRevisado] = useState(false);
+  const [liberadoEm, setLiberadoEm] = useState(null);
+  const [ocupado, setOcupado] = useState(false);
+  const [erro, setErro] = useState('');
+  const [aviso, setAviso] = useState('');
+  const [entradas, setEntradas] = useState([]);
+  const [editor, setEditor] = useState({ texto: '', ativo: true });
+  const [buscaFicha, setBuscaFicha] = useState('');
 
-  function adicionarPostit() {
-    if (!novoTexto.trim()) return;
-    setPostits(prev => [...prev, {
-      id: Date.now(),
-      texto: novoTexto,
-      categoria: novaCategoria,
-    }]);
-    setNovoTexto('');
+  const local = mundo.find(item => item.tipo === 'local' && item.id === localId);
+  const aguardando = liberadoEm && new Date(liberadoEm).getTime() > Date.now();
+  const normalizar = v => v.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const busca = normalizar(buscaFicha.trim());
+  const sugestoes = busca && !editor.entidade_id
+    ? mundo.filter(item => normalizar(item.nome).includes(busca)).slice(0, 6)
+    : [];
+
+  const carregarMural = useCallback(async () => {
+    const res = await api.get('/rumores/mural');
+    setMural(res.data.data || []);
+    setCarregado(true);
+  }, []);
+
+useEffect(() => {
+  if (!user) return;
+
+  function atualizar() {
+    carregarMural().catch(() => setErro('Não foi possível carregar o quadro.'));
+    api.get(`/campanha-local/${CAMPANHA_ID}`)
+      .then(res => setLocalId(res.data?.data ?? null))
+      .catch(() => {});
   }
 
-function removerPostit(id) {
-  setPostits(prev => prev.filter(p => p.id !== id));
+  atualizar();
+  api.get(`/wiki-indice/${CAMPANHA_ID}/jogador`)
+    .then(res => setMundo(res.data.data || []))
+    .catch(() => {});
+
+  const timer = setInterval(atualizar, 10000);
+  return () => clearInterval(timer);
+}, [user, CAMPANHA_ID, carregarMural]);
+
+async function executar(acao) {
+  if (ocupado) return;
+  setOcupado(true);
+  setErro('');
+  setAviso('');
+
+  try {
+    await acao();
+  } catch (e) {
+    const detalhe = e.response?.data?.detail;
+    if (detalhe?.liberado_em) setLiberadoEm(detalhe.liberado_em);
+    setErro(
+      typeof detalhe === 'string' ? detalhe
+        : detalhe?.mensagem || 'Não foi possível concluir a ação.'
+    );
+  } finally {
+    setOcupado(false);
+  }
 }
+
+function ouvir() {
+  executar(async () => {
+    const res = await api.get('/boato');
+    setFala(res.data.data);
+    setPainel('ouvir');
+  });
+}
+
+function abrirSugestao() {
+  executar(async () => {
+    const res = await api.get('/rumores/sugestao');
+    setLiberadoEm(res.data.data.liberado_em);
+    setPainel('sugerir');
+  });
+}
+
+function revisar() {
+  executar(async () => {
+    const res = await api.post('/rumores/revisar', { texto: texto.trim() });
+    setTexto(res.data.data.texto);
+    setRevisado(true);
+  });
+}
+
+function enviarSugestao() {
+  executar(async () => {
+    const res = await api.post('/rumores/sugestao', { texto: texto.trim() });
+    setLiberadoEm(res.data.data.liberado_em);
+    setTexto('');
+    setRevisado(false);
+    setPainel('');
+    setAviso('Rumor enviado. Ele já pode circular na taverna.');
+  });
+}
+
+async function carregarGestao() {
+  const res = await api.get('/rumores/gerenciar');
+  setEntradas(res.data.data || []);
+}
+
+function selecionarEntrada(entrada) {
+  setEditor(entrada || { texto: '', ativo: true });
+  const ficha = mundo.find(
+    item => item.tipo === entrada?.entidade_tipo && item.id === entrada?.entidade_id
+  );
+  setBuscaFicha(ficha?.nome || '');
+}
+
+function salvarEntrada() {
+  executar(async () => {
+    const dados = {
+      texto: editor.texto.trim(),
+      ativo: editor.ativo,
+      entidade_tipo: editor.entidade_tipo ?? null,
+      entidade_id: editor.entidade_id ?? null,
+    };
+
+    if (editor.id) await api.patch(`/rumores/gerenciar/${editor.id}`, dados);
+    else await api.post('/rumores/gerenciar', dados);
+
+    selecionarEntrada(null);
+    setAviso('Rumor salvo.');
+    await carregarGestao();
+  });
+}
+
 
 useEffect(() => {
   let ativo = true;
@@ -83,11 +196,6 @@ useEffect(() => {
         <span style={cinzel} className="text-[#c8a84b] text-lg tracking-widest font-bold cursor-pointer"
           onClick={() => navigate('/')}>⚔ TAVERNA</span>
         <div className="flex gap-3 items-center">
-          <button onClick={() => setModoMestre(m => !m)}
-            className={`px-3 py-1 text-xs border transition-colors ${modoMestre ? 'bg-[#c8a84b] text-[#0f0e0c] border-[#c8a84b]' : 'border-[#c8a84b40] text-[#c8a84b]'}`}
-            style={{ ...cinzel, borderRadius: '2px' }}>
-            {modoMestre ? '⚔ MESTRE' : '👁 JOGADOR'}
-          </button>
           <button onClick={() => navigate('/')}
             className="text-[#9a8e78] text-sm hover:text-[#c8a84b] transition-colors" style={cinzel}>
             ← Voltar
@@ -99,25 +207,147 @@ useEffect(() => {
         <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-2 opacity-70">SESSÃO ATUAL</p>
         <h1 style={cinzel} className="text-2xl text-[#f0e8d8] font-semibold mb-8">Quadro de Rumores</h1>
 
-        {/* Adicionar post-it — só mestre */}
-        {modoMestre && (
-          <div className="flex flex-col sm:flex-row gap-2 mb-8">
-            <select value={novaCategoria} onChange={e => setNovaCategoria(e.target.value)}
-              className="bg-[#161410] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 text-xs focus:outline-none"
-              style={{ borderRadius: '2px' }}>
-              {CATEGORIAS.map(c => (
-                <option key={c.label} value={c.label}>{c.label}</option>
-              ))}
-            </select>
-            <input value={novoTexto} onChange={e => setNovoTexto(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && adicionarPostit()}
-              placeholder="Ex: Ferreiro Goran, Taverna do Cervo, Chave misteriosa..." aria-label="Ex: Ferreiro Goran, Taverna do Cervo, Chave misteriosa..."
-              className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 flex-1 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
-              style={{ borderRadius: '2px' }} />
-            <button onClick={adicionarPostit}
-              className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors"
-              style={{ ...cinzel, borderRadius: '2px' }}>
-              + ADICIONAR
+        {local && (
+          <p className="mb-4 text-sm text-[#9a8e78]">
+            Local do grupo · <span className="text-[#c8a84b]">{local.nome}</span>
+          </p>
+        )}
+
+        {user && (
+          <div className="flex flex-wrap gap-3 mb-6 text-sm text-[#c8a84b]">
+            <button type="button" disabled={ocupado} onClick={ouvir}>🍺 Ouvir boatos</button>
+            <button type="button" disabled={ocupado} onClick={abrirSugestao}>Sugerir rumor</button>
+            {isMestre && (
+              <button
+                type="button"
+                disabled={ocupado}
+                onClick={() => executar(async () => {
+                  if (painel === 'gerenciar') {
+                    setPainel('');
+                    return;
+                  }
+                  await carregarGestao();
+                  setPainel('gerenciar');
+                })}
+              >
+                {painel === 'gerenciar' ? 'Fechar gerenciamento' : 'Gerenciar'}
+              </button>
+            )}
+          </div>
+        )}
+
+        {erro && <p role="alert" className="text-red-400 mb-3">{erro}</p>}
+        {aviso && <p role="status" className="text-[#c8a84b] mb-3">{aviso}</p>}
+
+        {painel === 'ouvir' && fala && (
+          <div className="mb-6 border border-[#c8a84b20] bg-[#161410] p-4">
+            <p className="italic">“{fala.boato}”</p>
+            <p className="text-xs text-[#9a8e78] mt-2">— {fala.fonte}</p>
+            <AnotarBoato
+              key={fala.fala_id}
+              falaId={fala.fala_id}
+              onAnotado={() => carregarMural().catch(() => {})}
+            />
+          </div>
+        )}
+
+        {painel === 'sugerir' && (
+          <div className="mb-6 border border-[#c8a84b20] bg-[#161410] p-4 space-y-3">
+            {aguardando ? (
+              <p className="text-[#9a8e78]">
+                Próxima sugestão disponível em {new Date(liberadoEm).toLocaleString('pt-BR')}.
+              </p>
+            ) : (
+              <>
+                <textarea
+                  value={texto}
+                  onChange={e => { setTexto(e.target.value); setRevisado(false); }}
+                  maxLength={1000}
+                  rows={3}
+                  aria-label="Sua sugestão de rumor"
+                  placeholder="Escreva como alguém contaria a fofoca na taverna…"
+                  className="w-full bg-[#0f0e0c] border border-[#c8a84b20] p-3"
+                />
+                <p className="text-sm text-[#9a8e78]">
+                  {revisado
+                    ? 'Confira o texto revisado antes de confirmar.'
+                    : 'A IA revisa a escrita. Você pode sugerir um rumor a cada 72 horas.'}
+                </p>
+                <button
+                  type="button"
+                  disabled={ocupado || !texto.trim()}
+                  onClick={revisado ? enviarSugestao : revisar}
+                  className="text-[#c8a84b] underline disabled:opacity-50"
+                >
+                  {revisado ? 'Confirmar e enviar' : 'Revisar texto'}
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
+        {isMestre && painel === 'gerenciar' && (
+          <div className="mb-6 border border-[#c8a84b20] bg-[#161410] p-4 space-y-3">
+            <div className="flex flex-wrap gap-4 text-sm text-[#c8a84b]">
+              <button type="button" onClick={() => selecionarEntrada(null)}>Novo rumor</button>
+              <Link to="/lendas">Gerenciar lendas</Link>
+            </div>
+            {entradas.map(entrada => (
+              <button
+                type="button"
+                key={entrada.id}
+                onClick={() => selecionarEntrada(entrada)}
+                className="block text-left text-sm text-[#e8e0d0]"
+              >
+                {entrada.ativo ? 'Em circulação' : 'Desativado'} · {entrada.texto}
+              </button>
+            ))}
+            <textarea
+              value={editor.texto}
+              onChange={e => setEditor(prev => ({ ...prev, texto: e.target.value }))}
+              maxLength={1000}
+              rows={3}
+              aria-label="Texto do rumor"
+              className="w-full bg-[#0f0e0c] border border-[#c8a84b20] p-3"
+            />
+            <input
+              value={buscaFicha}
+              onChange={e => {
+                setBuscaFicha(e.target.value);
+                setEditor(prev => ({ ...prev, entidade_tipo: null, entidade_id: null }));
+              }}
+              placeholder="Vincular ficha do mundo"
+              aria-label="Vincular ficha do mundo"
+              className="bg-[#0f0e0c] border border-[#c8a84b20] p-2"
+            />
+            {sugestoes.map(item => (
+              <button
+                type="button"
+                key={`${item.tipo}:${item.id}`}
+                onClick={() => {
+                  setBuscaFicha(item.nome);
+                  setEditor(prev => ({ ...prev, entidade_tipo: item.tipo, entidade_id: item.id }));
+                }}
+                className="block text-sm text-[#c8a84b]"
+              >
+                {item.nome} · {item.tipo}
+              </button>
+            ))}
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={editor.ativo}
+                onChange={e => setEditor(prev => ({ ...prev, ativo: e.target.checked }))}
+              />
+              Disponível no sorteio
+            </label>
+            <button
+              type="button"
+              onClick={salvarEntrada}
+              disabled={ocupado || !editor.texto.trim()}
+              className="text-[#c8a84b] underline disabled:opacity-50"
+            >
+              Salvar rumor
             </button>
           </div>
         )}
@@ -130,46 +360,36 @@ useEffect(() => {
           </div>
         )}
 
-        {/* Post-its por categoria */}
-        {postits.length === 0 ? (
-          <div className="text-center py-20">
-            <p style={cinzel} className="text-[#8a7e68] text-sm tracking-widest">NENHUMA INFORMAÇÃO REGISTRADA</p>
-            {!modoMestre && (
-              <p className="text-[#2a2018] text-xs mt-2">Aguarde o mestre adicionar informações da sessão.</p>
-            )}
-          </div>
+        {!user ? (
+          <p className="text-[#9a8e78]">Entre na campanha para ver o mural.</p>
+        ) : !carregado ? (
+          <p className="text-[#9a8e78]">Carregando rumores…</p>
+        ) : mural.length === 0 ? (
+          <p className="text-[#9a8e78] py-8">
+            O quadro ainda está vazio. Ouça um boato e anote o que vale lembrar.
+          </p>
         ) : (
-          <div className="space-y-8">
-            {CATEGORIAS.filter(cat => postits.some(p => p.categoria === cat.label)).map(cat => (
-              <div key={cat.label}>
-                <p style={{ ...cinzel, color: cat.cor }} className="text-xs tracking-[3px] mb-3 opacity-80">
-                  {cat.label.toUpperCase()}S
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  {postits.filter(p => p.categoria === cat.label).map(postit => (
-                    <div key={postit.id}
-                      className="relative border px-4 py-3 text-sm"
-                      style={{
-                        borderRadius: '2px',
-                        borderColor: cat.borda,
-                        backgroundColor: cat.bg,
-                        color: '#e8e0d0',
-                        minWidth: '140px',
-                        maxWidth: '240px',
-                      }}>
-                      <p style={cinzel} className="text-xs mb-1" style2={{ color: cat.cor }}>{cat.label}</p>
-                      <p className="leading-relaxed">{postit.texto}</p>
-                      {modoMestre && (
-                        <button onClick={() => removerPostit(postit.id)}
-                          className="absolute top-1 right-2 text-red-600 hover:text-red-600 text-sm transition-colors">
-                          ×
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+          <div className="grid gap-3 sm:grid-cols-2">
+            {mural.map(item => {
+              const lugar = mundo.find(f => f.tipo === 'local' && f.id === item.local_id);
+              const ficha = mundo.find(f => f.tipo === item.entidade_tipo && f.id === item.entidade_id);
+
+              return (
+                <article key={item.id} className="border border-[#c8a84b20] bg-[#161410] p-4">
+                  <p className="italic break-words">“{item.texto}”</p>
+                  <p className="text-xs text-[#9a8e78] mt-2">— {item.fonte}</p>
+                  {lugar && <p className="text-xs text-[#9a8e78] mt-1">{lugar.nome}</p>}
+                  {ficha && (
+                    <Link
+                      to={`/wiki?tipo=${encodeURIComponent(ficha.tipo)}&id=${encodeURIComponent(ficha.id)}`}
+                      className="inline-block mt-2 text-xs text-[#c8a84b] underline"
+                    >
+                      Abrir ficha · {ficha.nome}
+                    </Link>
+                  )}
+                </article>
+              );
+            })}
           </div>
         )}
       </div>

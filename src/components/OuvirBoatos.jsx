@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import api from '../services/api';
 import { cinzel } from '../estilos';
+import AnotarBoato from './AnotarBoato';
 
 const PERICIAS = [['investigation', 'Investigação'], ['persuasion', 'Persuasão'], ['insight', 'Intuição']];
 const radius = { borderRadius: '2px' };
@@ -57,6 +58,7 @@ export default function OuvirBoatos({ personagemId, compacto = false }) {
           )}
           <p className="text-[#e8e0d0] text-sm italic">"{resultado.boato}"</p>
           {resultado.fonte && <p className="text-[#8a7e68] text-xs mt-1">— {resultado.fonte}</p>}
+          <AnotarBoato key={resultado.fala_id} falaId={resultado.fala_id} />
         </div>
       )}
     </div>
