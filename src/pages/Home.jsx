@@ -25,6 +25,8 @@ export default function Home() {
   const [gerandoBoato, setGerandoBoato] = useState(false);
   const [drawerAberto, setDrawerAberto] = useState(false);
   const [monstro, setMonstro] = useState(null);
+  const [buscandoAmeaca, setBuscandoAmeaca] = useState(false);
+  const [estadoAmeaca, setEstadoAmeaca] = useState('');
   const [imagemRevelada, setImagemRevelada] = useState(null);
   const isMestre = user?.role === 'mestre';
   const [proximos, setProximos] = useState([]);
@@ -38,13 +40,21 @@ useEffect(() => {
 }, [user, carregandoUser]); // eslint-disable-line react-hooks/exhaustive-deps
 
 async function buscarMonstroAleatorio(novo = false) {
+  if (buscandoAmeaca) return;
+  setBuscandoAmeaca(true);
+
   try {
     const res = await api.get('/bestiary/random-description', {
-      params: novo ? { novo: true } : {},
+      params: novo ? { novo: true, anterior: monstro?.id } : {},
     });
-    setMonstro(res.data.data);
+
+    setMonstro(res.data.data ?? null);
+    setEstadoAmeaca(res.data.motivo || '');
   } catch {
-    if (!novo) setMonstro(null);   
+    setMonstro(null);
+    setEstadoAmeaca('erro');
+  } finally {
+    setBuscandoAmeaca(false);
   }
 }
 
@@ -243,24 +253,62 @@ async function buscarImagemRevelada() {
         {/* MONSTRO ALEATÓRIO */}
         <div className="border border-[#c8a84b20] bg-[#161410] p-8" style={{ borderRadius: '2px' }}>
           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[4px] mb-4 opacity-70">AMEAÇA DO DIA</p>
-          {monstro ? (
+          {buscandoAmeaca ? (
+            <p className="text-[#8a7e68] text-sm">Buscando ameaças do local…</p>
+          ) : monstro ? (
             <>
-              <h3 style={cinzel} className="text-[#f0e8d8] text-xl font-bold mb-1">{monstro.nome}</h3>
-              <p style={cinzel} className="text-[#8a7e68] text-xs mb-4">{monstro.tipo} · CR {monstro.cr}</p>
-              <p className="text-[#8a8070] text-sm leading-relaxed font-light italic">{monstro.descricao}</p>
+              <h3 style={cinzel} className="text-[#f0e8d8] text-xl font-bold mb-1">
+                {monstro.nome}
+              </h3>
+              <p style={cinzel} className="text-[#8a7e68] text-xs mb-4">
+                {monstro.tipo} · CR {monstro.cr}
+              </p>
+              <p className="text-[#a09880] text-sm leading-relaxed italic">
+                {monstro.descricao}
+              </p>
+
+              <div className="mt-5 flex flex-wrap gap-2" style={cinzel}>
+                {monstro.tem_outra && (
+                  <button
+                    type="button"
+                    onClick={() => buscarMonstroAleatorio(true)}
+                    className="rounded-sm border border-[#c8a84b40] px-3 py-2 text-xs
+                              text-[#c8a84b] hover:bg-[#c8a84b15]"
+                  >
+                    ↻ Outra ameaça
+                  </button>
+                )}
+                {isMestre && monstro.combate && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const params = new URLSearchParams({
+                        addMonster: monstro.nome,
+                        hp: String(monstro.combate.hp),
+                        dex: String(monstro.combate.dex ?? 10),
+                        qtd: '1',
+                      });
+                      navigate(`/mestre?${params}`);
+                    }}
+                    className="rounded-sm border border-[#c8a84b] bg-[#c8a84b]
+                              px-3 py-2 text-xs font-bold text-[#161410] hover:bg-[#e0c060]"
+                  >
+                    ⚔ + Combate
+                  </button>
+                )}
+              </div>
             </>
           ) : (
-            <div className="flex items-center gap-3">
-              <div className="w-5 h-5 border border-[#c8a84b40] border-t-[#c8a84b] rounded-full animate-spin" />
-              <p style={cinzel} className="text-[#8a7e68] text-xs">INVOCANDO...</p>
-            </div>
+            <p className="text-[#9a8e78] text-sm">
+              {{
+                sem_local: 'O grupo ainda não tem um local definido no Atlas.',
+                sem_perigos: 'Ainda não há monstros ou perigos cadastrados neste local.',
+                sem_criatura_revelada: 'Nenhuma criatura revelada corresponde aos perigos deste local.',
+                erro: 'Não foi possível carregar a ameaça do dia.',
+              }[estadoAmeaca] || 'A ameaça do dia ficará disponível ao entrar na campanha.'}
+            </p>
           )}
-          <button onClick={() => buscarMonstroAleatorio(true)}
-            className="mt-6 text-xs text-[#8a7e68] hover:text-[#c8a84b] transition-colors"
-            style={cinzel}>
-            ↻ Outro monstro
-          </button>
-        </div>
+        </div> {/* Fecha o card Ameaça do Dia */}
 
         {/* IMAGEM REVELADA */}
         <div className="border border-[#c8a84b20] bg-[#161410] p-8" style={{ borderRadius: '2px' }}>
