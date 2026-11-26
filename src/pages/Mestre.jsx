@@ -1266,7 +1266,12 @@ useEffect(() => {
               const attrs = d.attributes || {};
 
               return (
-                <div key={npc.id} className="bg-[#161410]">
+                <div
+                  key={npc.id}
+                  id={`npc-${npc.id}`}
+                  ref={focarRegistro}
+                  className="bg-[#161410]"
+                >
                   <div className="p-6 flex items-start justify-between gap-4 cursor-pointer hover:bg-[#1c1a16] transition-colors"
                     onClick={() => setNpcExpandido(expandido ? null : npc.id)}>
                     <div className="flex-1 min-w-0">
