@@ -406,17 +406,6 @@ useEffect(() => {
             {mural.map(item => {
               const lugar = mundo.find(f => f.tipo === 'local' && f.id === item.local_id);
               const ficha = mundo.find(f => f.tipo === item.entidade_tipo && f.id === item.entidade_id);
-              {isMestre && (
-                <button
-                  type="button"
-                  disabled={ocupado}
-                  onClick={() => removerDoQuadro(item.id)}
-                  className="block mt-3 text-xs text-[#c18078] hover:text-red-300
-                            hover:underline disabled:opacity-50"
-                >
-                  Remover do quadro
-                </button>
-              )}
 
               return (
                 <article key={item.id} className="border border-[#c8a84b20] bg-[#161410] p-4">
@@ -430,6 +419,17 @@ useEffect(() => {
                     >
                       Abrir ficha · {ficha.nome}
                     </Link>
+                  )}
+                  {isMestre && (
+                    <button
+                      type="button"
+                      disabled={ocupado}
+                      onClick={() => removerDoQuadro(item.id)}
+                      className="block mt-3 text-xs text-[#c18078] hover:text-red-300
+                                 hover:underline disabled:opacity-50"
+                    >
+                      Remover do quadro
+                    </button>
                   )}
                 </article>
               );
