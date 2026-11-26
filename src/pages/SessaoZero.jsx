@@ -1,7 +1,7 @@
 import { cinzel, crimson } from '../estilos';
 import { getCampanhaId } from '../utils/campanha';
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { notificar } from '../utils/notificar';
 import { VINCULOS } from '../constants/vinculos';
