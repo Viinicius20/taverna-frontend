@@ -11,11 +11,18 @@ function PostIt({ nota, indice, onFeito, onApagar }) {
   const inclinacao = [-1.8, 1.2, -0.8, 1.6][indice % 4];
   const faltam = nota.sessions_left === 1 ? 'FALTA 1 SESSÃO' : `FALTAM ${nota.sessions_left} SESSÕES`;
   return (
-    <div className="relative p-3 pt-4 min-h-[110px] flex flex-col justify-between"
+    <div
+      id={`nota-${nota.id}`}
+      ref={focarRegistro}
+      className="relative p-3 pt-4 min-h-[110px] flex flex-col justify-between"
       style={{
-        backgroundColor: CORES[nota.color] || CORES.amarelo, color: '#2a2418',
-        transform: `rotate(${inclinacao}deg)`, boxShadow: '2px 4px 10px rgba(0,0,0,0.5)', borderRadius: '2px',
-      }}>
+        backgroundColor: CORES[nota.color] || CORES.amarelo,
+        color: '#2a2418',
+        transform: `rotate(${inclinacao}deg)`,
+        boxShadow: '2px 4px 10px rgba(0,0,0,0.5)',
+        borderRadius: '2px',
+      }}
+    >
       {/* tachinha */}
       <span className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#8a2020] shadow" />
       <p className="text-sm leading-snug italic break-words">{nota.text}</p>
@@ -41,7 +48,6 @@ export default function NotasSessao({ gancho } = {}) {
   const [cor, setCor] = useState('amarelo');
   const [sessoes, setSessoes] = useState('');
   const [erro, setErro] = useState('');
-  const { key, state, hash } = useLocation();
   const [ganchoEmUso, setGanchoEmUso] = useState(Boolean(gancho));
   const [salvando, setSalvando] = useState(false);
   const [texto, setTexto] = useState(

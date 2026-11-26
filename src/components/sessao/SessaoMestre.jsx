@@ -5,7 +5,6 @@ import NotasSessao from '../NotasSessao';
 import { cinzel } from '../../estilos';
 import GanchosPessoais from '../GanchosPessoais';
 import PainelDescobertas from '../PainelDescobertas';
-import { focarRegistro, registrarUsoDoGancho } from '../utils/ganchosSessaoZero';
 import { useLocation } from 'react-router-dom';
 
 const radius = { borderRadius: '2px' };
