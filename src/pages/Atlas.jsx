@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { cinzel, crimson } from '../estilos';
 import { getCampanhaId } from '../utils/campanha';
@@ -219,6 +219,10 @@ export default function Atlas() {
   const [cadeia, setCadeia] = useState(null);
   const [zoom, setZoom] = useState(1);
   const mudarZoom = d => setZoom(z => Math.min(3, Math.max(1, +(z + d).toFixed(2))));
+  const [npcsDoAtlas, setNpcsDoAtlas] = useState([]);
+  const [lendasDoAtlas, setLendasDoAtlas] = useState([]);
+  const [salvandoVinculo, setSalvandoVinculo] = useState(false);
+  const [erroVinculo, setErroVinculo] = useState('');
 
   useEffect(() => {
     if (!isMestre) return;
@@ -232,20 +236,54 @@ export default function Atlas() {
       .catch(() => {});
   }
 
-  useEffect(() => {
-    if (!user) return;
-    const rota = isMestre ? `/atlas-mestre/${campanha}` : `/atlas/${campanha}`;
-    api.get(rota)
-      .then(r => {
-        setPins(r.data.data.pins || []);
-        setRegioes(r.data.data.regioes || []);
-        setFaccoes(r.data.data.faccoes || []);
-      })
-      .catch(() => {})
-      .finally(() => setCarregado(true));
+const carregarAtlas = useCallback(async () => {
+  const rota = isMestre ? `/atlas-mestre/${campanha}` : `/atlas/${campanha}`;
+  const res = await api.get(rota);
+  const dados = res.data.data;
+  setPins(dados.pins || []);
+  setRegioes(dados.regioes || []);
+  setFaccoes(dados.faccoes || []);
+}, [campanha, isMestre]);
+
+const carregarListasDoPin = useCallback(async () => {
+  const [npcs, lendas] = await Promise.all([
+    api.get(`/npcs/${campanha}`),
+    api.get('/lendas'),
+  ]);
+  setNpcsDoAtlas(npcs.data.data || []);
+  setLendasDoAtlas(lendas.data.data || []);
+}, [campanha]);
+
+useEffect(() => {
+  if (!user) return;
+
+  carregarAtlas()
+    .catch(() => {})
+    .finally(() => setCarregado(true));
+
+  if (isMestre) {
     carregarDescobertas();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [campanha, isMestre, user]);
+    carregarListasDoPin().catch(() => setErroVinculo('Não foi possível carregar NPCs e lendas.'));
+  }
+  // carregarDescobertas já usa a campanha atual.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [user, isMestre, carregarAtlas, carregarListasDoPin]);
+
+async function alterarVinculoDoPin(rota, dados) {
+  if (salvandoVinculo) return;
+  setSalvandoVinculo(true);
+  setErroVinculo('');
+
+  try {
+    await api.patch(rota, dados);
+    await Promise.all([carregarAtlas(), carregarListasDoPin()]);
+  } catch (e) {
+    const detalhe = e.response?.data?.detail;
+    setErroVinculo(typeof detalhe === 'string' ? detalhe : 'Não foi possível atualizar o pin.');
+  } finally {
+    setSalvandoVinculo(false);
+  }
+}
   
   useEffect(() => {
   api.get(`/campanha-local/${campanha}`)          
@@ -773,6 +811,16 @@ async function removerPresenca(faccaoId) {
                         </>
                       )}
                       📍
+                      {p.tem_lenda_pendente && (
+                        <span
+                          title="Lenda por descobrir"
+                          className="pointer-events-none absolute -right-2 -top-1 flex h-5 w-5
+                                    items-center justify-center rounded-full border border-[#c8a84b]
+                                    bg-[#161410] text-xs font-bold text-[#c8a84b]"
+                        >
+                          ?
+                        </span>
+                      )}
                     </button>
                   ))}
 
@@ -1029,12 +1077,13 @@ async function removerPresenca(faccaoId) {
                     </div>
                     {isMestre && (
                       <div className="flex flex-wrap gap-2 justify-end">
-                        <BotaoRevelar tipo="local" entidadeId={local.id} campanhaId={campanha}
-                          descoberta={descDe('local', local.id)} onMudou={() => {
-                          const eraOculto = !descDe('local', local.id);
-                          carregarDescobertas();
-                          if (eraOculto) abrirCadeia('local', local);
-                        }} />
+                        <BotaoRevelar
+                          tipo="local"
+                          entidadeId={local.id}
+                          campanhaId={campanha}
+                          descoberta={descDe('local', local.id)}
+                          onMudou={carregarDescobertas}
+                        />
                         <button onClick={() => { setEditando(local.id); setMovendo(null); setEscolhendo(null); }}
                           className={`${btn} border-[#c8a84b30] text-[#c8a84b] hover:bg-[#c8a84b10]`}
                           style={{ ...cinzel, ...radius }}>📍 Posicionar</button>
@@ -1059,23 +1108,132 @@ async function removerPresenca(faccaoId) {
                     </p>
                   )}
 
-                  {local.npcs?.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-[#c8a84b10]">
-                      <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px] mb-2">QUEM ESTÁ AQUI</p>
-                      {isMestre ? (
-                        <div className="space-y-2">
-                          {local.npcs.map(n => (
-                            <div key={n.id} className="flex items-center justify-between gap-3">
-                              <span className="text-[#9a8e78] text-sm">{n.nome}</span>
-                              <BotaoRevelar tipo="npc" entidadeId={n.id} campanhaId={campanha}
-                                descoberta={descDe('npc', n.id)} onMudou={carregarDescobertas} />
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-[#9a8e78] text-sm">{local.npcs.map(n => n.nome).join(', ')}</p>
+                  {isMestre && erroVinculo && (
+                    <p role="alert" className="mt-3 text-xs text-red-400">{erroVinculo}</p>
+                  )}
+
+                  {(isMestre || local.npcs?.length > 0) && (
+                    <section className="mt-3 space-y-2 border-t border-[#c8a84b10] pt-3">
+                      <h3 style={cinzel} className="text-xs tracking-[2px] text-[#8a7e68]">
+                        NPCs do local
+                      </h3>
+
+                      {isMestre && (
+                        <select
+                          value=""
+                          aria-label="Adicionar NPC ao local"
+                          disabled={salvandoVinculo}
+                          onChange={e => {
+                            const npcId = e.target.value;
+                            if (npcId) alterarVinculoDoPin(`/atlas/npcs/${npcId}/local`, { local_id: local.id });
+                          }}
+                          className="w-full border border-[#c8a84b20] bg-[#0f0e0c] px-2 py-2 text-sm"
+                        >
+                          <option value="">＋ Adicionar NPC ao local</option>
+                          {npcsDoAtlas
+                            .filter(npc => !(local.npcs || []).some(n => n.id === npc.id))
+                            .map(npc => (
+                              <option key={npc.id} value={npc.id}>
+                                {npc.data?.name || npc.name}
+                              </option>
+                            ))}
+                        </select>
                       )}
-                    </div>
+
+                      {(local.npcs || []).map(npc => (
+                        <div key={npc.id} className="flex flex-wrap items-center justify-between gap-2">
+                          <Link
+                            to={`/wiki?tipo=npc&id=${encodeURIComponent(npc.id)}`}
+                            className="text-sm text-[#c8a84b] hover:underline"
+                          >
+                            {npc.nome}
+                          </Link>
+
+                          {isMestre && (
+                            <div className="flex flex-wrap gap-2">
+                              <BotaoRevelar
+                                tipo="npc"
+                                entidadeId={npc.id}
+                                campanhaId={campanha}
+                                descoberta={descDe('npc', npc.id)}
+                                onMudou={carregarDescobertas}
+                              />
+                              <button
+                                type="button"
+                                disabled={salvandoVinculo}
+                                className="text-xs text-[#c18078] hover:underline"
+                                onClick={() => alterarVinculoDoPin(`/atlas/npcs/${npc.id}/local`, { local_id: null })}
+                              >
+                                Desvincular
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </section>
+                  )}
+
+                  {(isMestre || local.tem_lenda_pendente || local.lendas?.length > 0) && (
+                    <section className="mt-3 space-y-2 border-t border-[#c8a84b10] pt-3">
+                      <h3 style={cinzel} className="text-xs tracking-[2px] text-[#8a7e68]">
+                        Lendas do local
+                      </h3>
+
+                      {isMestre ? (
+                        <select
+                          value=""
+                          aria-label="Adicionar lenda ao local"
+                          disabled={salvandoVinculo}
+                          onChange={e => {
+                            const lendaId = e.target.value;
+                            if (lendaId) alterarVinculoDoPin(`/atlas/lendas/${lendaId}/local`, { local_id: local.id });
+                          }}
+                          className="w-full border border-[#c8a84b20] bg-[#0f0e0c] px-2 py-2 text-sm"
+                        >
+                          <option value="">＋ Adicionar lenda ao local</option>
+                          {lendasDoAtlas.filter(lenda => !lenda.local_id).map(lenda => (
+                            <option key={lenda.id} value={lenda.id}>{lenda.titulo}</option>
+                          ))}
+                        </select>
+                      ) : local.tem_lenda_pendente && (
+                        <p className="text-sm text-[#c8a84b]">Há uma lenda por descobrir aqui.</p>
+                      )}
+
+                      {(local.lendas || []).map(lenda => (
+                        <div key={lenda.id} className="space-y-1">
+                          <p className="text-sm text-[#e8e0d0]">
+                            {lenda.titulo}{isMestre && !lenda.ativa ? ' · Inativa' : ''}
+                          </p>
+
+                          {!isMestre && lenda.versao_popular && (
+                            <p className="text-sm text-[#9a8e78]">{lenda.versao_popular}</p>
+                          )}
+
+                          {isMestre && (
+                            <div className="flex flex-wrap gap-3 text-xs">
+                              <button
+                                type="button"
+                                disabled={salvandoVinculo}
+                                className="text-[#c8a84b] hover:underline"
+                                onClick={() => alterarVinculoDoPin(`/atlas/lendas/${lenda.id}/descoberta`, {
+                                  descoberta: !lenda.descoberta,
+                                })}
+                              >
+                                {lenda.descoberta ? '✓ Descoberta · desfazer' : 'Marcar como descoberta'}
+                              </button>
+                              <button
+                                type="button"
+                                disabled={salvandoVinculo}
+                                className="text-[#c18078] hover:underline"
+                                onClick={() => alterarVinculoDoPin(`/atlas/lendas/${lenda.id}/local`, { local_id: null })}
+                              >
+                                Desvincular
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </section>
                   )}
 
                   {isMestre && terras.length > 0 && (
