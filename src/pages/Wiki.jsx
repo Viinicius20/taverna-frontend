@@ -40,6 +40,22 @@ function LinhaPagina({ p, abrir }) {
   );
 }
 
+function linksOcultos(texto, paginas, entidades, atualId) {
+  const achados = new Set();
+  const re = /\[\[([^\]]+)\]\]/g;
+  let m;
+  while ((m = re.exec(texto || '')) !== null) achados.add(m[1].trim().toLowerCase());
+
+  const ocultos = [];
+  achados.forEach(nome => {
+    const pag = paginas.find(p => p.id !== atualId && (p.titulo || '').toLowerCase() === nome);
+    if (pag) { if (!pag.revelada) ocultos.push(pag.titulo); return; }
+    const ent = entidades.find(e => (e.nome || '').toLowerCase() === nome);
+    if (ent && !ent.revelado) ocultos.push(ent.nome);
+  });
+  return ocultos;
+}
+
 export default function Wiki() {
   const navigate = useNavigate();
   const [paginas, setPaginas] = useState([]);
@@ -220,6 +236,9 @@ async function gerarHistoria() {
   const citadaEm = atualId
     ? paginas.filter(p => p.id !== atualId && menciona(p.conteudo, form.titulo))
     : [];
+  const ocultosNoTexto = form.revelada
+  ? linksOcultos(form.conteudo, paginas, entidades, atualId)
+  : [];
 
   function renderInicio() {
     return (
@@ -489,6 +508,16 @@ async function gerarHistoria() {
             onChange={e => setForm(f => ({ ...f, revelada: e.target.checked }))} />
           <span style={cinzel} className="tracking-widest">REVELADA PARA OS JOGADORES</span>
         </label>
+
+        {ocultosNoTexto.length > 0 && (
+          <div className="border border-[#b07050] bg-[#b0705010] px-3 py-2 text-xs text-[#d09070]" style={radius}>
+            <p style={cinzel} className="tracking-[2px] mb-1">⚠ CITA ALGO AINDA OCULTO</p>
+            <p className="leading-relaxed">
+              Os jogadores vão ler o nome de: {ocultosNoTexto.join(', ')}.
+              Revele antes, ou tire o link do texto.
+            </p>
+          </div>
+        )}
 
         <div className="flex gap-2 justify-between">
           <button onClick={salvar} disabled={!form.titulo.trim() || salvando}

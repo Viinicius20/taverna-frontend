@@ -80,6 +80,13 @@ html, body {
 .tema-feiticeiro{ --cor-classe: #e07a7a; --cor-classe-20: #c84b4b20; --cor-classe-40: #c84b4b40; }
 .tema-bruxo     { --cor-classe: #9b7ae0; --cor-classe-20: #6b4bc820; --cor-classe-40: #6b4bc840; }
 
+:root { color-scheme: dark; }
+* { scrollbar-width: thin; scrollbar-color: #c8a84b40 #0f0e0c; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: #0f0e0c; }
+*::-webkit-scrollbar-thumb { background: #c8a84b40; border-radius: 4px; }
+*::-webkit-scrollbar-thumb:hover { background: #c8a84b80; }
+
 
 .page-fade .text-\[\#c8a84b\] {
   color: var(--cor-classe, #c8a84b);

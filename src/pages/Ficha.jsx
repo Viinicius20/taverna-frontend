@@ -17,6 +17,7 @@ import MesaFeed from '../components/MesaFeed';
 import Retrato from '../components/Retrato';
 import PopupMensagem from '../components/PopupMensagem';
 import OuvirBoatos from '../components/OuvirBoatos';
+import EstadoVazio from '../components/EstadoVazio';
 
 
 const CAMPANHA_ID = getCampanhaId();
@@ -274,7 +275,10 @@ function Momentos({ momentos = [], onChange }) {
           {historia.map(m => <CartaoMomento key={m.id} m={m} onRemover={remover} />)}
         </div>
       ) : fixos.length === 0 && (
-        <p className="text-[#8a7e68] text-sm text-center py-6 italic">Nenhuma façanha (ou desgraça) registrada ainda.</p>
+        <EstadoVazio
+          titulo="Nenhuma façanha (ou desgraça) registrada ainda"
+          texto="Os momentos marcantes da campanha aparecem aqui."
+        />
       )}
     </div>
   );
@@ -3206,7 +3210,10 @@ style={{
         <div className="border border-[#c8a84b20] bg-[#161410] mb-6 p-6">
           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">DOCUMENTOS RECEBIDOS</p>
           {handoutsRecebidos.length === 0 ? (
-            <p className="text-[#8a7e68] text-sm text-center py-6">Nenhum documento recebido ainda.</p>
+            <EstadoVazio
+              titulo="Nenhum documento recebido ainda"
+              texto="Cartas, mapas e outros documentos que o mestre entregar ao seu personagem aparecem aqui."
+            />
           ) : (
             <div className="flex flex-col gap-3">
               {handoutsRecebidos.map(h => (
@@ -3351,7 +3358,10 @@ style={{
           <>
           <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">WIKI DA CAMPANHA</p>
           {wikiPaginas.length === 0 ? (
-            <p className="text-[#9a8e78] text-sm text-center py-6">Nenhuma página revelada ainda.</p>
+            <EstadoVazio
+              titulo="Nenhuma página revelada ainda"
+              texto="Quando o mestre revelar páginas da Wiki, elas aparecem aqui."
+            />
           ) : (
             <div className="flex flex-col gap-1">
               {wikiPaginas.map(p => (

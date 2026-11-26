@@ -35,6 +35,7 @@ import PerfilPersonagem from './pages/PerfilPersonagem';
 import Atlas from './pages/Atlas';
 import Lendas from './pages/Lendas';
 import Enciclopedia from './pages/Enciclopedia';
+import BuscaGlobal from './components/BuscaGlobal';
 
 instalarAlertGlobal();
 
@@ -56,6 +57,7 @@ return (
         <Toasts />
           <ConfirmHost />
           <LimiteDeErro>
+            <BuscaGlobal />
             <Routes>
               <Route path="/login" element={<Login />} /> {/* ← adiciona */}
               <Route path="/" element={<Home />} />
