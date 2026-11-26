@@ -386,7 +386,7 @@ async function gerarHistoria() {
               })}
             </div>
           </div>
-        )}
+        )} 
 
         {det && det.campos.map(c => (
           <div key={c.chave}>
