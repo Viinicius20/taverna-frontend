@@ -1,13 +1,14 @@
 import { cinzel, crimson } from '../estilos';
 import { getCampanhaId } from '../utils/campanha';
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { notificar, confirmar } from '../utils/notificar';
 import MapaRelacoes from '../components/MapaRelacoes';
 import { VINCULOS } from '../constants/vinculos';
 import LogoTaverna from '../components/LogoTaverna';
 import { useUser } from '../context/UserContext';
+import { focarRegistro, registrarUsoDoGancho } from '../utils/ganchosSessaoZero';
 
 const CAMPANHA_ID = getCampanhaId();
 
@@ -21,16 +22,21 @@ export default function Relacoes() {
   const navigate = useNavigate();
   const [entidades, setEntidades] = useState([]);
   const [grafo, setGrafo] = useState({ nos: [], arestas: [] });
-  const [origem, setOrigem] = useState('');
+  const [origem, setOrigem] = useState(gancho ? `character:${gancho.personagemId}` : '');
   const [destino, setDestino] = useState('');
-  const [tipo, setTipo] = useState('conhece');
-  const [nota, setNota] = useState('');
+  const [tipo, setTipo] = useState(gancho?.campo === 'medo' ? 'teme' : 'conhece');
+  const [nota, setNota] = useState(gancho?.texto.slice(0, 300) || '');
   const [secreto, setSecreto] = useState(true);
   const [erro, setErro] = useState('');
   const [vista, setVista] = useState('lista');
   const [como, setComo] = useState('');
   const { user } = useUser();
   const isMestre = user?.role === 'mestre';
+
+  const { state } = useLocation();
+  const gancho = state?.gancho;
+  const [ganchoEmUso, setGanchoEmUso] = useState(Boolean(gancho));
+  const [salvando, setSalvando] = useState(false);
 
   const carregarEntidades = useCallback(async () => {
     const lista = [];
@@ -79,19 +85,37 @@ useEffect(() => { carregarGrafo(); }, [carregarGrafo]);
 
   const nomes = useMemo(() => Object.fromEntries(grafo.nos.map(n => [n.id, n.label])), [grafo]);
 
-  async function criar() {
-    const [st, sid] = origem.split(':');
-    const [tt, tid] = destino.split(':');
-    if (!sid || !tid) return;
-    try {
-      await api.post(`/relacoes/${CAMPANHA_ID}`, {
-        source_type: st, source_id: sid, target_type: tt, target_id: tid,
-        kind: tipo, note: nota, secret: secreto,
-      });
-      setNota(''); setErro('');
-      carregarGrafo();
-    } catch (e) { setErro(mensagem(e, 'Erro ao criar o vínculo.')); }
+async function criar() {
+  const [st, sid] = origem.split(':');
+  const [tt, tid] = destino.split(':');
+  if (!sid || !tid || origem === destino || salvando) return;
+
+  setSalvando(true);
+  try {
+    const res = await api.post(`/relacoes/${CAMPANHA_ID}`, {
+      source_type: st,
+      source_id: sid,
+      target_type: tt,
+      target_id: tid,
+      kind: tipo,
+      note: nota,
+      secret: secreto,
+    });
+
+    if (ganchoEmUso && res.data.data?.id) {
+      registrarUsoDoGancho(gancho, `/relacoes#vinculo-${res.data.data.id}`);
+      setGanchoEmUso(false);
+    }
+
+    setNota('');
+    setErro('');
+    carregarGrafo();
+  } catch (e) {
+    setErro(mensagem(e, 'Erro ao criar o vínculo.'));
+  } finally {
+    setSalvando(false);
   }
+}
 
   const opcoes = Object.keys(TIPOS).map(t => (
     <optgroup key={t} label={TIPOS[t]}>
@@ -131,7 +155,7 @@ useEffect(() => { carregarGrafo(); }, [carregarGrafo]);
               <input type="checkbox" checked={secreto} onChange={e => setSecreto(e.target.checked)} />
               🔒 Secreto (os jogadores não veem)
             </label>
-            <button onClick={criar} disabled={!origem || !destino || origem === destino}
+            <button onClick={criar} disabled={!origem || !destino || origem === destino || salvando}
               className="ml-auto bg-[#c8a84b] text-[#0f0e0c] px-5 py-2 text-xs font-bold disabled:opacity-30"
               style={{ ...cinzel, borderRadius: '2px' }}>
               + Criar vínculo

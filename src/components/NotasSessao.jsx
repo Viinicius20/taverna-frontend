@@ -1,6 +1,7 @@
 import { cinzel } from '../estilos';
 import { useState, useEffect, useCallback } from "react";
 import api from "../services/api";
+import { focarRegistro, registrarUsoDoGancho } from '../utils/ganchosSessaoZero';
 
 
 const CORES = { amarelo: '#e8d27a', rosa: '#e8a0a8', azul: '#8ec5e0', verde: '#a6d48a' };
@@ -35,12 +36,17 @@ function PostIt({ nota, indice, onFeito, onApagar }) {
   );
 }
 
-export default function NotasSessao() {
+export default function NotasSessao({ gancho } = {}) {
   const [notas, setNotas] = useState([]);
-  const [texto, setTexto] = useState('');
   const [cor, setCor] = useState('amarelo');
   const [sessoes, setSessoes] = useState('');
   const [erro, setErro] = useState('');
+  const { key, state, hash } = useLocation();
+  const [ganchoEmUso, setGanchoEmUso] = useState(Boolean(gancho));
+  const [salvando, setSalvando] = useState(false);
+  const [texto, setTexto] = useState(
+    gancho ? `${gancho.nome} · ${gancho.texto}`.slice(0, 300) : ''
+  );
 
   const carregar = useCallback(async () => {
     try {
@@ -51,16 +57,32 @@ export default function NotasSessao() {
 
   useEffect(() => { carregar(); }, [carregar]);
 
-  async function fixar() {
-    if (!texto.trim()) return;
-    try {
-      await api.post('/notas-sessao', {
-        text: texto, color: cor, sessions_left: sessoes === '' ? null : Number(sessoes),
-      });
-      setTexto(''); setSessoes(''); setErro('');
-      carregar();
-    } catch { setErro('Erro ao fixar a anotação.'); }
+async function fixar() {
+  if (!texto.trim() || salvando) return;
+
+  setSalvando(true);
+  try {
+    const res = await api.post('/notas-sessao', {
+      text: texto,
+      color: cor,
+      sessions_left: sessoes === '' ? null : Number(sessoes),
+    });
+
+    if (ganchoEmUso && res.data.data?.id) {
+      registrarUsoDoGancho(gancho, `/mestre?aba=sessao#nota-${res.data.data.id}`);
+      setGanchoEmUso(false);
+    }
+
+    setTexto('');
+    setSessoes('');
+    setErro('');
+    carregar();
+  } catch {
+    setErro('Erro ao fixar a anotação.');
+  } finally {
+    setSalvando(false);
   }
+}
 
   async function marcarFeito(id) {
     try { await api.patch(`/notas-sessao/${id}`, { done: true }); carregar(); }
@@ -116,7 +138,7 @@ export default function NotasSessao() {
           title="Prazo em sessões (vazio = sem prazo)"
           className="w-24 bg-[#161410] border border-[#c8a84b20] text-[#c8a84b] px-2 py-2 text-sm text-center focus:outline-none"
           style={{ borderRadius: '2px' }} />
-        <button onClick={fixar} disabled={!texto.trim()}
+        <button onClick={fixar}disabled={!texto.trim() || salvando}
           className="bg-[#c8a84b] text-[#0f0e0c] px-4 py-2 text-xs font-bold disabled:opacity-30"
           style={{ ...cinzel, borderRadius: '2px' }}>
           Fixar

@@ -5,6 +5,8 @@ import NotasSessao from '../NotasSessao';
 import { cinzel } from '../../estilos';
 import GanchosPessoais from '../GanchosPessoais';
 import PainelDescobertas from '../PainelDescobertas';
+import { focarRegistro, registrarUsoDoGancho } from '../utils/ganchosSessaoZero';
+import { useLocation } from 'react-router-dom';
 
 const radius = { borderRadius: '2px' };
 
@@ -14,6 +16,7 @@ export default function SessaoMestre({ combate, onCondicoes, personagens }) {
     proximoTurno, atualizarCombatente, removerCombatente,
   } = combate;
   const atual = combatentes[turnoAtual];
+  const { key, state, hash } = useLocation();
 
   return (
     <div className="grid gap-4 lg:grid-cols-3">
@@ -67,7 +70,7 @@ export default function SessaoMestre({ combate, onCondicoes, personagens }) {
         <MesaFeed />
         <PainelDescobertas />
         <GanchosPessoais personagens={personagens} />
-        <NotasSessao />
+        <NotasSessao key={key} gancho={hash === '#anotacoes' ? state?.gancho : undefined} />
       </div>
     </div>
   );

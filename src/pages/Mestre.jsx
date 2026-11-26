@@ -2,7 +2,7 @@ import { cinzel, crimson } from '../estilos';
 import { getCampanhaId } from '../utils/campanha';
 import { confirmar } from '../utils/notificar';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import Dados from '../components/Dados';
 import { createPortal } from 'react-dom';
@@ -25,6 +25,7 @@ import ModalCondicoes from '../components/combate/ModalCondicoes';
 import SessaoMestre from '../components/sessao/SessaoMestre';
 import CampoLocal from '../components/CampoLocal';
 import AbasCartao from '../components/AbasCartao';
+import { focarRegistro, registrarUsoDoGancho } from '../utils/ganchosSessaoZero';
 
 
 const CAMPANHA_ID = getCampanhaId();
@@ -128,6 +129,9 @@ export default function Mestre() {
   const [criandoFato, setCriandoFato] = useState(false);
   const [perspectivaFiltro, setPerspectivaFiltro] = useState('todos'); 
   const [params, setParams] = useSearchParams();
+  const { state, hash } = useLocation();
+  const ganchoNpc = params.get('aba') === 'npcs' ? state?.gancho : undefined;
+  const [ganchoNpcEmUso, setGanchoNpcEmUso] = useState(false);
   const processado = useRef(false);
   const [aba, setAba] = useState(params.get('aba') || 'painel');
   const [opcoesEse, setOpcoesEse] = useState([]);
@@ -156,6 +160,21 @@ useEffect(() => {
   const abaUrl = params.get('aba');
   if (abaUrl) setAba(abaUrl);
 }, [params]);
+
+useEffect(() => {
+  setGanchoNpcEmUso(Boolean(ganchoNpc));
+
+  if (ganchoNpc) {
+    setDescNpc('');
+    setErro('');
+    setAbaForm('ia');
+    setMostrarForm(true);
+  }
+
+  if (params.get('aba') === 'npcs' && hash.startsWith('#npc-')) {
+    setNpcExpandido(hash.slice(5));
+  }
+}, [params, ganchoNpc, hash]);
 
 useEffect(() => {
   const t = setTimeout(() => {
@@ -222,6 +241,11 @@ async function apresentarNpc(npcId, valor) {
         name: res.data.data?.name || 'NPC',
         data: res.data.data
       }, ...prev]);
+      const id = res.data.id || res.data.saved_id;
+      if (ganchoNpcEmUso && ganchoNpc && id) {
+        registrarUsoDoGancho(ganchoNpc, `/mestre?aba=npcs#npc-${id}`);
+        setGanchoNpcEmUso(false);
+      }
       setDescNpc('');
       setMostrarForm(false);
       setNpcExpandido(res.data.id || res.data.saved_id);

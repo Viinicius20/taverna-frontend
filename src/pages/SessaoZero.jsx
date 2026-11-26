@@ -103,11 +103,24 @@ export default function SessaoZero() {
           ))}
         </div>
 
-        <button onClick={gerar} disabled={gerando || respondeu === 0}
-          className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-3 text-xs tracking-widest font-bold disabled:opacity-30 mb-8"
-          style={{ ...cinzel, borderRadius: '2px' }}>
-          {gerando ? 'A IA está pensando...' : '✦ Gerar proposta com IA'}
-        </button>
+        <div className="flex flex-wrap items-center gap-4 mb-8">
+          <button
+            onClick={gerar}
+            disabled={gerando || respondeu === 0}
+            className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-3 text-xs tracking-widest font-bold disabled:opacity-30"
+            style={{ ...cinzel, borderRadius: '2px' }}
+          >
+            {gerando ? 'A IA está pensando...' : '✦ Gerar proposta com IA'}
+          </button>
+
+          <Link
+            to="/mestre?aba=sessao#ganchos"
+            className="text-[#c8a84b] text-sm underline"
+            style={cinzel}
+          >
+            Ver ganchos
+          </Link>
+        </div>
 
         {proposta && (
           <div className="flex flex-col gap-6">
