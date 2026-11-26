@@ -5,7 +5,6 @@ import { useUser } from '../context/UserContext';
 import api from '../services/api';
 import { notificar } from '../utils/notificar';
 
-const DIVISIVEIS = MOEDAS.filter(({ chave }) => chave !== 'platina');
 const botaoTesouro = 'rounded-sm border border-[#c8a84b40] px-3 py-2 text-xs ' +
   'text-[#c8a84b] hover:bg-[#c8a84b15] disabled:opacity-40';
 
@@ -16,6 +15,8 @@ const MOEDAS = [
   { chave: 'ouro', rotulo: 'OURO', cor: '#c8a84b' },
   { chave: 'platina', rotulo: 'PLATINA', cor: '#d8e0f0' },
 ];
+
+const DIVISIVEIS = MOEDAS.filter(({ chave }) => chave !== 'platina');
 
 const NOVO_VAZIO = { nome: '', quantidade: '1', notas: '', valor: '' };
 const campo = "bg-[#0f0e0c] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 text-sm focus:outline-none focus:border-[#c8a84b50]";
