@@ -5,7 +5,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useUser } from '../context/UserContext';
 import AnotarBoato from '../components/AnotarBoato';
+import { confirmar } from '../utils/notificar';
 
+const BOTAO_QUADRO = 'rounded-sm border px-4 py-2 text-xs font-semibold ' +
+  'transition-colors focus-visible:outline focus-visible:outline-2 ' +
+  'focus-visible:outline-offset-2 focus-visible:outline-[#c8a84b] ' +
+  'disabled:opacity-50';
 
 export default function Quadro() {
   const navigate = useNavigate();
@@ -149,6 +154,15 @@ function salvarEntrada() {
   });
 }
 
+async function removerDoQuadro(id) {
+  if (!(await confirmar('Remover esta fala do quadro?'))) return;
+
+  executar(async () => {
+    await api.delete(`/rumores/mural/${id}`);
+    setMural(atual => atual.filter(item => item.id !== id));
+    setAviso('Fala removida do quadro.');
+  });
+}
 
 useEffect(() => {
   let ativo = true;
@@ -214,13 +228,30 @@ useEffect(() => {
         )}
 
         {user && (
-          <div className="flex flex-wrap gap-3 mb-6 text-sm text-[#c8a84b]">
-            <button type="button" disabled={ocupado} onClick={ouvir}>🍺 Ouvir boatos</button>
-            <button type="button" disabled={ocupado} onClick={abrirSugestao}>Sugerir rumor</button>
+          <div className="mb-6 flex flex-wrap items-center gap-2" style={cinzel}>
+            <button
+              type="button"
+              disabled={ocupado}
+              onClick={ouvir}
+              className={`${BOTAO_QUADRO} border-[#c8a84b] bg-[#c8a84b]
+                          text-[#161410] hover:bg-[#e0c060]`}
+            >
+              🍺 Ouvir boatos
+            </button>
+            <button
+              type="button"
+              disabled={ocupado}
+              onClick={abrirSugestao}
+              className={`${BOTAO_QUADRO} border-[#c8a84b50] text-[#c8a84b]
+                          hover:bg-[#c8a84b15]`}
+            >
+              Sugerir rumor
+            </button>
             {isMestre && (
               <button
                 type="button"
                 disabled={ocupado}
+                aria-expanded={painel === 'gerenciar'}
                 onClick={() => executar(async () => {
                   if (painel === 'gerenciar') {
                     setPainel('');
@@ -229,6 +260,8 @@ useEffect(() => {
                   await carregarGestao();
                   setPainel('gerenciar');
                 })}
+                className={`${BOTAO_QUADRO} border-[#c8a84b25] text-[#b8a98b]
+                            hover:border-[#c8a84b60] hover:text-[#c8a84b]`}
               >
                 {painel === 'gerenciar' ? 'Fechar gerenciamento' : 'Gerenciar'}
               </button>
@@ -373,6 +406,17 @@ useEffect(() => {
             {mural.map(item => {
               const lugar = mundo.find(f => f.tipo === 'local' && f.id === item.local_id);
               const ficha = mundo.find(f => f.tipo === item.entidade_tipo && f.id === item.entidade_id);
+              {isMestre && (
+                <button
+                  type="button"
+                  disabled={ocupado}
+                  onClick={() => removerDoQuadro(item.id)}
+                  className="block mt-3 text-xs text-[#c18078] hover:text-red-300
+                            hover:underline disabled:opacity-50"
+                >
+                  Remover do quadro
+                </button>
+              )}
 
               return (
                 <article key={item.id} className="border border-[#c8a84b20] bg-[#161410] p-4">
