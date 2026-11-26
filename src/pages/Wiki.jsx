@@ -76,6 +76,8 @@ export default function Wiki() {
   const areaRef = useRef(null);
   const [sug, setSug] = useState(null);
   const [gerando, setGerando] = useState(false);
+  const [encontro, setEncontro] = useState(null);
+  const [sorteando, setSorteando] = useState(false);
 
   useEffect(() => {
     api.get(`/wiki/${CAMPANHA_ID}`)
@@ -170,6 +172,26 @@ function recarregarIndice() {
   api.get(`/wiki-indice/${CAMPANHA_ID}`)
     .then(r => setEntidades(r.data.data || []))
     .catch(() => alert('Não foi possível atualizar.'));
+}
+
+async function sortearEncontro(ent) {
+  setSorteando(true);
+  setEncontro(null);
+  try {
+    const r = await api.get(`/encontro-local/${CAMPANHA_ID}/${ent.id}`);
+    setEncontro({ ...r.data.data, localId: ent.id });
+  } catch (err) {
+    setEncontro({ erro: err.response?.data?.detail || 'Não foi possível sortear um encontro.', localId: ent.id });
+  }
+  setSorteando(false);
+}
+
+function iniciarCombate(c, qtd) {
+  const q = new URLSearchParams({
+    addMonster: c.name, hp: String(c.hp ?? 1), ac: String(c.ac ?? 10),
+    dex: String(c.dex ?? 10), qtd: String(qtd),
+  });
+  navigate(`/mestre?${q}`);
 }
 
   /* ---------- salvar / apagar ---------- */
@@ -425,7 +447,43 @@ async function gerarHistoria() {
               Ver no {t.rotaNome}
             </button>
           )}
+          {e.tipo === 'local' && (
+            <button onClick={() => sortearEncontro(e)} disabled={sorteando}
+              className={btnSec} style={{ ...cinzel, ...radius }}>
+              🎲 {sorteando ? 'Sorteando...' : 'Sortear encontro'}
+            </button>
+          )}
         </div>
+
+        {encontro && encontro.localId === e.id && (
+          <div className="border border-[#c8a84b30] bg-[#161410] p-4 flex flex-col gap-2" style={radius}>
+            {encontro.erro ? (
+              <p className="text-red-400 text-sm">{encontro.erro}</p>
+            ) : (
+              <>
+                <p style={cinzel} className="text-[#8a7e68] text-xs tracking-[2px]">ENCONTRO SORTEADO</p>
+                <p style={cinzel} className="text-[#e8e0d0] text-lg">
+                  {encontro.qtd}× {encontro.criatura.name}
+                </p>
+                <p className="text-[#9a8e78] text-sm">
+                  CR {encontro.criatura.cr} · HP {encontro.criatura.hp} · CA {encontro.criatura.ac}
+                </p>
+                <p className="text-[#6a6050] text-xs">
+                  {encontro.origem === 'citada'
+                    ? `Sorteado entre as criaturas citadas em “monstros e perigos” (${encontro.opcoes} opção/ões).`
+                    : `Este local não cita criaturas do bestiário. Sorteei pelo nível médio (${encontro.opcoes} opções).`}
+                </p>
+                <div className="flex gap-2 pt-1">
+                  <button onClick={() => iniciarCombate(encontro.criatura, encontro.qtd)}
+                    className={btnSec} style={{ ...cinzel, ...radius }}>⚔ + Combate</button>
+                  <button onClick={() => sortearEncontro(e)} className={btnSec} style={{ ...cinzel, ...radius }}>
+                    Sortear de novo
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
 
         {doMundo.length > 0 && (
           <div>
@@ -574,6 +632,7 @@ async function gerarHistoria() {
   setModo('ficha');
   setAtualId(null);
   setDetalhe(null);
+  setEncontro(null);
   setCarregandoDetalhe(true);
   api.get(`/wiki-entidade/${CAMPANHA_ID}/${ent.tipo}/${ent.id}`)
     .then(r => setDetalhe(r.data.data))
