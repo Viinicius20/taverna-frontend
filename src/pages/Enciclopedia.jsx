@@ -4,6 +4,7 @@ import api from '../services/api';
 import { getCampanhaId } from '../utils/campanha';
 import { cinzel, crimson } from '../estilos';
 import TextoWiki from '../components/TextoWiki';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const CAMPANHA_ID = getCampanhaId();
 const radius = { borderRadius: '2px' };
@@ -19,9 +20,11 @@ const SECOES = [
 
 export default function Enciclopedia() {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const npcDoLink = params.get('npc');
   const [dados, setDados] = useState(null);
   const [erro, setErro] = useState(false);
-  const [aba, setAba] = useState('cronicas');
+  const [aba, setAba] = useState(npcDoLink ? 'npcs' : 'cronicas');
   const [paginaAberta, setPaginaAberta] = useState(null);
 
   useEffect(() => {
@@ -38,6 +41,17 @@ export default function Enciclopedia() {
 
     const sobre = (tipo, id) =>
     paginas.filter(p => p.entidade_tipo === tipo && String(p.entidade_id) === String(id));
+
+  useEffect(() => {
+    if (npcDoLink) setAba('npcs');
+  }, [npcDoLink]);
+
+  useEffect(() => {
+    if (aba === 'npcs' && npcDoLink && dados) {
+      document.getElementById(`enc-npc-${npcDoLink}`)
+        ?.scrollIntoView({ block: 'center' });
+    }
+  }, [aba, npcDoLink, dados]);
 
   if (erro) return <p className="text-red-400 p-6">Não foi possível carregar a enciclopédia.</p>;
   if (!dados) return <p className="text-[#8a7e68] p-6">Carregando...</p>;
@@ -93,7 +107,16 @@ export default function Enciclopedia() {
             ? <p className="text-[#8a7e68] text-sm">Nada descoberto aqui ainda.</p>
             : <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {dados[secao.chave].map(x => (
-                  <div key={x.id} className="border border-[#c8a84b20] bg-[#161410] p-4" style={radius}>
+                  <div
+                    key={x.id}
+                    id={secao.tipo === 'npc' ? `enc-npc-${x.id}` : undefined}
+                    className={`border bg-[#161410] p-4 ${
+                      secao.tipo === 'npc' && String(x.id) === npcDoLink
+                        ? 'border-[#c8a84b]'
+                        : 'border-[#c8a84b20]'
+                    }`}
+                    style={radius}
+                  >
                     <p style={cinzel} className="text-[#e8e0d0] text-sm">{x.nome}</p>
                     {x.subtitulo && <p className="text-[#8a7e68] text-xs mt-0.5">{x.subtitulo}</p>}
                     {x.descricao && <p className="text-[#9a8e78] text-sm mt-2 leading-relaxed">{x.descricao}</p>}

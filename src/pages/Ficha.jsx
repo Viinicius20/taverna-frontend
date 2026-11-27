@@ -3306,14 +3306,16 @@ style={{
                             {item.titulo}
                           </p>
                         </div>
-                        <Link
-                          to={item.tipo === 'npc'
-                            ? `/wiki?tipo=npc&id=${encodeURIComponent(item.entidade_id)}`
-                            : `/atlas?local=${encodeURIComponent(item.local_id)}`}
-                          className="text-xs text-[#c8a84b] underline"
-                        >
-                          {item.tipo === 'npc' ? 'Abrir ficha' : 'Ver no Atlas'}
-                        </Link>
+                        {(item.tipo === 'npc' || item.local_id) && (
+                          <Link
+                            to={item.tipo === 'npc'
+                              ? `/enciclopedia?npc=${encodeURIComponent(item.entidade_id)}`
+                              : `/atlas?local=${encodeURIComponent(item.local_id)}`}
+                            className="text-xs text-[#c8a84b] underline"
+                          >
+                            {item.tipo === 'npc' ? 'Ver na Enciclopédia' : 'Ver no Atlas'}
+                          </Link>
+                        )}
                       </li>
                     ))}
                   </ul>
