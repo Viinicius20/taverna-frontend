@@ -1,7 +1,7 @@
 import { cinzel, crimson } from '../estilos';
 import { getCampanhaId } from '../utils/campanha';
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import api from '../services/api';
 import html2pdf from 'html2pdf.js';
 import { createPortal } from 'react-dom';
@@ -3284,6 +3284,41 @@ style={{
                   </div>
                 )}
               </div>
+
+              <section className="border border-[#c8a84b20] bg-[#161410] p-6">
+                <h2 style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">
+                  DESCOBERTAS DO GRUPO
+                </h2>
+
+                {!(diario.descobertas || []).length ? (
+                  <p className="text-[#8a7e68] text-sm">Nenhuma descoberta registrada ainda.</p>
+                ) : (
+                  <ul className="divide-y divide-[#c8a84b20]">
+                    {diario.descobertas.map(item => (
+                      <li
+                        key={`${item.tipo}:${item.entidade_id}`}
+                        className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm"
+                      >
+                        <div>
+                          <p className="text-[#8a7e68] text-xs">Dia {item.dia_total + 1}</p>
+                          <p className="text-[#e8e0d0]">
+                            {item.tipo === 'npc' ? 'O grupo conheceu ' : 'Lenda descoberta · '}
+                            {item.titulo}
+                          </p>
+                        </div>
+                        <Link
+                          to={item.tipo === 'npc'
+                            ? `/wiki?tipo=npc&id=${encodeURIComponent(item.entidade_id)}`
+                            : `/atlas?local=${encodeURIComponent(item.local_id)}`}
+                          className="text-xs text-[#c8a84b] underline"
+                        >
+                          {item.tipo === 'npc' ? 'Abrir ficha' : 'Ver no Atlas'}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
 
               <div className="border border-[#c8a84b20] bg-[#161410] p-6">
                 <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[3px] mb-4">QUEM EU CONHEÇO</p>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import { cinzel, crimson } from '../estilos';
 import { getCampanhaId } from '../utils/campanha';
@@ -224,6 +224,9 @@ export default function Atlas() {
   const [salvandoVinculo, setSalvandoVinculo] = useState(false);
   const [erroVinculo, setErroVinculo] = useState('');
   const [encontrosDoPin, setEncontrosDoPin] = useState([]);
+  const [atlasParams] = useSearchParams();
+  const localDoLink = atlasParams.get('local');
+  const ultimoLocalDoLink = useRef(null);
 
   useEffect(() => {
     if (!isMestre) return;
@@ -616,6 +619,20 @@ async function removerPresenca(faccaoId) {
     return () => { ativo = false; };
   }, [isMestre, localIdEncontros]);
 
+  const pinDoLinkExiste = pins.some(pin => pin.id === localDoLink);
+
+useEffect(() => {
+  if (!localDoLink) {
+    ultimoLocalDoLink.current = null;
+    return;
+  }
+  if (!pinDoLinkExiste || ultimoLocalDoLink.current === localDoLink) return;
+
+  ultimoLocalDoLink.current = localDoLink;
+  setLocalAberto(localDoLink);
+  setRegiaoAberta(null);
+  setFaccaoAberta(null);
+}, [localDoLink, pinDoLinkExiste]);
 
   const regiao = regioes.find(g => g.id === regiaoAberta);
   const faccao = faccoes.find(f => f.id === faccaoAberta);
