@@ -18,7 +18,8 @@ import Retrato from '../components/Retrato';
 import PopupMensagem from '../components/PopupMensagem';
 import OuvirBoatos from '../components/OuvirBoatos';
 import EstadoVazio from '../components/EstadoVazio';
-
+import { PedidosRolagemFicha } from '../components/PedidosRolagem';
+import { useUser } from '../context/UserContext';
 
 const CAMPANHA_ID = getCampanhaId();
 const attrLabel = { str: 'FOR', dex: 'DES', con: 'CON', int: 'INT', wis: 'SAB', cha: 'CAR' };
@@ -295,7 +296,7 @@ export default function Ficha() {
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState('');
-
+  const { user } = useUser();
   const [modalLevelUp, setModalLevelUp] = useState(false);
   const [nivelAlvo, setNivelAlvo] = useState(2);
   const [upando, setUpando] = useState(false);
@@ -1418,6 +1419,10 @@ async function abrirCofre(h) {
           <div className="border border-red-900 bg-red-950 bg-opacity-30 px-4 py-3 mb-6">
             <p className="text-red-400 text-sm">{erro}</p>
           </div>
+        )}
+
+        {user && user.id === personagem?.user_id && !exportandoPDF && (
+          <PedidosRolagemFicha key={id} personagemId={id} />
         )}
 
         {/* NAVEGAÇÃO DE ABAS */}

@@ -6,6 +6,7 @@ import { cinzel } from '../../estilos';
 import GanchosPessoais from '../GanchosPessoais';
 import PainelDescobertas from '../PainelDescobertas';
 import { useLocation } from 'react-router-dom';
+import { PedidosRolagemMestre } from '../PedidosRolagem';
 
 const radius = { borderRadius: '2px' };
 
@@ -66,6 +67,7 @@ export default function SessaoMestre({ combate, onCondicoes, personagens }) {
       {/* Rolagens e notas */}
       <div className="space-y-4">
         <RolagemRapida />
+        <PedidosRolagemMestre personagens={personagens} />
         <MesaFeed />
         <PainelDescobertas />
         <GanchosPessoais personagens={personagens} />
