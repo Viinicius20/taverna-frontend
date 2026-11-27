@@ -7,6 +7,7 @@ import GanchosPessoais from '../GanchosPessoais';
 import PainelDescobertas from '../PainelDescobertas';
 import { useLocation } from 'react-router-dom';
 import { PedidosRolagemMestre } from '../PedidosRolagem';
+import NesteLocal from '../NesteLocal';
 
 const radius = { borderRadius: '2px' };
 
@@ -20,6 +21,9 @@ export default function SessaoMestre({ combate, onCondicoes, personagens }) {
 
   return (
     <div className="grid gap-4 lg:grid-cols-3">
+      <div className="lg:col-span-3 empty:hidden">
+        <NesteLocal />
+      </div>
 
       {/* Combate */}
       <div className="lg:col-span-2 space-y-3">
