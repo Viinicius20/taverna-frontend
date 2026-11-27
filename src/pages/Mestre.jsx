@@ -27,7 +27,7 @@ import CampoLocal from '../components/CampoLocal';
 import AbasCartao from '../components/AbasCartao';
 import { focarRegistro, registrarUsoDoGancho } from '../utils/ganchosSessaoZero';
 import EncontroEditor from '../components/EncontroEditor';
-
+import MecanicaNpc from '../components/MecanicaNpc';
 
 const CAMPANHA_ID = getCampanhaId();
 const attrLabel = { str: 'FOR', dex: 'DES', con: 'CON', int: 'INT', wis: 'SAB', cha: 'CAR' };
@@ -40,6 +40,7 @@ export default function Mestre() {
   const [gerando, setGerando] = useState(false);
   const [erro, setErro] = useState('');
   const [npcExpandido, setNpcExpandido] = useState(null);
+  const [abasNpc, setAbasNpc] = useState({});
   const [mostrarForm, setMostrarForm] = useState(false);
   const [abaForm, setAbaForm] = useState('ia');
   const [descNpc, setDescNpc] = useState('');
@@ -1472,6 +1473,7 @@ useEffect(() => {
             {npcs.map(npc => {
               const d = npc.data || {};
               const expandido = npcExpandido === npc.id;
+              const abaNpc = abasNpc[npc.id] || 'perfil';
               const attrs = d.attributes || {};
 
               return (
@@ -1505,12 +1507,39 @@ useEffect(() => {
 
                   {expandido && (
                     <div className="border-t border-[#c8a84b10] px-6 pb-6 flex flex-col gap-6 pt-6">
+                      <div className="flex gap-2 border-b border-[#c8a84b20] pb-3">
+                        {[
+                          ['perfil', 'Perfil'],
+                          ['mecanica', 'Mecânica'],
+                        ].map(([id, rotulo]) => (
+                          <button
+                            key={id}
+                            type="button"
+                            aria-pressed={abaNpc === id}
+                            onClick={() => setAbasNpc(prev => ({ ...prev, [npc.id]: id }))}
+                            style={cinzel}
+                            className={`rounded-sm border px-4 py-2 text-xs ${
+                              abaNpc === id
+                                ? 'border-[#c8a84b] bg-[#c8a84b] text-[#0f0e0c]'
+                                : 'border-[#c8a84b30] text-[#c8a84b] hover:bg-[#c8a84b10]'
+                            }`}
+                          >
+                            {rotulo}
+                          </button>
+                        ))}
+                    </div>
 
-                      {d.art_url && (
-                        <img src={d.art_url} alt={d.name} className="w-full max-h-64 object-cover mb-2" style={{ borderRadius: '2px' }} />
+                      {abaNpc === 'perfil' && d.art_url && (
+                        <img
+                          src={d.art_url}
+                          alt={`Retrato de ${d.name || npc.name}`}
+                          className="aspect-[3/4] w-full max-w-[15rem] self-center
+                                    rounded-sm border border-[#c8a84b25] bg-[#0f0e0c] object-contain"
+                        />
                       )}
                 
-
+                    {abaNpc === 'mecanica' && (
+                    <>
                     {/* STATS DE COMBATE */}
                       {d.combat && (
                         <div className="border border-[#c8a84b15] bg-[#c8a84b05] p-4">
@@ -1644,7 +1673,17 @@ useEffect(() => {
                           </div>
                         </div>
                       )}
+                          <MecanicaNpc
+                          npc={npc}
+                          getNota={getNota}
+                          editarNotaLocal={editarNotaLocal}
+                          getAttr={getAttr}
+                        />
+                      </>
+                    )}
 
+                    {abaNpc === 'perfil' && (
+                      <>
                       {[
                         { label: 'PERSONALIDADE', campo: 'personality' },
                         { label: 'MOTIVAÇÃO', campo: 'motivation' },
@@ -1835,6 +1874,8 @@ useEffect(() => {
                           Deletar NPC
                         </button>
                       </div>
+                      </>
+                    )}
                     </div>
                   )}
                 </div>
