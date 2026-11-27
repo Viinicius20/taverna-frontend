@@ -3,7 +3,7 @@ import { cinzel } from '../../estilos';
 const radius = { borderRadius: '2px' };
 
 export default function ControlesCombate({
-  temCombatentes, combateAtivo, onOrdenar, onIniciar, onProximo, onResetar,
+  temCombatentes, combateAtivo, onOrdenar, onIniciar, onProximo, onResetar, onEncerrar,
 }) {
   return (
     <div className="flex items-center justify-between mb-2">
@@ -41,9 +41,26 @@ export default function ControlesCombate({
             </button>
           )}
 
-          <button onClick={onResetar}
+          {combateAtivo && (
+            <button
+              type="button"
+              onClick={onEncerrar}
+              className="rounded-sm border border-[#c8a84b40] px-3 py-2 text-xs
+                        text-[#c8a84b] hover:bg-[#c8a84b10]"
+              style={cinzel}
+            >
+              Encerrar combate
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={onResetar}
+            title="Limpar encontro sem saque"
+            aria-label="Limpar encontro sem saque"
             className="border border-red-600 text-red-600 px-3 py-2 text-xs hover:bg-red-600 hover:bg-opacity-10 transition-colors"
-            style={{ ...cinzel, ...radius }}>
+            style={{ ...cinzel, ...radius }}
+          >
             ✕
           </button>
         </div>

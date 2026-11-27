@@ -50,6 +50,11 @@ export default function Mestre() {
   const [attrsLocais, setAttrsLocais] = useState({});
   const [novoMonstro, setNovoMonstro] = useState({ nome: '', hp: '', qtd: 1 });
   const [loot, setLoot] = useState(null);
+  const [saque, setSaque] = useState(null);
+  const [enviandoSaque, setEnviandoSaque] = useState(false);
+  const [erroSaque, setErroSaque] = useState('');
+  const [avisoSaque, setAvisoSaque] = useState('');
+  const geradorLootRef = useRef(null);
   const [gerandoLoot, setGerandoLoot] = useState(false);
   const [lootConfig, setLootConfig] = useState({ nivel_medio: 5, quantidade_mundanos: 4, quantidade_magicos: 1, contexto: '' });
   const [personagens, setPersonagens] = useState([]);
@@ -340,16 +345,125 @@ async function buscarPresagios() {
   } catch {}
 }
 
-async function gerarLoot() {
-  setGerandoLoot(true);
+function encerrarComSaque() {
+  if (gerandoLoot || enviandoSaque) return;
+
+  if (saque) {
+    geradorLootRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setErroSaque('Finalize ou descarte o saque aberto antes de encerrar outro combate.');
+    return;
+  }
+
+  const inimigos = [...new Set(
+    combatentes.filter(c => c.tipo === 'monstro').map(c => c.nome)
+  )].join(', ');
+
   setLoot(null);
+  setErroSaque('');
+  setAvisoSaque('');
+  setSaque({
+    id: crypto.randomUUID(),
+    origem: inimigos ? `Saque de combate: ${inimigos}`.slice(0, 160) : 'Saque de combate',
+    itens: [],
+    moedas: {},
+    envio: null,
+  });
+  setLootConfig(prev => ({
+    ...prev,
+    contexto: inimigos ? `Saque de um encontro com ${inimigos}` : 'Saque de combate',
+  }));
+
+  resetarCombate();
+  geradorLootRef.current?.scrollIntoView({ behavior: 'smooth' });
+}
+
+async function gerarLoot() {
+  if (gerandoLoot || saque?.envio) return;
+  setGerandoLoot(true);
+  setErroSaque('');
+  if (!saque) setLoot(null);
+
   try {
     const res = await api.post('/loot/generate', lootConfig);
-    setLoot(res.data.data);
+    const resultado = res.data.data;
+
+    if (saque) {
+      const mundanos = (resultado.mundanos || [])
+        .filter(item => typeof item === 'string' && item.trim())
+        .map(item => ({ nome: item.trim().slice(0, 80), quantidade: 1, notas: '' }));
+
+      const magicos = (resultado.magicos || [])
+        .filter(item => typeof item?.nome === 'string' && item.nome.trim())
+        .map(item => ({
+          nome: item.nome.trim().slice(0, 80),
+          quantidade: 1,
+          notas: [item.raridade, item.descricao].filter(Boolean).join(' · ').slice(0, 300),
+        }));
+
+      setSaque(prev => prev && ({
+        ...prev,
+        itens: [...prev.itens, ...mundanos, ...magicos]
+          .slice(0, 30)
+          .map(item => ({ ...item, id: item.id || crypto.randomUUID() })),
+      }));
+    } else {
+      setLoot(resultado);
+    }
   } catch {
-    setErro('Erro ao gerar loot.');
+    if (saque) setErroSaque('Não foi possível gerar os itens. Você pode incluí-los manualmente.');
+    else setErro('Erro ao gerar loot.');
+  } finally {
+    setGerandoLoot(false);
   }
-  setGerandoLoot(false);
+}
+
+async function enviarSaqueAoTesouro(e) {
+  e.preventDefault();
+  if (!saque || enviandoSaque || gerandoLoot) return;
+
+  let dados = saque.envio;
+  if (!dados) {
+    const itens = saque.itens.map(item => ({
+      nome: item.nome.trim(),
+      quantidade: Number(item.quantidade),
+      notas: item.notas.trim() || null,
+    }));
+    const moedas = Object.fromEntries(
+      Object.entries(saque.moedas).map(([chave, valor]) => [chave, Number(valor) || 0])
+    );
+
+    if (!saque.origem.trim() || itens.some(item => !item.nome)) {
+      setErroSaque('Preencha a origem do saque e o nome dos itens.');
+      return;
+    }
+    if (!itens.length && !Object.values(moedas).some(valor => valor > 0)) {
+      setErroSaque('Inclua pelo menos um item ou uma moeda.');
+      return;
+    }
+
+    dados = { operacao_id: saque.id, origem: saque.origem.trim(), itens, moedas };
+    setSaque(prev => ({ ...prev, envio: dados }));
+  }
+
+  setEnviandoSaque(true);
+  setErroSaque('');
+
+  try {
+    await api.post('/tesouro/saque', dados);
+    setSaque(null);
+    setAvisoSaque('Saque enviado ao Tesouro do Grupo.');
+  } catch (e) {
+    const status = e.response?.status;
+    const detalhe = e.response?.data?.detail;
+    if (status === 400 || status === 422) {
+      setSaque(prev => ({ ...prev, envio: null }));
+      setErroSaque(typeof detalhe === 'string' ? detalhe : 'Confira os campos do saque.');
+    } else {
+      setErroSaque('Não deu pra confirmar o envio. Tente novamente com o mesmo saque.');
+    }
+  } finally {
+    setEnviandoSaque(false);
+  }
 }
 
 async function entregarItem(item, personagemId) {
@@ -1779,6 +1893,7 @@ useEffect(() => {
             onIniciar={() => setCombateAtivo(true)}
             onProximo={proximoTurno}
             onResetar={resetarCombate}
+            onEncerrar={encerrarComSaque}
           />
 
           <AdicionarMonstro
@@ -1828,7 +1943,7 @@ useEffect(() => {
 
 
 {/* GERADOR DE LOOT */}
-<div className="mt-12">
+<div ref={geradorLootRef} className="mt-12">
   <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
   <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 opacity-70">FERRAMENTAS</p>
   <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Gerador de Loot</h2>
@@ -1866,11 +1981,143 @@ useEffect(() => {
     </div>
   </div>
 
-  <button onClick={gerarLoot} disabled={gerandoLoot}
+  <button onClick={gerarLoot} disabled={gerandoLoot || Boolean(saque?.envio)}
     className="bg-[#c8a84b] text-[#0f0e0c] px-6 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50 mb-6"
     style={{ ...cinzel, borderRadius: '2px' }}>
     {gerandoLoot ? '⟳ GERANDO...' : '⚄ GERAR LOOT'}
   </button>
+
+  {erroSaque && <p role="alert" className="mb-3 text-sm text-red-400">{erroSaque}</p>}
+
+  {avisoSaque && (
+    <p role="status" className="mb-3 text-sm text-[#c8a84b]">
+      {avisoSaque}{' '}
+      <button type="button" onClick={() => navigate('/tesouro')} className="underline">
+        Abrir Tesouro
+      </button>
+    </p>
+  )}
+
+  {saque && (
+    <form
+      onSubmit={enviarSaqueAoTesouro}
+      className="mb-6 space-y-4 border border-[#c8a84b30] bg-[#161410] p-4"
+    >
+      <h3 style={cinzel} className="text-sm text-[#c8a84b]">Revisar saque do combate</h3>
+
+      <fieldset disabled={Boolean(saque.envio) || gerandoLoot} className="space-y-3">
+        <label className="block text-sm">
+          Origem no histórico
+          <input
+            required
+            value={saque.origem}
+            maxLength={160}
+            onChange={e => setSaque({ ...saque, origem: e.target.value })}
+            className="mt-1 w-full border border-[#c8a84b20] bg-[#0f0e0c] px-2 py-1"
+          />
+        </label>
+
+        {saque.itens.map(item => (
+          <div key={item.id} className="grid gap-2 sm:grid-cols-[1fr_5rem_auto]">
+            <input
+              required
+              value={item.nome}
+              maxLength={80}
+              aria-label="Nome do item"
+              placeholder="Nome do item"
+              onChange={e => setSaque(prev => ({
+                ...prev,
+                itens: prev.itens.map(i => i.id === item.id ? { ...i, nome: e.target.value } : i),
+              }))}
+              className="border border-[#c8a84b20] bg-[#0f0e0c] px-2 py-1"
+            />
+            <input
+              required type="number" min={1} max={9999} step={1}
+              aria-label={`Quantidade de ${item.nome || 'item'}`}
+              value={item.quantidade}
+              onChange={e => setSaque(prev => ({
+                ...prev,
+                itens: prev.itens.map(i => i.id === item.id ? { ...i, quantidade: e.target.value } : i),
+              }))}
+              className="border border-[#c8a84b20] bg-[#0f0e0c] px-2 py-1"
+            />
+            <button
+              type="button"
+              onClick={() => setSaque(prev => ({
+                ...prev, itens: prev.itens.filter(i => i.id !== item.id),
+              }))}
+              className="text-xs text-red-400 hover:underline"
+            >
+              Remover
+            </button>
+            <input
+              value={item.notas}
+              maxLength={300}
+              aria-label={`Notas de ${item.nome || 'item'}`}
+              placeholder="Notas (opcional)"
+              onChange={e => setSaque(prev => ({
+                ...prev,
+                itens: prev.itens.map(i => i.id === item.id ? { ...i, notas: e.target.value } : i),
+              }))}
+              className="border border-[#c8a84b20] bg-[#0f0e0c] px-2 py-1 text-sm sm:col-span-3"
+            />
+          </div>
+        ))}
+
+        <button
+          type="button"
+          disabled={saque.itens.length >= 30}
+          onClick={() => {
+            const item = { id: crypto.randomUUID(), nome: '', quantidade: 1, notas: '' };
+            setSaque(prev => ({ ...prev, itens: [...prev.itens, item] }));
+          }}
+          className="text-xs text-[#c8a84b] underline disabled:opacity-40"
+        >
+          + Incluir item
+        </button>
+
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+          {[
+            ['cobre', 'PC'], ['prata', 'PP'], ['electro', 'PE'],
+            ['ouro', 'PO'], ['platina', 'Platina'],
+          ].map(([chave, rotulo]) => (
+            <label key={chave} className="text-xs text-[#9a8e78]">
+              {rotulo}
+              <input
+                type="number" min={0} max={1000000} step={1}
+                value={saque.moedas[chave] ?? ''}
+                placeholder="0"
+                onChange={e => setSaque(prev => ({
+                  ...prev, moedas: { ...prev.moedas, [chave]: e.target.value },
+                }))}
+                className="mt-1 block w-full border border-[#c8a84b20] bg-[#0f0e0c] px-2 py-1"
+              />
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <div className="flex flex-wrap gap-3">
+        <button
+          type="submit"
+          disabled={enviandoSaque || gerandoLoot}
+          className="rounded-sm bg-[#c8a84b] px-4 py-2 text-xs font-bold text-[#0f0e0c] disabled:opacity-50"
+        >
+          {enviandoSaque ? 'Enviando…' : saque.envio ? 'Tentar envio novamente' : 'Enviar ao Tesouro'}
+        </button>
+        {!saque.envio && (
+          <button
+            type="button"
+            disabled={gerandoLoot}
+            onClick={() => { setSaque(null); setErroSaque(''); }}
+            className="text-xs text-[#9a8e78] hover:underline"
+          >
+            Descartar saque
+          </button>
+        )}
+      </div>
+    </form>
+  )}
 
   {/* Resultado */}
   {loot && (
