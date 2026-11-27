@@ -26,6 +26,7 @@ import SessaoMestre from '../components/sessao/SessaoMestre';
 import CampoLocal from '../components/CampoLocal';
 import AbasCartao from '../components/AbasCartao';
 import { focarRegistro, registrarUsoDoGancho } from '../utils/ganchosSessaoZero';
+import EncontroEditor from '../components/EncontroEditor';
 
 
 const CAMPANHA_ID = getCampanhaId();
@@ -83,6 +84,11 @@ export default function Mestre() {
   const [novoItemIdentificado, setNovoItemIdentificado] = useState(true);
   const [novoItemNomeMisterioso, setNovoItemNomeMisterioso] = useState('');
   const [encounter, setEncounter] = useState(null);
+  const [encontrosSalvos, setEncontrosSalvos] = useState([]);
+  const [locaisEncontro, setLocaisEncontro] = useState([]);
+  const [erroEncontro, setErroEncontro] = useState('');
+  const [abrindoEncontro, setAbrindoEncontro] = useState(false);
+  const [chaveEditorEncontro, setChaveEditorEncontro] = useState(0);
   const [gerandoEncounter, setGerandoEncounter] = useState(false);
   const [mensagemSecreta, setMensagemSecreta] = useState('');
   const [personagemDestino, setPersonagemDestino] = useState('');
@@ -754,16 +760,105 @@ async function deletarSessao(id) {
   }
 }
 
+const encontroDaUrl = params.get('encontro');
+
+useEffect(() => {
+  let ativo = true;
+
+  Promise.all([
+    api.get('/encontros-preparados'),
+    api.get(`/locations/${CAMPANHA_ID}`),
+  ]).then(([encontros, locais]) => {
+    if (!ativo) return;
+    setEncontrosSalvos(encontros.data.data || []);
+    setLocaisEncontro(locais.data.data || []);
+  }).catch(() => {
+    if (ativo) setErroEncontro('Não foi possível carregar os encontros e os locais.');
+  });
+
+  return () => { ativo = false; };
+}, []);
+
+useEffect(() => {
+  if (!encontroDaUrl) return;
+  let ativo = true;
+  setAba('painel');
+  setAbrindoEncontro(true);
+  setErroEncontro('');
+
+  api.get(`/encontros-preparados/${encontroDaUrl}`)
+    .then(res => {
+      if (!ativo) return;
+      setEncounter(res.data.data);
+      setChaveEditorEncontro(chave => chave + 1);
+    })
+    .catch(() => {
+      if (ativo) setErroEncontro('Não foi possível abrir o encontro salvo.');
+    })
+    .finally(() => {
+      if (ativo) setAbrindoEncontro(false);
+    });
+
+  return () => { ativo = false; };
+}, [encontroDaUrl]);
+
+useEffect(() => {
+  if (!encontroDaUrl || !encounter) return;
+  document.getElementById('encontros-preparados')?.scrollIntoView({ block: 'start' });
+}, [encontroDaUrl, encounter]);
+
+function abrirEditorEncontro(dados) {
+  setEncounter(dados);
+  setChaveEditorEncontro(chave => chave + 1);
+  setErroEncontro('');
+}
+
 async function gerarEncounter() {
+  if (gerandoEncounter || abrindoEncontro) return;
   setGerandoEncounter(true);
-  setEncounter(null);
+  setErroEncontro('');
   try {
     const res = await api.post('/encounter/generate', encounterConfig);
-    setEncounter(res.data.data);
+    abrirEditorEncontro(res.data.data);
   } catch {
-    setErro('Erro ao gerar encontro.');
+    setErroEncontro('Erro ao gerar encontro.');
+  } finally {
+    setGerandoEncounter(false);
   }
-  setGerandoEncounter(false);
+}
+
+async function abrirEncontroSalvo(id) {
+  if (!id || abrindoEncontro || gerandoEncounter) return;
+  setAbrindoEncontro(true);
+  setErroEncontro('');
+
+  try {
+    const res = await api.get(`/encontros-preparados/${id}`);
+    abrirEditorEncontro(res.data.data);
+  } catch {
+    setErroEncontro('Não foi possível abrir o encontro salvo.');
+  } finally {
+    setAbrindoEncontro(false);
+  }
+}
+
+function atualizarListaEncontros(salvo) {
+  const resumo = { id: salvo.id, titulo: salvo.titulo, local_id: salvo.local_id };
+  setEncontrosSalvos(prev => [resumo, ...prev.filter(e => e.id !== salvo.id)]);
+}
+
+function carregarEncontroNoCombate(dados) {
+  if (combateAtivo || combatentes.some(c => c.tipo === 'monstro')) return;
+
+  dados.inimigos.forEach(item => {
+    adicionarMonstros({
+      nome: item.nome,
+      hp: item.hp,
+      qtd: item.quantidade,
+      dex: item.dex,
+    });
+  });
+  document.getElementById('painel-combate')?.scrollIntoView({ block: 'start' });
 }
 
 async function enviarMensagemSecreta() {
@@ -1886,6 +1981,7 @@ useEffect(() => {
         {aba === 'painel' && (
         <>
         <div>
+          <div id="painel-combate">
           <ControlesCombate
             temCombatentes={combatentes.length > 0}
             combateAtivo={combateAtivo}
@@ -1895,6 +1991,7 @@ useEffect(() => {
             onResetar={resetarCombate}
             onEncerrar={encerrarComSaque}
           />
+        </div>
 
           <AdicionarMonstro
             novoMonstro={novoMonstro}
@@ -2627,94 +2724,91 @@ useEffect(() => {
 </div>
 */} 
 
-{/* ENCONTRO ALEATÓRIO */}
-<div className="mt-12">
-  <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
-  <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 opacity-70">IMPROVISO</p>
-  <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">Encontro Aleatório</h2>
+      {/* ENCONTROS */}
+      <div id="encontros-preparados" className="mt-12">
+        <div className="w-16 h-px bg-[#c8a84b30] mb-8" />
+        <p style={cinzel} className="text-[#b07050] text-xs tracking-[4px] mb-2 opacity-70">
+          IMPROVISO
+        </p>
+        <h2 style={cinzel} className="text-xl text-[#f0e8d8] font-semibold mb-6">
+          Encontros
+        </h2>
 
-  <div className="flex flex-col sm:flex-row gap-2 mb-4">
-    <div className="flex flex-wrap gap-2 mb-3">
-      {MODELOS.encontro.map(m => (
-        <button key={m.id} onClick={() => aplicarModeloEncontro(m)}
-          className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
-          style={{ ...cinzel, borderRadius: '2px' }}>
-          {m.emoji} {m.label}
-        </button>
-      ))}
-    </div>
-    <select value={encounterConfig.bioma} onChange={e => setEncounterConfig(p => ({ ...p, bioma: e.target.value }))}
-      className="bg-[#161410] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 text-xs focus:outline-none focus:border-[#c8a84b50]"
-      style={{ borderRadius: '2px' }}>
-      {['Floresta', 'Masmorra', 'Cidade', 'Deserto', 'Montanha', 'Pântano', 'Costa', 'Planície', 'Subterrâneo'].map(b => (
-        <option key={b} value={b}>{b}</option>
-      ))}
-    </select>
-    <input type="number" min={1} max={20} value={encounterConfig.nivel}
-      onChange={e => setEncounterConfig(p => ({ ...p, nivel: Number(e.target.value) }))}
-      className="bg-[#161410] border border-[#c8a84b20] text-[#c8a84b] px-3 py-2 w-20 text-sm text-center focus:outline-none focus:border-[#c8a84b50]"
-      style={{ borderRadius: '2px' }} />
-    <input value={encounterConfig.contexto} onChange={e => setEncounterConfig(p => ({ ...p, contexto: e.target.value }))}
-      placeholder="Contexto extra (opcional)..." aria-label="Contexto extra (opcional)..."
-      className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 flex-1 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
-      style={{ borderRadius: '2px' }} />
-    <button onClick={gerarEncounter} disabled={gerandoEncounter}
-      className="bg-[#c8a84b] text-[#0f0e0c] px-5 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50"
-      style={{ ...cinzel, borderRadius: '2px' }}>
-      {gerandoEncounter ? '⟳ GERANDO...' : '⚔ GERAR'}
-    </button>
-  </div>
-
-  <label className="flex items-center gap-2 mb-4 text-[#9a8e78] text-xs cursor-pointer">
-      <input type="checkbox" checked={encounterConfig.usar_mundo}
-        onChange={e => setEncounterConfig(p => ({ ...p, usar_mundo: e.target.checked }))} />
-      <span style={cinzel} className="tracking-widest">USAR ESTADO DO MUNDO</span>
-    </label>
-
-  {encounter && (
-    <div className="border border-[#c8a84b20] bg-[#161410] p-6 space-y-4">
-      <div>
-        <h3 style={cinzel} className="text-[#f0e8d8] text-lg font-semibold">{encounter.titulo}</h3>
-        <p className="text-[#9a8e78] text-sm leading-relaxed mt-2 font-light">{encounter.descricao}</p>
-      </div>
-
-      {encounter.inimigos?.length > 0 && (
-        <div className="border-t border-[#c8a84b10] pt-4">
-          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-2">INIMIGOS</p>
-          <div className="flex flex-wrap gap-2">
-            {encounter.inimigos.map((inimigo, i) => (
-              <div key={i} className="border border-[#c8a84b15] bg-[#0f0e0c] px-3 py-2 text-sm">
-                <span style={cinzel} className="text-[#e8e0d0]">{inimigo.quantidade}× {inimigo.nome}</span>
-                <span style={cinzel} className="text-[#8a7e68] text-xs ml-2">CR {inimigo.cr}</span>
-              </div>
+        <div className="flex flex-col sm:flex-row gap-2 mb-4">
+          <div className="flex flex-wrap gap-2 mb-3">
+            {MODELOS.encontro.map(m => (
+              <button key={m.id} onClick={() => aplicarModeloEncontro(m)}
+                className="border border-[#c8a84b30] text-[#c8a84b] px-3 py-1 text-xs hover:bg-[#c8a84b10] transition-colors"
+                style={{ ...cinzel, borderRadius: '2px' }}>
+                {m.emoji} {m.label}
+              </button>
             ))}
           </div>
+          <select value={encounterConfig.bioma} onChange={e => setEncounterConfig(p => ({ ...p, bioma: e.target.value }))}
+            className="bg-[#161410] border border-[#c8a84b20] text-[#9a8e78] px-3 py-2 text-xs focus:outline-none focus:border-[#c8a84b50]"
+            style={{ borderRadius: '2px' }}>
+            {['Floresta', 'Masmorra', 'Cidade', 'Deserto', 'Montanha', 'Pântano', 'Costa', 'Planície', 'Subterrâneo'].map(b => (
+              <option key={b} value={b}>{b}</option>
+            ))}
+          </select>
+          <input type="number" min={1} max={20} value={encounterConfig.nivel}
+            onChange={e => setEncounterConfig(p => ({ ...p, nivel: Number(e.target.value) }))}
+            className="bg-[#161410] border border-[#c8a84b20] text-[#c8a84b] px-3 py-2 w-20 text-sm text-center focus:outline-none focus:border-[#c8a84b50]"
+            style={{ borderRadius: '2px' }} />
+          <input value={encounterConfig.contexto} onChange={e => setEncounterConfig(p => ({ ...p, contexto: e.target.value }))}
+            placeholder="Contexto extra (opcional)..." aria-label="Contexto extra (opcional)..."
+            className="bg-[#161410] border border-[#c8a84b20] text-[#e8e0d0] px-3 py-2 flex-1 text-sm focus:outline-none focus:border-[#c8a84b50] placeholder-[#3a3020]"
+            style={{ borderRadius: '2px' }} />
+          <button onClick={gerarEncounter} disabled={gerandoEncounter || abrindoEncontro}
+            className="bg-[#c8a84b] text-[#0f0e0c] px-5 py-2 text-xs font-bold hover:bg-[#e0c060] transition-colors disabled:opacity-50"
+            style={{ ...cinzel, borderRadius: '2px' }}>
+            {gerandoEncounter ? '⟳ GERANDO...' : '⚔ GERAR'}
+          </button>
         </div>
-      )}
 
-      {encounter.diferencial && (
-        <div className="border-t border-[#c8a84b10] pt-4">
-          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">TWIST</p>
-          <p className="text-[#8a8070] text-sm leading-relaxed font-light">{encounter.diferencial}</p>
+        <label className="flex items-center gap-2 mb-4 text-[#9a8e78] text-xs cursor-pointer">
+            <input type="checkbox" checked={encounterConfig.usar_mundo}
+              onChange={e => setEncounterConfig(p => ({ ...p, usar_mundo: e.target.checked }))} />
+            <span style={cinzel} className="tracking-widest">USAR ESTADO DO MUNDO</span>
+          </label>
+
+          <div className="mb-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={gerandoEncounter || abrindoEncontro}
+              onClick={() => abrirEditorEncontro({ titulo: '', inimigos: [] })}
+              className="rounded-sm border border-[#c8a84b40] px-3 py-2 text-xs text-[#c8a84b]"
+            >
+              + Encontro do zero
+            </button>
+
+            <select
+              value=""
+              disabled={gerandoEncounter || abrindoEncontro || encontrosSalvos.length === 0}
+              onChange={e => abrirEncontroSalvo(e.target.value)}
+              aria-label="Abrir encontro salvo"
+              className="rounded-sm border border-[#c8a84b25] bg-[#161410] px-3 py-2 text-sm"
+            >
+              <option value="">Abrir encontro salvo…</option>
+              {encontrosSalvos.map(e => (
+                <option key={e.id} value={e.id}>{e.titulo}</option>
+              ))}
+            </select>
+          </div>
+
+          {erroEncontro && <p role="alert" className="mb-3 text-sm text-red-400">{erroEncontro}</p>}
+
+          {encounter && !abrindoEncontro && (
+            <EncontroEditor
+              key={chaveEditorEncontro}
+              inicial={encounter}
+              locais={locaisEncontro}
+              onSalvo={atualizarListaEncontros}
+              onCombate={carregarEncontroNoCombate}
+              podeCarregar={!combateAtivo && !combatentes.some(c => c.tipo === 'monstro')}
+            />
+          )}
         </div>
-      )}
-
-      {encounter.ligacao_mundo && (
-  <div className="border-t border-[#c8a84b10] pt-4">
-    <p style={cinzel} className="text-[#a86aa8] text-xs tracking-[2px] mb-1">🌎 LIGAÇÃO COM O MUNDO</p>
-    <p className="text-[#8a8070] text-sm leading-relaxed font-light">{encounter.ligacao_mundo}</p>
-  </div>
-)}
-
-      {encounter.recompensa && (
-        <div className="border-t border-[#c8a84b10] pt-4">
-          <p style={cinzel} className="text-[#c8a84b] text-xs tracking-[2px] mb-1">RECOMPENSA</p>
-          <p className="text-[#8a8070] text-sm leading-relaxed font-light">{encounter.recompensa}</p>
-        </div>
-      )}
-    </div>
-  )}
-</div>
 
 {/* VOZES NA CABEÇA */}
 <div className="mt-12">

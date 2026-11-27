@@ -223,6 +223,7 @@ export default function Atlas() {
   const [lendasDoAtlas, setLendasDoAtlas] = useState([]);
   const [salvandoVinculo, setSalvandoVinculo] = useState(false);
   const [erroVinculo, setErroVinculo] = useState('');
+  const [encontrosDoPin, setEncontrosDoPin] = useState([]);
 
   useEffect(() => {
     if (!isMestre) return;
@@ -595,7 +596,27 @@ async function removerPresenca(faccaoId) {
   const terras = regioes.filter(g => g.cx != null);
   const noMapa = pins.filter(p => p.x != null && p.y != null);
   const semPosicao = pins.filter(p => p.x == null || p.y == null);
+
+
   const local = pins.find(p => p.id === localAberto);
+  const localIdEncontros = local?.id;
+
+  useEffect(() => {
+    if (!isMestre || !localIdEncontros) return;
+    let ativo = true;
+
+    api.get('/encontros-preparados', { params: { local_id: localIdEncontros } })
+      .then(res => {
+        if (ativo) setEncontrosDoPin(res.data.data || []);
+      })
+      .catch(() => {
+        if (ativo) setEncontrosDoPin([]);
+      });
+
+    return () => { ativo = false; };
+  }, [isMestre, localIdEncontros]);
+
+
   const regiao = regioes.find(g => g.id === regiaoAberta);
   const faccao = faccoes.find(f => f.id === faccaoAberta);
   const faccoesDaTerra = regiao ? faccoes.filter(f => f.regioes?.includes(regiao.id)) : [];
@@ -1178,6 +1199,23 @@ async function removerPresenca(faccaoId) {
                       <h3 style={cinzel} className="text-xs tracking-[2px] text-[#8a7e68]">
                         Lendas do local
                       </h3>
+
+                      {isMestre && encontrosDoPin.some(e => e.local_id === local.id) && (
+                        <section className="mt-3 space-y-2 border-t border-[#c8a84b10] pt-3">
+                          <h3 style={cinzel} className="text-xs tracking-[2px] text-[#8a7e68]">
+                            Encontros preparados
+                          </h3>
+                          {encontrosDoPin.filter(e => e.local_id === local.id).map(encontro => (
+                            <Link
+                              key={encontro.id}
+                              to={`/mestre?aba=painel&encontro=${encodeURIComponent(encontro.id)}`}
+                              className="block text-sm text-[#c8a84b] hover:underline"
+                            >
+                              {encontro.titulo}
+                            </Link>
+                          ))}
+                        </section>
+                      )}
 
                       {isMestre ? (
                         <select

@@ -11,9 +11,8 @@ export default function useCombate({ atalhos = true, campanhaId } = {}) {
   }, [combatentes.length]);
 
   const adicionarMonstros = useCallback(({ nome, hp, qtd = 1, dex = null }) => {
-    const base = Date.now();
     const novos = Array.from({ length: qtd }, (_, i) => ({
-      id: base + i,
+      id: crypto.randomUUID(),
       nome: qtd > 1 ? `${nome} ${i + 1}` : nome,
       tipo: 'monstro',
       hpMax: Number(hp),
