@@ -1,10 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import { getCampanhaId } from '../utils/campanha';
 import { cinzel, crimson } from '../estilos';
 import TextoWiki from '../components/TextoWiki';
-import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const CAMPANHA_ID = getCampanhaId();
 const radius = { borderRadius: '2px' };
